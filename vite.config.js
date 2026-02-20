@@ -10,8 +10,8 @@ export default defineConfig(({ mode }) => {
         '/api/tmdb': {
           target: 'https://api.themoviedb.org/3',
           changeOrigin: true,
-          rewrite: (path, req) => {
-            const url = new URL(req.url, 'http://localhost');
+          rewrite: (path) => {
+            const url = new URL(path, 'http://localhost');
             const targetPath = url.searchParams.get('path');
             url.searchParams.delete('path');
             url.searchParams.append('api_key', env.VITE_TMDB_API_KEY);

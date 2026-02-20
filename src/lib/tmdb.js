@@ -166,3 +166,54 @@ export async function getTVSeasonDetails(tvId, seasonNumber) {
     const data = await response.json();
     return data;
 }
+
+export async function searchOrDiscover(query, mediaType, filters) {
+    if (query && query.trim()) {
+        const { results } = await searchMulti(query);
+        let filtered = results;
+        if (mediaType !== 'all') {
+            filtered = filtered.filter(item => item.media_type === mediaType);
+        }
+        return { results: filtered };
+    } else {
+        const getSortParam = (type) => {
+            if (filters.sortBy === 'newest') {
+                return type === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc';
+            }
+            return filters.sortBy;
+        };
+
+        const localFilters = {
+            with_genres: filters.selectedGenre,
+            page: 1,
+            ...filters
+        };
+
+        if (mediaType === 'movie') {
+            return await discoverMovies({ ...localFilters, sort_by: getSortParam('movie') });
+        } else if (mediaType === 'tv') {
+            return await discoverTV({ ...localFilters, sort_by: getSortParam('tv') });
+        } else {
+            const [mRes, tRes] = await Promise.all([
+                discoverMovies({ ...localFilters, sort_by: getSortParam('movie') }),
+                discoverTV({ ...localFilters, sort_by: getSortParam('tv') })
+            ]);
+
+            let combined = [...mRes.results, ...tRes.results];
+
+            combined.sort((a, b) => {
+                if (filters.sortBy === 'newest') {
+                    const dateA = new Date(a.date || '1970-01-01');
+                    const dateB = new Date(b.date || '1970-01-01');
+                    return dateB - dateA;
+                } else if (filters.sortBy === 'vote_average.desc') {
+                    return (b.vote_average || 0) - (a.vote_average || 0);
+                } else {
+                    return (b.popularity || 0) - (a.popularity || 0);
+                }
+            });
+
+            return { results: combined };
+        }
+    }
+}

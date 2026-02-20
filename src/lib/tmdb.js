@@ -1,9 +1,22 @@
+const isDev = import.meta.env.DEV;
+const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+
+function getFetchUrl(path, queryParams = new URLSearchParams()) {
+    if (isDev) {
+        queryParams.append('api_key', TMDB_KEY);
+        const qString = queryParams.toString();
+        return `https://api.themoviedb.org/3${path}${qString ? '?' + qString : ''}`;
+    } else {
+        const qString = queryParams.toString();
+        return `/api/tmdb?path=${path}${qString ? '&' + qString : ''}`;
+    }
+}
+
 export async function searchMulti(query) {
     if (!query) return { results: [] };
 
-    const response = await fetch(
-        `/api/tmdb?path=search/multi&query=${encodeURIComponent(query)}`
-    );
+    const params = new URLSearchParams({ query });
+    const response = await fetch(getFetchUrl('/search/multi', params));
 
     const data = await response.json();
 
@@ -30,17 +43,13 @@ export async function searchMulti(query) {
 }
 
 export async function getMovieDetails(id) {
-    const response = await fetch(
-        `/api/tmdb?path=movie/${id}`
-    );
+    const response = await fetch(getFetchUrl(`/movie/${id}`));
     return response.json();
 }
 
 export async function getDetails(id, media_type) {
     const endpoint = media_type === 'tv' ? 'tv' : 'movie';
-    const response = await fetch(
-        `/api/tmdb?path=${endpoint}/${id}`
-    );
+    const response = await fetch(getFetchUrl(`/${endpoint}/${id}`));
     const item = await response.json();
 
     const isMovie = endpoint === 'movie';
@@ -60,9 +69,7 @@ export async function getDetails(id, media_type) {
 
 export async function getGenres(mediaType) {
     const endpoint = mediaType === 'tv' ? 'tv' : 'movie';
-    const response = await fetch(
-        `/api/tmdb?path=genre/${endpoint}/list`
-    );
+    const response = await fetch(getFetchUrl(`/genre/${endpoint}/list`));
     const data = await response.json();
     return data.genres || [];
 }
@@ -81,7 +88,7 @@ export async function discoverMovies(filters = {}) {
     const params = buildQueryParams(filters);
     if (filters.primary_release_year) params.append('primary_release_year', filters.primary_release_year);
 
-    const response = await fetch(`/api/tmdb?path=discover/movie&${params.toString()}`);
+    const response = await fetch(getFetchUrl('/discover/movie', params));
     const data = await response.json();
 
     const results = (data.results || []).map(item => ({
@@ -103,7 +110,7 @@ export async function discoverTV(filters = {}) {
     const params = buildQueryParams(filters);
     if (filters.first_air_date_year) params.append('first_air_date_year', filters.first_air_date_year);
 
-    const response = await fetch(`/api/tmdb?path=discover/tv&${params.toString()}`);
+    const response = await fetch(getFetchUrl('/discover/tv', params));
     const data = await response.json();
 
     const results = (data.results || []).map(item => ({
@@ -134,10 +141,10 @@ export function mapGenreIdsToNames(items, genresList) {
 }
 
 export async function getTVFullDetails(tvId) {
-    const detailsRes = await fetch(`/api/tmdb?path=tv/${tvId}`);
+    const detailsRes = await fetch(getFetchUrl(`/tv/${tvId}`));
     const details = await detailsRes.json();
 
-    const creditsRes = await fetch(`/api/tmdb?path=tv/${tvId}/credits`);
+    const creditsRes = await fetch(getFetchUrl(`/tv/${tvId}/credits`));
     const credits = await creditsRes.json();
 
     return {
@@ -158,7 +165,58 @@ export async function getTVFullDetails(tvId) {
 }
 
 export async function getTVSeasonDetails(tvId, seasonNumber) {
-    const response = await fetch(`/api/tmdb?path=tv/${tvId}/season/${seasonNumber}`);
+    const response = await fetch(getFetchUrl(`/tv/${tvId}/season/${seasonNumber}`));
     const data = await response.json();
     return data;
+}
+
+export async function searchOrDiscover(query, mediaType, filters) {
+    if (query && query.trim()) {
+        const { results } = await searchMulti(query);
+        let filtered = results;
+        if (mediaType !== 'all') {
+            filtered = filtered.filter(item => item.media_type === mediaType);
+        }
+        return { results: filtered };
+    } else {
+        const getSortParam = (type) => {
+            if (filters.sortBy === 'newest') {
+                return type === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc';
+            }
+            return filters.sortBy;
+        };
+
+        const localFilters = {
+            with_genres: filters.selectedGenre,
+            page: 1,
+            ...filters
+        };
+
+        if (mediaType === 'movie') {
+            return await discoverMovies({ ...localFilters, sort_by: getSortParam('movie') });
+        } else if (mediaType === 'tv') {
+            return await discoverTV({ ...localFilters, sort_by: getSortParam('tv') });
+        } else {
+            const [mRes, tRes] = await Promise.all([
+                discoverMovies({ ...localFilters, sort_by: getSortParam('movie') }),
+                discoverTV({ ...localFilters, sort_by: getSortParam('tv') })
+            ]);
+
+            let combined = [...mRes.results, ...tRes.results];
+
+            combined.sort((a, b) => {
+                if (filters.sortBy === 'newest') {
+                    const dateA = new Date(a.date || '1970-01-01');
+                    const dateB = new Date(b.date || '1970-01-01');
+                    return dateB - dateA;
+                } else if (filters.sortBy === 'vote_average.desc') {
+                    return (b.vote_average || 0) - (a.vote_average || 0);
+                } else {
+                    return (b.popularity || 0) - (a.popularity || 0);
+                }
+            });
+
+            return { results: combined };
+        }
+    }
 }

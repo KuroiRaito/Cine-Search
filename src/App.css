@@ -1,0 +1,294 @@
+:root {
+  --bg-color: #0f172a;
+  --surface-color: #1e293b;
+  --primary-text: #f8fafc;
+  --secondary-text: #94a3b8;
+  --accent-color: #38bdf8;
+  --accent-hover: #0ea5e9;
+  --danger-color: #ef4444;
+  --save-btn-bg: rgba(0, 0, 0, 0.6);
+  --save-btn-hover: #eab308;
+
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --transition: all 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--primary-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* Header */
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(to right, var(--accent-color), #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.05em;
+}
+
+/* Search Form */
+.search-form {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  /* Centered */
+  position: relative;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--surface-color);
+  background-color: var(--surface-color);
+  color: var(--primary-text);
+  font-size: 1rem;
+  transition: var(--transition);
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
+}
+
+.search-button {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: none;
+  background-color: var(--accent-color);
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.search-button:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* Main Content */
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--primary-text);
+  border-left: 4px solid var(--accent-color);
+  padding-left: 12px;
+}
+
+/* Movie Grid */
+.movie-grid {
+  display: grid;
+  /* Fixed 4 columns as requested, flexible width */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-bottom: 4rem;
+  max-width: 1000px;
+  /* Constrain width to keep tiles reasonable size */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.movie-card {
+  background-color: transparent;
+  /* Cleaner look, less boxy */
+  border-radius: var(--radius-md);
+  overflow: visible;
+  /* Allow hover scaling to not be clipped if needed, or keeping hidden for poster */
+  transition: var(--transition);
+  position: relative;
+  /* Ensure consistent height */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.movie-card:hover {
+  transform: translateY(-4px);
+}
+
+.poster-wrapper {
+  position: relative;
+  aspect-ratio: 2/3;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background-color: #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+  /* Prevent poster compression */
+}
+
+.movie-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.movie-card:hover .movie-poster {
+  transform: scale(1.05);
+}
+
+.no-poster {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-text);
+  background-color: #1e293b;
+  font-size: 0.9rem;
+  gap: 0.5rem;
+}
+
+/* Save Button (Overlay) */
+.save-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--save-btn-bg);
+  backdrop-filter: blur(4px);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  opacity: 0;
+  transform: scale(0.8);
+  z-index: 10;
+}
+
+.movie-card:hover .save-button {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.save-button:hover {
+  background-color: var(--save-btn-hover);
+  color: #0f172a;
+}
+
+.movie-info {
+  padding: 0 0.25rem;
+  flex-grow: 1;
+  /* Fill remaining space if needed */
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: var(--primary-text);
+  text-align: left;
+
+  /* Support 2 lines nicely, fixed height to prevent jumping */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.4em;
+  /* Approx height for 2 lines */
+  line-height: 1.2;
+}
+
+.movie-year {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  text-align: left;
+  margin-top: auto;
+  /* Push to bottom if we want aligned years, or just sit below title */
+}
+
+/* Saved Section */
+.saved-section {
+  background-color: var(--surface-color);
+  padding: 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.saved-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.saved-item {
+  padding: 0.75rem 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  color: var(--secondary-text);
+  transition: var(--transition);
+  cursor: default;
+}
+
+.saved-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--primary-text);
+}
+
+.empty-state {
+  color: var(--secondary-text);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+}

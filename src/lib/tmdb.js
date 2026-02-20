@@ -1,11 +1,8 @@
-const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const TMDB_BASE = 'https://api.themoviedb.org/3';
-
 export async function searchMulti(query) {
     if (!query) return { results: [] };
 
     const response = await fetch(
-        `${TMDB_BASE}/search/multi?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}`
+        `/api/tmdb?path=search/multi&query=${encodeURIComponent(query)}`
     );
 
     const data = await response.json();
@@ -33,10 +30,8 @@ export async function searchMulti(query) {
 }
 
 export async function getMovieDetails(id) {
-    // Note: This defaults to movie details. 
-    // If we start saving TV shows, we might need to handle endpoints dynamically.
     const response = await fetch(
-        `${TMDB_BASE}/movie/${id}?api_key=${TMDB_KEY}`
+        `/api/tmdb?path=movie/${id}`
     );
     return response.json();
 }
@@ -44,7 +39,7 @@ export async function getMovieDetails(id) {
 export async function getDetails(id, media_type) {
     const endpoint = media_type === 'tv' ? 'tv' : 'movie';
     const response = await fetch(
-        `${TMDB_BASE}/${endpoint}/${id}?api_key=${TMDB_KEY}`
+        `/api/tmdb?path=${endpoint}/${id}`
     );
     const item = await response.json();
 
@@ -66,7 +61,7 @@ export async function getDetails(id, media_type) {
 export async function getGenres(mediaType) {
     const endpoint = mediaType === 'tv' ? 'tv' : 'movie';
     const response = await fetch(
-        `${TMDB_BASE}/genre/${endpoint}/list?api_key=${TMDB_KEY}`
+        `/api/tmdb?path=genre/${endpoint}/list`
     );
     const data = await response.json();
     return data.genres || [];
@@ -79,7 +74,6 @@ function buildQueryParams(filters) {
     if (filters.with_original_language) params.append('with_original_language', filters.with_original_language);
     if (filters.sort_by) params.append('sort_by', filters.sort_by);
     if (filters.page) params.append('page', filters.page);
-    params.append('api_key', TMDB_KEY);
     return params;
 }
 
@@ -87,7 +81,7 @@ export async function discoverMovies(filters = {}) {
     const params = buildQueryParams(filters);
     if (filters.primary_release_year) params.append('primary_release_year', filters.primary_release_year);
 
-    const response = await fetch(`${TMDB_BASE}/discover/movie?${params.toString()}`);
+    const response = await fetch(`/api/tmdb?path=discover/movie&${params.toString()}`);
     const data = await response.json();
 
     const results = (data.results || []).map(item => ({
@@ -109,7 +103,7 @@ export async function discoverTV(filters = {}) {
     const params = buildQueryParams(filters);
     if (filters.first_air_date_year) params.append('first_air_date_year', filters.first_air_date_year);
 
-    const response = await fetch(`${TMDB_BASE}/discover/tv?${params.toString()}`);
+    const response = await fetch(`/api/tmdb?path=discover/tv&${params.toString()}`);
     const data = await response.json();
 
     const results = (data.results || []).map(item => ({
@@ -140,10 +134,10 @@ export function mapGenreIdsToNames(items, genresList) {
 }
 
 export async function getTVFullDetails(tvId) {
-    const detailsRes = await fetch(`${TMDB_BASE}/tv/${tvId}?api_key=${TMDB_KEY}`);
+    const detailsRes = await fetch(`/api/tmdb?path=tv/${tvId}`);
     const details = await detailsRes.json();
 
-    const creditsRes = await fetch(`${TMDB_BASE}/tv/${tvId}/credits?api_key=${TMDB_KEY}`);
+    const creditsRes = await fetch(`/api/tmdb?path=tv/${tvId}/credits`);
     const credits = await creditsRes.json();
 
     return {
@@ -164,7 +158,7 @@ export async function getTVFullDetails(tvId) {
 }
 
 export async function getTVSeasonDetails(tvId, seasonNumber) {
-    const response = await fetch(`${TMDB_BASE}/tv/${tvId}/season/${seasonNumber}?api_key=${TMDB_KEY}`);
+    const response = await fetch(`/api/tmdb?path=tv/${tvId}/season/${seasonNumber}`);
     const data = await response.json();
     return data;
 }

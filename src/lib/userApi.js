@@ -5,13 +5,15 @@ export async function getSavedForUser(userId) {
         .from('user_movies')
         .select('*')
         .eq('user_id', userId)
+        .eq('status', 'wishlist')
         .order('created_at', { ascending: false });
 }
 
-export async function saveUserMovie({ userId, tmdbId, title, rating, status }) {
+export async function saveUserContent({ userId, tmdbId, media_type, title, rating, status }) {
     const payload = {
         user_id: userId,
         tmdb_id: tmdbId,
+        media_type: media_type || 'movie',
         title: title,
     };
 
@@ -20,13 +22,16 @@ export async function saveUserMovie({ userId, tmdbId, title, rating, status }) {
 
     return await supabase
         .from('user_movies')
-        .upsert(payload);
+        .upsert(payload, { onConflict: 'user_id,tmdb_id,media_type' })
+        .select()
+        .single();
 }
 
-export async function removeUserMovie(userId, tmdbId) {
+export async function removeUserContent(userId, tmdbId, media_type) {
     return await supabase
         .from('user_movies')
         .delete()
         .eq('user_id', userId)
-        .eq('tmdb_id', tmdbId);
+        .eq('tmdb_id', tmdbId)
+        .eq('media_type', media_type || 'movie');
 }

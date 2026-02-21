@@ -35,7 +35,9 @@ export default function HomeView({ savedMovies, handleSaveMovie, onCardClick }) 
                     <section className="results-section">
                         <div className="movie-grid">
                             {results.map(movie => {
-                                const isSaved = savedMovies.some(m => m.tmdb_id === movie.id);
+                                const movieType = movie.media_type || 'movie';
+                                const isSaved = savedMovies.some(m => m.tmdb_id === movie.id && m.media_type === movieType);
+
                                 // Get first genre name
                                 const genreName = movie.genre_ids && movie.genre_ids.length > 0
                                     ? allGenresMap[movie.genre_ids[0]]

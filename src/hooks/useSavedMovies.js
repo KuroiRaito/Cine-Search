@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getSavedForUser, saveUserMovie, removeUserMovie } from '../lib/userApi';
-import { getMovieDetails } from '../lib/tmdb';
+import { getSavedForUser, saveUserContent, removeUserContent } from '../lib/userApi';
+import { getDetails } from '../lib/tmdb';
 
 export function useSavedMovies(userId) {
     const [savedMovies, setSavedMovies] = useState([]);
@@ -19,17 +19,21 @@ export function useSavedMovies(userId) {
     async function handleSaveMovie(movie) {
         if (!userId) return;
 
-        const isSaved = savedMovies.some(m => m.tmdb_id === movie.id);
+        // Check using both tmdb_id and media_type since it's a composite key now
+        const isSaved = savedMovies.some(m => m.tmdb_id === movie.id && m.media_type === (movie.media_type || 'movie'));
 
         if (isSaved) {
-            await removeUserMovie(userId, movie.id);
+            const { error } = await removeUserContent(userId, movie.id, movie.media_type);
+            if (error) console.error('Error removing content:', error);
         } else {
-            await saveUserMovie({
+            const { error } = await saveUserContent({
                 userId,
                 tmdbId: movie.id,
-                title: movie.title,
+                media_type: movie.media_type,
+                title: movie.title || movie.name,
                 status: 'wishlist'
             });
+            if (error) console.error('Error saving content:', error);
         }
         fetchSavedMovies();
     }
@@ -38,8 +42,8 @@ export function useSavedMovies(userId) {
         if (savedMovies.length > 0) {
             const wishlistItems = savedMovies.filter(m => m.status === 'wishlist');
             const fetchPromises = wishlistItems.map(item =>
-                getMovieDetails(item.tmdb_id).catch(err => {
-                    console.error(`Failed to fetch details for movie ${item.tmdb_id}`, err);
+                getDetails(item.tmdb_id, item.media_type).catch(err => {
+                    console.error(`Failed to fetch details for ${item.media_type} ${item.tmdb_id}`, err);
                     return null;
                 })
             );

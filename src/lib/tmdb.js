@@ -180,10 +180,12 @@ export async function searchOrDiscover(query, mediaType, filters) {
         return { results: filtered };
     } else {
         const getSortParam = (type) => {
-            if (filters.sortBy === 'newest') {
-                return type === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc';
+            const [field, dir] = filters.sortBy ? filters.sortBy.split('.') : ['popularity', 'desc'];
+
+            if (field === 'date') {
+                return type === 'movie' ? `primary_release_date.${dir}` : `first_air_date.${dir}`;
             }
-            return filters.sortBy;
+            return `${field}.${dir}`;
         };
 
         const localFilters = {
@@ -204,15 +206,19 @@ export async function searchOrDiscover(query, mediaType, filters) {
 
             let combined = [...mRes.results, ...tRes.results];
 
+            // Client-side sort for 'all' mapping
+            const [field, dir] = filters.sortBy ? filters.sortBy.split('.') : ['popularity', 'desc'];
+            const multiplier = dir === 'asc' ? 1 : -1;
+
             combined.sort((a, b) => {
-                if (filters.sortBy === 'newest') {
-                    const dateA = new Date(a.date || '1970-01-01');
-                    const dateB = new Date(b.date || '1970-01-01');
-                    return dateB - dateA;
-                } else if (filters.sortBy === 'vote_average.desc') {
-                    return (b.vote_average || 0) - (a.vote_average || 0);
+                if (field === 'date') {
+                    const dateA = new Date(a.date || '1970-01-01').getTime();
+                    const dateB = new Date(b.date || '1970-01-01').getTime();
+                    return (dateA - dateB) * multiplier;
+                } else if (field === 'vote_average') {
+                    return ((a.vote_average || 0) - (b.vote_average || 0)) * multiplier;
                 } else {
-                    return (b.popularity || 0) - (a.popularity || 0);
+                    return ((a.popularity || 0) - (b.popularity || 0)) * multiplier;
                 }
             });
 

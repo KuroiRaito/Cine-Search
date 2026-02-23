@@ -6,6 +6,7 @@ import { useSavedMovies } from './hooks/useSavedMovies';
 import { getDetails, getTVFullDetails } from './lib/tmdb';
 import DetailModal from './components/DetailModal';
 import Footer from './components/Footer';
+import { useRegion } from './hooks/useRegion';
 import './App.css';
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
   const [view, setView] = useState('home'); // 'home' or 'profile'
   const [selectedMovieData, setSelectedMovieData] = useState(null);
 
+  const { region, setRegion } = useRegion();
   const { savedMovies, handleSaveMovie, wishlistDetails, fetchWishlistDetails } = useSavedMovies(userId);
 
   async function handleCardClick(movie) {
@@ -47,24 +49,14 @@ export default function App() {
   return (
     <div className="app-container">
       {/* Top Bar with Navigation */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '10px 20px',
-        backgroundColor: '#1e293b',
-        color: '#94a3b8',
-        fontSize: '0.9rem',
-        borderBottom: '1px solid #334155',
-        marginBottom: '1rem'
-      }}>
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          <button onClick={() => setView('home')} style={{ background: 'transparent', border: 'none', color: view === 'home' ? '#fff' : '#94a3b8', fontWeight: view === 'home' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '1rem' }}>Home</button>
-          <button onClick={() => setView('profile')} style={{ background: 'transparent', border: 'none', color: view === 'profile' ? '#fff' : '#94a3b8', fontWeight: view === 'profile' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '1rem' }}>Profile</button>
+      <div className="app-header-nav">
+        <div className="app-header-nav-left">
+          <button className={`nav-btn ${view === 'home' ? 'active' : 'inactive'}`} onClick={() => setView('home')}>Home</button>
+          <button className={`nav-btn ${view === 'profile' ? 'active' : 'inactive'}`} onClick={() => setView('profile')}>Profile</button>
         </div>
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-          <span>Logged in as: <strong style={{ color: '#fff' }}>{username}</strong></span>
-          <button onClick={handleLogout} style={{ padding: '4px 12px', backgroundColor: 'transparent', border: '1px solid #475569', color: '#cbd5e1', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Logout</button>
+        <div className="app-header-nav-right">
+          <span><span className="greeting-text">Logged in as: </span><strong style={{ color: '#fff' }}>{username}</strong></span>
+          <button onClick={handleLogout} className="logout-btn">Logout</button>
         </div>
       </div>
 
@@ -82,7 +74,7 @@ export default function App() {
       )}
 
       {selectedMovieData && (
-        <DetailModal data={selectedMovieData} onClose={() => setSelectedMovieData(null)} />
+        <DetailModal data={selectedMovieData} onClose={() => setSelectedMovieData(null)} region={region} />
       )}
 
       <Footer />

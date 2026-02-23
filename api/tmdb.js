@@ -2,10 +2,18 @@ const CACHE = new Map();
 const TTL = 60 * 1000;
 
 export default async function handler(request, response) {
-  const { path, ...queryParams } = request.query;
+  if (request.method !== 'GET') {
+    return response.status(400).json({ error: 'Method not allowed' });
+  }
+
+  const { path, api_key, ...queryParams } = request.query;
 
   if (!path) {
     return response.status(400).json({ error: 'Missing path parameter' });
+  }
+
+  if (!/^[a-zA-Z0-9/_-]+$/.test(path)) {
+    return response.status(400).json({ error: 'Invalid path' });
   }
 
   const cacheKey = path + '?' + new URLSearchParams(queryParams).toString();
@@ -27,7 +35,8 @@ export default async function handler(request, response) {
       ...queryParams
     });
 
-    const tmdbUrl = `https://api.themoviedb.org/3${path}?${params.toString()}`;
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    const tmdbUrl = `https://api.themoviedb.org/3/${cleanPath}?${params.toString()}`;
 
     const res = await fetch(tmdbUrl);
     const data = await res.json();

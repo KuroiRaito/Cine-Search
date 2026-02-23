@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getTVSeasonDetails } from '../lib/tmdb';
+import WatchProviders from './WatchProviders';
 
-export default function DetailModal({ data, onClose }) {
+export default function DetailModal({ data, onClose, region }) {
     if (!data || !data.tmdb) return null;
 
     const { tmdb } = data;
@@ -51,6 +52,8 @@ export default function DetailModal({ data, onClose }) {
 
                         <h3 style={{ marginTop: 0, borderBottom: '1px solid #334155', paddingBottom: '8px' }}>Overview</h3>
                         <p style={{ lineHeight: '1.6', color: '#cbd5e1' }}>{overview}</p>
+
+                        <WatchProviders id={tmdb.id} type={isTV ? 'tv' : 'movie'} region={region} />
 
                         {isTV && cast.length > 0 && (
                             <>

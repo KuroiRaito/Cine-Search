@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import UsernameEntry from './components/UsernameEntry';
+import { useState, useEffect } from 'react';
+import AuthPage from './views/AuthPage';
+import UsernameSetup from './views/UsernameSetup';
 import HomeView from './views/HomeView';
 import ProfileView from './views/ProfileView';
 import { useSavedMovies } from './hooks/useSavedMovies';
@@ -7,16 +8,46 @@ import { getDetails, getTVFullDetails } from './lib/tmdb';
 import DetailModal from './components/DetailModal';
 import Footer from './components/Footer';
 import { useRegion } from './hooks/useRegion';
+import { useAuth } from './context/AuthProvider';
+import { supabase } from './lib/supabaseClient';
 import './App.css';
 
 export default function App() {
-  const [userId, setUserId] = useState(localStorage.getItem('user_id'));
-  const [username, setUsername] = useState(localStorage.getItem('username'));
+  const { user, loading: authLoading, signOut } = useAuth();
+  const [username, setUsername] = useState(null);
+  const [fetchingProfile, setFetchingProfile] = useState(true);
   const [view, setView] = useState('home'); // 'home' or 'profile'
   const [selectedMovieData, setSelectedMovieData] = useState(null);
 
-  const { region, setRegion } = useRegion();
-  const { savedMovies, handleSaveMovie, wishlistDetails, fetchWishlistDetails } = useSavedMovies(userId);
+  const { region } = useRegion();
+  const { savedMovies, handleSaveMovie, wishlistDetails, fetchWishlistDetails } = useSavedMovies(user?.id);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      if (user) {
+        setFetchingProfile(true);
+        const { data } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', user.id)
+          .single();
+
+        if (data && data.username) {
+          setUsername(data.username);
+        } else {
+          setUsername(null);
+        }
+        setFetchingProfile(false);
+      } else {
+        setUsername(null);
+        setFetchingProfile(false);
+      }
+    }
+
+    if (!authLoading) {
+      fetchProfile();
+    }
+  }, [user, authLoading]);
 
   async function handleCardClick(movie) {
     try {
@@ -33,17 +64,25 @@ export default function App() {
     }
   }
 
-  function handleLogout() {
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('username');
+  async function handleLogout() {
+    await signOut();
     window.location.reload();
   }
 
-  if (!userId) {
-    return <UsernameEntry onReady={() => {
-      setUserId(localStorage.getItem('user_id'));
-      setUsername(localStorage.getItem('username'));
-    }} />;
+  if (authLoading || fetchingProfile) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', color: 'white' }}>
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage />;
+  }
+
+  if (user && !username) {
+    return <UsernameSetup onComplete={({ username }) => setUsername(username)} />;
   }
 
   return (

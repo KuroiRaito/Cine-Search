@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import MovieCard from '../components/MovieCard';
 
-export default function ProfileView({ username, savedMovies, handleSaveMovie, wishlistDetails, fetchWishlistDetails, onCardClick }) {
+export default function ProfileView({ username, handleSaveMovie, wishlistDetails, fetchWishlistDetails, onCardClick }) {
 
     useEffect(() => {
         fetchWishlistDetails();

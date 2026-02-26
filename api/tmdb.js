@@ -1,3 +1,4 @@
+/* global process */
 const CACHE = new Map();
 const TTL = 60 * 1000;
 
@@ -6,6 +7,7 @@ export default async function handler(request, response) {
     return response.status(400).json({ error: 'Method not allowed' });
   }
 
+  // eslint-disable-next-line no-unused-vars
   const { path, api_key, ...queryParams } = request.query;
 
   if (!path) {

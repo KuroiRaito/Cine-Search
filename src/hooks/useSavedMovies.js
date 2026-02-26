@@ -13,7 +13,10 @@ export function useSavedMovies(userId) {
     }, [userId]);
 
     useEffect(() => {
-        fetchSavedMovies();
+        const load = async () => {
+            await fetchSavedMovies();
+        };
+        load();
     }, [fetchSavedMovies]);
 
     async function handleSaveMovie(movie) {

@@ -27,10 +27,8 @@ export default function HomeView({ savedMovies, handleSaveMovie, onCardClick }) 
     const { genresList, allGenresMap } = useGenres(mediaType, selectedGenre, setSelectedGenre);
     const { results, totalPages, isLoading } = useMovieSearch(query, mediaType, selectedGenre, sortBy, minRating, year, page, pageSize);
 
-    // Reset page to 1 when filters or query or pageSize change
-    useEffect(() => {
-        setPage(1);
-    }, [query, mediaType, selectedGenre, sortBy, minRating, year, pageSize]);
+    // Removed the effect that blindly reset page to 1 on any dependency change.
+    // We now reset page to 1 securely in the event handlers to prevent cascading renders.
 
     const handleQueryChange = (newQuery) => {
         setQuery(newQuery);
@@ -42,6 +40,7 @@ export default function HomeView({ savedMovies, handleSaveMovie, onCardClick }) 
             setMinRating(0);
             setYear('');
         }
+        setPage(1);
     };
 
     const handleApplyFilters = (filters) => {
@@ -50,6 +49,7 @@ export default function HomeView({ savedMovies, handleSaveMovie, onCardClick }) 
         setSortBy(filters.sortBy);
         setMinRating(filters.minRating);
         setYear(filters.year);
+        setPage(1);
         setShowFilters(false);
     };
 
@@ -61,6 +61,7 @@ export default function HomeView({ savedMovies, handleSaveMovie, onCardClick }) 
         setSortBy('popularity.desc');
         setMinRating(0);
         setYear('');
+        setPage(1);
         setShowFilters(false);
     };
 
@@ -140,15 +141,16 @@ export default function HomeView({ savedMovies, handleSaveMovie, onCardClick }) 
                         setQuery={handleQueryChange}
                         onOpenFilters={() => setShowFilters(true)}
                     />
-                    <Filters
-                        show={showFilters}
-                        onClose={() => setShowFilters(false)}
-                        onApply={handleApplyFilters}
-                        initialFilters={{ mediaType, selectedGenre, sortBy, minRating, year }}
-                        genresList={genresList}
-                        isFilterActive={isFilterActive}
-                        onRemoveFilters={handleRemoveFilters}
-                    />
+                    {showFilters && (
+                        <Filters
+                            onClose={() => setShowFilters(false)}
+                            onApply={handleApplyFilters}
+                            initialFilters={{ mediaType, selectedGenre, sortBy, minRating, year }}
+                            genresList={genresList}
+                            isFilterActive={isFilterActive}
+                            onRemoveFilters={handleRemoveFilters}
+                        />
+                    )}
                 </div>
             </header>
 

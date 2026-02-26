@@ -6,7 +6,6 @@ export function useRegion() {
 
     useEffect(() => {
         if (localStorage.getItem('user_region')) {
-            setIsResolving(false);
             return;
         }
 

@@ -1,23 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-export default function Filters({ show, onClose, onApply, initialFilters, genresList }) {
-    const [localMediaType, setLocalMediaType] = useState('all');
-    const [localGenre, setLocalGenre] = useState('');
-    const [localSortBy, setLocalSortBy] = useState('popularity.desc');
-    const [localMinRating, setLocalMinRating] = useState(0);
-    const [localYear, setLocalYear] = useState('');
-
-    useEffect(() => {
-        if (show) {
-            setLocalMediaType(initialFilters.mediaType || 'all');
-            setLocalGenre(initialFilters.selectedGenre || '');
-            setLocalSortBy(initialFilters.sortBy || 'popularity.desc');
-            setLocalMinRating(initialFilters.minRating || 0);
-            setLocalYear(initialFilters.year || '');
-        }
-    }, [show, initialFilters]);
-
-    if (!show) return null;
+export default function Filters({ onClose, onApply, initialFilters, genresList }) {
+    const [localMediaType, setLocalMediaType] = useState(initialFilters?.mediaType || 'all');
+    const [localGenre, setLocalGenre] = useState(initialFilters?.selectedGenre || '');
+    const [localSortBy, setLocalSortBy] = useState(initialFilters?.sortBy || 'popularity.desc');
+    const [localMinRating, setLocalMinRating] = useState(initialFilters?.minRating || 0);
+    const [localYear, setLocalYear] = useState(initialFilters?.year || '');
 
     const handleApply = () => {
         onApply({

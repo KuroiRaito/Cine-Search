@@ -99,7 +99,7 @@ function SeasonBlock({ season, tvId }) {
 
     useEffect(() => {
         if (expanded && episodes.length === 0) {
-            setLoading(true);
+            setTimeout(() => setLoading(true), 0);
             getTVSeasonDetails(tvId, season.season_number)
                 .then(data => {
                     if (data && data.episodes) {
@@ -112,7 +112,7 @@ function SeasonBlock({ season, tvId }) {
                     setLoading(false);
                 });
         }
-    }, [expanded, tvId, season.season_number, episodes.length]);
+    }, [expanded, tvId, season.season_number, season.name, episodes.length]);
 
     return (
         <div style={{ backgroundColor: '#0f172a', borderRadius: '6px', overflow: 'hidden' }}>

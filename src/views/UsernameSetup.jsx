@@ -1,34 +1,59 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthProvider';
 
-export default function UsernameEntry({ onReady }) {
+export default function UsernameSetup({ onComplete }) {
+    const { user } = useAuth();
     const [username, setUsername] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!username.trim()) return;
+        setError('');
+
+        const trimmedUser = username.trim();
+        if (!trimmedUser) {
+            setError('Username cannot be empty.');
+            return;
+        }
+
+        if (trimmedUser.length < 3 || trimmedUser.length > 20) {
+            setError('Username must be between 3 and 20 characters.');
+            return;
+        }
+
+        if (/\s/.test(trimmedUser)) {
+            setError('Username cannot contain spaces.');
+            return;
+        }
+
+        if (!user) {
+            setError('No active user session found.');
+            return;
+        }
 
         setLoading(true);
-        setError(null);
 
         try {
-            const { data, error: dbError } = await supabase
+            // Attempt to insert the profile
+            const { error: dbError } = await supabase
                 .from('profiles')
-                .upsert({ username }, { onConflict: 'username' })
-                .select()
-                .single();
+                .insert({ id: user.id, username: trimmedUser }); // id must be the auth user's UUID
 
-            if (dbError) throw dbError;
-
-            localStorage.setItem('user_id', data.id);
-            localStorage.setItem('username', data.username);
-
-            if (onReady) onReady();
+            // Note: If username has unique constraint, this will fail if it's taken.
+            if (dbError) {
+                if (dbError.code === '23505') { // Postgres unique violation code
+                    setError('Username is already taken.');
+                } else {
+                    throw dbError;
+                }
+            } else {
+                if (onComplete) onComplete({ username: trimmedUser });
+            }
         } catch (err) {
-            console.error('Error joining:', err);
-            setError(err.message || 'Failed to join');
+            console.error('Error setting username:', err);
+            setError(err.message || 'Failed to set username');
         } finally {
             setLoading(false);
         }
@@ -44,7 +69,7 @@ export default function UsernameEntry({ onReady }) {
             gap: '1rem',
             color: '#fff'
         }}>
-            <h2 style={{ margin: 0 }}>Welcome</h2>
+            <h2 style={{ margin: 0 }}>Choose a Username</h2>
             <form
                 onSubmit={handleSubmit}
                 style={{
@@ -60,8 +85,9 @@ export default function UsernameEntry({ onReady }) {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Choose a username"
+                    placeholder="Username"
                     disabled={loading}
+                    required
                     style={{
                         padding: '10px',
                         borderRadius: '6px',
@@ -88,10 +114,10 @@ export default function UsernameEntry({ onReady }) {
                         fontSize: '1rem'
                     }}
                 >
-                    {loading ? 'Joining...' : 'Start Reviewing'}
+                    {loading ? 'Saving...' : 'Start Reviewing'}
                 </button>
             </form>
-            {error && <span style={{ color: '#ef4444', fontSize: '0.9rem' }}>{error}</span>}
+            {error && <span style={{ color: '#ef4444', fontSize: '0.9rem', textAlign: 'center', maxWidth: '300px' }}>{error}</span>}
         </div>
     );
 }

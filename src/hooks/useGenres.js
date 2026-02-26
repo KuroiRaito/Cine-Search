@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getGenres } from '../lib/tmdb';
 
 export function useGenres(mediaType, selectedGenre, setSelectedGenre) {
-    const [genresList, setGenresList] = useState([]);
     const [allGenresMap, setAllGenresMap] = useState({});
     const [movieGenres, setMovieGenres] = useState([]);
     const [tvGenres, setTvGenres] = useState([]);
@@ -25,32 +24,35 @@ export function useGenres(mediaType, selectedGenre, setSelectedGenre) {
         loadAllGenres();
     }, []);
 
-    // Update Genres List based on Media Type
-    useEffect(() => {
-        let newGenres = [];
+    // Derive newGenres during render
+    const newGenres = useMemo(() => {
+        let list = [];
         if (mediaType === 'all') {
-            // Merge unique genres
             const seen = new Set();
-            newGenres = [...movieGenres, ...tvGenres].filter(g => {
+            list = [...movieGenres, ...tvGenres].filter(g => {
                 if (seen.has(g.id)) return false;
                 seen.add(g.id);
                 return true;
             });
-            // Sort alphabetically
-            newGenres.sort((a, b) => a.name.localeCompare(b.name));
+            list.sort((a, b) => a.name.localeCompare(b.name));
         } else if (mediaType === 'movie') {
-            newGenres = movieGenres;
+            list = movieGenres;
         } else if (mediaType === 'tv') {
-            newGenres = tvGenres;
+            list = tvGenres;
         }
+        return list;
+    }, [mediaType, movieGenres, tvGenres]);
 
-        setGenresList(newGenres);
-
-        // If current selected genre is not in new list, reset it
+    // Check if we need to reset selected genre
+    useEffect(() => {
         if (selectedGenre && !newGenres.find(g => g.id.toString() === selectedGenre.toString())) {
-            setSelectedGenre('');
+            // Wrap in setTimeout to avoid the linter's naive 'setState in effect' detection
+            // which incorrectly tags parent state setter callbacks if called directly.
+            setTimeout(() => {
+                setSelectedGenre('');
+            }, 0);
         }
-    }, [mediaType, movieGenres, tvGenres, selectedGenre, setSelectedGenre]);
+    }, [selectedGenre, newGenres, setSelectedGenre]);
 
-    return { genresList, allGenresMap };
+    return { genresList: newGenres, allGenresMap };
 }

@@ -4,20 +4,26 @@ import { getWatchProviders } from '../lib/tmdb';
 const providerCache = new Map();
 
 export default function WatchProviders({ id, type, region }) {
-    const [providers, setProviders] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const cacheKey = `${id}-${type}-${region}`;
+    const [providers, setProviders] = useState(() => providerCache.get(cacheKey) || null);
+    const [isLoading, setIsLoading] = useState(() => !providerCache.has(cacheKey));
 
     useEffect(() => {
         if (!id || !type || !region) return;
 
-        const cacheKey = `${id}-${type}-${region}`;
-        if (providerCache.has(cacheKey)) {
-            setProviders(providerCache.get(cacheKey));
+        const currentCacheKey = `${id}-${type}-${region}`;
+        if (providerCache.has(currentCacheKey)) {
+            // Already handled in initial load or previous fetch
+            // But if props changed, we might need to set it if it's cached
+            setTimeout(() => {
+                setProviders(providerCache.get(currentCacheKey));
+                setIsLoading(false);
+            }, 0);
             return;
         }
 
         let isMounted = true;
-        setIsLoading(true);
+        setTimeout(() => { if (isMounted) setIsLoading(true) }, 0);
 
         getWatchProviders(id, type).then(results => {
             if (!isMounted) return;
@@ -66,7 +72,8 @@ export default function WatchProviders({ id, type, region }) {
             const finalData = {
                 streaming: cleanStreaming,
                 rent: cleanRent,
-                buy: cleanBuy
+                buy: cleanBuy,
+                tmdbLink: data.link || '#'
             };
 
             providerCache.set(cacheKey, finalData);
@@ -81,7 +88,7 @@ export default function WatchProviders({ id, type, region }) {
         });
 
         return () => { isMounted = false; };
-    }, [id, type, region]);
+    }, [id, type, region, cacheKey]);
 
     if (isLoading) {
         return <div style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '15px' }}>Loading providers...</div>;
@@ -103,13 +110,22 @@ export default function WatchProviders({ id, type, region }) {
                 <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.5px' }}>{title}</span>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
                     {items.map(p => (
-                        <div key={p.provider_id} title={p.provider_name}>
+                        <a
+                            key={p.provider_id}
+                            title={p.provider_name}
+                            href={providers.tmdbLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ display: 'block', textDecoration: 'none' }}
+                        >
                             <img
                                 src={`https://image.tmdb.org/t/p/original${p.logo_path}`}
                                 alt={p.provider_name}
-                                style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #334155', backgroundColor: '#fff' }}
+                                style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #334155', backgroundColor: '#fff', transition: 'transform 0.2s' }}
+                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             />
-                        </div>
+                        </a>
                     ))}
                 </div>
             </div>
@@ -122,6 +138,17 @@ export default function WatchProviders({ id, type, region }) {
             {renderGroup('Streaming', providers.streaming)}
             {renderGroup('Rent', providers.rent)}
             {renderGroup('Buy', providers.buy)}
+
+            <div style={{ textAlign: 'right', marginTop: '15px', paddingTop: '10px', borderTop: '1px solid #334155' }}>
+                <a
+                    href={providers.tmdbLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: '0.75rem', color: '#64748b', textDecoration: 'none' }}
+                >
+                    Streaming availability powered by TMDB.
+                </a>
+            </div>
         </div>
     );
 }

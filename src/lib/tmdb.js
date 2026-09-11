@@ -1,15 +1,9 @@
-const isDev = import.meta.env.DEV;
-const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-
+// The API key never reaches the browser. Every call goes to /api/tmdb, which is
+// the Vercel serverless proxy in production and the Vite dev-server proxy locally
+// (see vite.config.js). Both inject TMDB_API_KEY server-side.
 function getFetchUrl(path, queryParams = new URLSearchParams()) {
-    if (isDev) {
-        queryParams.append('api_key', TMDB_KEY);
-        const qString = queryParams.toString();
-        return `https://api.themoviedb.org/3${path}${qString ? '?' + qString : ''}`;
-    } else {
-        const qString = queryParams.toString();
-        return `/api/tmdb?path=${path}${qString ? '&' + qString : ''}`;
-    }
+    const qString = queryParams.toString();
+    return `/api/tmdb?path=${path}${qString ? '&' + qString : ''}`;
 }
 
 export async function searchMovies(query, page = 1, year = '') {

@@ -1,0 +1,1469 @@
+{
+  "version": 1,
+  "created": "2026-09-11T16:52:36.334Z",
+  "total": 120,
+  "counts": {
+    "exact_title": 15,
+    "typo": 20,
+    "partial": 10,
+    "person_led": 15,
+    "franchise": 10,
+    "hinglish": 15,
+    "mood": 20,
+    "plot_recall": 10,
+    "attribute": 5
+  },
+  "queries": [
+    {
+      "id": "q001",
+      "query": "inception",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Inception (2010)",
+      "expected": [
+        {
+          "key": "movie:27205",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Inception (2010)"
+    },
+    {
+      "id": "q002",
+      "query": "breaking bad",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Breaking Bad (2008 series)",
+      "expected": [
+        {
+          "key": "tv:1396",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Breaking Bad (2008)"
+    },
+    {
+      "id": "q003",
+      "query": "the dark knight",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "The Dark Knight (2008)",
+      "expected": [
+        {
+          "key": "movie:155",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Dark Knight (2008)"
+    },
+    {
+      "id": "q004",
+      "query": "3 idiots",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "3 Idiots (2009)",
+      "expected": [
+        {
+          "key": "movie:20453",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: 3 Idiots (2009)"
+    },
+    {
+      "id": "q005",
+      "query": "gully boy",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Gully Boy (2019)",
+      "expected": [
+        {
+          "key": "movie:491625",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Gully Boy (2019)"
+    },
+    {
+      "id": "q006",
+      "query": "the office",
+      "category": "exact_title",
+      "answer_type": "open_set",
+      "intended": "The Office US (2005) or UK (2001)",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q007",
+      "query": "parasite",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Parasite (2019)",
+      "expected": [
+        {
+          "key": "movie:496243",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Parasite (2019)"
+    },
+    {
+      "id": "q008",
+      "query": "sacred games",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Sacred Games (2018 series)",
+      "expected": [
+        {
+          "key": "tv:79352",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Sacred Games (2018)"
+    },
+    {
+      "id": "q009",
+      "query": "rrr",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "RRR (2022)",
+      "expected": [
+        {
+          "key": "movie:579974",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: RRR (2022)"
+    },
+    {
+      "id": "q010",
+      "query": "interstellar",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Interstellar (2014)",
+      "expected": [
+        {
+          "key": "movie:157336",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Interstellar (2014)"
+    },
+    {
+      "id": "q011",
+      "query": "money heist",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Money Heist / La Casa de Papel (2017 series)",
+      "expected": [],
+      "labelled_by": null,
+      "notes": "UNRESOLVED - needs manual label"
+    },
+    {
+      "id": "q012",
+      "query": "dangal",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Dangal (2016)",
+      "expected": [
+        {
+          "key": "movie:360814",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Dangal (2016)"
+    },
+    {
+      "id": "q013",
+      "query": "the family man",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "The Family Man (2019 Indian series)",
+      "expected": [
+        {
+          "key": "tv:93352",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Family Man (2019)"
+    },
+    {
+      "id": "q014",
+      "query": "spirited away",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Spirited Away (2001)",
+      "expected": [
+        {
+          "key": "movie:129",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Spirited Away (2001)"
+    },
+    {
+      "id": "q015",
+      "query": "kantara",
+      "category": "exact_title",
+      "answer_type": "known_item",
+      "intended": "Kantara (2022)",
+      "expected": [
+        {
+          "key": "movie:858485",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Kantara (2022)"
+    },
+    {
+      "id": "q016",
+      "query": "intersteller",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Interstellar (2014)",
+      "expected": [
+        {
+          "key": "movie:157336",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Interstellar (2014)"
+    },
+    {
+      "id": "q017",
+      "query": "avengers endgaem",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Avengers: Endgame (2019)",
+      "expected": [
+        {
+          "key": "movie:299534",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Avengers: Endgame (2019)"
+    },
+    {
+      "id": "q018",
+      "query": "brekaing bad",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Breaking Bad (2008 series)",
+      "expected": [
+        {
+          "key": "tv:1396",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Breaking Bad (2008)"
+    },
+    {
+      "id": "q019",
+      "query": "inceptoin",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Inception (2010)",
+      "expected": [
+        {
+          "key": "movie:27205",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Inception (2010)"
+    },
+    {
+      "id": "q020",
+      "query": "the dark knigt",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "The Dark Knight (2008)",
+      "expected": [
+        {
+          "key": "movie:155",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Dark Knight (2008)"
+    },
+    {
+      "id": "q021",
+      "query": "shawshank redemtion",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "The Shawshank Redemption (1994)",
+      "expected": [
+        {
+          "key": "movie:278",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Shawshank Redemption (1994)"
+    },
+    {
+      "id": "q022",
+      "query": "pulp ficiton",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Pulp Fiction (1994)",
+      "expected": [
+        {
+          "key": "movie:680",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Pulp Fiction (1994)"
+    },
+    {
+      "id": "q023",
+      "query": "gladaitor",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Gladiator (2000)",
+      "expected": [
+        {
+          "key": "movie:98",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Gladiator (2000)"
+    },
+    {
+      "id": "q024",
+      "query": "titanc",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Titanic (1997)",
+      "expected": [
+        {
+          "key": "movie:597",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Titanic (1997)"
+    },
+    {
+      "id": "q025",
+      "query": "jurrasic park",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Jurassic Park (1993)",
+      "expected": [
+        {
+          "key": "movie:329",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Jurassic Park (1993)"
+    },
+    {
+      "id": "q026",
+      "query": "bahubali",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Baahubali: The Beginning (2015)",
+      "expected": [],
+      "labelled_by": null,
+      "notes": "UNRESOLVED - needs manual label"
+    },
+    {
+      "id": "q027",
+      "query": "dangl",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Dangal (2016)",
+      "expected": [
+        {
+          "key": "movie:360814",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Dangal (2016)"
+    },
+    {
+      "id": "q028",
+      "query": "3 idoits",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "3 Idiots (2009)",
+      "expected": [
+        {
+          "key": "movie:20453",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: 3 Idiots (2009)"
+    },
+    {
+      "id": "q029",
+      "query": "stanger things",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Stranger Things (2016 series)",
+      "expected": [
+        {
+          "key": "tv:66732",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Stranger Things (2016)"
+    },
+    {
+      "id": "q030",
+      "query": "game of thornes",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Game of Thrones (2011 series)",
+      "expected": [
+        {
+          "key": "tv:1399",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Game of Thrones (2011)"
+    },
+    {
+      "id": "q031",
+      "query": "the godfater",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "The Godfather (1972)",
+      "expected": [
+        {
+          "key": "movie:238",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Godfather (1972)"
+    },
+    {
+      "id": "q032",
+      "query": "forest gump",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Forrest Gump (1994)",
+      "expected": [
+        {
+          "key": "movie:13",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Forrest Gump (1994)"
+    },
+    {
+      "id": "q033",
+      "query": "sholey",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Sholay (1975)",
+      "expected": [
+        {
+          "key": "movie:12259",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Sholay (1975)"
+    },
+    {
+      "id": "q034",
+      "query": "zindagi na milegi dubara",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "Zindagi Na Milegi Dobara (2011)",
+      "expected": [
+        {
+          "key": "movie:61202",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Zindagi Na Milegi Dobara (2011)"
+    },
+    {
+      "id": "q035",
+      "query": "kgf chapter two",
+      "category": "typo",
+      "answer_type": "known_item",
+      "intended": "K.G.F: Chapter 2 (2022)",
+      "expected": [
+        {
+          "key": "movie:587412",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: K.G.F: Chapter 2 (2022)"
+    },
+    {
+      "id": "q036",
+      "query": "dark kni",
+      "category": "partial",
+      "answer_type": "known_item",
+      "intended": "The Dark Knight (2008)",
+      "expected": [
+        {
+          "key": "movie:155",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Dark Knight (2008)"
+    },
+    {
+      "id": "q037",
+      "query": "game of thr",
+      "category": "partial",
+      "answer_type": "known_item",
+      "intended": "Game of Thrones (2011 series)",
+      "expected": [
+        {
+          "key": "tv:1399",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Game of Thrones (2011)"
+    },
+    {
+      "id": "q038",
+      "query": "shawsha",
+      "category": "partial",
+      "answer_type": "known_item",
+      "intended": "The Shawshank Redemption (1994)",
+      "expected": [
+        {
+          "key": "movie:278",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Shawshank Redemption (1994)"
+    },
+    {
+      "id": "q039",
+      "query": "intersta",
+      "category": "partial",
+      "answer_type": "known_item",
+      "intended": "Interstellar (2014)",
+      "expected": [
+        {
+          "key": "movie:157336",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Interstellar (2014)"
+    },
+    {
+      "id": "q040",
+      "query": "breaking b",
+      "category": "partial",
+      "answer_type": "known_item",
+      "intended": "Breaking Bad (2008 series)",
+      "expected": [
+        {
+          "key": "tv:1396",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Breaking Bad (2008)"
+    },
+    {
+      "id": "q041",
+      "query": "the family m",
+      "category": "partial",
+      "answer_type": "known_item",
+      "intended": "The Family Man (2019 Indian series)",
+      "expected": [
+        {
+          "key": "tv:93352",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Family Man (2019)"
+    },
+    {
+      "id": "q042",
+      "query": "lord of the ri",
+      "category": "partial",
+      "answer_type": "open_set",
+      "intended": "Lord of the Rings films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q043",
+      "query": "harry pot",
+      "category": "partial",
+      "answer_type": "open_set",
+      "intended": "Harry Potter films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q044",
+      "query": "stranger th",
+      "category": "partial",
+      "answer_type": "known_item",
+      "intended": "Stranger Things (2016 series)",
+      "expected": [
+        {
+          "key": "tv:66732",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Stranger Things (2016)"
+    },
+    {
+      "id": "q045",
+      "query": "kabhi khushi",
+      "category": "partial",
+      "answer_type": "known_item",
+      "intended": "Kabhi Khushi Kabhie Gham (2001)",
+      "expected": [
+        {
+          "key": "movie:10757",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Kabhi Khushi Kabhie Gham (2001)"
+    },
+    {
+      "id": "q046",
+      "query": "christopher nolan movies",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films directed by Christopher Nolan",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q047",
+      "query": "movies with tom hanks",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films starring Tom Hanks",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q048",
+      "query": "shah rukh khan",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films starring Shah Rukh Khan",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q049",
+      "query": "tarantino",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films directed by Quentin Tarantino",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q050",
+      "query": "scorsese films",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films directed by Martin Scorsese",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q051",
+      "query": "aamir khan movies",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films starring Aamir Khan",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q052",
+      "query": "films by wes anderson",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films directed by Wes Anderson",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q053",
+      "query": "leonardo dicaprio",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films starring Leonardo DiCaprio",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q054",
+      "query": "rajkumar hirani",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films directed by Rajkumar Hirani",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q055",
+      "query": "anurag kashyap movies",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films directed by Anurag Kashyap",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q056",
+      "query": "brad pitt",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films starring Brad Pitt",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q057",
+      "query": "deepika padukone",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films starring Deepika Padukone",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q058",
+      "query": "denis villeneuve",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films directed by Denis Villeneuve",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q059",
+      "query": "nawazuddin siddiqui",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films starring Nawazuddin Siddiqui",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q060",
+      "query": "greta gerwig movies",
+      "category": "person_led",
+      "answer_type": "open_set",
+      "intended": "Films directed by Greta Gerwig",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q061",
+      "query": "avengers all parts",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "The four Avengers films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q062",
+      "query": "harry potter in order",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "The eight Harry Potter films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q063",
+      "query": "lord of the rings trilogy",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "The three LOTR films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q064",
+      "query": "mission impossible movies",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "Mission: Impossible series",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q065",
+      "query": "john wick series",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "John Wick series",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q066",
+      "query": "baahubali all parts",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "Baahubali 1 and 2",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q067",
+      "query": "dhoom series",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "Dhoom 1/2/3",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q068",
+      "query": "the hunger games movies",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "Hunger Games series",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q069",
+      "query": "star wars movies",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "Star Wars saga films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q070",
+      "query": "golmaal series",
+      "category": "franchise",
+      "answer_type": "open_set",
+      "intended": "Golmaal series",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q071",
+      "query": "salman bhai ki movie",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Films starring Salman Khan",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q072",
+      "query": "hindi comedy picture",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Hindi-language comedies",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q073",
+      "query": "koi acchi thriller movie",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Well-rated thrillers",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q074",
+      "query": "shahrukh ki romantic film",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "SRK romance films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q075",
+      "query": "bhaijaan",
+      "category": "hinglish",
+      "answer_type": "known_item",
+      "intended": "Bajrangi Bhaijaan (2015)",
+      "expected": [
+        {
+          "key": "movie:348892",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Bajrangi Bhaijaan (2015)"
+    },
+    {
+      "id": "q076",
+      "query": "dil chahta hai",
+      "category": "hinglish",
+      "answer_type": "known_item",
+      "intended": "Dil Chahta Hai (2001)",
+      "expected": [
+        {
+          "key": "movie:14752",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Dil Chahta Hai (2001)"
+    },
+    {
+      "id": "q077",
+      "query": "kuch kuch hota hai",
+      "category": "hinglish",
+      "answer_type": "known_item",
+      "intended": "Kuch Kuch Hota Hai (1998)",
+      "expected": [
+        {
+          "key": "movie:11854",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Kuch Kuch Hota Hai (1998)"
+    },
+    {
+      "id": "q078",
+      "query": "paisa vasool action movie",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Crowd-pleasing action films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q079",
+      "query": "purani hindi filme",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Classic-era Hindi films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q080",
+      "query": "south ki action movie",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "South Indian action films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q081",
+      "query": "bacchon ke liye movie",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Family / kids films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q082",
+      "query": "rajinikanth ki picture",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Films starring Rajinikanth",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q083",
+      "query": "comedy film hindi mein",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Hindi comedies",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q084",
+      "query": "sad hindi movie",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Emotional Hindi dramas",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q085",
+      "query": "tamil thriller padam",
+      "category": "hinglish",
+      "answer_type": "open_set",
+      "intended": "Tamil thrillers",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q086",
+      "query": "something light for a sunday",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Light, easy watches",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q087",
+      "query": "sad war movie",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Emotionally heavy war films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q088",
+      "query": "watch with parents",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Broad-appeal family-safe films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q089",
+      "query": "feel good movie",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Uplifting films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q090",
+      "query": "something scary but not too scary",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Mild horror / thriller",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q091",
+      "query": "movie to cry to",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Tearjerkers",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q092",
+      "query": "background noise show",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Low-attention sitcoms",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q093",
+      "query": "something dramatic but not emotionally exhausting",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Engaging but light drama",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q094",
+      "query": "funny movie to watch with friends",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Group comedies",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q095",
+      "query": "mind bending thriller",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Twisty psychological thrillers",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q096",
+      "query": "cozy winter movie",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Warm seasonal films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q097",
+      "query": "movie after a breakup",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Comfort / recovery films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q098",
+      "query": "something to watch while eating",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Low-commitment viewing",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q099",
+      "query": "uplifting movie",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Inspirational films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q100",
+      "query": "dark comedy",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Dark comedies",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q101",
+      "query": "feel good indian movie",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Uplifting Indian films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q102",
+      "query": "movie for a rainy day",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Cosy indoor watches",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q103",
+      "query": "something with my kids",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Kids / family films",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q104",
+      "query": "intense psychological thriller",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Psychological thrillers",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q105",
+      "query": "relaxing nature documentary",
+      "category": "mood",
+      "answer_type": "open_set",
+      "intended": "Nature documentaries",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q106",
+      "query": "movie where guy loses his memory",
+      "category": "plot_recall",
+      "answer_type": "known_item",
+      "intended": "Memento (2000)",
+      "expected": [
+        {
+          "key": "movie:77",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Memento (2000)"
+    },
+    {
+      "id": "q107",
+      "query": "kid alone at home christmas",
+      "category": "plot_recall",
+      "answer_type": "known_item",
+      "intended": "Home Alone (1990)",
+      "expected": [
+        {
+          "key": "movie:771",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Home Alone (1990)"
+    },
+    {
+      "id": "q108",
+      "query": "movie about dreams within dreams",
+      "category": "plot_recall",
+      "answer_type": "known_item",
+      "intended": "Inception (2010)",
+      "expected": [
+        {
+          "key": "movie:27205",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Inception (2010)"
+    },
+    {
+      "id": "q109",
+      "query": "man stranded on mars",
+      "category": "plot_recall",
+      "answer_type": "known_item",
+      "intended": "The Martian (2015)",
+      "expected": [
+        {
+          "key": "movie:286217",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: The Martian (2015)"
+    },
+    {
+      "id": "q110",
+      "query": "boy raised by animals in the jungle",
+      "category": "plot_recall",
+      "answer_type": "open_set",
+      "intended": "The Jungle Book adaptations",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q111",
+      "query": "movie about a chess prodigy",
+      "category": "plot_recall",
+      "answer_type": "open_set",
+      "intended": "The Queens Gambit (2020) / Queen of Katwe (2016)",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q112",
+      "query": "time loop same day repeating",
+      "category": "plot_recall",
+      "answer_type": "open_set",
+      "intended": "Groundhog Day (1993) / Edge of Tomorrow (2014)",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q113",
+      "query": "shark attacks a beach town",
+      "category": "plot_recall",
+      "answer_type": "known_item",
+      "intended": "Jaws (1975)",
+      "expected": [
+        {
+          "key": "movie:578",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Jaws (1975)"
+    },
+    {
+      "id": "q114",
+      "query": "father trains his daughters to wrestle",
+      "category": "plot_recall",
+      "answer_type": "known_item",
+      "intended": "Dangal (2016)",
+      "expected": [
+        {
+          "key": "movie:360814",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Dangal (2016)"
+    },
+    {
+      "id": "q115",
+      "query": "man talks to a volleyball on an island",
+      "category": "plot_recall",
+      "answer_type": "known_item",
+      "intended": "Cast Away (2000)",
+      "expected": [
+        {
+          "key": "movie:8358",
+          "grade": 3
+        }
+      ],
+      "labelled_by": "auto",
+      "notes": "auto-matched: Cast Away (2000)"
+    },
+    {
+      "id": "q116",
+      "query": "movies under 2 hours",
+      "category": "attribute",
+      "answer_type": "open_set",
+      "intended": "Films with runtime < 120 min",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q117",
+      "query": "released this year",
+      "category": "attribute",
+      "answer_type": "open_set",
+      "intended": "Films released in the current year",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q118",
+      "query": "movies from the 90s",
+      "category": "attribute",
+      "answer_type": "open_set",
+      "intended": "Films released 1990-1999",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q119",
+      "query": "telugu movies rated above 8",
+      "category": "attribute",
+      "answer_type": "open_set",
+      "intended": "Telugu films with rating > 8",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    },
+    {
+      "id": "q120",
+      "query": "tv shows with only one season",
+      "category": "attribute",
+      "answer_type": "open_set",
+      "intended": "Single-season series",
+      "expected": [],
+      "labelled_by": null,
+      "notes": ""
+    }
+  ],
+  "schema": 2
+}

@@ -1,5 +1,27 @@
+import { validatePath, fetchTmdb } from './_tmdbCore.mjs';
+
 const CACHE = new Map();
 const TTL = 60 * 1000;
+const MAX_ENTRIES = 500;
+
+// The cache previously grew without bound - entries were only TTL-checked on
+// read, never evicted - so a long-lived container leaked until OOM. Flagged as
+// High risk in docs/Architecture audit.md. Map preserves insertion order, so
+// deleting the first key evicts the oldest.
+function setCached(key, data) {
+  if (CACHE.has(key)) CACHE.delete(key);
+  CACHE.set(key, { time: Date.now(), data });
+  while (CACHE.size > MAX_ENTRIES) {
+    CACHE.delete(CACHE.keys().next().value);
+  }
+}
+
+function getCached(key) {
+  const hit = CACHE.get(key);
+  if (!hit) return null;
+  if (Date.now() - hit.time >= TTL) { CACHE.delete(key); return null; }
+  return hit.data;
+}
 
 export default async function handler(request, response) {
   if (request.method !== 'GET') {
@@ -9,20 +31,17 @@ export default async function handler(request, response) {
   // eslint-disable-next-line no-unused-vars
   const { path, api_key, ...queryParams } = request.query;
 
-  if (!path) {
-    return response.status(400).json({ error: 'Missing path parameter' });
-  }
-
-  if (!/^[a-zA-Z0-9/_-]+$/.test(path)) {
-    return response.status(400).json({ error: 'Invalid path' });
+  const pathError = validatePath(path);
+  if (pathError) {
+    return response.status(400).json({ error: pathError });
   }
 
   const cacheKey = path + '?' + new URLSearchParams(queryParams).toString();
-  const cached = CACHE.get(cacheKey);
+  const cached = getCached(cacheKey);
 
-  if (cached && Date.now() - cached.time < TTL) {
+  if (cached) {
     response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
-    return response.status(200).json(cached.data);
+    return response.status(200).json(cached);
   }
 
   // Server-side only. Never hardcode a fallback here: this file is committed to git.
@@ -32,23 +51,14 @@ export default async function handler(request, response) {
   }
 
   try {
-    const params = new URLSearchParams({
-      api_key: tmdbKey,
-      ...queryParams
-    });
+    const { status, data } = await fetchTmdb(path, queryParams, tmdbKey);
 
-    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-    const tmdbUrl = `https://api.themoviedb.org/3/${cleanPath}?${params.toString()}`;
-
-    const res = await fetch(tmdbUrl);
-    const data = await res.json();
-
-    if (res.ok) {
-      CACHE.set(cacheKey, { time: Date.now(), data });
+    if (status >= 200 && status < 300) {
+      setCached(cacheKey, data);
       response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
     }
 
-    return response.status(res.status).json(data);
+    return response.status(status).json(data);
   } catch (error) {
     console.error('Error proxying to TMDB:', error);
     return response.status(500).json({ error: 'Failed to fetch from TMDB' });

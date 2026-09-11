@@ -1,298 +1,60 @@
-// The API key never reaches the browser. Every call goes to /api/tmdb, which is
-// the Vercel serverless proxy in production and the Vite dev-server proxy locally
-// (see vite.config.js). Both inject TMDB_API_KEY server-side.
-function getFetchUrl(path, queryParams = new URLSearchParams()) {
-    const qString = queryParams.toString();
-    return `/api/tmdb?path=${path}${qString ? '&' + qString : ''}`;
-}
+// Compatibility facade.
+//
+// The TMDB layer now lives in lib/tmdb/ (transport, endpoints, normalize) and
+// search lives in lib/search/. This file keeps the old import paths working so
+// the restructure did not have to touch every consumer at once.
+//
+// New code should import from lib/tmdb/endpoints.js or lib/search/ directly.
 
-export async function searchMovies(query, page = 1, year = '') {
-    if (!query) return { results: [] };
+import * as api from './tmdb/endpoints.js';
+import { toItem, attachGenreNames } from './tmdb/normalize.js';
+import { search as runSearch } from './search/index.js';
 
-    const params = new URLSearchParams({ query, page });
-    if (year) params.append('year', year);
-    const response = await fetch(getFetchUrl('/search/movie', params));
+export { attachGenreNames as mapGenreIdsToNames };
 
-    const data = await response.json();
+export const searchMovies = (query, page = 1, year = '') =>
+    query ? api.searchMovies(query, { page, year: year || undefined }) : Promise.resolve({ results: [] });
 
-    const results = (data.results || []).map(item => ({
-        id: item.id,
-        title: item.title,
-        year: item.release_date ? item.release_date.substring(0, 4) : 'Unknown',
-        poster_path: item.poster_path,
-        media_type: 'movie',
-        genre_ids: item.genre_ids,
-        popularity: item.popularity,
-        vote_average: item.vote_average,
-        date: item.release_date
-    }));
+export const searchTV = (query, page = 1, year = '') =>
+    query ? api.searchTV(query, { page, first_air_date_year: year || undefined }) : Promise.resolve({ results: [] });
 
-    return { results: results.slice(0, 20), totalPages: data.total_pages || 1 };
-}
+export const discoverMovies = (filters = {}) =>
+    api.discoverMovies({
+        with_genres: filters.with_genres, 'vote_average.gte': filters.minRating,
+        with_original_language: filters.with_original_language, sort_by: filters.sort_by,
+        page: filters.page, primary_release_year: filters.year,
+    });
 
-export async function searchTV(query, page = 1, year = '') {
-    if (!query) return { results: [] };
+export const discoverTV = (filters = {}) =>
+    api.discoverTV({
+        with_genres: filters.with_genres, 'vote_average.gte': filters.minRating,
+        with_original_language: filters.with_original_language, sort_by: filters.sort_by,
+        page: filters.page, first_air_date_year: filters.year,
+    });
 
-    const params = new URLSearchParams({ query, page });
-    if (year) params.append('first_air_date_year', year);
-    const response = await fetch(getFetchUrl('/search/tv', params));
-
-    const data = await response.json();
-
-    const results = (data.results || []).map(item => ({
-        id: item.id,
-        title: item.name,
-        year: item.first_air_date ? item.first_air_date.substring(0, 4) : 'Unknown',
-        poster_path: item.poster_path,
-        media_type: 'tv',
-        genre_ids: item.genre_ids,
-        popularity: item.popularity,
-        vote_average: item.vote_average,
-        date: item.first_air_date
-    }));
-
-    return { results: results.slice(0, 20), totalPages: data.total_pages || 1 };
-}
-
-export async function getMovieDetails(id) {
-    const response = await fetch(getFetchUrl(`/movie/${id}`));
-    return response.json();
-}
+export const getGenres = (mediaType) => api.genres(mediaType);
+export const getWatchProviders = (id, mediaType) => api.watchProviders(id, mediaType);
+export const getTVSeasonDetails = (tvId, seasonNumber) => api.season(tvId, seasonNumber);
+export const getMovieDetails = (id) => api.details(id, 'movie');
 
 export async function getDetails(id, media_type) {
-    const endpoint = media_type === 'tv' ? 'tv' : 'movie';
-    const response = await fetch(getFetchUrl(`/${endpoint}/${id}`));
-    const item = await response.json();
-
-    const isMovie = endpoint === 'movie';
-    return {
-        id: item.id,
-        title: isMovie ? item.title : item.name,
-        year: isMovie
-            ? (item.release_date ? item.release_date.substring(0, 4) : 'Unknown')
-            : (item.first_air_date ? item.first_air_date.substring(0, 4) : 'Unknown'),
-        poster_path: item.poster_path,
-        media_type: media_type || (isMovie ? 'movie' : 'tv'),
-        overview: item.overview,
-        vote_average: item.vote_average,
-        genres: item.genres
-    };
-}
-
-export async function getGenres(mediaType) {
-    const endpoint = mediaType === 'tv' ? 'tv' : 'movie';
-    const response = await fetch(getFetchUrl(`/genre/${endpoint}/list`));
-    const data = await response.json();
-    return data.genres || [];
-}
-
-function buildQueryParams(filters) {
-    const params = new URLSearchParams();
-    if (filters.with_genres) params.append('with_genres', filters.with_genres);
-    if (filters.minRating) params.append('vote_average.gte', filters.minRating);
-    if (filters.with_original_language) params.append('with_original_language', filters.with_original_language);
-    if (filters.sort_by) params.append('sort_by', filters.sort_by);
-    if (filters.page) params.append('page', filters.page);
-    return params;
-}
-
-export async function discoverMovies(filters = {}) {
-    const params = buildQueryParams(filters);
-    if (filters.year) params.append('primary_release_year', filters.year);
-
-    const response = await fetch(getFetchUrl('/discover/movie', params));
-    const data = await response.json();
-
-    const results = (data.results || []).map(item => ({
-        id: item.id,
-        title: item.title,
-        year: item.release_date ? item.release_date.substring(0, 4) : 'Unknown',
-        poster_path: item.poster_path,
-        media_type: 'movie',
-        genre_ids: item.genre_ids,
-        popularity: item.popularity,
-        vote_average: item.vote_average,
-        date: item.release_date
-    }));
-
-    return { results: results.slice(0, 20), totalPages: data.total_pages || 1 };
-}
-
-export async function discoverTV(filters = {}) {
-    const params = buildQueryParams(filters);
-    if (filters.year) params.append('first_air_date_year', filters.year);
-
-    const response = await fetch(getFetchUrl('/discover/tv', params));
-    const data = await response.json();
-
-    const results = (data.results || []).map(item => ({
-        id: item.id,
-        title: item.name,
-        year: item.first_air_date ? item.first_air_date.substring(0, 4) : 'Unknown',
-        poster_path: item.poster_path,
-        media_type: 'tv',
-        genre_ids: item.genre_ids,
-        popularity: item.popularity,
-        vote_average: item.vote_average,
-        date: item.first_air_date
-    }));
-
-    return { results: results.slice(0, 20), totalPages: data.total_pages || 1 };
-}
-
-export function mapGenreIdsToNames(items, genresList) {
-    if (!items || !genresList) return items || [];
-
-    const genreMap = {};
-    genresList.forEach(g => genreMap[g.id] = g.name);
-
-    return items.map(item => ({
-        ...item,
-        genres: (item.genre_ids || []).map(id => genreMap[id]).filter(Boolean)
-    }));
+    const raw = await api.details(id, media_type);
+    return { ...toItem(raw, media_type), overview: raw.overview, genres: raw.genres };
 }
 
 export async function getTVFullDetails(tvId) {
-    const detailsRes = await fetch(getFetchUrl(`/tv/${tvId}`));
-    const details = await detailsRes.json();
-
-    const creditsRes = await fetch(getFetchUrl(`/tv/${tvId}/credits`));
-    const credits = await creditsRes.json();
-
+    const [details, cr] = await Promise.all([api.details(tvId, 'tv'), api.credits(tvId, 'tv')]);
     return {
-        id: details.id,
-        name: details.name,
-        overview: details.overview,
-        poster_path: details.poster_path,
-        first_air_date: details.first_air_date,
-        seasons: details.seasons || [],
-        genres: details.genres || [],
+        id: details.id, name: details.name, overview: details.overview,
+        poster_path: details.poster_path, first_air_date: details.first_air_date,
+        seasons: details.seasons || [], genres: details.genres || [],
         vote_average: details.vote_average,
-        cast: (credits.cast || []).slice(0, 10).map(c => ({
-            name: c.name,
-            character: c.character,
-            profile_path: c.profile_path
-        }))
+        cast: (cr.cast || []).slice(0, 10).map((c) => ({
+            name: c.name, character: c.character, profile_path: c.profile_path,
+        })),
     };
 }
 
-export async function getTVSeasonDetails(tvId, seasonNumber) {
-    const response = await fetch(getFetchUrl(`/tv/${tvId}/season/${seasonNumber}`));
-    const data = await response.json();
-    return data;
-}
-
-export async function searchOrDiscover(query, mediaType, filters) {
-    const isSearch = !!(query && query.trim());
-    const pageSize = filters.pageSize || 20;
-    const needsUnifiedFill = pageSize !== 20 || mediaType === 'all' || (isSearch && (filters.minRating || filters.selectedGenre));
-    const uiPage = filters.page || 1;
-    const year = filters.year || '';
-
-    const getSortParam = (type, sortBy) => {
-        const [field, dir] = sortBy ? sortBy.split('.') : ['popularity', 'desc'];
-        if (field === 'date') return type === 'movie' ? `primary_release_date.${dir}` : `first_air_date.${dir}`;
-        return `${field}.${dir}`;
-    };
-
-    if (!needsUnifiedFill) {
-        // Fast path: TMDB perfectly matches 1:1 with UI pagination
-        if (isSearch) {
-            return mediaType === 'movie' ? await searchMovies(query, uiPage, year) : await searchTV(query, uiPage, year);
-        } else {
-            const localFilters = { ...filters, with_genres: filters.selectedGenre, page: uiPage };
-            return mediaType === 'movie'
-                ? await discoverMovies({ ...localFilters, sort_by: getSortParam('movie', filters.sortBy) })
-                : await discoverTV({ ...localFilters, sort_by: getSortParam('tv', filters.sortBy) });
-        }
-    }
-
-    // Unified Fill Path: loops TMDB pages to guarantee pageSize items per UI page
-    const targetCount = uiPage * pageSize;
-    let validItems = [];
-    let currentTmdbPage = 1;
-    let maxTmdbPages = uiPage; // Updated dynamically below
-
-    while (validItems.length < targetCount && currentTmdbPage <= maxTmdbPages) {
-        let mRes = { results: [], totalPages: 0 };
-        let tRes = { results: [], totalPages: 0 };
-        let fetchPromises = [];
-
-        if (mediaType === 'movie' || mediaType === 'all') {
-            if (isSearch) {
-                fetchPromises.push(searchMovies(query, currentTmdbPage, year).then(r => mRes = r));
-            } else {
-                const localFilters = { ...filters, with_genres: filters.selectedGenre, page: currentTmdbPage };
-                fetchPromises.push(discoverMovies({ ...localFilters, sort_by: getSortParam('movie', filters.sortBy) }).then(r => mRes = r));
-            }
-        }
-
-        if (mediaType === 'tv' || mediaType === 'all') {
-            if (isSearch) {
-                fetchPromises.push(searchTV(query, currentTmdbPage, year).then(r => tRes = r));
-            } else {
-                const localFilters = { ...filters, with_genres: filters.selectedGenre, page: currentTmdbPage };
-                fetchPromises.push(discoverTV({ ...localFilters, sort_by: getSortParam('tv', filters.sortBy) }).then(r => tRes = r));
-            }
-        }
-
-        await Promise.all(fetchPromises);
-
-        let mergedMax = Math.max(mRes.totalPages || 1, tRes.totalPages || 1);
-        maxTmdbPages = Math.max(maxTmdbPages, mergedMax);
-
-        let combined = [...mRes.results, ...tRes.results];
-
-        // Apply client filters universally
-        if (filters.minRating) combined = combined.filter(r => r.vote_average >= filters.minRating);
-        if (filters.selectedGenre) combined = combined.filter(r => r.genre_ids && r.genre_ids.includes(Number(filters.selectedGenre)));
-
-        validItems = [...validItems, ...combined];
-        currentTmdbPage++;
-    }
-
-    // Sort accumulated valid items
-    const [field, dir] = filters.sortBy ? filters.sortBy.split('.') : ['popularity', 'desc'];
-    const multiplier = dir === 'asc' ? 1 : -1;
-
-    validItems.sort((a, b) => {
-        if (field === 'date') {
-            const dateA = new Date(a.date || '1970-01-01').getTime();
-            const dateB = new Date(b.date || '1970-01-01').getTime();
-            return (dateA - dateB) * multiplier;
-        } else if (field === 'vote_average') {
-            return ((a.vote_average || 0) - (b.vote_average || 0)) * multiplier;
-        } else {
-            return ((a.popularity || 0) - (b.popularity || 0)) * multiplier;
-        }
-    });
-
-    // Deduplicate in case of overlapping TMDB pages over time
-    const uniqueItems = [];
-    const seen = new Set();
-    for (const item of validItems) {
-        const key = `${item.media_type}-${item.id}`;
-        if (!seen.has(key)) {
-            seen.add(key);
-            uniqueItems.push(item);
-        }
-    }
-
-    const startIndex = (uiPage - 1) * pageSize;
-    const pageResults = uniqueItems.slice(startIndex, startIndex + pageSize);
-
-    // Provide a continuous pagination experience
-    let calculatedTotalPages = Math.ceil(uniqueItems.length / pageSize);
-    if (currentTmdbPage <= maxTmdbPages) {
-        // If we haven't exhausted TMDB, guarantee there are at least 4 visible pages to keep the UI static
-        calculatedTotalPages = Math.max(uiPage + 3, calculatedTotalPages);
-    }
-
-    return { results: pageResults, totalPages: calculatedTotalPages };
-}
-
-export async function getWatchProviders(id, mediaType) {
-    const response = await fetch(getFetchUrl(`/${mediaType}/${id}/watch/providers`));
-    const data = await response.json();
-    return data.results || {};
-}
+/** @deprecated import { search } from './search/index.js' */
+export const searchOrDiscover = (query, mediaType, filters = {}) =>
+    runSearch(query, { ...filters, mediaType });

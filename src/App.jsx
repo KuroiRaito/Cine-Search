@@ -25,19 +25,35 @@ export default function App() {
   useEffect(() => {
     async function fetchProfile() {
       if (user) {
-        setFetchingProfile(true);
-        const { data } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', user.id)
-          .single();
-
-        if (data && data.username) {
-          setUsername(data.username);
-        } else {
-          setUsername(null);
+        if (user.isGuest) {
+          setUsername(user.user_metadata?.username || 'Guest Explorer');
+          setFetchingProfile(false);
+          return;
         }
-        setFetchingProfile(false);
+
+        setFetchingProfile(true);
+        try {
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Profile fetch timeout')), 3000)
+          );
+          const requestPromise = supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', user.id)
+            .single();
+
+          const res = await Promise.race([requestPromise, timeoutPromise]);
+          if (res?.data?.username) {
+            setUsername(res.data.username);
+          } else {
+            setUsername(user.email ? user.email.split('@')[0] : 'User');
+          }
+        } catch (e) {
+          console.warn('Could not fetch user profile:', e);
+          setUsername(user.email ? user.email.split('@')[0] : 'User');
+        } finally {
+          setFetchingProfile(false);
+        }
       } else {
         setUsername(null);
         setFetchingProfile(false);

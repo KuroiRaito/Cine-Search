@@ -10,28 +10,84 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let isMounted = true;
+
+        const timer = setTimeout(() => {
+            if (isMounted && loading) {
+                setLoading(false);
+            }
+        }, 3000);
+
+        const storedGuest = localStorage.getItem('cine_guest_user');
+        if (storedGuest) {
+            try {
+                const parsed = JSON.parse(storedGuest);
+                setUser(parsed);
+                setLoading(false);
+                clearTimeout(timer);
+                return;
+            } catch (e) {
+                console.error(e);
+                localStorage.removeItem('cine_guest_user');
+            }
+        }
+
         // Check active sessions and sets the user
         supabase.auth.getSession().then(({ data: { session } }) => {
+            if (!isMounted) return;
             setSession(session);
-            setUser(session?.user ?? null);
+            if (session?.user) setUser(session.user);
             setLoading(false);
+            clearTimeout(timer);
+        }).catch((err) => {
+            console.warn('Supabase session check failed:', err);
+            if (isMounted) setLoading(false);
+            clearTimeout(timer);
         });
 
         // Listen for changes on auth state (sign in, sign out, etc.)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (!isMounted) return;
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            isMounted = false;
+            clearTimeout(timer);
+            subscription?.unsubscribe();
+        };
     }, []);
+
+    const loginAsGuest = (guestName = 'Guest Explorer') => {
+        const mockUser = {
+            id: 'guest-local-id',
+            email: 'guest@cinesearch.local',
+            user_metadata: { username: guestName },
+            isGuest: true
+        };
+        localStorage.setItem('cine_guest_user', JSON.stringify(mockUser));
+        setUser(mockUser);
+    };
+
+    const signOut = async () => {
+        localStorage.removeItem('cine_guest_user');
+        try {
+            await supabase.auth.signOut();
+        } catch (e) {
+            console.warn('Supabase signout notice:', e);
+        }
+        setUser(null);
+        setSession(null);
+    };
 
     // Will be passed down to AuthContext.Provider
     const value = {
         signUp: (data) => supabase.auth.signUp(data),
         signIn: (data) => supabase.auth.signInWithPassword(data),
-        signOut: () => supabase.auth.signOut(),
+        signOut,
+        loginAsGuest,
         user,
         session,
         loading,
@@ -47,3 +103,4 @@ export function AuthProvider({ children }) {
 export function useAuth() {
     return useContext(AuthContext);
 }
+

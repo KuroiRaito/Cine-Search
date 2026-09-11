@@ -1,15 +1,12 @@
-const isDev = import.meta.env.DEV;
-const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-
+// All TMDB traffic goes through /api/tmdb in every environment:
+//   dev  -> the Vite dev-server proxy in vite.config.js
+//   prod -> the Vercel function in api/tmdb.js
+// The API key therefore never reaches the browser. The previous dev path read
+// import.meta.env.VITE_TMDB_API_KEY, which Vite inlines into the client bundle
+// where anyone can read it - that is how the earlier key leaked and was revoked.
 function getFetchUrl(path, queryParams = new URLSearchParams()) {
-    if (isDev) {
-        queryParams.append('api_key', TMDB_KEY);
-        const qString = queryParams.toString();
-        return `https://api.themoviedb.org/3${path}${qString ? '?' + qString : ''}`;
-    } else {
-        const qString = queryParams.toString();
-        return `/api/tmdb?path=${path}${qString ? '&' + qString : ''}`;
-    }
+    const qString = queryParams.toString();
+    return `/api/tmdb?path=${path}${qString ? '&' + qString : ''}`;
 }
 
 export async function searchMovies(query, page = 1, year = '') {

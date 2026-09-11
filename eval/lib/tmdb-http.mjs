@@ -27,6 +27,28 @@ export async function detectMode(realFetch = fetch) {
 export function getMode() { return mode; }
 
 /**
+ * src/lib/tmdb.js now emits app-relative "/api/tmdb?path=..." URLs in every
+ * environment. Node has no origin to resolve those against, so normalise them
+ * back to a canonical TMDB url (no key) - used both as the cache key and as the
+ * basis for the real request.
+ */
+export function toCanonicalTmdb(url) {
+    const raw = String(url);
+    if (raw.startsWith('http')) {
+        const u = new URL(raw);
+        u.searchParams.delete('api_key');
+        return u.toString();
+    }
+    const u = new URL(raw, 'http://local');
+    const path = u.searchParams.get('path') || '';
+    u.searchParams.delete('path');
+    u.searchParams.delete('api_key');
+    const rest = u.searchParams.toString();
+    const clean = path.startsWith('/') ? path : '/' + path;
+    return `https://api.themoviedb.org/3${clean}${rest ? '?' + rest : ''}`;
+}
+
+/**
  * src/lib/tmdb.js builds its dev URLs from import.meta.env.VITE_TMDB_API_KEY,
  * which is intentionally absent. Inject the real key here so the harness can
  * run the production module unmodified instead of editing it.

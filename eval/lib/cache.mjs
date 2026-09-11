@@ -9,7 +9,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { detectMode, getMode, toProxyUrl, withKey } from './tmdb-http.mjs';
+import { detectMode, getMode, toProxyUrl, withKey, toCanonicalTmdb } from './tmdb-http.mjs';
 
 const CACHE_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', '.cache');
 
@@ -40,10 +40,12 @@ export async function installCachingFetch({ refresh = false } = {}) {
     await detectMode(realFetch);
 
     globalThis.fetch = async function cachingFetch(url, opts) {
-        // Cache key is the ORIGINAL TMDB url, so direct and proxy runs share a
-        // cache and stay comparable.
-        const file = join(CACHE_DIR, keyFor(url) + '.json');
-        const target = getMode() === 'proxy' ? toProxyUrl(url) : withKey(url);
+        // Normalise first: src/lib/tmdb.js emits app-relative /api/tmdb URLs,
+        // which Node cannot fetch. Canonical form is also the cache key, so
+        // direct and proxy runs share a cache and stay comparable.
+        const canonical = toCanonicalTmdb(url);
+        const file = join(CACHE_DIR, keyFor(canonical) + '.json');
+        const target = getMode() === 'proxy' ? toProxyUrl(canonical) : withKey(canonical);
 
         if (!refresh && existsSync(file)) {
             stats.hits++;

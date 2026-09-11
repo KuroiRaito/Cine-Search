@@ -1,3 +1,5 @@
+import { validatePath, fetchTmdb } from './_tmdbCore.mjs';
+
 const CACHE = new Map();
 const TTL = 60 * 1000;
 
@@ -9,12 +11,9 @@ export default async function handler(request, response) {
   // eslint-disable-next-line no-unused-vars
   const { path, api_key, ...queryParams } = request.query;
 
-  if (!path) {
-    return response.status(400).json({ error: 'Missing path parameter' });
-  }
-
-  if (!/^[a-zA-Z0-9/_-]+$/.test(path)) {
-    return response.status(400).json({ error: 'Invalid path' });
+  const pathError = validatePath(path);
+  if (pathError) {
+    return response.status(400).json({ error: pathError });
   }
 
   const cacheKey = path + '?' + new URLSearchParams(queryParams).toString();
@@ -32,23 +31,14 @@ export default async function handler(request, response) {
   }
 
   try {
-    const params = new URLSearchParams({
-      api_key: tmdbKey,
-      ...queryParams
-    });
+    const { status, data } = await fetchTmdb(path, queryParams, tmdbKey);
 
-    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-    const tmdbUrl = `https://api.themoviedb.org/3/${cleanPath}?${params.toString()}`;
-
-    const res = await fetch(tmdbUrl);
-    const data = await res.json();
-
-    if (res.ok) {
+    if (status >= 200 && status < 300) {
       CACHE.set(cacheKey, { time: Date.now(), data });
       response.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
     }
 
-    return response.status(res.status).json(data);
+    return response.status(status).json(data);
   } catch (error) {
     console.error('Error proxying to TMDB:', error);
     return response.status(500).json({ error: 'Failed to fetch from TMDB' });

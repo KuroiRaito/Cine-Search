@@ -1,4 +1,3 @@
-/* global process */
 const CACHE = new Map();
 const TTL = 60 * 1000;
 

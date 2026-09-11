@@ -16,10 +16,16 @@ let mode = null;
 export async function detectMode(realFetch = fetch) {
     if (mode) return mode;
     if (KEY) {
-        try {
-            const r = await realFetch(`https://api.themoviedb.org/3/configuration?api_key=${KEY}`);
-            if (r.ok) return (mode = 'direct');
-        } catch { /* fall through */ }
+        // Retry: a single transient ECONNRESET must not silently downgrade the
+        // whole run to proxy mode, which would change measured latency.
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                const r = await realFetch(`https://api.themoviedb.org/3/configuration?api_key=${KEY}`);
+                if (r.ok) return (mode = 'direct');
+                if (r.status === 401) break;          // genuinely bad key
+            } catch { /* transient - retry */ }
+            await new Promise(r => setTimeout(r, 300 * (attempt + 1)));
+        }
     }
     return (mode = 'proxy');
 }

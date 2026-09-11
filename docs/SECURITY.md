@@ -26,7 +26,7 @@ unset, so a missing key fails loudly instead of silently using a committed secre
 
 ## 4. Storage of Server Keys
 - **Client Side**: Only expose variables prefixed with `VITE_`.
-- **Backend Side**: Consider creating a serverless function proxy to securely query TMDB under the hood so that your underlying `VITE_TMDB_API_KEY` isn't leaked to client browsers.
+- **Backend Side**: The TMDB key is server-scoped as `TMDB_API_KEY` (no `VITE_` prefix), so Vite never inlines it into the browser bundle. All TMDB traffic goes through the `/api/tmdb` proxy - the Vercel serverless function in production, the Vite dev-server proxy locally - and the key is injected there. The client never sees it in any environment.
 
 ## 5. Supabase Row Level Security (RLS)
 - Because `VITE_SUPABASE_ANON_KEY` is public by design, you **must enable Row Level Security (RLS)** in your Supabase database.

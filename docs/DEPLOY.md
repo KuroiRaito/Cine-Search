@@ -18,10 +18,9 @@ Set these in the Vercel dashboard (Project → Settings → Environment Variable
 
 | Variable | Scope | Required | Purpose |
 | --- | --- | --- | --- |
-| `TMDB_API_KEY` | Server only | Yes, for content | Used by the `/api/tmdb` serverless proxy. **Not** `VITE_`-prefixed, so it is never shipped to the browser. |
+| `TMDB_API_KEY` | Server only | Yes, for content | Used by the `/api/tmdb` serverless proxy in production, and by the Vite dev proxy locally. **Not** `VITE_`-prefixed, so it is never shipped to the browser. |
 | `VITE_SUPABASE_URL` | Client | For accounts | Supabase project URL. |
 | `VITE_SUPABASE_ANON_KEY` | Client | For accounts | Public anon key. Requires RLS — see `SECURITY.md`. |
-| `VITE_TMDB_API_KEY` | Client (local dev only) | No in prod | Only used by the Vite dev proxy. In production the client calls `/api/tmdb` instead. |
 
 ### Graceful degradation
 
@@ -48,7 +47,7 @@ Guest mode needs no backend and is the fastest smoke test of a deployment:
 
 If steps 1–4 pass but no titles appear, the app is fine and `TMDB_API_KEY` is missing or wrong.
 
-> Note: `npm run preview` serves only the static `dist` bundle. `/api/tmdb` is a Vercel serverless function and does **not** run locally under preview, so titles will be empty there. Use `npm run dev` (which proxies TMDB directly using `VITE_TMDB_API_KEY`) for local content testing.
+> Note: `npm run preview` serves only the static `dist` bundle. `/api/tmdb` is a Vercel serverless function and does **not** run locally under preview, so titles will be empty there. Use `npm run dev` (whose dev-server proxy injects `TMDB_API_KEY` from your local `.env`) for local content testing.
 
 ## Troubleshooting
 

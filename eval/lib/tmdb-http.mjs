@@ -7,7 +7,9 @@
 // Either way src/lib/tmdb.js is untouched - we rewrite at the fetch layer.
 
 const PROXY = process.env.EVAL_TMDB_PROXY || 'https://v0-cine-search.vercel.app/api/tmdb';
-const KEY = process.env.VITE_TMDB_API_KEY || process.env.TMDB_API_KEY;
+// Un-prefixed TMDB_API_KEY is preferred: a VITE_-prefixed var is bundled into
+// client JS and publicly readable, which is how the previous key leaked.
+const KEY = process.env.TMDB_API_KEY || process.env.VITE_TMDB_API_KEY;
 
 let mode = null;
 
@@ -23,6 +25,18 @@ export async function detectMode(realFetch = fetch) {
 }
 
 export function getMode() { return mode; }
+
+/**
+ * src/lib/tmdb.js builds its dev URLs from import.meta.env.VITE_TMDB_API_KEY,
+ * which is intentionally absent. Inject the real key here so the harness can
+ * run the production module unmodified instead of editing it.
+ */
+export function withKey(url) {
+    const u = new URL(String(url));
+    if (!u.hostname.includes('themoviedb.org')) return String(url);
+    u.searchParams.set('api_key', KEY);
+    return u.toString();
+}
 
 /** Rewrite a direct TMDB URL to go through the deployed proxy. */
 export function toProxyUrl(url) {

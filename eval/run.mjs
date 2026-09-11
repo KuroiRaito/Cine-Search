@@ -77,13 +77,17 @@ async function main() {
 
     console.log(`\n  ${queries.length} queries · variant "${VARIANT}" · cache ${REFRESH ? 'REFRESH' : 'on'} · tmdb: ${getMode()}`);
 
+    const errored = [];
     const scores = await mapLimit(queries, CONCURRENCY, async (q) => {
         try {
             const res = await searchOrDiscover(q.query, DEFAULT_UI_STATE.mediaType, DEFAULT_UI_STATE);
             return scoreQuery(q, res.results || []);
         } catch (err) {
-            console.error(`\n  error on "${q.query}": ${err.message}`);
-            return scoreQuery(q, []);
+            // NOT scored as a zero-result: a network failure is our problem, not
+            // the search engine's. Excluded and reported loudly instead.
+            errored.push({ query: q.query, error: err.message });
+            return { id: q.id, category: q.category, answer_type: q.answer_type,
+                     scored: false, harnessError: true, error: err.message };
         }
     });
 
@@ -92,10 +96,17 @@ async function main() {
         config: { variant: VARIANT, ...DEFAULT_UI_STATE, querySetSize: queries.length },
         cache: getStats(),
         tmdb_mode: getMode(),
-        aggregate: aggregate(scores),
-        categories: byCategory(scores),
+        harness_errors: errored,
+        aggregate: aggregate(scores.filter(s => !s.harnessError)),
+        categories: byCategory(scores.filter(s => !s.harnessError)),
         per_query: scores,
     };
+
+    if (errored.length) {
+        console.warn(`\n  \x1b[31m${errored.length} quer${errored.length === 1 ? 'y' : 'ies'} failed to reach TMDB and were EXCLUDED (not counted as failures):\x1b[0m`);
+        errored.forEach(e => console.warn(`    "${e.query}" — ${e.error}`));
+        console.warn(`  \x1b[33mRe-run to pick them up; results below are over ${scores.filter(s => !s.harnessError).length} queries.\x1b[0m`);
+    }
 
     const prev = COMPARE ? loadPreviousRun(COMPARE) : null;
     printReport(run, prev && prev.run_id !== run.run_id ? prev : null);

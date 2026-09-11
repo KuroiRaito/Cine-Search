@@ -10,10 +10,24 @@ If an API key is accidentally committed or compromised:
 2. Update the environment variables in your deployment dashboard and local `.env`.
 3. Trigger a fresh deployment and purge the old keys entirely.
 
-## 3. Storage of Server Keys
+## 3. Known Incident: Committed TMDB Key
+
+A TMDB API key was hardcoded as a fallback in `api/tmdb.js` and committed to this
+repository. The literal was removed, but **it remains in git history** and must be
+treated as compromised.
+
+Required action:
+1. Revoke/regenerate the TMDB key in the TMDB dashboard.
+2. Set the new key as `TMDB_API_KEY` in the Vercel dashboard (server-scoped, no `VITE_` prefix).
+3. Redeploy.
+
+The server proxy now has **no fallback** - it returns `500` if `TMDB_API_KEY` is
+unset, so a missing key fails loudly instead of silently using a committed secret.
+
+## 4. Storage of Server Keys
 - **Client Side**: Only expose variables prefixed with `VITE_`.
 - **Backend Side**: Consider creating a serverless function proxy to securely query TMDB under the hood so that your underlying `VITE_TMDB_API_KEY` isn't leaked to client browsers.
 
-## 4. Supabase Row Level Security (RLS)
+## 5. Supabase Row Level Security (RLS)
 - Because `VITE_SUPABASE_ANON_KEY` is public by design, you **must enable Row Level Security (RLS)** in your Supabase database.
 - Restrict malicious client-side changes by enforcing Policies on inserts, deletes, and updates directly tied to the currently authenticated user session.

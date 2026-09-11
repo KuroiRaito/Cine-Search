@@ -25,7 +25,8 @@ export default async function handler(request, response) {
     return response.status(200).json(cached.data);
   }
 
-  const tmdbKey = process.env.VITE_TMDB_API_KEY || process.env.TMDB_API_KEY || '47d8395816c287806d064106fe7ddd62';
+  // Server-side only. Never hardcode a fallback here: this file is committed to git.
+  const tmdbKey = process.env.TMDB_API_KEY || process.env.VITE_TMDB_API_KEY;
   if (!tmdbKey) {
     return response.status(500).json({ error: 'TMDB API key not configured on server' });
   }

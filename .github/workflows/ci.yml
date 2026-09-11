@@ -20,3 +20,5 @@ jobs:
         run: npm ci
       - name: Build Project
         run: npm run build
+      - name: Smoke-test serverless API
+        run: npm run test:api

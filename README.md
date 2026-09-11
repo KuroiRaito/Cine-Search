@@ -14,7 +14,7 @@ A modern web application to search, wishlist, rate, and track movies and TV show
    ```
 2. Create a `.env` file based on your environment:
    ```env
-   VITE_TMDB_API_KEY=your_key
+   TMDB_API_KEY=your_key
    VITE_SUPABASE_URL=your_url
    VITE_SUPABASE_ANON_KEY=your_key
    ```

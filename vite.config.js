@@ -43,8 +43,13 @@ function tmdbDevProxy(env) {
   }
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
+  // Empty prefix so server-only (non-VITE_) vars load here. Runs in Node,
+  // never in the browser bundle.
   const env = loadEnv(mode, process.cwd(), '')
+  if (command === 'serve' && !(env.TMDB_API_KEY || env.VITE_TMDB_API_KEY)) {
+    console.warn('[vite] TMDB_API_KEY is not set in .env - /api/tmdb requests will fail.')
+  }
   return {
     plugins: [react(), tmdbDevProxy(env)],
   }

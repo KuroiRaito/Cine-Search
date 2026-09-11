@@ -1,9 +1,6 @@
-// All TMDB traffic goes through /api/tmdb in every environment:
-//   dev  -> the Vite dev-server proxy in vite.config.js
-//   prod -> the Vercel function in api/tmdb.js
-// The API key therefore never reaches the browser. The previous dev path read
-// import.meta.env.VITE_TMDB_API_KEY, which Vite inlines into the client bundle
-// where anyone can read it - that is how the earlier key leaked and was revoked.
+// The API key never reaches the browser. Every call goes to /api/tmdb, which is
+// the Vercel serverless proxy in production and the Vite dev-server proxy locally
+// (see vite.config.js). Both inject TMDB_API_KEY server-side.
 function getFetchUrl(path, queryParams = new URLSearchParams()) {
     const qString = queryParams.toString();
     return `/api/tmdb?path=${path}${qString ? '&' + qString : ''}`;

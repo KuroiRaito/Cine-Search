@@ -21,7 +21,10 @@
       "answer_type": "known_item",
       "intended": "Inception (2010)",
       "expected": [
-        "movie:27205"
+        {
+          "key": "movie:27205",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Inception (2010)"
@@ -33,7 +36,10 @@
       "answer_type": "known_item",
       "intended": "Breaking Bad (2008 series)",
       "expected": [
-        "tv:1396"
+        {
+          "key": "tv:1396",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Breaking Bad (2008)"
@@ -45,7 +51,10 @@
       "answer_type": "known_item",
       "intended": "The Dark Knight (2008)",
       "expected": [
-        "movie:155"
+        {
+          "key": "movie:155",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Dark Knight (2008)"
@@ -57,7 +66,10 @@
       "answer_type": "known_item",
       "intended": "3 Idiots (2009)",
       "expected": [
-        "movie:20453"
+        {
+          "key": "movie:20453",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: 3 Idiots (2009)"
@@ -69,7 +81,10 @@
       "answer_type": "known_item",
       "intended": "Gully Boy (2019)",
       "expected": [
-        "movie:491625"
+        {
+          "key": "movie:491625",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Gully Boy (2019)"
@@ -91,7 +106,10 @@
       "answer_type": "known_item",
       "intended": "Parasite (2019)",
       "expected": [
-        "movie:496243"
+        {
+          "key": "movie:496243",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Parasite (2019)"
@@ -103,7 +121,10 @@
       "answer_type": "known_item",
       "intended": "Sacred Games (2018 series)",
       "expected": [
-        "tv:79352"
+        {
+          "key": "tv:79352",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Sacred Games (2018)"
@@ -115,7 +136,10 @@
       "answer_type": "known_item",
       "intended": "RRR (2022)",
       "expected": [
-        "movie:579974"
+        {
+          "key": "movie:579974",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: RRR (2022)"
@@ -127,7 +151,10 @@
       "answer_type": "known_item",
       "intended": "Interstellar (2014)",
       "expected": [
-        "movie:157336"
+        {
+          "key": "movie:157336",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Interstellar (2014)"
@@ -149,7 +176,10 @@
       "answer_type": "known_item",
       "intended": "Dangal (2016)",
       "expected": [
-        "movie:360814"
+        {
+          "key": "movie:360814",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Dangal (2016)"
@@ -161,7 +191,10 @@
       "answer_type": "known_item",
       "intended": "The Family Man (2019 Indian series)",
       "expected": [
-        "tv:93352"
+        {
+          "key": "tv:93352",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Family Man (2019)"
@@ -173,7 +206,10 @@
       "answer_type": "known_item",
       "intended": "Spirited Away (2001)",
       "expected": [
-        "movie:129"
+        {
+          "key": "movie:129",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Spirited Away (2001)"
@@ -185,7 +221,10 @@
       "answer_type": "known_item",
       "intended": "Kantara (2022)",
       "expected": [
-        "movie:858485"
+        {
+          "key": "movie:858485",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Kantara (2022)"
@@ -197,7 +236,10 @@
       "answer_type": "known_item",
       "intended": "Interstellar (2014)",
       "expected": [
-        "movie:157336"
+        {
+          "key": "movie:157336",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Interstellar (2014)"
@@ -209,7 +251,10 @@
       "answer_type": "known_item",
       "intended": "Avengers: Endgame (2019)",
       "expected": [
-        "movie:299534"
+        {
+          "key": "movie:299534",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Avengers: Endgame (2019)"
@@ -221,7 +266,10 @@
       "answer_type": "known_item",
       "intended": "Breaking Bad (2008 series)",
       "expected": [
-        "tv:1396"
+        {
+          "key": "tv:1396",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Breaking Bad (2008)"
@@ -233,7 +281,10 @@
       "answer_type": "known_item",
       "intended": "Inception (2010)",
       "expected": [
-        "movie:27205"
+        {
+          "key": "movie:27205",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Inception (2010)"
@@ -245,7 +296,10 @@
       "answer_type": "known_item",
       "intended": "The Dark Knight (2008)",
       "expected": [
-        "movie:155"
+        {
+          "key": "movie:155",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Dark Knight (2008)"
@@ -257,7 +311,10 @@
       "answer_type": "known_item",
       "intended": "The Shawshank Redemption (1994)",
       "expected": [
-        "movie:278"
+        {
+          "key": "movie:278",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Shawshank Redemption (1994)"
@@ -269,7 +326,10 @@
       "answer_type": "known_item",
       "intended": "Pulp Fiction (1994)",
       "expected": [
-        "movie:680"
+        {
+          "key": "movie:680",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Pulp Fiction (1994)"
@@ -281,7 +341,10 @@
       "answer_type": "known_item",
       "intended": "Gladiator (2000)",
       "expected": [
-        "movie:98"
+        {
+          "key": "movie:98",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Gladiator (2000)"
@@ -293,7 +356,10 @@
       "answer_type": "known_item",
       "intended": "Titanic (1997)",
       "expected": [
-        "movie:597"
+        {
+          "key": "movie:597",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Titanic (1997)"
@@ -305,7 +371,10 @@
       "answer_type": "known_item",
       "intended": "Jurassic Park (1993)",
       "expected": [
-        "movie:329"
+        {
+          "key": "movie:329",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Jurassic Park (1993)"
@@ -327,7 +396,10 @@
       "answer_type": "known_item",
       "intended": "Dangal (2016)",
       "expected": [
-        "movie:360814"
+        {
+          "key": "movie:360814",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Dangal (2016)"
@@ -339,7 +411,10 @@
       "answer_type": "known_item",
       "intended": "3 Idiots (2009)",
       "expected": [
-        "movie:20453"
+        {
+          "key": "movie:20453",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: 3 Idiots (2009)"
@@ -351,7 +426,10 @@
       "answer_type": "known_item",
       "intended": "Stranger Things (2016 series)",
       "expected": [
-        "tv:66732"
+        {
+          "key": "tv:66732",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Stranger Things (2016)"
@@ -363,7 +441,10 @@
       "answer_type": "known_item",
       "intended": "Game of Thrones (2011 series)",
       "expected": [
-        "tv:1399"
+        {
+          "key": "tv:1399",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Game of Thrones (2011)"
@@ -375,7 +456,10 @@
       "answer_type": "known_item",
       "intended": "The Godfather (1972)",
       "expected": [
-        "movie:238"
+        {
+          "key": "movie:238",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Godfather (1972)"
@@ -387,7 +471,10 @@
       "answer_type": "known_item",
       "intended": "Forrest Gump (1994)",
       "expected": [
-        "movie:13"
+        {
+          "key": "movie:13",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Forrest Gump (1994)"
@@ -399,7 +486,10 @@
       "answer_type": "known_item",
       "intended": "Sholay (1975)",
       "expected": [
-        "movie:12259"
+        {
+          "key": "movie:12259",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Sholay (1975)"
@@ -411,7 +501,10 @@
       "answer_type": "known_item",
       "intended": "Zindagi Na Milegi Dobara (2011)",
       "expected": [
-        "movie:61202"
+        {
+          "key": "movie:61202",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Zindagi Na Milegi Dobara (2011)"
@@ -423,7 +516,10 @@
       "answer_type": "known_item",
       "intended": "K.G.F: Chapter 2 (2022)",
       "expected": [
-        "movie:587412"
+        {
+          "key": "movie:587412",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: K.G.F: Chapter 2 (2022)"
@@ -435,7 +531,10 @@
       "answer_type": "known_item",
       "intended": "The Dark Knight (2008)",
       "expected": [
-        "movie:155"
+        {
+          "key": "movie:155",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Dark Knight (2008)"
@@ -447,7 +546,10 @@
       "answer_type": "known_item",
       "intended": "Game of Thrones (2011 series)",
       "expected": [
-        "tv:1399"
+        {
+          "key": "tv:1399",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Game of Thrones (2011)"
@@ -459,7 +561,10 @@
       "answer_type": "known_item",
       "intended": "The Shawshank Redemption (1994)",
       "expected": [
-        "movie:278"
+        {
+          "key": "movie:278",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Shawshank Redemption (1994)"
@@ -471,7 +576,10 @@
       "answer_type": "known_item",
       "intended": "Interstellar (2014)",
       "expected": [
-        "movie:157336"
+        {
+          "key": "movie:157336",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Interstellar (2014)"
@@ -483,7 +591,10 @@
       "answer_type": "known_item",
       "intended": "Breaking Bad (2008 series)",
       "expected": [
-        "tv:1396"
+        {
+          "key": "tv:1396",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Breaking Bad (2008)"
@@ -495,7 +606,10 @@
       "answer_type": "known_item",
       "intended": "The Family Man (2019 Indian series)",
       "expected": [
-        "tv:93352"
+        {
+          "key": "tv:93352",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Family Man (2019)"
@@ -527,7 +641,10 @@
       "answer_type": "known_item",
       "intended": "Stranger Things (2016 series)",
       "expected": [
-        "tv:66732"
+        {
+          "key": "tv:66732",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Stranger Things (2016)"
@@ -539,7 +656,10 @@
       "answer_type": "known_item",
       "intended": "Kabhi Khushi Kabhie Gham (2001)",
       "expected": [
-        "movie:10757"
+        {
+          "key": "movie:10757",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Kabhi Khushi Kabhie Gham (2001)"
@@ -841,7 +961,10 @@
       "answer_type": "known_item",
       "intended": "Bajrangi Bhaijaan (2015)",
       "expected": [
-        "movie:348892"
+        {
+          "key": "movie:348892",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Bajrangi Bhaijaan (2015)"
@@ -853,7 +976,10 @@
       "answer_type": "known_item",
       "intended": "Dil Chahta Hai (2001)",
       "expected": [
-        "movie:14752"
+        {
+          "key": "movie:14752",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Dil Chahta Hai (2001)"
@@ -865,7 +991,10 @@
       "answer_type": "known_item",
       "intended": "Kuch Kuch Hota Hai (1998)",
       "expected": [
-        "movie:11854"
+        {
+          "key": "movie:11854",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Kuch Kuch Hota Hai (1998)"
@@ -1157,7 +1286,10 @@
       "answer_type": "known_item",
       "intended": "Memento (2000)",
       "expected": [
-        "movie:77"
+        {
+          "key": "movie:77",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Memento (2000)"
@@ -1169,7 +1301,10 @@
       "answer_type": "known_item",
       "intended": "Home Alone (1990)",
       "expected": [
-        "movie:771"
+        {
+          "key": "movie:771",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Home Alone (1990)"
@@ -1181,7 +1316,10 @@
       "answer_type": "known_item",
       "intended": "Inception (2010)",
       "expected": [
-        "movie:27205"
+        {
+          "key": "movie:27205",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Inception (2010)"
@@ -1193,7 +1331,10 @@
       "answer_type": "known_item",
       "intended": "The Martian (2015)",
       "expected": [
-        "movie:286217"
+        {
+          "key": "movie:286217",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: The Martian (2015)"
@@ -1235,7 +1376,10 @@
       "answer_type": "known_item",
       "intended": "Jaws (1975)",
       "expected": [
-        "movie:578"
+        {
+          "key": "movie:578",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Jaws (1975)"
@@ -1247,7 +1391,10 @@
       "answer_type": "known_item",
       "intended": "Dangal (2016)",
       "expected": [
-        "movie:360814"
+        {
+          "key": "movie:360814",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Dangal (2016)"
@@ -1259,7 +1406,10 @@
       "answer_type": "known_item",
       "intended": "Cast Away (2000)",
       "expected": [
-        "movie:8358"
+        {
+          "key": "movie:8358",
+          "grade": 3
+        }
       ],
       "labelled_by": "auto",
       "notes": "auto-matched: Cast Away (2000)"
@@ -1314,5 +1464,6 @@
       "labelled_by": null,
       "notes": ""
     }
-  ]
+  ],
+  "schema": 2
 }

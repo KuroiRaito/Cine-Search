@@ -17,9 +17,16 @@ main{padding:20px;max-width:1400px;margin:0 auto}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .card{background:var(--panel);border:2px solid transparent;border-radius:10px;overflow:hidden;cursor:pointer;transition:.12s;position:relative}
 .card:hover{transform:translateY(-2px);border-color:var(--line)}
-.card.on{border-color:var(--ok);box-shadow:0 0 0 3px rgba(34,197,94,.2)}
-.card.on .tick{opacity:1;transform:scale(1)}
-.tick{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:var(--ok);color:#052e16;display:grid;place-items:center;font-weight:800;opacity:0;transform:scale(.6);transition:.12s}
+.card.g3{border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.2)}
+.card.g2{border-color:#eab308;box-shadow:0 0 0 3px rgba(234,179,8,.2)}
+.card.g1{border-color:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.2)}
+.card.g3 .tick,.card.g2 .tick,.card.g1 .tick{opacity:1;transform:scale(1)}
+.card.g3 .tick{background:#22c55e;color:#052e16}
+.card.g2 .tick{background:#eab308;color:#422006}
+.card.g1 .tick{background:#f97316;color:#431407}
+.tick{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;opacity:0;transform:scale(.6);transition:.12s;font-size:.8rem}
+.legend{display:flex;gap:14px;align-items:center;font-size:.78rem;color:var(--dim);margin-bottom:12px;flex-wrap:wrap}
+.sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .card img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#0b1220}
 .noimg{width:100%;aspect-ratio:2/3;display:grid;place-items:center;color:var(--dim);font-size:.7rem;text-align:center;padding:8px;background:#0b1220}
 .cap{padding:8px 10px}
@@ -49,6 +56,13 @@ input{background:var(--bg);border:1px solid var(--line);color:var(--txt);padding
 <main>
   <div id="view">
     <div class="intent"><b>What the user means:</b> <span id="intent"></span></div>
+    <div class="legend">
+      <span>Click a title to cycle its grade:</span>
+      <span><i class="sw" style="background:#22c55e"></i>3 — perfect answer</span>
+      <span><i class="sw" style="background:#eab308"></i>2 — good</span>
+      <span><i class="sw" style="background:#f97316"></i>1 — marginal</span>
+      <span><i class="sw" style="background:var(--line)"></i>unclicked — wrong</span>
+    </div>
     <div class="gap" id="gapnote" style="display:none">
       Marked <b>not in catalogue</b> — this query will be excluded from scoring and reported
       separately as a catalogue gap, so the ranker isn't blamed for missing data.
@@ -68,7 +82,7 @@ input{background:var(--bg);border:1px solid var(--line);color:var(--txt);padding
   <span class="count" id="count"></span>
 </footer>
 <script>
-let QS=[],CAND={},i=0,picked=new Set(),extra=[],searchTimer=null;
+let QS=[],CAND={},i=0,picked=new Map(),extra=[],searchTimer=null;
 
 const el=id=>document.getElementById(id);
 const img=p=>p?`<img loading="lazy" src="https://image.tmdb.org/t/p/w185${p}">`:`<div class="noimg">no poster</div>`;
@@ -91,7 +105,7 @@ function pool(){
 function render(){
   if(i>=QS.length){el('view').style.display='none';el('done').style.display='block';return;}
   const q=QS[i];
-  picked=new Set(q.expected||[]);extra=[];
+  picked=new Map((q.expected||[]).map(e=>[e.key,e.grade??3]));extra=[];
   el('qtext').textContent='"'+q.query+'"';
   el('qcat').textContent=q.category.replace('_',' ');
   el('qpos').textContent=`${i+1} of ${QS.length}`;
@@ -104,31 +118,41 @@ function render(){
 function paint(){
   const items=pool();
   el('grid').innerHTML=items.map(c=>`
-    <div class="card ${picked.has(c.key)?'on':''}" data-k="${c.key}">
-      <div class="tick">✓</div>
+    <div class="card ${picked.has(c.key)?'g'+picked.get(c.key):''}" data-k="${c.key}">
+      <div class="tick">${picked.get(c.key)??''}</div>
       <div class="src">${c.source||'?'}</div>
       ${img(c.poster)}
       <div class="cap"><b>${c.title}</b><span>${c.year} · ${c.media_type}</span></div>
     </div>`).join('');
   el('grid').querySelectorAll('.card').forEach(n=>n.onclick=()=>{
-    const k=n.dataset.k;picked.has(k)?picked.delete(k):picked.add(k);
-    n.classList.toggle('on');updateCount();
+    const k=n.dataset.k;
+    // cycle: unset -> 3 -> 2 -> 1 -> unset
+    const next={undefined:3,3:2,2:1,1:undefined}[picked.get(k)];
+    if(next===undefined)picked.delete(k);else picked.set(k,next);
+    n.className='card '+(picked.has(k)?'g'+picked.get(k):'');
+    n.querySelector('.tick').textContent=picked.get(k)??'';
+    updateCount();
   });
   updateCount();
 }
-const updateCount=()=>el('count').textContent=`${picked.size} marked acceptable`;
+const updateCount=()=>{
+  const g=[...picked.values()];
+  el('count').textContent=picked.size
+    ? `${picked.size} graded — ${g.filter(x=>x===3).length}×3  ${g.filter(x=>x===2).length}×2  ${g.filter(x=>x===1).length}×1`
+    : 'nothing graded yet';
+};
 
 async function save(next=1){
   const q=QS[i];
   await fetch('/api/label',{method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify({id:q.id,expected:[...picked],answer_type:q.answer_type})});
-  q.expected=[...picked];q.labelled_by='human';
+    body:JSON.stringify({id:q.id,expected:[...picked].map(([key,grade])=>({key,grade})),answer_type:q.answer_type})});
+  q.expected=[...picked].map(([key,grade])=>({key,grade}));q.labelled_by='human';
   i=Math.max(0,i+next);render();
 }
 
 el('next').onclick=()=>save(1);
 el('prev').onclick=()=>{i=Math.max(0,i-1);render();};
-el('gap').onclick=()=>{QS[i].answer_type='not_in_catalogue';picked=new Set();save(1);};
+el('gap').onclick=()=>{QS[i].answer_type='not_in_catalogue';picked=new Map();save(1);};
 
 el('add').oninput=e=>{
   clearTimeout(searchTimer);const v=e.target.value.trim();

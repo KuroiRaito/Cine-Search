@@ -11,9 +11,31 @@ export const keyOf = (item) => `${item.media_type}:${item.id}`;
  * @param {object} q      entry from queries.json
  * @param {object[]} results ranked results from the search implementation
  */
+/** Graded gain for a result key. 0 = not labelled acceptable. */
+const gradeOf = (expected, key) => expected.get(key) ?? 0;
+
+/**
+ * NDCG@k over graded labels.
+ *
+ * Binary relevance cannot say that one acceptable mood result is better than
+ * another, and raw DCG is not comparable across queries with different numbers
+ * of correct answers ("inception" has 1, "sad war movie" has ~15). Normalising
+ * against the ideal ordering fixes both, which is why this replaces the
+ * per-answer-type metric split.
+ */
+function ndcgAt(ranked, expected, k) {
+    const disc = (i) => 1 / Math.log2(i + 2);           // i is 0-based
+    const dcg = ranked.slice(0, k).reduce((sum, key, i) => sum + gradeOf(expected, key) * disc(i), 0);
+    const ideal = [...expected.values()].sort((a, b) => b - a).slice(0, k);
+    const idcg = ideal.reduce((sum, g, i) => sum + g * disc(i), 0);
+    return idcg > 0 ? dcg / idcg : null;
+}
+
 export function scoreQuery(q, results) {
     const ranked = results.map(keyOf);
-    const expected = new Set(q.expected || []);
+    // schema 2: expected is [{key, grade}]. Grade >= 1 counts as acceptable for
+    // the binary metrics, which are kept because they are easier to explain.
+    const expected = new Map((q.expected || []).map((e) => [e.key, e.grade ?? 3]));
     const zeroResult = ranked.length === 0;
 
     // Catalogue gaps are a data problem, not a ranking problem. Scoring them
@@ -26,6 +48,8 @@ export function scoreQuery(q, results) {
     const top5 = ranked.slice(0, 5);
     const top10 = ranked.slice(0, 10);
     const hitsTop5 = top5.filter(k => expected.has(k)).length;
+    const ndcg10 = ndcgAt(ranked, expected, 10);
+    const ndcg5 = ndcgAt(ranked, expected, 5);
 
     // Headline metric. Empty OR nothing acceptable in the top 5.
     // Deliberately chosen over bare zero-result rate: a "never-empty" fallback
@@ -34,7 +58,7 @@ export function scoreQuery(q, results) {
 
     const base = { id: q.id, category: q.category, answer_type: q.answer_type,
                    scored: true, zeroResult, nullAndLow, catalogueGap: false,
-                   resultCount: ranked.length };
+                   resultCount: ranked.length, ndcg10, ndcg5 };
 
     if (q.answer_type === 'known_item') {
         // One correct answer => rank-sensitive metrics are the honest ones.
@@ -84,6 +108,10 @@ export function aggregate(scores) {
         // Open-set only
         precision5: open.length ? mean(open.map(s => s.precision5)) : null,
         coverage10: open.length ? mean(open.map(s => s.coverage10).filter(v => v !== null)) : null,
+        // Primary ranking-quality metric: graded, position-aware, and comparable
+        // across queries regardless of how many correct answers they have.
+        ndcg10: mean(scored.map(s => s.ndcg10).filter(v => v !== null && v !== undefined)),
+        ndcg5: mean(scored.map(s => s.ndcg5).filter(v => v !== null && v !== undefined)),
         // Reported separately, never folded into the scores above
         catalogueGap: frac(gaps.length, scores.length),
         // Small samples are noise. The report flags these rather than trusting them.

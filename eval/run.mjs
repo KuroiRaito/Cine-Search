@@ -8,7 +8,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { installCachingFetch, getStats, resetStats } from './lib/cache.mjs';
+import { makeCachingFetch, getStats, resetStats } from './lib/cache.mjs';
 import { getMode } from './lib/tmdb-http.mjs';
 import { scoreQuery, aggregate, byCategory } from './lib/metrics.mjs';
 import { printReport, saveRun, loadPreviousRun } from './lib/report.mjs';
@@ -28,6 +28,9 @@ const VARIANT = opt('variant', process.env.VITE_SEARCH_V2 === 'true' ? 'v2' : 'v
 const LIMIT = Number(opt('limit', 0));
 const COMPARE = opt('compare', null);
 const CONCURRENCY = Number(opt('concurrency', 4));
+// Which implementation to exercise. Defaults to the baseline so an unflagged
+// run always measures v1.
+const VARIANT_PATH = VARIANT.startsWith('v2') ? 'v2' : 'v1-baseline';
 
 // The exact state a user lands on. Pinned so runs are comparable, and recorded
 // in the output so a future reader knows what was measured.
@@ -70,10 +73,14 @@ async function main() {
     if (!queries.length) { console.error('  Nothing to score.\n'); process.exit(1); }
 
     resetStats();
-    await installCachingFetch({ refresh: REFRESH });
 
-    // Imported AFTER the fetch patch so its network calls are cached.
-    const { searchOrDiscover } = await import('../src/lib/tmdb.js');
+    // Inject the caching transport into the app's own TMDB client. No globals
+    // are touched, so nothing else in the process can be affected by it.
+    const { setFetchImpl } = await import('../src/lib/client-shim.mjs');
+    setFetchImpl(await makeCachingFetch({ refresh: REFRESH }));
+
+    const { search } = await import('../src/lib/search/index.js');
+    const searchOrDiscover = (q, mediaType, o) => search(q, { ...o, mediaType }, { variant: VARIANT_PATH });
 
     console.log(`\n  ${queries.length} queries · variant "${VARIANT}" · cache ${REFRESH ? 'REFRESH' : 'on'} · tmdb: ${getMode()}`);
 

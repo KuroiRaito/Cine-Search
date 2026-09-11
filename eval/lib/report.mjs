@@ -26,18 +26,19 @@ export function printReport(run, prev = null) {
     console.log(`  null-and-low@5   ${C.bold}${pct(agg.nullAndLow5)}${C.reset}  ${C.dim}(${fr(agg.nullAndLow5)})  nothing useful in top 5${C.reset}`);
     console.log(`    ├ zero results        ${pct(agg.zeroResult)}  ${C.dim}(${fr(agg.zeroResult)})${C.reset}`);
     console.log(`    └ populated but wrong ${pct(agg.populatedButWrong)}  ${C.dim}(${fr(agg.populatedButWrong)})${C.reset}`);
+    console.log(`  NDCG@10          ${C.bold}${num(agg.ndcg10)}${C.reset}  ${C.dim}graded, position-aware, comparable across query types${C.reset}`);
     console.log(`  MRR (known-item)  ${num(agg.mrr)}   P@5 (open-set) ${num(agg.precision5)}   coverage@10 ${num(agg.coverage10)}`);
     console.log(`  catalogue gaps    ${pct(agg.catalogueGap)} ${C.dim}(${fr(agg.catalogueGap)}) excluded from scoring${C.reset}\n`);
 
     // ---- per category ----
     console.log(`${C.bold}BY CATEGORY${C.reset}  ${C.dim}(lower null-and-low is better)${C.reset}`);
-    console.log(`${C.dim}  ${pad('category', 22)} ${pad('n&l@5', 12)} ${pad('zero', 11)} ${pad('MRR', 6)} ${pad('P@5', 6)} ${pad('cov@10', 7)}${C.reset}`);
+    console.log(`${C.dim}  ${pad('category', 22)} ${pad('n&l@5', 12)} ${pad('zero', 11)} ${pad('NDCG@10', 8)} ${pad('MRR', 6)} ${pad('P@5', 6)}${C.reset}`);
 
     const rows = Object.entries(categories).sort((a, b) => (b[1].nullAndLow5.pct ?? 0) - (a[1].nullAndLow5.pct ?? 0));
     for (const [cat, a] of rows) {
         const flag = a.directionalOnly ? `${C.yellow}~${C.reset}` : ' ';
         const sev = (a.nullAndLow5.pct ?? 0) >= 0.5 ? C.red : (a.nullAndLow5.pct ?? 0) >= 0.25 ? C.yellow : C.green;
-        console.log(`${flag} ${pad(cat, 22)} ${sev}${pct(a.nullAndLow5)}${C.reset} ${pad(C.dim + fr(a.nullAndLow5) + C.reset, 16)} ${pad(pct(a.zeroResult), 11)} ${pad(num(a.mrr), 6)} ${pad(num(a.precision5), 6)} ${pad(num(a.coverage10), 7)}`);
+        console.log(`${flag} ${pad(cat, 22)} ${sev}${pct(a.nullAndLow5)}${C.reset} ${pad(C.dim + fr(a.nullAndLow5) + C.reset, 16)} ${pad(pct(a.zeroResult), 11)} ${pad(num(a.ndcg10), 8)} ${pad(num(a.mrr), 6)} ${pad(num(a.precision5), 6)}`);
     }
     console.log(`${C.dim}  ~ = fewer than 15 scored queries; directional only, do not present as a result${C.reset}`);
 

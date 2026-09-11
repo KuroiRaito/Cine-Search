@@ -29,17 +29,17 @@ function keyFor(url) {
 }
 
 /**
- * Wraps globalThis.fetch with a read-through disk cache.
- * Monkey-patching rather than editing src/lib/tmdb.js is deliberate: the harness
- * must measure the production module *unmodified*, or the baseline is not a
- * baseline of anything real.
+ * Build a read-through disk-caching fetch. Injected into the app's TMDB client
+ * via setFetchImpl rather than patched onto globalThis: patching globals meant a
+ * single transient error could silently change transport mid-run and corrupt
+ * every latency measurement in it.
  */
-export async function installCachingFetch({ refresh = false } = {}) {
+export async function makeCachingFetch({ refresh = false } = {}) {
     if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
     const realFetch = globalThis.fetch;
     await detectMode(realFetch);
 
-    globalThis.fetch = async function cachingFetch(url, opts) {
+    return async function cachingFetch(url, opts) {
         // Normalise first: src/lib/tmdb.js emits app-relative /api/tmdb URLs,
         // which Node cannot fetch. Canonical form is also the cache key, so
         // direct and proxy runs share a cache and stay comparable.
@@ -82,4 +82,9 @@ export async function installCachingFetch({ refresh = false } = {}) {
         }
         return new Response(text, { status: res.status, headers: res.headers });
     };
+}
+
+/** Back-compat for scripts that still want the global patched. */
+export async function installCachingFetch(opts) {
+    globalThis.fetch = await makeCachingFetch(opts);
 }

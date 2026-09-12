@@ -452,6 +452,88 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
 .prow.nolink{cursor:default;background:var(--bg-sub)}
 .prow.nolink:hover{background:var(--bg-sub)}
 .i-vg{background-image:url(https://image.tmdb.org/t/p/w185/wJIxATESjzsjSgvRhVavOmdamXc.jpg)}
+
+/* ---------- desktop frames ---------- */
+.desk{border:1px solid var(--bd-str);border-radius:14px;overflow:hidden;background:var(--bg);
+  box-shadow:var(--sh);margin-top:18px}
+.desk-chrome{height:30px;background:var(--bg-sub);border-bottom:1px solid var(--bd-sub);
+  display:flex;align-items:center;gap:6px;padding:0 12px}
+.desk-chrome i{width:9px;height:9px;border-radius:99px;background:var(--ink-7);font-style:normal}
+.desk-chrome b{margin-left:10px;font-family:var(--f-m);font-size:10px;color:var(--ink-9);font-weight:400}
+.desk-body{padding:0;overflow-x:auto}
+.desk-in{min-width:920px}
+
+/* desktop top nav */
+.dnav{display:flex;align-items:center;gap:22px;padding:11px 22px;border-bottom:1px solid var(--bd-sub)}
+.dnav .lg{display:flex;align-items:center;gap:7px;font-family:var(--f-d);font-weight:800;font-size:15px;letter-spacing:-.03em}
+.dnav .lg i{width:6px;height:6px;border-radius:99px;background:var(--acc);font-style:normal}
+.dnav a{font-size:13px;color:var(--muted);text-decoration:none}
+.dnav a.on{color:var(--text);font-weight:600}
+.dnav .sp{flex:1}
+.dnav .srch{background:var(--ink-3);border-radius:9px;padding:7px 13px;font-size:12.5px;color:var(--muted);width:230px}
+
+/* desktop title layout */
+.dhero{height:230px;position:relative}
+.dhero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 70%)}
+.dgrid{display:grid;grid-template-columns:210px minmax(0,1fr) 250px;gap:28px;padding:0 28px 28px;
+  margin-top:-78px;position:relative;z-index:2;align-items:start}
+.dposter{aspect-ratio:2/3;border-radius:12px;border:1px solid var(--bd-sub);box-shadow:var(--sh)}
+.dmain h3{font-family:var(--f-d);font-size:30px;font-weight:800;letter-spacing:-.035em;margin:0 0 6px;padding-top:48px}
+.dside{position:sticky;top:12px;background:var(--surface);border-radius:12px;padding:14px}
+.dcards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.drail{display:flex;gap:11px;overflow-x:auto;margin-top:9px}
+.drail::-webkit-scrollbar{height:0}
+.drail .rt{flex:0 0 92px}
+
+/* desktop library */
+.dlib{display:grid;grid-template-columns:190px minmax(0,1fr);gap:26px;padding:22px 28px 28px}
+.dfilters{display:flex;flex-direction:column;gap:3px}
+.dfilters button{text-align:left;border:none;background:none;cursor:pointer;color:var(--muted);
+  font-family:var(--f-s);font-size:13px;padding:8px 11px;border-radius:9px;display:flex;
+  justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums;transition:all .12s}
+.dfilters button em{font-style:normal;opacity:.5}
+.dfilters button:hover{background:var(--ink-3);color:var(--text)}
+.dfilters button[aria-pressed="true"]{background:var(--acc-bg);color:var(--acc-t);font-weight:600;
+  box-shadow:inset 0 0 0 1px var(--acc-bd)}
+.dfgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.dsrow{display:grid;grid-template-columns:52px minmax(0,1fr) 190px 40px;gap:14px;align-items:center;
+  padding:11px 13px;border-radius:11px;background:var(--surface);margin-bottom:8px;position:relative;overflow:hidden}
+.dsrow .th{width:52px;aspect-ratio:2/3;border-radius:6px;border:1px solid var(--bd-sub)}
+.dsrow .nm{font-size:14px;font-weight:600}
+.dsrow .ep{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dmeter{height:5px;border-radius:99px;background:var(--ink-4);overflow:hidden}
+.dmeter i{display:block;height:100%;background:var(--acc);border-radius:99px}
+@media (max-width:820px){.desk-in{min-width:920px}}
+
+/* desktop: editor as centred modal */
+.dmodal-wrap{position:relative;background:var(--bg-sub);padding:26px;display:grid;place-items:center;min-height:430px}
+.dmodal-wrap::before{content:"";position:absolute;inset:0;background:rgba(4,8,16,.55)}
+.dmodal{position:relative;width:660px;max-width:100%;background:var(--bg);border-radius:15px;
+  box-shadow:0 24px 60px -12px rgba(0,0,0,.6);overflow:hidden}
+.dm-head{display:flex;align-items:center;gap:13px;padding:15px 18px;border-bottom:1px solid var(--bd-sub)}
+.dm-head .po{width:46px;flex:0 0 auto;aspect-ratio:2/3;border-radius:7px;border:1px solid var(--bd-sub)}
+.dm-head .tt{flex:1;min-width:0}
+.dm-head .tt b{display:block;font-family:var(--f-d);font-size:16px;font-weight:700;letter-spacing:-.02em}
+.dm-head .tt span{display:block;font-size:11.5px;color:var(--muted)}
+.dm-body{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:18px}
+.dm-body .full{grid-column:1/-1}
+.dm-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:13px 18px;border-top:1px solid var(--bd-sub);background:var(--bg-sub)}
+.dm-foot .sp{flex:1}
+
+/* desktop home */
+.dhome{padding:22px 28px 28px}
+.dcw{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.dcwcard{display:flex;gap:11px;padding:11px;border-radius:11px;background:var(--surface);position:relative;overflow:hidden}
+.dcwcard .th{width:46px;flex:0 0 auto;aspect-ratio:2/3;border-radius:6px;border:1px solid var(--bd-sub)}
+.dcwcard .bd{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.dcwcard .nm{font-size:13px;font-weight:600;line-height:1.25}
+.dcwcard .ep{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* desktop person */
+.dperson{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;padding:24px 28px 28px}
+.dpcard{background:var(--surface);border-radius:13px;padding:16px;position:sticky;top:12px}
+.dpface{width:100%;aspect-ratio:1;border-radius:13px;margin-bottom:12px;background-size:cover;background-position:center}
 </style>
 
 <div class="bar">
@@ -1333,6 +1415,305 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
       placeholders ("…And the Bag's in the River" wraps to two lines), episode stills are genuinely dark, and the gold
       score badge has to survive being placed over any of it. That's why the badge keeps its own scrim rather than
       trusting the theme.</div>
+  </section>
+
+  <!-- ============ DESKTOP ============ -->
+  <section>
+    <h2>Desktop · the same components, given room</h2>
+    <p class="lede">Nothing below is new. Every element here already exists in the mobile screens — the poster, the
+      status pill, the provider chips, the preview cards, the rails, the rows, the meters. Desktop changes
+      <b>how many fit and where they sit</b>, not what they are. That's the whole argument for doing it inside one
+      product rather than forking a second one.</p>
+
+    <h3 style="margin-top:28px">Title page at 1120px</h3>
+    <div class="desk">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app/film/693134</b></div>
+      <div class="desk-body"><div class="desk-in">
+        <div class="dnav">
+          <span class="lg"><i></i>Cine Search</span>
+          <a href="#d">Home</a><a href="#d" class="on">Discover</a><a href="#d">Library</a>
+          <span class="sp"></span>
+          <span class="srch">⌕&nbsp; Search films and series</span>
+          <span class="circ">◍</span>
+        </div>
+        <div class="dhero img i-dune_b"></div>
+        <div class="dgrid">
+          <div><div class="dposter img i-dune_p"></div></div>
+
+          <div class="dmain">
+            <h3>Dune: Part Two</h3>
+            <div class="metaline" style="font-size:12px">2024 · Science Fiction, Adventure · 2h 47m</div>
+            <div class="scores" style="margin:18px 0 0;max-width:380px">
+              <div class="score gold"><b>8.1</b><span>TMDB · 8.5k</span></div>
+              <div class="score"><b>9.0</b><span>Your score</span></div>
+              <div class="score dim"><b>1</b><span>Rewatches</span></div>
+            </div>
+            <div style="margin-top:22px">
+              <div class="sect-h"><span>Overview</span></div>
+              <p class="ov" style="max-width:62ch;font-size:13.5px">Follow the mythic journey of Paul Atreides as he
+                unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his
+                family. Facing a choice between the love of his life and the fate of the known universe, he endeavors
+                to prevent a terrible future.</p>
+            </div>
+            <div class="dcards">
+              <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div>
+                <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div>
+                <div class="ptx" style="margin-top:6px">Chalamet, Zendaya<br>+3 more</div></div>
+              <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Denis Villeneuve<br>Director</div></div>
+              <div class="pc"><div class="pc-h"><b>Themes</b><i>⌄</i></div><div class="ptx">chosen one, desert<br>+6 more</div></div>
+              <div class="pc"><div class="pc-h"><b>Details</b><i>⌄</i></div><div class="ptx">No IN certificate<br>Budget, language</div></div>
+            </div>
+            <div style="margin-top:24px">
+              <div class="sect-h"><span>More like this</span><a href="#d">See all</a></div>
+              <div class="drail">
+                <div class="rt"><div class="im img i-rec0"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+                <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+                <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+                <div class="rt"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+                <div class="rt"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+                <div class="rt"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="tt">Enemy</div><div class="yy">2014</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dside">
+            <div class="arow" style="margin-bottom:12px">
+              <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button>
+            </div>
+            <div style="border-top:1px solid var(--bd-sub);padding-top:12px">
+              <div class="prov-l">Where to watch · India</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="pchip" style="justify-content:flex-start"><span class="plogo" style="background:#E50914">N</span>Netflix</button>
+                <button class="pchip" style="justify-content:flex-start;opacity:.8"><span class="plogo" style="background:var(--ink-8)">↧</span>Rent from ₹149</button>
+              </div>
+              <p style="font-size:10px;color:var(--ink-9);margin-top:9px">Availability by JustWatch</p>
+            </div>
+            <div style="border-top:1px solid var(--bd-sub);margin-top:12px;padding-top:12px">
+              <div class="prov-l">Directed by</div>
+              <button class="prow" style="padding:7px 8px"><span class="pf img i-dv_face"></span>
+                <span class="pb"><b>Denis Villeneuve</b><span>6 of 10 seen</span></span>
+                <span class="go">›</span></button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <p class="lede" style="margin-top:14px;font-size:13.5px"><b>What changed:</b> the action block became a sticky
+      right rail, the four preview cards went from 2×2 to 1×4, and the recommendations rail shows six instead of three.
+      The director moved from a buried crew card into the rail as a person row, because there was room for it.
+      <b>No new component was designed.</b></p>
+
+    <h3 style="margin-top:34px">Library at 1120px</h3>
+    <div class="desk">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app/library</b></div>
+      <div class="desk-body"><div class="desk-in">
+        <div class="dnav">
+          <span class="lg"><i></i>Cine Search</span>
+          <a href="#d">Home</a><a href="#d">Discover</a><a href="#d" class="on">Library</a>
+          <span class="sp"></span>
+          <span class="srch">⌕&nbsp; Search films and series</span>
+          <span class="circ">◍</span>
+        </div>
+        <div class="dlib">
+          <div class="dfilters">
+            <button aria-pressed="true">Watching<em>3</em></button>
+            <button>Want to watch<em>12</em></button>
+            <button>Watched<em>84</em></button>
+            <button>On hold<em>2</em></button>
+            <button>Dropped<em>1</em></button>
+            <button style="margin-top:6px">Liked<em>9</em></button>
+            <button>All<em>102</em></button>
+          </div>
+          <div>
+            <div class="grp-h" style="margin:0 0 10px"><b>Series</b><span>3 in progress</span></div>
+            <div class="dsrow"><div class="th img i-bb_p"></div>
+              <div><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62 episodes</div></div>
+              <div><div class="dmeter"><i style="width:17.7%"></i></div>
+                <div class="ep" style="margin-top:5px">18% complete</div></div>
+              <button class="plus">+</button></div>
+            <div class="dsrow"><div class="th" style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></div>
+              <div><div class="nm">Severance</div><div class="ep">S2 E7 · 16 of 19 episodes</div></div>
+              <div><div class="dmeter"><i style="width:84%"></i></div>
+                <div class="ep" style="margin-top:5px">84% complete</div></div>
+              <button class="plus">+</button></div>
+            <div class="dsrow"><div class="th" style="background:linear-gradient(150deg,#3B5A7A,#16243A)"></div>
+              <div><div class="nm">Shōgun</div><div class="ep">S1 E2 · 2 of 10 episodes</div></div>
+              <div><div class="dmeter"><i style="width:20%"></i></div>
+                <div class="ep" style="margin-top:5px">20% complete</div></div>
+              <button class="plus">+</button></div>
+
+            <div class="grp-h" style="margin:24px 0 10px"><b>Films</b><span>want to watch · 12</span></div>
+            <div class="dfgrid">
+              <div class="fc"><div class="im img i-dune_p"><button class="sb want">◷</button><span class="gb">8.1</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im img i-rec0"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im img i-dv3"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="nm">Enemy</div><div class="yr">2014</div></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <p class="lede" style="margin-top:14px;font-size:13.5px"><b>What changed:</b> the horizontal filter chips became a
+      vertical sidebar — which also makes room for <code>Liked</code> and <code>Dropped</code> without a scroll. Series
+      rows gained a dedicated progress column instead of a hairline on the card edge. The film grid went from 3-up to
+      6-up. Again, <b>same components</b>.</p>
+
+    <h3 style="margin-top:34px">The editor — a modal, not a sheet</h3>
+    <p class="lede" style="font-size:13.5px">This is the one screen that genuinely changes shape. A bottom sheet is a
+      phone idiom; on desktop it becomes a centred modal, and the two-column form means every field is visible without
+      scrolling — so Save stops needing to live in the header.</p>
+    <div class="desk">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app/series/1396</b></div>
+      <div class="desk-body"><div class="desk-in"><div class="dmodal-wrap">
+        <div class="dmodal">
+          <div class="dm-head">
+            <div class="po img i-bb_p"></div>
+            <div class="tt"><b>Breaking Bad</b><span>2008–2013 · 5 seasons · 62 episodes</span></div>
+            <button class="ibtn like on" aria-pressed="true">♥</button>
+            <button class="circ">✕</button>
+          </div>
+          <div class="dm-body">
+            <div class="fld full" style="padding:0 0 14px"><label>Status</label>
+              <div class="segs" style="grid-template-columns:repeat(6,1fr)">
+                <button class="seg" style="--c:var(--st-want-11);--b:var(--st-want-3)">◷<i>Want</i></button>
+                <button class="seg on" style="--c:var(--st-ing-11);--b:var(--st-ing-3)">▶<i>Watching</i></button>
+                <button class="seg" style="--c:var(--st-hold-11);--b:var(--st-hold-3)">‖<i>On hold</i></button>
+                <button class="seg" style="--c:var(--st-done-11);--b:var(--st-done-3)">✓<i>Watched</i></button>
+                <button class="seg" style="--c:var(--st-re-11);--b:var(--st-re-3)">↻<i>Rewatch</i></button>
+                <button class="seg" style="--c:var(--st-drop-11);--b:var(--st-drop-3)">✕<i>Dropped</i></button>
+              </div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Progress</label>
+              <div class="prog"><button class="stp">−</button>
+                <div class="prog-v"><b>11</b><span>of 62 episodes</span></div>
+                <button class="stp">+</button></div>
+              <div class="jump">Currently at <b>S2 E4</b> · <span>Jump to episode</span></div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Your rating</label>
+              <div class="stars"><i class="on">★</i><i class="on">★</i><i class="on">★</i><i class="on">★</i><i>★</i>
+                <span class="sv">8 / 10</span></div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Started</label><div class="inp">12 Aug 2026</div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Finished</label><div class="inp dim">—</div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Rewatches</label>
+              <div class="prog compact" style="width:100%"><button class="stp">−</button>
+                <div class="prog-v"><b>0</b></div><button class="stp">+</button></div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Who recommended it?</label>
+              <div class="inp">Ravi · Mar 2026</div></div>
+            <div class="fld full" style="padding:0"><label>Notes</label>
+              <div class="inp dim" style="min-height:56px">Private to you…</div></div>
+          </div>
+          <div class="dm-foot">
+            <button class="del" style="width:auto;padding:9px 15px">Remove from library</button>
+            <span class="sp"></span>
+            <button class="btn q">Cancel</button><button class="btn">Save</button>
+          </div>
+        </div>
+      </div></div></div>
+    </div>
+
+    <h3 style="margin-top:34px">Home and Person</h3>
+    <div class="desk">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app</b></div>
+      <div class="desk-body"><div class="desk-in">
+        <div class="dnav"><span class="lg"><i></i>Cine Search</span>
+          <a href="#d" class="on">Home</a><a href="#d">Discover</a><a href="#d">Library</a>
+          <span class="sp"></span><span class="srch">⌕&nbsp; Search films and series</span><span class="circ">◍</span></div>
+        <div class="dhome">
+          <div class="grp-h" style="margin:0 0 11px"><b>Continue watching</b><span>3</span></div>
+          <div class="dcw">
+            <div class="dcwcard"><div class="th img i-bb_p"></div>
+              <div class="bd"><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62</div>
+                <div class="dmeter" style="margin-top:5px"><i style="width:17.7%"></i></div></div>
+              <button class="plus" style="align-self:center">+</button></div>
+            <div class="dcwcard"><div class="th" style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></div>
+              <div class="bd"><div class="nm">Severance</div><div class="ep">S2 E7 · 16 of 19</div>
+                <div class="dmeter" style="margin-top:5px"><i style="width:84%"></i></div></div>
+              <button class="plus" style="align-self:center">+</button></div>
+            <div class="dcwcard"><div class="th" style="background:linear-gradient(150deg,#3B5A7A,#16243A)"></div>
+              <div class="bd"><div class="nm">Shōgun</div><div class="ep">S1 E2 · 2 of 10</div>
+                <div class="dmeter" style="margin-top:5px"><i style="width:20%"></i></div></div>
+              <button class="plus" style="align-self:center">+</button></div>
+          </div>
+          <div style="margin-top:24px"><div class="sect-h"><span>Because you watched Dune: Part Two</span><a href="#d">See all</a></div>
+            <div class="drail">
+              <div class="rt"><div class="im img i-rec0"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+              <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+              <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+              <div class="rt"><div class="im img i-rec3"><button class="sb">+</button><span class="gb">6.3</span></div><div class="tt">Prince of Persia</div><div class="yy">2010</div></div>
+              <div class="rt"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+              <div class="rt"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+              <div class="rt"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="tt">Enemy</div><div class="yy">2014</div></div>
+            </div></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="desk" style="margin-top:16px">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app/person/137427</b></div>
+      <div class="desk-body"><div class="desk-in">
+        <div class="dnav"><span class="lg"><i></i>Cine Search</span>
+          <a href="#d">Home</a><a href="#d" class="on">Discover</a><a href="#d">Library</a>
+          <span class="sp"></span><span class="srch">⌕&nbsp; Search films and series</span><span class="circ">◍</span></div>
+        <div class="dperson">
+          <div class="dpcard">
+            <div class="dpface img i-dv_face"></div>
+            <div style="font-family:var(--f-d);font-size:17px;font-weight:700;letter-spacing:-.02em">Denis Villeneuve</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-bottom:14px">Directing · b. 1967, Québec</div>
+            <div class="collectbar" style="margin:0">
+              <div class="cb-t"><b><i>6</i> of 10</b><span>60%</span></div>
+              <div class="cb-track"><i style="width:60%"></i></div>
+              <div class="cb-sub">4 to go · 16 filtered out</div></div>
+          </div>
+          <div>
+            <div class="seasonsw" style="margin:0 0 16px;display:inline-flex">
+              <button class="sw" aria-pressed="true">Director<em>10</em></button>
+              <button class="sw">Writer<em>7</em></button><button class="sw">Producer<em>5</em></button></div>
+            <div class="sect-h" style="margin-bottom:11px"><span>As director</span><a href="#d">Year ▾</a></div>
+            <div class="dfgrid">
+              <div class="fc"><div class="im img i-dv0"><button class="sb done">✓</button><span class="gb">8.1</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im img i-dv1"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im img i-dv3"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="nm">Enemy</div><div class="yr">2014</div></div>
+            </div>
+            <div style="margin-top:12px;padding:10px 13px;border:1px dashed var(--bd);border-radius:10px;
+              font-size:12px;color:var(--muted)"><b style="color:var(--text)">16 more credits hidden</b> — shorts,
+              documentaries and 2 unreleased projects. <span style="color:var(--acc-t)">Show all 26</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <h3 style="margin-top:34px">Cases that only exist on desktop</h3>
+    <p class="lede" style="font-size:13.5px">The screens above are layout. These are the genuinely new problems — the
+      ones a mobile-only design never has to answer.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:200px">Case</th><th>Decision</th></tr></thead>
+        <tbody>
+          <tr><td><b>Hover exists</b></td><td>The tile <code>+</code> stays <b>always visible</b>, not hover-revealed. Hidden-until-hover is undiscoverable, breaks on touch laptops, and the button is small enough that showing it costs nothing. Hover changes its <i>colour</i>, not its existence.</td></tr>
+          <tr><td><b>Keyboard navigation</b></td><td>Segmented controls are arrow-key navigable as a single tab stop, not six. <code>Esc</code> closes the editor; <code>⌘/Ctrl+Enter</code> saves. Every focusable element keeps the visible focus ring the system already defines.</td></tr>
+          <tr><td><b>Line length</b></td><td>The overview caps at ~65 characters even in a 1120px column. Full-width body text is the most common desktop failure and the easiest to avoid.</td></tr>
+          <tr><td><b>Very wide screens</b></td><td>Page content caps at <b>1280px</b> and centres. Rails may extend to the viewport edge; reading columns never do.</td></tr>
+          <tr><td><b>Sticky rail shorter than content</b></td><td>The action rail sticks to the top of the viewport. If the rail is <i>taller</i> than the viewport it scrolls normally and stops sticking — never traps its own content out of reach.</td></tr>
+          <tr><td><b>Nav has nowhere to go</b></td><td>Bottom tabs become a top bar. The fourth destination ("You") moves into the avatar menu, since profile and settings are a session concern rather than a browsing one.</td></tr>
+          <tr><td><b>Long episode lists</b></td><td>A 62-episode season stays a <b>single column</b> at desktop. Two columns break the natural reading order of a numbered sequence, and the list is scanned rather than read.</td></tr>
+          <tr><td><b>The editor</b></td><td>Bottom sheet → centred modal, two-column form. Every field visible without scrolling, so Save moves from the header to a proper footer with an explicit Cancel.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="lede" style="margin-top:16px;font-size:13.5px"><b>Search, Taste and the state screens</b> aren't drawn
+      separately because they're the patterns already shown — Search is the Library grid with a query bar, Taste is
+      the same taste cards at 3-up, and the state screens are unchanged apart from centring within the wider column.</p>
+
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>The day-one cost is small; the retrofit cost is not.</b> None of this needs designing now — it needs the
+      components to not assume a 430px container. Fluid widths, a column count driven by a variant rather than
+      hardcoded, a nav that can render as tabs or a bar, and the editor able to mount as either a sheet or a modal.
+      Get that right while building m-web and desktop is a layout pass. Hardcode 430px and it's a rewrite.</div>
   </section>
 
   <!-- ============ LIVE DATA ============ -->

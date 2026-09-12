@@ -58,8 +58,7 @@ export default function Cover() {
                 </div>
 
                 <div className="cover-fine">
-                    Film and TV data from <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer noopener">TMDB</a>.
-                    <br />Streaming availability by <a href="https://www.justwatch.com" target="_blank" rel="noreferrer noopener">JustWatch</a>.
+                    Data from <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer noopener">TMDB</a>
                 </div>
             </div>
         </div>

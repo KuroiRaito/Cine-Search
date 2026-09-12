@@ -22,6 +22,15 @@ export function formatRuntime(minutes) {
 
 export const yearOf = (date) => (date ? String(date).slice(0, 4) : null);
 
+/** 18592 -> "18.6k". Keeps a three-column score strip on one line at 375px. */
+export function compactCount(n) {
+    if (!n) return '0';
+    if (n < 1000) return String(n);
+    if (n < 10000) return `${(n / 1000).toFixed(1)}k`;
+    if (n < 1000000) return `${Math.round(n / 1000)}k`;
+    return `${(n / 1000000).toFixed(1)}m`;
+}
+
 /**
  * Certification for one region, or null.
  *

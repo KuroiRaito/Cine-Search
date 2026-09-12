@@ -3,7 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { search } from '../lib/search/index.js';
 import { fromItem } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
-import { Tile, Skeleton, Empty, ErrorBox, Attribution } from '../components/ui.jsx';
+import { Tile, Skeleton, Empty, ErrorBox } from '../components/ui.jsx';
 
 const DEBOUNCE_MS = 250;
 
@@ -80,7 +80,6 @@ export default function SearchPage() {
                 />
             )}
 
-            <Attribution />
         </div>
     );
 }

@@ -4,7 +4,7 @@ import { trending, nowPlaying, upcoming, onTheAir } from '../lib/tmdb/endpoints.
 import { fromItem } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { useRegion } from '../hooks/useRegion.js';
-import { Rail, Skeleton, ErrorBox, Attribution } from '../components/ui.jsx';
+import { Rail, Skeleton, ErrorBox } from '../components/ui.jsx';
 import SignInPrompt from '../components/SignInPrompt.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 
@@ -83,7 +83,6 @@ export default function Discover() {
                 deps={[region]}
             />
 
-            <Attribution />
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
         </div>
     );

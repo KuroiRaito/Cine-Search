@@ -1,11 +1,25 @@
 import { useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { titleFull, season as fetchSeason } from '../lib/tmdb/endpoints.js';
-import { toTitleView, toSeasonView } from '../lib/tmdb/view.js';
+import { toTitleView, toSeasonView, compactCount } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { useRegion } from '../hooks/useRegion.js';
-import { Poster, Rail, PersonChip, TitleSkeleton, ErrorBox, Empty, Attribution } from '../components/ui.jsx';
+import { Poster, Rail, PersonChip, TitleSkeleton, ErrorBox, Empty } from '../components/ui.jsx';
 import SignInPrompt from '../components/SignInPrompt.jsx';
+
+/**
+ * Two whole labels, not one label with half of it hidden — splitting a word
+ * across a toggled span breaks the moment the hidden half is forced visible by
+ * a more specific rule, which is exactly what happened here.
+ */
+function Label({ short, long }) {
+    return (
+        <>
+            <span className="lbl-short">{short}</span>
+            <span className="lbl-long">{long}</span>
+        </>
+    );
+}
 
 const countryName = (code) => {
     try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code; }
@@ -50,14 +64,14 @@ export default function Title() {
     return (
         <div className="page">
             <div className="hero">
-                {t.backdrop && <img src={t.backdrop} alt="" />}
+                {t.backdrop && <img src={t.backdrop} alt="" fetchPriority="high" />}
                 <div className="hero-nav">
                     <button type="button" className="circ on-image" onClick={() => navigate(-1)} aria-label="Back">‹</button>
                 </div>
             </div>
 
             <div className="title-head">
-                <div className="poster"><Poster src={t.poster} title={t.title} /></div>
+                <div className="poster"><Poster src={t.poster} title={t.title} eager /></div>
                 <div className="who">
                     <h1>{t.title}</h1>
                     {/* A missing certification is simply absent — the line reflows around it. */}
@@ -105,7 +119,7 @@ export default function Title() {
                 ) : (
                     <p className="prov-none">
                         Not streaming in {countryName(t.providers.region)}.
-                        {t.providers.link && <> <a href={t.providers.link} target="_blank" rel="noreferrer noopener">Check JustWatch</a></>}
+                        {t.providers.link && <> <a href={t.providers.link} target="_blank" rel="noreferrer noopener">See options on TMDB</a></>}
                     </p>
                 )}
             </div>
@@ -113,16 +127,16 @@ export default function Title() {
             <div className="scores">
                 <div className="s gold">
                     <b>{t.voteAverage || '—'}</b>
-                    <span>TMDB<span className="wide-only"> · {t.voteCount.toLocaleString()} votes</span></span>
+                    <span><Label short="TMDB" long={`TMDB · ${compactCount(t.voteCount)}`} /></span>
                 </div>
                 <div className="s dim">
                     <b>—</b>
-                    <span>Your<span className="wide-only"> score</span></span>
+                    <span><Label short="You" long="Your score" /></span>
                 </div>
                 {isTV && (
                     <div className="s">
                         <b>{t.airedEpisodes}</b>
-                        <span>Episodes<span className="wide-only"> aired</span></span>
+                        <span><Label short="Aired" long="Aired episodes" /></span>
                     </div>
                 )}
             </div>
@@ -167,7 +181,6 @@ export default function Title() {
             )}
 
             <Rail title="More like this" items={t.related} />
-            <Attribution />
 
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
         </div>

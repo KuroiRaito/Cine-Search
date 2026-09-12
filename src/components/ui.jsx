@@ -1,8 +1,22 @@
 import { Link } from 'react-router-dom';
 
 /** A poster we have no artwork for still says which title it is. Never a broken image. */
-export function Poster({ src, title, className = '' }) {
-    if (src) return <img src={src} alt="" loading="lazy" className={className} />;
+/**
+ * `eager` for anything above the fold. A lazily-loaded hero or title poster
+ * arrives late enough that the page looks broken while you wait for it.
+ */
+export function Poster({ src, title, className = '', eager = false }) {
+    if (src) {
+        return (
+            <img
+                src={src}
+                alt=""
+                className={className}
+                loading={eager ? 'eager' : 'lazy'}
+                fetchPriority={eager ? 'high' : undefined}
+            />
+        );
+    }
     return <div className="noart">{title}</div>;
 }
 
@@ -106,12 +120,15 @@ export function ErrorBox({ what, onRetry }) {
     );
 }
 
+/**
+ * Kept deliberately quiet. TMDB asks to be credited; it doesn't ask to be
+ * shouted, and a paragraph of small print on every screen was in the way of
+ * the product. One short line, on the cover only.
+ */
 export function Attribution() {
     return (
         <p className="attribution">
-            Data from <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer noopener">TMDB</a>.
-            Streaming availability by <a href="https://www.justwatch.com" target="_blank" rel="noreferrer noopener">JustWatch</a>.
-            <br />This product is not endorsed or certified by TMDB.
+            Data from <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer noopener">TMDB</a>
         </p>
     );
 }

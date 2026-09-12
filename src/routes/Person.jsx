@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { person as fetchPerson } from '../lib/tmdb/endpoints.js';
 import { toPersonView } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
-import { Tile, Skeleton, Empty, Attribution, initialsOf } from '../components/ui.jsx';
+import { Tile, Skeleton, Empty, initialsOf } from '../components/ui.jsx';
 
 const year = (d) => (d ? new Date(d).getFullYear() : null);
 
@@ -65,7 +65,7 @@ export default function Person() {
 
             <div className="phead">
                 <div className="avatar">
-                    {p.photo ? <img src={p.photo} alt="" /> : initialsOf(p.name)}
+                    {p.photo ? <img src={p.photo} alt="" fetchPriority="high" /> : initialsOf(p.name)}
                 </div>
                 <div style={{ minWidth: 0 }}>
                     <h1>{p.name}</h1>
@@ -106,7 +106,6 @@ export default function Person() {
                 </div>
             )}
 
-            <Attribution />
         </div>
     );
 }

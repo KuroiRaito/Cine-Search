@@ -305,12 +305,6 @@ export function toSeasonView(raw) {
 }
 
 /**
- * A person, with their filmography split by role.
- *
- * Credits with no release date are dropped - verified, 2 of Villeneuve's 26
- * raw director credits are unreleased projects with no date at all.
- */
-/**
  * How many votes a credit needs to count as part of someone's body of work.
  *
  * This is a policy, not a fact, and it is the number the design was drawn
@@ -356,24 +350,52 @@ function notableCredits(list) {
 }
 
 /**
+ * The bodies of work a person page can show, and the verb each one takes.
+ *
+ * These are the same six jobs stored as credits when a title is saved, so the
+ * fraction on a person page and the fraction on a taste card are answering the
+ * same question about the same set. A composer had no page at all before this:
+ * Hans Zimmer has no Director or Writer credits and his cast credits are all
+ * "Self", so his filmography came out empty behind a biography.
+ */
+const ROLES = [
+    { key: 'director', label: 'Director', verb: 'directed', jobs: ['Director'] },
+    { key: 'creator', label: 'Creator', verb: 'created', jobs: ['Creator'] },
+    { key: 'writer', label: 'Writer', verb: 'written', jobs: ['Writer', 'Screenplay'] },
+    { key: 'composer', label: 'Composer', verb: 'scored', jobs: ['Original Music Composer'] },
+    { key: 'camera', label: 'Cinematographer', verb: 'shot', jobs: ['Director of Photography'] },
+    { key: 'cast', label: 'Cast', verb: 'acted in', jobs: null },
+];
+
+/** Which role a stored credit belongs to, so a card can find its denominator. */
+export function roleForJob(role, job) {
+    if (role === 'cast') return ROLES.find((r) => r.key === 'cast');
+    return ROLES.find((r) => r.jobs?.includes(job)) || null;
+}
+
+/**
  * A person, with their filmography split by role.
  *
  * Each role carries its own denominator. "6 of 11" means eleven films they
  * directed, six of which you have seen; switching to Writer changes both halves
  * because it is a different body of work.
+ *
+ * Roles are ordered by size, so the largest body of work leads — which is
+ * Director for a director, Cast for an actor, and Composer for a composer,
+ * without needing a rule for each.
  */
 export function toPersonView(raw) {
     const credits = raw.combined_credits || {};
-    const crewFor = (...jobs) => (credits.crew || []).filter((c) => jobs.includes(c.job));
 
-    const build = (key, label, verb, all) => {
+    const build = (role) => {
+        const all = role.jobs
+            ? (credits.crew || []).filter((c) => role.jobs.includes(c.job))
+            : (credits.cast || []);
         const items = notableCredits(all).map(toCard);
         return {
-            key,
-            label,
-            // "6 of 10 directed" — the fraction reads as "six of the ten films
-            // they directed", so the verb goes last and stays past tense.
-            verb,
+            key: role.key,
+            label: role.label,
+            verb: role.verb,
             items,
             // Everything the filter removed, counted so the screen can admit to
             // it rather than quietly present an opinion as a total.
@@ -381,13 +403,11 @@ export function toPersonView(raw) {
         };
     };
 
-    const roles = [
-        build('director', 'Director', 'directed', crewFor('Director')),
-        build('writer', 'Writer', 'written', crewFor('Writer', 'Screenplay')),
-        build('cast', 'Cast', 'acted in', credits.cast || []),
+    const roles = ROLES.map(build)
         // A role with nothing left after filtering shows no tab. An empty grid
         // behind a tab that promised a count is worse than no tab.
-    ].filter((r) => r.items.length);
+        .filter((r) => r.items.length)
+        .sort((a, b) => b.items.length - a.items.length);
 
     return {
         id: raw.id,

@@ -1061,3 +1061,13 @@ img { max-width: 100%; display: block; }
 .setrow b { font-weight: 500; min-width: 0; overflow-wrap: anywhere; text-align: right; }
 /* Keeps the title centred when the head carries a back button on one side. */
 .head-spacer { width: 34px; flex: 0 0 auto; }
+
+/* A person card carries a face. The same name on the same screen should look
+   the same wherever it appears. */
+.tc-face {
+  width: 20px; height: 20px; border-radius: 99px; overflow: hidden;
+  display: inline-grid; place-items: center; vertical-align: -5px; margin-right: 7px;
+  background: var(--ink-5); font-size: 8px; font-weight: 700; color: var(--ink-11);
+  font-family: var(--f-s);
+}
+.tc-face img { width: 100%; height: 100%; object-fit: cover; }

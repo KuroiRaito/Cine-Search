@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Skeleton, Empty } from '../components/ui.jsx';
+import { Skeleton, Empty, initialsOf } from '../components/ui.jsx';
 import { useAuth } from '../context/AuthProvider.jsx';
 import { useLibrary } from '../context/LibraryProvider.jsx';
 import { useAsync } from '../hooks/useAsync.js';
-import { posterUrl } from '../lib/tmdb/view.js';
+import { posterUrl, profileUrl, toPersonView, roleForJob } from '../lib/tmdb/view.js';
+import { person as fetchPerson } from '../lib/tmdb/endpoints.js';
 import { tasteSummary, formatDays, formatSpan, SCORE_FLOOR } from '../lib/library.js';
 
 /**
@@ -24,6 +25,10 @@ export default function You() {
         [isSignedIn, lib.ready],
         { skip: !isSignedIn },
     );
+
+    // Must sit after the fetch it reads from, and before any early return —
+    // hooks do not get to be conditional.
+    const filmographies = usePersonTotals(data?.people);
 
     if (!isSignedIn) {
         return (
@@ -119,7 +124,9 @@ export default function You() {
                     <br />One film you loved isn’t a taste.
                 </p>
             ) : (
-                ranked.map((c, i) => <TasteCard key={c.key} card={c} rank={i + 1} />)
+                ranked.map((c, i) => (
+                    <TasteCard key={c.key} card={c} rank={i + 1} total={filmographies[c.person_id]} />
+                ))
             )}
         </div>
     );
@@ -144,8 +151,9 @@ function interleave(data, order) {
             .sort((a, b) => b.avg - a.avg || b.count - a.count)
         : [...list].sort((a, b) => b.count - a.count || String(a.key).localeCompare(String(b.key))));
 
-    // Genre first, then decade. People join this list in step 4, between them.
-    const lanes = [rank(data.genres), rank(data.decades)].filter((l) => l.length);
+    // Genre, person, decade — in order of how much the answer tells you.
+    const lanes = [rank(data.genres), rank(data.people), rank(data.decades)]
+        .filter((l) => l.length);
     const out = [];
     for (let i = 0; out.length < lanes.reduce((n, l) => n + l.length, 0); i += 1) {
         for (const lane of lanes) if (lane[i]) out.push(lane[i]);
@@ -157,12 +165,36 @@ function interleave(data, order) {
  * One card shape serves genres, people and decades: name, rank, three measures
  * and poster evidence. Only the first measure's denominator differs.
  */
-function TasteCard({ card, rank }) {
+function TasteCard({ card, rank, total }) {
+    const isPerson = Boolean(card.person_id);
     return (
         <div className="tastecard">
-            <div className="tc-h"><b>{card.key}</b><i>{rank}</i></div>
+            <div className="tc-h">
+                <b>
+                    {isPerson && (
+                        <span className={`tc-face${card.profile_path ? '' : ' noimg'}`}>
+                            {card.profile_path
+                                ? <img src={profileUrl(card.profile_path, 'w185')} alt="" loading="lazy" />
+                                : initialsOf(card.name)}
+                        </span>
+                    )}
+                    {card.name ?? card.key}
+                </b>
+                <i>{rank}</i>
+            </div>
             <div className="tc-m">
-                <div><b>{card.count}</b><span>titles</span></div>
+                {/* "6 of 11" is the headline for a person: it is what tells you
+                    whether six means anything. The denominator is their whole
+                    filmography, which lives at TMDB rather than here, so it
+                    arrives a moment after the card and the card does not wait. */}
+                <div>
+                    <b>{card.count}</b>
+                    <span>
+                        {isPerson && total
+                            ? `of ${total.count} ${total.verb}`
+                            : `title${card.count === 1 ? '' : 's'}`}
+                    </span>
+                </div>
                 <div><b>{card.avg ?? '—'}</b><span>avg</span></div>
                 <div><b>{formatSpan(card.minutes)}</b><span>time</span></div>
             </div>
@@ -175,4 +207,56 @@ function TasteCard({ card, rank }) {
             )}
         </div>
     );
+}
+
+/**
+ * How much of each person's work exists, so "6" can become "6 of 11".
+ *
+ * The denominator is not ours: it is the whole filmography, which lives at
+ * TMDB. Fetched after the cards have painted, for only the people actually
+ * shown, and using the same filter the person page uses — otherwise a card and
+ * the page it links to would disagree about the same number.
+ */
+function usePersonTotals(people) {
+    const [totals, setTotals] = useState({});
+    const asked = useRef(new Set());
+
+    useEffect(() => {
+        if (!people?.length) return undefined;
+        let live = true;
+
+        (async () => {
+            for (const p of people) {
+                if (!live || asked.current.has(p.person_id)) continue;
+                // TMDB returns the occasional 502. Marking a person as asked
+                // before the attempt meant one transient failure left that card
+                // reading "6 titles" for the rest of the session, with no way
+                // back — so the mark goes on only once there is an answer.
+                for (let attempt = 0; attempt < 3 && live; attempt += 1) {
+                    try {
+                        const view = toPersonView(await fetchPerson(p.person_id));
+                        const role = roleForJob(p.role, p.job);
+                        const found = role && view.roles.find((r) => r.key === role.key);
+                        asked.current.add(p.person_id);
+                        if (live && found) {
+                            setTotals((t) => ({
+                                ...t,
+                                [p.person_id]: { count: found.items.length, verb: found.verb },
+                            }));
+                        }
+                        break;
+                    } catch {
+                        // A card reading "6 titles" is worse than "6 of 11" and
+                        // far better than no card, so a person who cannot be
+                        // reached is left alone rather than hidden.
+                        await new Promise((r) => { setTimeout(r, 400 * (attempt + 1)); });
+                    }
+                }
+            }
+        })();
+
+        return () => { live = false; };
+    }, [people]);
+
+    return totals;
 }

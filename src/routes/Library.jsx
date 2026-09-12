@@ -83,7 +83,11 @@ export default function Library() {
         );
     }
 
-    if (loading) {
+    // Signed in, but the fetch has not started yet: the session arrives a beat
+    // after the first render, so there is a frame where nothing is loading and
+    // nothing has loaded. Treating that as loaded shows an empty library to
+    // someone who has one.
+    if (loading || (!data && !error)) {
         return (
             <div className="page">
                 <div className="page-head"><h1>Library</h1></div>

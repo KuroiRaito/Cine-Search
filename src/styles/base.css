@@ -1005,3 +1005,59 @@ img { max-width: 100%; display: block; }
 .cb-track { height: 6px; border-radius: 99px; background: var(--ink-4); overflow: hidden; }
 .cb-track i { display: block; height: 100%; background: var(--st-done-9); border-radius: 99px; transition: width .18s; }
 .cb-sub { margin-top: 7px; font-size: 11.5px; color: var(--muted); }
+
+/* ---------------- taste ----------------
+
+   Everything here is cumulative. No streaks, no nudges, nothing that decays —
+   skipping a month costs nothing, because this is a record of what someone has
+   watched and not a game they can be losing.
+   ------------------------------------------------------------------ */
+
+.stiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 13px var(--gutter) 0; max-width: 440px; }
+.st-t { border: 0; border-left: 1px solid var(--bd-sub); border-radius: 0; padding: 2px 8px; text-align: center; }
+.stiles > .st-t:first-child { border-left: 0; text-align: left; padding-left: 0; }
+.st-t b { display: block; font-family: var(--f-d); font-size: 19px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.st-t span { display: block; font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+
+/* One card shape serves genres, people and decades: name, rank, three measures
+   and poster evidence. Only the first measure's denominator differs. */
+.tastecard { margin: 8px var(--gutter) 0; border: 0; border-radius: 11px; background: var(--surface); padding: 12px; max-width: 440px; }
+.tc-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
+.tc-h b { font-family: var(--f-d); font-size: 14px; font-weight: 700; color: var(--acc-t); }
+.tc-h i {
+  font-style: normal; font-size: 10.5px; font-weight: 600; color: var(--acc-t);
+  background: var(--acc-bg); border-radius: 99px; padding: 1px 7px; flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+.tc-m { display: flex; gap: 14px; margin-bottom: 9px; }
+.tc-m div b { display: block; font-family: var(--f-m); font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tc-m div span { display: block; font-family: var(--f-m); font-size: 8.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+
+/* The evidence for the number above it: the actual posters being counted. */
+.tc-r { display: flex; gap: 5px; overflow: hidden; }
+.tc-r i {
+  display: block; width: 30px; aspect-ratio: 2/3; border-radius: 4px;
+  border: 1px solid var(--bd-sub); flex: 0 0 auto;
+  background-size: cover; background-position: center; background-color: var(--ink-4);
+}
+
+/* The heading belongs to the cards beneath it, so it takes their geometry. On a
+   phone that is invisible; at 1280 it is what stops "Score ▾" from sitting 800px
+   away from the heading it modifies. */
+.sect.taste-head { margin: var(--s6) var(--gutter) 0; max-width: 440px; }
+
+/* ---------------- settings ----------------
+   Plain and conventional by decision, not omission. Standard rows and toggles. */
+
+.setblock { margin: var(--s6) var(--gutter) 0; max-width: 440px; }
+.setlabel { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+.segs.two { grid-template-columns: repeat(2, 1fr); }
+.setrow {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding: 10px 0; border-top: 1px solid var(--bd-sub); font-size: 13px;
+}
+.setrow:first-of-type { border-top: 0; }
+.setrow span { color: var(--muted); }
+.setrow b { font-weight: 500; min-width: 0; overflow-wrap: anywhere; text-align: right; }
+/* Keeps the title centred when the head carries a back button on one side. */
+.head-spacer { width: 34px; flex: 0 0 auto; }

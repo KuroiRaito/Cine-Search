@@ -1,11 +1,17 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Poster } from './ui.jsx';
 
+// The verb must match the control that was tapped. A pill reading "Want to
+// watch" that raises a sheet asking "Mark watched?" tells the user the app
+// wasn't listening.
 const VERBS = {
     save: 'Save',
+    want: 'Add',
     track: 'Track',
     rate: 'Rate',
+    like: 'Like',
+    edit: 'Edit',
     watched: 'Mark watched',
 };
 
@@ -20,6 +26,8 @@ const VERBS = {
  */
 export default function SignInPrompt({ title, poster, action = 'save', onClose }) {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
+    const go = (mode) => navigate(`/welcome/${mode}`, { state: { from: pathname } });
 
     useEffect(() => {
         const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -42,8 +50,8 @@ export default function SignInPrompt({ title, poster, action = 'save', onClose }
                     <li>Private by default — nobody sees your library but you</li>
                 </ul>
                 <div className="sheet-actions">
-                    <button type="button" className="btn" onClick={() => navigate('/welcome')}>Create account</button>
-                    <button type="button" className="btn quiet" onClick={() => navigate('/welcome')}>Sign in</button>
+                    <button type="button" className="btn" onClick={() => go('signup')}>Create account</button>
+                    <button type="button" className="btn quiet" onClick={() => go('signin')}>Sign in</button>
                 </div>
                 <button type="button" className="dismiss" onClick={onClose}>Not now</button>
             </div>

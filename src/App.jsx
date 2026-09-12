@@ -7,6 +7,8 @@ import Cover from './routes/Cover.jsx';
 import Stub from './routes/Stub.jsx';
 import NotFound from './routes/NotFound.jsx';
 import About from './routes/About.jsx';
+import Auth from './routes/Auth.jsx';
+import { useAuth } from './context/AuthProvider.jsx';
 import { hasSeenCover } from './lib/firstVisit.js';
 import ThemeToggle from './components/ThemeToggle.jsx';
 import './styles/tokens.css';
@@ -25,6 +27,7 @@ const isTopLevel = (pathname) => TABS.some((t) => t.to === pathname);
 
 function Shell({ children }) {
     const { pathname } = useLocation();
+    const { isSignedIn, profile } = useAuth();
     const showTabs = isTopLevel(pathname);
 
     return (
@@ -42,7 +45,9 @@ function Shell({ children }) {
                     </nav>
                     <span className="topbar-spacer" />
                     <ThemeToggle />
-                    <NavLink to="/welcome" className="btn quiet">Sign in</NavLink>
+                    {isSignedIn
+                        ? <NavLink to="/you" className="btn quiet">{profile?.username || 'You'}</NavLink>
+                        : <NavLink to="/welcome/signin" state={{ from: pathname }} className="btn quiet">Sign in</NavLink>}
                 </div>
             </header>
 
@@ -73,7 +78,8 @@ function HomeOrCover() {
 export default function App() {
     return (
         <Routes>
-            <Route path="/welcome/*" element={<Cover />} />
+            <Route path="/welcome" element={<Cover />} />
+            <Route path="/welcome/:mode" element={<Auth />} />
             <Route
                 path="*"
                 element={

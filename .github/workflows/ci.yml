@@ -18,6 +18,8 @@ jobs:
           cache: 'npm'
       - name: Install Dependencies
         run: npm ci
+      - name: Verify design system
+        run: npm run verify
       - name: Build Project
         run: npm run build
       - name: Smoke-test serverless API

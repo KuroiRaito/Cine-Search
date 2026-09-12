@@ -89,7 +89,7 @@ export default function Title() {
     const actions = (
         <>
             <div className="arow">
-                <button type="button" className="spill" onClick={() => ask(isTV ? 'track' : 'watched')}>
+                <button type="button" className="spill" onClick={() => ask(isTV ? 'track' : 'want')}>
                     {isTV ? 'Track this series' : '+ Want to watch'}
                 </button>
                 <button type="button" className="ibtn like" aria-label="Like" onClick={() => ask('like')}>♥</button>

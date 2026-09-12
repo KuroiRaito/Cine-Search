@@ -412,16 +412,8 @@ img { max-width: 100%; display: block; }
   .page-head h1 { font-size: 30px; }
 
   .app-main { padding-bottom: 40px; }
-  /* Generous, equal margins either side so the content reads as a column
-     rather than as edge-to-edge clutter. */
-
-  .hero { height: 320px; }
-  .title-head { padding-inline: 24px; margin-top: -70px; gap: 20px; }
-  .title-head .poster { width: 150px; }
-  .title-head h1 { font-size: 32px; }
-
   /* Reading columns never go full width, however wide the screen. */
-  .overview { max-width: 65ch; }
+  .ov, .bio { max-width: 65ch; }
   .bio { max-width: 65ch; }
 
   .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -639,3 +631,28 @@ img { max-width: 100%; display: block; }
   .cover-in h1 { font-size: 40px; }
   .mosaic { grid-template-columns: repeat(8, 1fr); }
 }
+
+/* ---------------- auth ---------------- */
+
+.auth-body { padding-inline: var(--gutter); max-width: 420px; margin: var(--s6) auto 0; }
+.auth-body h1 { font-size: 24px; font-weight: 800; letter-spacing: -.035em; margin-bottom: 8px; }
+.auth-lede { font-size: 13.5px; color: var(--muted); margin-bottom: var(--s6); }
+
+.field { display: block; margin-bottom: 14px; }
+.field > span {
+  display: block; margin-bottom: 6px;
+  font-size: 11.5px; font-weight: 600; color: var(--muted);
+}
+
+.field-hint {
+  display: block; margin-top: 6px; font-size: 11.5px; color: var(--muted); line-height: 1.5;
+  font-weight: 400;
+}
+
+.auth-error {
+  background: var(--st-drop-3); color: var(--st-drop-11);
+  border-radius: 9px; padding: 10px 12px; font-size: 12.5px; margin-bottom: 14px;
+}
+
+.auth-alt { margin-top: 16px; font-size: 12.5px; color: var(--muted); text-align: center; }
+.auth-alt a { color: var(--acc-t); font-weight: 600; }

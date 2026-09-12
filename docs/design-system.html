@@ -1,0 +1,2406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Cine Search design system: colour scales, watch-state palette, controls, screens, guest spec and build contract.">
+<meta name="color-scheme" content="dark light">
+<title>Projector Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
+</head>
+<body>
+<style>
+:root{
+  color-scheme:dark;
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-1:#071318;--beam-2:#08191F;--beam-3:#0A2530;--beam-4:#0B2E3C;--beam-5:#0D3848;
+  --beam-6:#114659;--beam-7:#155A72;--beam-8:#1A7794;--beam-9:#25BADF;--beam-10:#3DC7E8;
+  --beam-11:#6FDCF5;--beam-12:#C5F2FD;
+  --mar-1:#17120A;--mar-2:#1D1709;--mar-3:#2B210B;--mar-4:#35290C;--mar-5:#40320E;
+  --mar-6:#513F12;--mar-7:#6B5316;--mar-8:#93721C;--mar-9:#F5C45C;--mar-10:#F9D283;
+  --mar-11:#F0C468;--mar-12:#FDF0D5;
+  --on-beam-9:#06333F;--on-mar-9:#3D2D06;
+  --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
+  --hl:rgba(255,255,255,.08);
+  /* watch-state palette */
+  --st-want-9:#7C8AA8;--st-want-11:#A8B4CC;--st-want-3:#151C2A;
+  --st-ing-9:#2ABFA0;--st-ing-11:#6FE0C8;--st-ing-3:#07241F;
+  --st-done-9:#4BA85C;--st-done-11:#86D493;--st-done-3:#0C2412;
+  --st-re-9:#9B7BD4;--st-re-11:#C0A8EC;--st-re-3:#1A1230;
+  --st-hold-9:#C87A3C;--st-hold-11:#E2A468;--st-hold-3:#261607;
+  --st-drop-9:#B5594A;--st-drop-11:#DC8E7F;--st-drop-3:#26100C;
+
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);--on-rate:var(--on-mar-9);
+  --f-d:'Archivo',sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',monospace;
+  --sh:0 6px 16px -4px rgba(0,0,0,.6);
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-1:#FAFEFF;--beam-2:#F2FBFD;--beam-3:#E1F6FB;--beam-4:#CFEFF7;--beam-5:#BAE6F2;
+  --beam-6:#A0DAEB;--beam-7:#7EC9E0;--beam-8:#4FB2CE;--beam-9:#25BADF;--beam-10:#17A6CA;
+  --beam-11:#0B6B84;--beam-12:#06333F;
+  --mar-1:#FEFDFB;--mar-2:#FDFAF3;--mar-3:#FBF3E0;--mar-4:#F8EACA;--mar-5:#F4E0B4;
+  --mar-6:#EED29A;--mar-7:#E4BF78;--mar-8:#D5A648;--mar-9:#F5C45C;--mar-10:#EDB845;
+  --mar-11:#7A5A0B;--mar-12:#3D2D06;
+  --st-want-9:#6B7994;--st-want-11:#4C566B;--st-want-3:#EEF0F5;
+  --st-ing-9:#159E82;--st-ing-11:#0A6152;--st-ing-3:#E2F6F1;
+  --st-done-9:#3F8F4E;--st-done-11:#2C6B38;--st-done-3:#E6F4E9;
+  --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
+  --st-hold-9:#B0642A;--st-hold-11:#7A4415;--st-hold-3:#FBEDE0;
+  --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --hl:rgba(255,255,255,.7);
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --hl:rgba(255,255,255,.7);
+  --sh:0 6px 16px -4px rgba(23,27,38,.13);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-1:#FAFEFF;--beam-2:#F2FBFD;--beam-3:#E1F6FB;--beam-4:#CFEFF7;--beam-5:#BAE6F2;
+  --beam-6:#A0DAEB;--beam-7:#7EC9E0;--beam-8:#4FB2CE;--beam-9:#25BADF;--beam-10:#17A6CA;
+  --beam-11:#0B6B84;--beam-12:#06333F;
+  --mar-1:#FEFDFB;--mar-2:#FDFAF3;--mar-3:#FBF3E0;--mar-4:#F8EACA;--mar-5:#F4E0B4;
+  --mar-6:#EED29A;--mar-7:#E4BF78;--mar-8:#D5A648;--mar-9:#F5C45C;--mar-10:#EDB845;
+  --mar-11:#7A5A0B;--mar-12:#3D2D06;
+  --st-want-9:#6B7994;--st-want-11:#4C566B;--st-want-3:#EEF0F5;
+  --st-ing-9:#159E82;--st-ing-11:#0A6152;--st-ing-3:#E2F6F1;
+  --st-done-9:#3F8F4E;--st-done-11:#2C6B38;--st-done-3:#E6F4E9;
+  --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
+  --st-hold-9:#B0642A;--st-hold-11:#7A4415;--st-hold-3:#FBEDE0;
+  --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
+  --sh:0 6px 16px -4px rgba(23,27,38,.13);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-s);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-d);margin:0;letter-spacing:-.022em;line-height:1.14}
+p{margin:0}
+code{font-family:var(--f-m);font-size:.88em;background:var(--surface-hv);padding:1px 5px;border-radius:4px;color:var(--muted)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:5px}
+
+.bar{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 90%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--bd-sub)}
+.bar-in{max-width:1240px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.mark{display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-weight:800;font-size:16px;letter-spacing:-.03em}
+.mark i{width:6px;height:6px;border-radius:99px;background:var(--acc);font-style:normal}
+.mark em{font-style:normal;font-family:var(--f-m);font-weight:400;font-size:11px;color:var(--muted)}
+.tog{display:inline-flex;background:var(--surface);border:1px solid var(--bd);border-radius:99px;padding:3px;gap:2px}
+.tog button{font-family:var(--f-m);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:4px 11px;
+  border-radius:99px;border:none;background:none;color:var(--muted);cursor:pointer}
+.tog button[aria-pressed="true"]{background:var(--acc);color:var(--on-acc);font-weight:600}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px 80px}
+.intro{padding:48px 0 8px;max-width:66ch}
+.eyebrow{font-family:var(--f-m);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t);margin-bottom:12px}
+.intro h1{font-size:44px;font-weight:800;letter-spacing:-.04em;margin-bottom:16px}
+.intro h1 em{font-style:normal;color:var(--acc-t)}
+.lede{color:var(--muted)}
+.warnbox{border-left:3px solid var(--rate);background:var(--rate-bg);padding:16px 20px;border-radius:0 9px 9px 0;
+  font-size:14px;color:var(--muted);margin-top:24px}
+.warnbox b{color:var(--text)}
+
+section{padding-block:48px;border-top:1px solid var(--bd-sub);margin-top:40px}
+h2{font-size:26px;font-weight:700;margin-bottom:8px}
+h3{font-size:17px;font-weight:700;margin:32px 0 10px}
+
+/* colour scales */
+.scale{margin-top:18px}
+.scale-h{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.scale-h b{font-family:var(--f-d);font-size:15px;font-weight:700;letter-spacing:-.02em}
+.scale-h span{font-size:12.5px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(12,1fr);border-radius:10px;overflow:hidden}
+.stp-c{aspect-ratio:1/1.6;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;
+  font-family:var(--f-m);font-size:10px;font-weight:500}
+.jobs{display:grid;grid-template-columns:repeat(12,1fr);margin-top:5px}
+.job{font-size:9.5px;line-height:1.25;color:var(--muted);text-align:center;padding:0 2px;opacity:.7}
+
+/* primitives showcase */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:20px}
+.pbox{background:var(--surface);border-radius:12px;padding:15px}
+.pbox h4{font-family:var(--f-d);font-size:13.5px;font-weight:700;margin:0 0 11px;letter-spacing:-.02em}
+.pbox .r{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* state palette */
+.stgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:20px}
+.stcard{border:1px solid var(--bd);border-radius:11px;overflow:hidden;background:var(--surface)}
+.stswatch{height:52px;display:grid;place-items:center;font-size:20px;font-weight:700}
+.stbody{padding:9px 10px}
+.stbody b{display:block;font-size:12.5px;font-weight:600;margin-bottom:2px}
+.stbody span{font-family:var(--f-m);font-size:9.5px;color:var(--muted);line-height:1.35;display:block}
+
+/* screens grid */
+.screens{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:40px;margin-top:28px;align-items:start}
+.col{min-width:0}
+.col-h{margin-bottom:14px}
+.col-h h3{font-size:19px;font-weight:700;margin:0 0 3px}
+.col-h p{font-size:13px;color:var(--muted);line-height:1.5}
+
+.phone{width:100%;border:1px solid var(--bd-str);border-radius:20px;overflow:hidden;background:var(--bg);box-shadow:var(--sh)}
+.ph-top{height:22px;background:var(--bg-sub);border-bottom:1px solid var(--bd-sub);display:flex;align-items:center;justify-content:center}
+.ph-top span{width:46px;height:3px;border-radius:99px;background:var(--bd-str)}
+.ph-body{height:620px;overflow-y:auto;position:relative;font-size:14px}
+.ph-body.short{height:430px}
+.ph-body::-webkit-scrollbar{width:0}
+
+/* shared bits */
+.tbar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 0}
+.tbar h4{font-family:var(--f-d);font-size:20px;font-weight:800;letter-spacing:-.03em;margin:0}
+.circ{width:32px;height:32px;border-radius:99px;background:var(--ink-3);border:none;
+  color:var(--muted);display:grid;place-items:center;font-size:14px;cursor:pointer;transition:background .12s}
+.circ:hover{background:var(--ink-4);color:var(--text)}
+.circ.dark{background:rgba(4,6,12,.6);backdrop-filter:blur(6px);color:#fff;border:none}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 14px 4px}
+.chips::-webkit-scrollbar{height:0}
+.chip{flex:0 0 auto;font-family:var(--f-s);font-size:12.5px;font-weight:500;padding:6px 13px;border-radius:99px;
+  background:var(--ink-3);border:none;color:var(--muted);cursor:pointer;white-space:nowrap;
+  font-variant-numeric:tabular-nums;transition:all .12s}
+.chip em{font-style:normal;opacity:.5;margin-left:4px}
+.chip:hover{background:var(--ink-4);color:var(--text)}
+.chip[aria-pressed="true"]{background:var(--acc);color:var(--on-beam-9);font-weight:600;box-shadow:inset 0 1px 0 var(--hl)}
+.chip[aria-pressed="true"] em{opacity:.65}
+.sect{margin:16px 14px 0}
+.sect-h{font-family:var(--f-d);font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--text);
+  margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sect-h a{color:var(--acc-t);text-decoration:none;font-family:var(--f-s);font-size:12px;font-weight:500}
+.rail{display:flex;gap:8px;overflow-x:auto;padding:0 14px 4px;margin-top:7px}
+.rail::-webkit-scrollbar{height:0}
+.rt{flex:0 0 76px}
+.rt .im{aspect-ratio:2/3;border-radius:7px;border:1px solid var(--bd-sub);margin-bottom:4px;position:relative;overflow:hidden}
+.rt .tt{font-size:10.5px;line-height:1.25;color:var(--text)}
+.rt .yy{font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.gb{position:absolute;left:4px;bottom:4px;font-family:var(--f-m);font-size:8.5px;font-weight:600;color:var(--mar-9);
+  background:rgba(4,6,12,.68);padding:1px 4px;border-radius:3px}
+.sb{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:99px;border:none;cursor:pointer;
+  display:grid;place-items:center;font-size:14px;line-height:1;font-weight:500;color:#fff;
+  background:rgba(8,12,20,.62);backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+  transition:all .13s}
+.sb:hover{background:var(--acc);color:var(--on-beam-9);box-shadow:none}
+.sb.done{background:var(--st-done-9);color:#04170A;box-shadow:none;font-size:12px}
+.sb.want{color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+
+/* bottom nav */
+.bnav{position:sticky;bottom:0;display:flex;background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(10px);border-top:1px solid var(--bd-sub);padding:7px 0 9px;margin-top:16px}
+.bnav div{flex:1;text-align:center;font-size:9.5px;color:var(--muted);font-family:var(--f-m);letter-spacing:.03em}
+.bnav div span{display:block;font-size:16px;margin-bottom:1px;font-family:var(--f-s)}
+.bnav div.on{color:var(--acc-t)}
+
+/* title page */
+.hero{position:relative;height:160px}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 72%)}
+.hero-nav{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;justify-content:space-between;padding:10px 12px}
+.head{padding:0 14px;margin-top:-46px;position:relative;z-index:2;display:flex;gap:12px;align-items:flex-end}
+.poster{width:82px;flex:0 0 auto;aspect-ratio:2/3;border-radius:8px;border:1px solid var(--bd-sub);box-shadow:var(--sh)}
+.head-t{padding-bottom:3px;min-width:0}
+.head-t h5{font-family:var(--f-d);font-size:17px;font-weight:700;letter-spacing:-.03em;margin:0 0 3px}
+.metaline{font-family:var(--f-m);font-size:10px;color:var(--muted);line-height:1.5}
+.cert{border:1px solid var(--bd-str);border-radius:3px;padding:0 3px;margin-right:4px}
+.block{margin:14px 14px 0;border:1px solid var(--bd);border-radius:11px;background:var(--surface);padding:12px}
+.arow{display:flex;gap:7px}
+.spill{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--rate);color:var(--on-rate);
+  border:none;border-radius:10px;font-size:13.5px;font-weight:600;letter-spacing:-.01em;padding:10px;cursor:pointer;
+  box-shadow:inset 0 1px 0 var(--hl);transition:filter .12s}
+.spill:hover{filter:brightness(1.06)}
+.ibtn{width:40px;border:none;background:var(--ink-4);color:var(--muted);border-radius:10px;
+  cursor:pointer;display:grid;place-items:center;font-size:15px;transition:background .12s,color .12s}
+.ibtn:hover{background:var(--ink-5);color:var(--text)}
+.ibtn.like{color:var(--ink-10)}
+.ibtn.like:hover{color:var(--like-9)}
+.ibtn.like.on{background:var(--like-3);color:var(--like-9)}
+.prov{margin-top:11px;border-top:1px solid var(--bd-sub);padding-top:11px}
+.prov-l{font-family:var(--f-m);font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.provrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pchip{display:inline-flex;align-items:center;gap:6px;background:var(--ink-3);border:none;color:var(--text);
+  border-radius:9px;padding:5px 10px 5px 6px;font-size:11.5px;font-weight:500;cursor:pointer;
+  font-family:var(--f-s);transition:background .12s}
+.pchip:hover{background:var(--ink-4)}
+.plogo{width:16px;height:16px;border-radius:3px;display:grid;place-items:center;font-family:var(--f-d);font-size:8px;font-weight:800;color:#fff}
+.scores{display:flex;margin:16px 14px 0}
+.score{flex:1;padding:2px 8px;text-align:center;border-left:1px solid var(--bd-sub)}
+.score:first-child{border-left:none;text-align:left;padding-left:0}
+.score b{display:block;font-family:var(--f-d);font-size:21px;letter-spacing:-.03em;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.score span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}
+.score.gold b{color:var(--rate)}
+.score.dim b{color:var(--ink-9)}
+.ov{font-size:12.5px;line-height:1.6;color:var(--muted)}
+.ov b{color:var(--acc-t);font-weight:500}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 14px 0}
+.pc{border:1px solid var(--bd);border-radius:10px;background:var(--surface);padding:10px;cursor:pointer}
+.pc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.pc-h b{font-size:12px;font-weight:600}
+.pc-h i{font-style:normal;color:var(--muted);font-size:10px}
+.faces{display:flex}
+.face{width:23px;height:23px;border-radius:99px;border:2px solid var(--surface);margin-right:-6px;
+  background:linear-gradient(140deg,var(--ink-8),var(--ink-6))}
+.ptx{font-size:10.5px;color:var(--muted);line-height:1.4}
+
+/* episode rows */
+.eprow{display:flex;gap:9px;padding:9px 0;border-top:1px solid var(--bd-sub);align-items:center}
+.eprow .st{width:56px;flex:0 0 auto;aspect-ratio:16/9;border-radius:5px;border:1px solid var(--bd-sub)}
+.eprow .eb{flex:1;min-width:0}
+.eprow .en{font-size:12px;font-weight:600;line-height:1.3}
+.eprow .ed{font-family:var(--f-m);font-size:9.5px;color:var(--muted)}
+.epchk{width:28px;height:28px;flex:0 0 auto;border-radius:99px;border:none;background:var(--ink-4);
+  color:var(--ink-10);font-size:13px;cursor:pointer;display:grid;place-items:center;transition:all .13s}
+.epchk:hover{background:var(--ink-5);color:var(--muted)}
+.epchk.on{background:var(--st-done-9);color:#04170A;font-weight:700}
+.seasonsw,.rolesw{display:flex;gap:2px;overflow-x:auto;margin:12px 14px 0;background:var(--bg-sub);
+  border-radius:11px;padding:3px}
+.seasonsw::-webkit-scrollbar,.rolesw::-webkit-scrollbar{height:0}
+.sw{flex:0 0 auto;border:none;background:none;cursor:pointer;color:var(--muted);font-family:var(--f-s);
+  font-size:12.5px;font-weight:500;padding:6px 11px;border-radius:8px;white-space:nowrap;
+  font-variant-numeric:tabular-nums;transition:color .12s}
+.sw em{font-style:normal;opacity:.55;margin-left:4px;font-size:11px}
+.sw[aria-pressed="true"]{background:var(--acc-bg);color:var(--acc-t);font-weight:600;
+  box-shadow:inset 0 0 0 1px var(--acc-bd),0 1px 2px rgba(0,0,0,.25)}
+.sw[aria-pressed="true"] em{opacity:.8}
+.sw:hover:not([aria-pressed="true"]){color:var(--text)}
+
+/* library */
+.grp{margin:15px 14px 0}
+.grp-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.grp-h b{font-family:var(--f-d);font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.grp-h span{font-size:11.5px;color:var(--muted)}
+.srow{display:flex;gap:10px;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--surface);
+  margin-bottom:7px;position:relative;overflow:hidden}
+.srow .th{width:40px;flex:0 0 auto;aspect-ratio:2/3;border-radius:5px;border:1px solid var(--bd-sub)}
+.srow .bd{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.srow .nm{font-size:12.5px;font-weight:600;line-height:1.25}
+.srow .ep{font-family:var(--f-m);font-size:10px;color:var(--muted)}
+.plus{width:32px;height:32px;flex:0 0 auto;align-self:center;border-radius:99px;border:none;
+  background:var(--acc);color:var(--on-beam-9);font-size:16px;font-weight:600;cursor:pointer;
+  display:grid;place-items:center;box-shadow:inset 0 1px 0 var(--hl);transition:filter .12s}
+.plus:hover{filter:brightness(1.08)}
+.track{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--ink-5)}
+.track i{display:block;height:100%;background:var(--acc)}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.fc .im{aspect-ratio:2/3;border-radius:7px;border:1px solid var(--bd-sub);box-shadow:var(--sh);margin-bottom:5px;position:relative;overflow:hidden}
+.fc .nm{font-size:10.5px;line-height:1.3;color:var(--text)}
+.fc .yr{font-family:var(--f-m);font-size:8.5px;color:var(--muted)}
+.toast{margin:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--ink-5);
+  border:none;border-radius:11px;padding:11px 13px;font-size:12px;box-shadow:var(--sh),inset 0 1px 0 var(--hl)}
+.toast b{color:var(--acc-t);cursor:pointer;font-size:11.5px}
+
+/* person */
+.phead{display:flex;gap:12px;padding:14px 14px 0;align-items:center}
+.pav{width:62px;height:62px;flex:0 0 auto;border-radius:99px;border:1px solid var(--bd-sub);
+  background:linear-gradient(140deg,var(--ink-7),var(--ink-5))}
+.phead .pn{font-family:var(--f-d);font-size:18px;font-weight:700;letter-spacing:-.03em}
+.phead .pr{font-size:11.5px;color:var(--muted)}
+.collectbar{margin:14px 14px 0}
+.cb-t{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.cb-t b{font-family:var(--f-d);font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.cb-t b i{font-style:normal;color:var(--st-done-9)}
+.cb-t span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cb-track{height:6px;border-radius:99px;background:var(--ink-4);overflow:hidden}
+.cb-track i{display:block;height:100%;background:var(--st-done-9);border-radius:99px}
+.cb-sub{margin-top:7px;font-size:11.5px;color:var(--muted)}
+
+/* profile */
+.stiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:13px 14px 0}
+.st-t{border:none;border-left:1px solid var(--bd-sub);border-radius:0;padding:2px 8px;text-align:center}
+.stiles>.st-t:first-child{border-left:none;text-align:left;padding-left:0}
+.st-t b{display:block;font-family:var(--f-d);font-size:19px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.st-t span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}
+.tastecard{margin:8px 14px 0;border:none;border-radius:11px;background:var(--surface);padding:12px}
+.tc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tc-h b{font-family:var(--f-d);font-size:14px;font-weight:700;color:var(--acc-t)}
+.tc-h i{font-style:normal;font-size:10.5px;font-weight:600;color:var(--acc-t);background:var(--acc-bg);
+  border-radius:99px;width:20px;height:20px;display:grid;place-items:center}
+.tc-m{display:flex;gap:14px;margin-bottom:9px}
+.tc-m div b{display:block;font-family:var(--f-m);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.tc-m div span{display:block;font-family:var(--f-m);font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tc-r{display:flex;gap:5px;overflow:hidden}
+.tc-r i{display:block;width:30px;aspect-ratio:2/3;border-radius:4px;border:1px solid var(--bd-sub);flex:0 0 auto}
+
+/* states */
+.empty{padding:44px 20px;text-align:center}
+.empty .ic{font-size:26px;color:var(--ink-9);margin-bottom:10px}
+.empty h6{font-family:var(--f-d);font-size:15px;font-weight:700;margin:0 0 5px}
+.empty p{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.55}
+.btn{font-family:var(--f-s);font-size:13px;font-weight:600;padding:10px 18px;border-radius:10px;border:none;
+  cursor:pointer;background:var(--acc);color:var(--on-acc);box-shadow:inset 0 1px 0 var(--hl);transition:filter .12s}
+.btn:hover{filter:brightness(1.06)}
+.btn.q{background:var(--ink-4);color:var(--text);box-shadow:none}
+.btn.q:hover{background:var(--ink-5);filter:none}
+.sk{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-hv) 50%,var(--surface) 75%);
+  background-size:200% 100%;animation:sh 1.4s linear infinite;border-radius:5px}
+@keyframes sh{to{background-position:-200% 0}}
+.errbox{margin:14px;border:1px solid var(--st-drop-9);background:var(--st-drop-3);border-radius:10px;padding:14px}
+.errbox b{display:block;font-size:13px;color:var(--st-drop-11);margin-bottom:4px;font-weight:700}
+.errbox p{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:11px}
+
+/* editor sheet */
+.sheet{background:var(--bg-sub);border-top:1px solid var(--bd);border-radius:16px 16px 0 0;
+  margin-top:-16px;position:relative;padding-bottom:10px}
+.sh-grab{width:34px;height:4px;border-radius:99px;background:var(--bd-str);margin:9px auto 0}
+.sh-head{display:flex;align-items:center;gap:9px;padding:11px 14px;border-bottom:1px solid var(--bd-sub)}
+.sh-po{width:34px;flex:0 0 auto;aspect-ratio:2/3;border-radius:5px;border:1px solid var(--bd-sub)}
+.sh-t{flex:1;min-width:0}
+.sh-t b{display:block;font-size:13px;font-weight:700;line-height:1.25}
+.sh-t span{display:block;font-family:var(--f-m);font-size:9.5px;color:var(--muted)}
+.fld{padding:12px 14px 0}
+.fld2{padding:12px 14px 0;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fld label,.fld2 label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.segs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.seg{background:var(--ink-3);border:none;border-radius:9px;padding:8px 3px;cursor:pointer;
+  color:var(--muted);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-family:var(--f-s);transition:all .12s}
+.seg:hover{background:var(--ink-4);color:var(--text)}
+.seg i{font-style:normal;font-size:9.5px;font-family:var(--f-s)}
+.seg.on{background:var(--b);color:var(--c);font-weight:600;box-shadow:inset 0 0 0 1px var(--c)}
+.prog{display:flex;align-items:center;gap:9px;background:var(--bg-sub);box-shadow:inset 0 0 0 1px var(--bd-sub);
+  border-radius:10px;padding:7px 9px}
+.prog.compact{width:150px}
+.stp{width:32px;height:32px;flex:0 0 auto;border-radius:8px;border:none;background:var(--ink-4);
+  color:var(--text);font-size:17px;cursor:pointer;display:grid;place-items:center;transition:background .12s}
+.stp:hover{background:var(--ink-5)}
+.prog-v{flex:1;text-align:center}
+.prog-v b{display:block;font-family:var(--f-d);font-size:18px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.prog-v span{display:block;font-family:var(--f-m);font-size:9px;color:var(--muted);margin-top:2px}
+.jump{margin-top:7px;font-size:11px;color:var(--muted)}
+.jump b{color:var(--text);font-family:var(--f-m)}
+.jump span{color:var(--acc-t);cursor:pointer}
+.stars{display:flex;align-items:center;gap:4px;background:var(--bg-sub);box-shadow:inset 0 0 0 1px var(--bd-sub);
+  border-radius:10px;padding:9px 11px}
+.stars i{font-style:normal;font-size:19px;color:var(--ink-7);cursor:pointer}
+.stars i.on{color:var(--rate)}
+.stars .sv{margin-left:auto;font-family:var(--f-m);font-size:11.5px;color:var(--rate-t);font-weight:600}
+.inp{background:var(--bg-sub);border:none;box-shadow:inset 0 0 0 1px var(--bd-sub);border-radius:9px;
+  padding:10px 11px;font-size:12.5px;color:var(--text);font-family:var(--f-s);transition:box-shadow .12s}
+.inp:hover{box-shadow:inset 0 0 0 1px var(--bd)}
+.inp.dim{color:var(--muted)}
+.hint{font-size:10.5px;color:var(--muted);margin-top:5px}
+.sh-foot{padding:14px 14px 4px;margin-top:6px;border-top:1px solid var(--bd-sub)}
+.del{width:100%;background:var(--st-drop-3);border:none;color:var(--st-drop-11);
+  border-radius:9px;padding:10px;font-size:12.5px;font-weight:600;cursor:pointer;transition:filter .12s}
+.del:hover{filter:brightness(1.1)}
+
+/* live data */
+.live{border:1px solid var(--bd);border-radius:11px;overflow:hidden;background:var(--surface);margin-top:16px}
+.live-h{padding:9px 14px;border-bottom:1px solid var(--bd-sub);background:var(--bg-sub);
+  display:flex;justify-content:space-between;align-items:center;gap:10px}
+.live-h b{font-family:var(--f-m);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.live-h span{font-family:var(--f-m);font-size:9.5px;color:var(--st-done-11)}
+.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:2px 14px;padding:12px 14px;font-size:12.5px}
+.kv dt{font-family:var(--f-m);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-top:3px}
+.kv dd{margin:0;color:var(--text);padding-bottom:7px}
+.kv dd.miss{color:var(--st-drop-11);font-family:var(--f-m);font-size:11.5px}
+
+/* rules */
+.rules{margin-top:20px;border:1px solid var(--bd);border-radius:11px;background:var(--bg-sub);overflow:hidden}
+.rules-h{padding:9px 14px;border-bottom:1px solid var(--bd-sub);background:var(--surface);font-family:var(--f-m);
+  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+ol.rl{list-style:none;counter-reset:r var(--start,0);margin:0;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+ol.rl li{counter-increment:r;position:relative;padding-left:28px;font-size:12.5px;color:var(--muted);line-height:1.55}
+ol.rl li::before{content:"R" counter(r);position:absolute;left:0;top:1px;font-family:var(--f-m);font-size:9px;
+  font-weight:600;color:var(--rate-t);background:var(--rate-bg);border:1px solid var(--rate-bd);border-radius:4px;padding:1px 3px}
+ol.rl b{color:var(--text);font-weight:600}
+
+.tw{overflow-x:auto;margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-family:var(--f-m);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  font-weight:500;padding:0 14px 7px 0;border-bottom:1px solid var(--bd)}
+td{padding:9px 14px 9px 0;border-bottom:1px solid var(--bd-sub);vertical-align:top;color:var(--muted)}
+td b{color:var(--text)}
+td:last-child,th:last-child{padding-right:0}
+tbody tr:last-child td{border-bottom:none}
+
+footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-size:12px;color:var(--muted);max-width:66ch}
+@media (max-width:900px){.stgrid{grid-template-columns:repeat(3,1fr)}.intro h1{font-size:32px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+.img{background-size:cover;background-position:center;background-repeat:no-repeat}
+.i-dune_p{background-image:url(https://image.tmdb.org/t/p/w342/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg)}
+.i-dune_b{background-image:url(https://image.tmdb.org/t/p/w780/eZ239CUp1d6OryZEBPnO2n87gMG.jpg)}
+.i-cast0{background-image:url(https://image.tmdb.org/t/p/w185/dFxpwRpmzpVfP1zjluH68DeQhyj.jpg)}
+.i-cast1{background-image:url(https://image.tmdb.org/t/p/w185/3WdOloHpjtjL96uVOhFRRCcYSwq.jpg)}
+.i-cast2{background-image:url(https://image.tmdb.org/t/p/w185/ra53cM1aNmdH0aFhj8yBqPOj2fb.jpg)}
+.i-cast3{background-image:url(https://image.tmdb.org/t/p/w185/zfRID0jx8DKBluPGU9xtk9sZWUt.jpg)}
+.i-rec0{background-image:url(https://image.tmdb.org/t/p/w185/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg)}
+.i-rec1{background-image:url(https://image.tmdb.org/t/p/w185/xfSAoBEm9MNBjmlNcDYLvLSMlnq.jpg)}
+.i-rec2{background-image:url(https://image.tmdb.org/t/p/w185/xAYGdGBGptNkisXRpmhZSry6SPF.jpg)}
+.i-rec3{background-image:url(https://image.tmdb.org/t/p/w185/siNGMLdOUNYLEGtlsnmQcpO2XZX.jpg)}
+.i-bb_p{background-image:url(https://image.tmdb.org/t/p/w342/anFx9aTOOYqgS3v7x3R84Kz67ly.jpg)}
+.i-bb_b{background-image:url(https://image.tmdb.org/t/p/w780/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg)}
+.i-ep0{background-image:url(https://image.tmdb.org/t/p/w300/88Z0fMP8a88EpQWMCs1593G0ngu.jpg)}
+.i-ep1{background-image:url(https://image.tmdb.org/t/p/w300/AbMoecO0ZZio0LcgeLxlzdyGs6X.jpg)}
+.i-ep2{background-image:url(https://image.tmdb.org/t/p/w300/vlgGfjtuO2WSLT7qYDVlvTpSVW.jpg)}
+.i-ep3{background-image:url(https://image.tmdb.org/t/p/w300/2UbRgW6apE4XPzhHPA726wUFyaR.jpg)}
+.i-dv0{background-image:url(https://image.tmdb.org/t/p/w185/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg)}
+.i-dv1{background-image:url(https://image.tmdb.org/t/p/w185/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg)}
+.i-dv2{background-image:url(https://image.tmdb.org/t/p/w185/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg)}
+.i-dv3{background-image:url(https://image.tmdb.org/t/p/w185/pEzNVQfdzYDzVK0XqxERIw2x2se.jpg)}
+.i-dv4{background-image:url(https://image.tmdb.org/t/p/w185/lz8vNyXeidqqOdJW9ZjnDAMb5Vr.jpg)}
+.i-dv5{background-image:url(https://image.tmdb.org/t/p/w185/vf40tyDRKZsBmaLsYeopzfFLzLx.jpg)}
+.i-dv_face{background-image:url(https://image.tmdb.org/t/p/w185/zdDx9Xs93UIrJFWYApYR28J8M6b.jpg)}
+.prow{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;background:var(--surface);
+  cursor:pointer;transition:background .12s;width:100%;border:none;text-align:left;font-family:var(--f-s)}
+.prow:hover{background:var(--surface-hv)}
+.prow .pf{width:38px;height:38px;flex:0 0 auto;border-radius:99px;background-size:cover;background-position:center;
+  background-color:var(--ink-5)}
+.prow .pf.noimg{display:grid;place-items:center;font-family:var(--f-d);font-size:13px;font-weight:700;color:var(--ink-11)}
+.prow .pb{flex:1;min-width:0}
+.prow .pb b{display:block;font-size:13px;font-weight:600;line-height:1.25;color:var(--text)}
+.prow .pb span{display:block;font-size:11px;color:var(--muted)}
+.prow .go{color:var(--ink-9);font-size:14px;flex:0 0 auto}
+.prow.nolink{cursor:default;background:var(--bg-sub)}
+.prow.nolink:hover{background:var(--bg-sub)}
+.i-vg{background-image:url(https://image.tmdb.org/t/p/w185/wJIxATESjzsjSgvRhVavOmdamXc.jpg)}
+
+/* ---------- desktop frames ---------- */
+.desk{border:1px solid var(--bd-str);border-radius:14px;overflow:hidden;background:var(--bg);
+  box-shadow:var(--sh);margin-top:18px}
+.desk-chrome{height:30px;background:var(--bg-sub);border-bottom:1px solid var(--bd-sub);
+  display:flex;align-items:center;gap:6px;padding:0 12px}
+.desk-chrome i{width:9px;height:9px;border-radius:99px;background:var(--ink-7);font-style:normal}
+.desk-chrome b{margin-left:10px;font-family:var(--f-m);font-size:10px;color:var(--ink-9);font-weight:400}
+.desk-body{padding:0;overflow-x:auto}
+.desk-in{min-width:920px}
+
+/* desktop top nav */
+.dnav{display:flex;align-items:center;gap:22px;padding:11px 22px;border-bottom:1px solid var(--bd-sub)}
+.dnav .lg{display:flex;align-items:center;gap:7px;font-family:var(--f-d);font-weight:800;font-size:15px;letter-spacing:-.03em}
+.dnav .lg i{width:6px;height:6px;border-radius:99px;background:var(--acc);font-style:normal}
+.dnav a{font-size:13px;color:var(--muted);text-decoration:none}
+.dnav a.on{color:var(--text);font-weight:600}
+.dnav .sp{flex:1}
+.dnav .srch{background:var(--ink-3);border-radius:9px;padding:7px 13px;font-size:12.5px;color:var(--muted);width:230px}
+
+/* desktop title layout */
+.dhero{height:230px;position:relative}
+.dhero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 70%)}
+.dgrid{display:grid;grid-template-columns:210px minmax(0,1fr) 250px;gap:28px;padding:0 28px 28px;
+  margin-top:-78px;position:relative;z-index:2;align-items:start}
+.dposter{aspect-ratio:2/3;border-radius:12px;border:1px solid var(--bd-sub);box-shadow:var(--sh)}
+.dmain h3{font-family:var(--f-d);font-size:30px;font-weight:800;letter-spacing:-.035em;margin:0 0 6px;padding-top:48px}
+.dside{position:sticky;top:12px;background:var(--surface);border-radius:12px;padding:14px}
+.dcards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.drail{display:flex;gap:11px;overflow-x:auto;margin-top:9px}
+.drail::-webkit-scrollbar{height:0}
+.drail .rt{flex:0 0 92px}
+
+/* desktop library */
+.dlib{display:grid;grid-template-columns:190px minmax(0,1fr);gap:26px;padding:22px 28px 28px}
+.dfilters{display:flex;flex-direction:column;gap:3px}
+.dfilters button{text-align:left;border:none;background:none;cursor:pointer;color:var(--muted);
+  font-family:var(--f-s);font-size:13px;padding:8px 11px;border-radius:9px;display:flex;
+  justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums;transition:all .12s}
+.dfilters button em{font-style:normal;opacity:.5}
+.dfilters button:hover{background:var(--ink-3);color:var(--text)}
+.dfilters button[aria-pressed="true"]{background:var(--acc-bg);color:var(--acc-t);font-weight:600;
+  box-shadow:inset 0 0 0 1px var(--acc-bd)}
+.dfgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.dsrow{display:grid;grid-template-columns:52px minmax(0,1fr) 190px 40px;gap:14px;align-items:center;
+  padding:11px 13px;border-radius:11px;background:var(--surface);margin-bottom:8px;position:relative;overflow:hidden}
+.dsrow .th{width:52px;aspect-ratio:2/3;border-radius:6px;border:1px solid var(--bd-sub)}
+.dsrow .nm{font-size:14px;font-weight:600}
+.dsrow .ep{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.dmeter{height:5px;border-radius:99px;background:var(--ink-4);overflow:hidden}
+.dmeter i{display:block;height:100%;background:var(--acc);border-radius:99px}
+@media (max-width:820px){.desk-in{min-width:920px}}
+
+/* desktop: editor as centred modal */
+.dmodal-wrap{position:relative;background:var(--bg-sub);padding:26px;display:grid;place-items:center;min-height:430px}
+.dmodal-wrap::before{content:"";position:absolute;inset:0;background:rgba(4,8,16,.55)}
+.dmodal{position:relative;width:660px;max-width:100%;background:var(--bg);border-radius:15px;
+  box-shadow:0 24px 60px -12px rgba(0,0,0,.6);overflow:hidden}
+.dm-head{display:flex;align-items:center;gap:13px;padding:15px 18px;border-bottom:1px solid var(--bd-sub)}
+.dm-head .po{width:46px;flex:0 0 auto;aspect-ratio:2/3;border-radius:7px;border:1px solid var(--bd-sub)}
+.dm-head .tt{flex:1;min-width:0}
+.dm-head .tt b{display:block;font-family:var(--f-d);font-size:16px;font-weight:700;letter-spacing:-.02em}
+.dm-head .tt span{display:block;font-size:11.5px;color:var(--muted)}
+.dm-body{display:grid;grid-template-columns:1fr 1fr;gap:0 22px;padding:18px}
+.dm-body .full{grid-column:1/-1}
+.dm-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:13px 18px;border-top:1px solid var(--bd-sub);background:var(--bg-sub)}
+.dm-foot .sp{flex:1}
+
+/* desktop home */
+.dhome{padding:22px 28px 28px}
+.dcw{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.dcwcard{display:flex;gap:11px;padding:11px;border-radius:11px;background:var(--surface);position:relative;overflow:hidden}
+.dcwcard .th{width:46px;flex:0 0 auto;aspect-ratio:2/3;border-radius:6px;border:1px solid var(--bd-sub)}
+.dcwcard .bd{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.dcwcard .nm{font-size:13px;font-weight:600;line-height:1.25}
+.dcwcard .ep{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* desktop person */
+.dperson{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;padding:24px 28px 28px}
+.dpcard{background:var(--surface);border-radius:13px;padding:16px;position:sticky;top:12px}
+.dpface{width:100%;aspect-ratio:1;border-radius:13px;margin-bottom:12px;background-size:cover;background-position:center}
+
+/* ---------- cover page ---------- */
+.cover{position:relative;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.mosaic{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);
+  grid-auto-rows:1fr;gap:5px;transform:rotate(-8deg) scale(1.35);transform-origin:center;opacity:.5}
+.mosaic div{background-size:cover;background-position:center;border-radius:7px}
+.cover-scrim{position:absolute;inset:0;
+  background:linear-gradient(to top,var(--bg) 34%,color-mix(in srgb,var(--bg) 72%,transparent) 62%,color-mix(in srgb,var(--bg) 30%,transparent))}
+.cover-in{position:relative;z-index:2;margin-top:auto;padding:22px 20px 20px}
+.cover-mark{display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-weight:800;
+  font-size:17px;letter-spacing:-.03em;margin-bottom:14px}
+.cover-mark i{width:7px;height:7px;border-radius:99px;background:var(--acc);font-style:normal;
+  box-shadow:0 0 12px var(--acc)}
+.cover h5{font-family:var(--f-d);font-size:25px;font-weight:800;letter-spacing:-.035em;
+  line-height:1.14;margin:0 0 9px}
+.cover p{font-size:13.5px;color:var(--muted);line-height:1.55;margin-bottom:20px}
+.cover-cta{display:flex;flex-direction:column;gap:9px}
+.btn-lg{width:100%;font-family:var(--f-s);font-size:14.5px;font-weight:600;padding:13px;border-radius:11px;
+  border:none;cursor:pointer;background:var(--acc);color:var(--on-acc);box-shadow:inset 0 1px 0 var(--hl)}
+.btn-lg.ghost{background:var(--ink-4);color:var(--text);box-shadow:none}
+.cover-skip{margin-top:14px;text-align:center}
+.cover-skip button{background:none;border:none;color:var(--acc-t);font-family:var(--f-s);
+  font-size:13.5px;font-weight:500;cursor:pointer;padding:7px}
+.cover-fine{margin-top:12px;font-size:10.5px;color:var(--ink-9);text-align:center;line-height:1.5}
+
+/* ---------- sign-in sheet ---------- */
+.gsheet{background:var(--bg-sub);border-radius:16px 16px 0 0;padding-bottom:16px;position:relative}
+.gs-art{display:flex;gap:11px;align-items:center;padding:18px 16px 14px}
+.gs-art .po{width:52px;flex:0 0 auto;aspect-ratio:2/3;border-radius:8px;border:1px solid var(--bd-sub)}
+.gs-art .tx b{display:block;font-family:var(--f-d);font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.gs-art .tx span{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.gs-body{padding:0 16px}
+.gs-list{display:flex;flex-direction:column;gap:9px;margin:4px 0 16px}
+.gs-list div{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.45}
+.gs-list i{font-style:normal;color:var(--acc-t);flex:0 0 auto;font-size:13px}
+
+/* ---------- spec table ---------- */
+.spec-t td:first-child{white-space:nowrap;color:var(--text);font-weight:600}
+.spec-t code{font-size:11px}
+
+/* small-screen comparison */
+.sscmp{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;margin-top:20px}
+.sscol{flex:0 0 auto}
+.sscol>.lbl{font-family:var(--f-m);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.sscol>.lbl em{font-style:normal;color:var(--ink-9);letter-spacing:0;text-transform:none;font-size:11px}
+.phone.w320{width:320px}
+.phone.w430{width:430px}
+@media (max-width:800px){.phone.w430{width:100%;max-width:430px}.phone.w320{width:100%;max-width:320px}}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="mark"><i></i>Projector<em>· design system v1</em></div>
+    <div class="tog" role="group" aria-label="Theme">
+      <button type="button" data-set="dark" aria-pressed="true">Dark</button>
+      <button type="button" data-set="light" aria-pressed="false">Light</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    <div class="eyebrow">Cine Search · everything in one place</div>
+    <h1>Tokens, controls,<br>and eight <em>screens</em>.</h1>
+    <p class="lede">The complete system: three twelve-step colour scales, a six-state watch palette, the control set,
+      all nine MVP screens, and a live section rendered with real TMDB data. Every screen is the same handful of
+      components recombined — which is the point of having a system at all.</p>
+    <div class="warnbox"><b>All business rules here are mine.</b> Reasoned from the personas, the data inventory and the
+      benchmark — not from a PRD, because there isn't one yet. They're numbered <code>R1…R26</code> so you can reject one
+      by number. Sample data is illustrative; where I've assumed a field exists, the rules say so.</div>
+  </div>
+
+  <!-- ============ SCALES ============ -->
+  <section>
+    <h2>Colour scales</h2>
+    <p class="lede">Three scales, twelve steps each, every step with one job. Semantic tokens alias <b>steps, not hex
+      values</b> — so switching theme swaps which scale is active rather than re-tuning colours by hand. The dark theme
+      is unchanged from what you shipped: <code>ink-1</code> is <code>#0A0F1B</code>, <code>beam-9</code> is
+      <code>#25BADF</code>, <code>marquee-9</code> is <code>#F5C45C</code>.</p>
+
+    <div class="scale">
+      <div class="scale-h"><b>Ink</b><span>blue-biased neutral · surfaces, borders, text</span></div>
+      <div class="steps">
+        <div class="stp-c" style="background:var(--ink-1);color:var(--ink-11)">1</div>
+        <div class="stp-c" style="background:var(--ink-2);color:var(--ink-11)">2</div>
+        <div class="stp-c" style="background:var(--ink-3);color:var(--ink-11)">3</div>
+        <div class="stp-c" style="background:var(--ink-4);color:var(--ink-11)">4</div>
+        <div class="stp-c" style="background:var(--ink-5);color:var(--ink-11)">5</div>
+        <div class="stp-c" style="background:var(--ink-6);color:var(--ink-11)">6</div>
+        <div class="stp-c" style="background:var(--ink-7);color:var(--ink-12)">7</div>
+        <div class="stp-c" style="background:var(--ink-8);color:var(--ink-12)">8</div>
+        <div class="stp-c" style="background:var(--ink-9);color:var(--ink-1)">9</div>
+        <div class="stp-c" style="background:var(--ink-10);color:var(--ink-1)">10</div>
+        <div class="stp-c" style="background:var(--ink-11);color:var(--ink-1)">11</div>
+        <div class="stp-c" style="background:var(--ink-12);color:var(--ink-1)">12</div>
+      </div>
+      <div class="jobs">
+        <div class="job">app bg</div><div class="job">subtle</div><div class="job">fill</div>
+        <div class="job">hover</div><div class="job">active</div><div class="job">divider</div>
+        <div class="job">border</div><div class="job">strong</div><div class="job">solid</div>
+        <div class="job">solid hv</div><div class="job">muted text</div><div class="job">text</div>
+      </div>
+    </div>
+
+    <div class="scale">
+      <div class="scale-h"><b>Beam</b><span>cyan · <b style="color:var(--acc-t)">acts</b> — buttons, links, focus, selection</span></div>
+      <div class="steps">
+        <div class="stp-c" style="background:var(--beam-1);color:var(--beam-11)">1</div>
+        <div class="stp-c" style="background:var(--beam-2);color:var(--beam-11)">2</div>
+        <div class="stp-c" style="background:var(--beam-3);color:var(--beam-11)">3</div>
+        <div class="stp-c" style="background:var(--beam-4);color:var(--beam-11)">4</div>
+        <div class="stp-c" style="background:var(--beam-5);color:var(--beam-12)">5</div>
+        <div class="stp-c" style="background:var(--beam-6);color:var(--beam-12)">6</div>
+        <div class="stp-c" style="background:var(--beam-7);color:var(--beam-12)">7</div>
+        <div class="stp-c" style="background:var(--beam-8);color:var(--beam-12)">8</div>
+        <div class="stp-c" style="background:var(--beam-9);color:var(--on-beam-9)">9</div>
+        <div class="stp-c" style="background:var(--beam-10);color:var(--on-beam-9)">10</div>
+        <div class="stp-c" style="background:var(--beam-11);color:var(--beam-1)">11</div>
+        <div class="stp-c" style="background:var(--beam-12);color:var(--beam-1)">12</div>
+      </div>
+    </div>
+
+    <div class="scale">
+      <div class="scale-h"><b>Marquee</b><span>gold · <b style="color:var(--rate-t)">rates</b> — scores only. Never a button.</span></div>
+      <div class="steps">
+        <div class="stp-c" style="background:var(--mar-1);color:var(--mar-11)">1</div>
+        <div class="stp-c" style="background:var(--mar-2);color:var(--mar-11)">2</div>
+        <div class="stp-c" style="background:var(--mar-3);color:var(--mar-11)">3</div>
+        <div class="stp-c" style="background:var(--mar-4);color:var(--mar-12)">4</div>
+        <div class="stp-c" style="background:var(--mar-5);color:var(--mar-12)">5</div>
+        <div class="stp-c" style="background:var(--mar-6);color:var(--mar-12)">6</div>
+        <div class="stp-c" style="background:var(--mar-7);color:var(--mar-12)">7</div>
+        <div class="stp-c" style="background:var(--mar-8);color:var(--mar-12)">8</div>
+        <div class="stp-c" style="background:var(--mar-9);color:var(--on-mar-9)">9</div>
+        <div class="stp-c" style="background:var(--mar-10);color:var(--on-mar-9)">10</div>
+        <div class="stp-c" style="background:var(--mar-11);color:var(--mar-1)">11</div>
+        <div class="stp-c" style="background:var(--mar-12);color:var(--mar-1)">12</div>
+      </div>
+    </div>
+
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>Solid and text are different steps — that separation is what makes light mode work.</b> Gold step 9
+      (<code>#F5C45C</code>) is ~1.7:1 on white, unreadable as text; step 11 flips to <code>#7A5A0B</code> at ~5.4:1.
+      The star <i>icon</i> keeps step 9, because icons need only 3:1. Step 9 itself is identical in both themes — it's
+      where the brand lives, so the product still reads as itself in light.</div>
+  </section>
+
+  <!-- ============ STATE PALETTE ============ -->
+  <section>
+    <h2>Watch-state palette</h2>
+    <p class="lede">Six states is past the point where colour alone is safely distinguishable, so each carries a hue
+      <b>and</b> a distinct icon shape <b>and</b> a label. Colour is the fast channel, never the only one.</p>
+    <div class="stgrid">
+      <div class="stcard"><div class="stswatch" style="background:var(--st-want-3);color:var(--st-want-11)">◷</div>
+        <div class="stbody"><b>Want to watch</b><span>st-want</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-ing-3);color:var(--st-ing-11)">▶</div>
+        <div class="stbody"><b>Watching</b><span>st-ing · series</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-done-3);color:var(--st-done-11)">✓</div>
+        <div class="stbody"><b>Watched</b><span>st-done</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-re-3);color:var(--st-re-11)">↻</div>
+        <div class="stbody"><b>Rewatching</b><span>st-re</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-hold-3);color:var(--st-hold-11)">‖</div>
+        <div class="stbody"><b>On hold</b><span>st-hold · series</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-drop-3);color:var(--st-drop-11)">✕</div>
+        <div class="stbody"><b>Dropped</b><span>st-drop</span></div></div>
+    </div>
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>Gold is not in this palette.</b> Marquee stays reserved for ratings and scores. If a status borrowed gold,
+      "saved" and "rated 9" would read as the same kind of thing — and they aren't.</div>
+  </section>
+
+  <!-- ============ PRIMITIVES ============ -->
+  <section>
+    <h2>Primitives</h2>
+    <p class="lede">The controls every screen is built from, live. Two rules govern all of them: <b>a border and a fill
+      together is one signal too many</b>, and <b>colour goes on the content, not the container</b>.</p>
+
+    <div class="pgrid">
+      <div class="pbox"><h4>Actions</h4><div class="r">
+        <button class="spill" style="flex:0 0 auto;padding:10px 18px">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+        <button class="ibtn like on" aria-pressed="true">♥</button>
+        <button class="ibtn">✎</button></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Gold status pill; heart marks
+          liked; neutral fill, coloured glyph.</p></div>
+
+      <div class="pbox"><h4>Segmented — one choice</h4>
+        <div class="seasonsw" style="margin:0">
+          <button class="sw" aria-pressed="true">S1<em>7</em></button><button class="sw">S2<em>13</em></button>
+          <button class="sw">S3<em>13</em></button><button class="sw">Specials<em>9</em></button></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Recessed track, raised selection
+          <i>plus</i> accent tint and ring. Shape says "this one"; colour says "and it's active".</p></div>
+
+      <div class="pbox"><h4>Filter chips</h4><div class="r">
+        <button class="chip" aria-pressed="true">Watching<em>3</em></button>
+        <button class="chip">Watched<em>84</em></button>
+        <button class="chip">All</button></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Borderless. Selected is a solid
+          accent, so selection reads instantly.</p></div>
+
+      <div class="pbox"><h4>Tile quick-add</h4>
+        <div class="r" style="align-items:flex-start">
+          <div style="width:66px"><div class="im img i-rec2" style="aspect-ratio:2/3;border-radius:8px;position:relative;overflow:hidden;margin-bottom:5px;background-size:cover">
+            <button class="sb">+</button><span class="gb">6.5</span></div>
+            <div style="font-size:10.5px">Not saved</div></div>
+          <div style="width:66px"><div class="im img i-dv1" style="aspect-ratio:2/3;border-radius:8px;position:relative;overflow:hidden;margin-bottom:5px;background-size:cover">
+            <button class="sb want">◷</button><span class="gb">7.8</span></div>
+            <div style="font-size:10.5px">Saved</div></div>
+          <div style="width:66px"><div class="im img i-dv3" style="aspect-ratio:2/3;border-radius:8px;position:relative;overflow:hidden;margin-bottom:5px;background-size:cover">
+            <button class="sb done">✓</button><span class="gb">7.6</span></div>
+            <div style="font-size:10.5px">Watched</div></div></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">One slot, three jobs, top-right
+          so a thumb doesn't cover the poster. Tap them.</p></div>
+
+      <div class="pbox"><h4>Episode ticks</h4><div class="r">
+        <button class="epchk on">✓</button><button class="epchk on">✓</button>
+        <button class="epchk">○</button><button class="epchk">○</button></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Solid fill when watched, so a
+          season scans as a column of solid marks.</p></div>
+
+      <div class="pbox"><h4>Providers &amp; inputs</h4>
+        <div class="r" style="margin-bottom:9px">
+          <button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button>
+          <button class="pchip"><span class="plogo" style="background:#00A8E1">P</span>Prime</button></div>
+        <div class="inp">Ravi · Mar 2026</div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Providers are real buttons —
+          they link out. Inputs use an inset ring, not a border.</p></div>
+
+      <div class="pbox"><h4>Meters</h4>
+        <div class="collectbar" style="margin:0">
+          <div class="cb-t"><b><i>6</i> of 10 directed</b><span>60%</span></div>
+          <div class="cb-track"><i style="width:60%"></i></div>
+          <div class="cb-sub">4 to go · 16 credits filtered out</div></div></div>
+
+      <div class="pbox"><h4>Stats</h4>
+        <div class="scores" style="margin:0">
+          <div class="score gold"><b>8.1</b><span>TMDB</span></div>
+          <div class="score"><b>9.0</b><span>You</span></div>
+          <div class="score dim"><b>1</b><span>Rewatches</span></div></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Hairline dividers, no box.</p></div>
+
+      <div class="pbox"><h4>Feedback</h4>
+        <div class="toast" style="margin:0 0 9px"><span>S2 E4 watched</span><b>Undo</b></div>
+        <div class="r"><button class="btn">Browse</button><button class="btn q">Retry</button></div></div>
+    </div>
+  </section>
+
+  <!-- ============ SCREENS ============ -->
+  <section>
+    <h2>The screens</h2>
+    <p class="lede">Scroll inside each frame. Bottom navigation is shown on the four top-level destinations only.</p>
+
+    <div class="screens">
+
+      <!-- 1 HOME -->
+      <div class="col">
+        <div class="col-h"><h3>1 · Home</h3><p>Lands on what you're mid-way through, then discovery.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>Tonight</h4><div style="display:flex;gap:6px"><button class="circ">⌕</button><button class="circ">◑</button></div></div>
+
+          <div class="grp" style="margin-top:14px">
+            <div class="grp-h"><b>Continue watching</b><span>3</span></div>
+            <div class="srow">
+              <div class="th" style="background:linear-gradient(150deg,#4A7C59,#1E3A28)"></div>
+              <div class="bd"><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:18%"></i></span>
+            </div>
+            <div class="srow">
+              <div class="th" style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></div>
+              <div class="bd"><div class="nm">Severance</div><div class="ep">S2 E7 · 16 of 19</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:84%"></i></span>
+            </div>
+          </div>
+
+          <div class="sect"><div class="sect-h"><span>Trending in India</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"><button class="sb">+</button><span class="gb">8.2</span></div><div class="tt">Dune: Part Two</div><div class="yy">2024</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#B5483C,#3A1512)"><button class="sb">+</button><span class="gb">7.1</span></div><div class="tt">Mirzapur</div><div class="yy">2024</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"><button class="sb">+</button><span class="gb">7.6</span></div><div class="tt">Arrival</div><div class="yy">2016</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"><button class="sb">+</button><span class="gb">8.0</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+          </div>
+
+          <div class="sect"><div class="sect-h"><span>On your services</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#2B5A4A,#0F241C)"><button class="sb want">◷</button><span class="gb">7.9</span></div><div class="tt">Past Lives</div><div class="yy">2023</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#6A6A6A,#242424)"><button class="sb">+</button><span class="gb">8.5</span></div><div class="tt">Oppenheimer</div><div class="yy">2023</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(140deg,#8A6A3B,#3A2A15)"><button class="sb">+</button><span class="gb">7.6</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div class="on"><span>⌂</span>Home</div><div><span>⌕</span>Search</div><div><span>▤</span>Library</div><div><span>◍</span>You</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl">
+          <li><b>Home leads with Continue watching, never a search box.</b> The habit loop is "open, see what I'm mid-way through, tap +". Discovery sits below it.</li>
+          <li><b>If nothing is in progress, that section is replaced</b> by "Pick up something new" — not left as an empty shelf.</li>
+          <li><b>"On your services" filters by the user's declared providers.</b> Region comes from the profile, not the IP, so a trip abroad doesn't scramble the home screen.</li>
+        </ol></div>
+      </div>
+
+      <!-- 2 SEARCH -->
+      <div class="col">
+        <div class="col-h"><h3>2 · Search results</h3><p>Grid with state badges. Filters expand in place.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div style="padding:12px 14px 0;display:flex;gap:7px;align-items:center">
+            <div style="flex:1;background:var(--surface);border:1px solid var(--bd-str);border-radius:9px;padding:9px 11px;font-size:13px">
+              denis villeneuve</div>
+            <button class="circ">⚙</button>
+          </div>
+          <div class="chips">
+            <button class="chip" aria-pressed="true">All</button>
+            <button class="chip">Films</button>
+            <button class="chip">Series</button>
+            <button class="chip">People</button>
+          </div>
+          <div class="sect"><div class="sect-h"><span>24 results · most relevant</span></div></div>
+          <div style="margin:0 14px">
+            <div class="fgrid">
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"><button class="sb done">✓</button><span class="gb">8.2</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"><button class="sb done">✓</button><span class="gb">8.0</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"><button class="sb want">◷</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(140deg,#8A6A3B,#3A2A15)"><button class="sb">+</button><span class="gb">7.6</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#3A5A7A,#14243A)"><button class="sb">+</button><span class="gb">8.0</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#6A4A6A,#241624)"><button class="sb">+</button><span class="gb">7.3</span></div><div class="nm">Prisoners</div><div class="yr">2013</div></div>
+            </div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>People</span></div></div>
+          <div style="margin:0 14px 14px">
+            <div class="srow" style="align-items:center">
+              <div class="th" style="width:36px;aspect-ratio:1;border-radius:99px;background:linear-gradient(140deg,var(--ink-7),var(--ink-5))"></div>
+              <div class="bd"><div class="nm">Denis Villeneuve</div><div class="ep">Director · 6 of 10 seen</div></div>
+            </div>
+          </div>
+          <div class="bnav"><div><span>⌂</span>Home</div><div class="on"><span>⌕</span>Search</div><div><span>▤</span>Library</div><div><span>◍</span>You</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:3">
+          <li><b>Results are a grid, not rows.</b> Search is "find the thing"; a state badge answers "have I seen it?" at a fraction of a row's height.</li>
+          <li><b>People rank alongside titles, never above them.</b> A person result appears only when the query plausibly names one, and sits after the titles.</li>
+          <li><b>A person row carries collection progress</b> — "6 of 11 seen". This is the wedge, surfaced at the first possible moment.</li>
+          <li><b>Filters expand in place</b>, pushing results down, rather than opening a sheet — so you see results change as you filter.</li>
+        </ol></div>
+      </div>
+
+      <!-- 3 TITLE FILM -->
+      <div class="col">
+        <div class="col-h"><h3>3 · Title — film</h3><p>Watched and rated. One bit of state on the page.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="hero" style="background:linear-gradient(150deg,#C79B5B,#8A5A2B 50%,#2A1B10)">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head">
+            <div class="poster" style="background:linear-gradient(150deg,#E8C98F,#C79B5B 55%,#8A5A2B)"></div>
+            <div class="head-t"><h5>Dune: Part Two</h5>
+              <div class="metaline">2024 · Science Fiction, Adventure · 2h 47m</div></div>
+          </div>
+          <div class="block">
+            <div class="arow">
+              <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button><button class="ibtn">✎</button>
+            </div>
+            <div class="prov"><div class="prov-l">Where to watch · India</div>
+              <div class="provrow">
+                <button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button>
+                <button class="pchip" style="opacity:.75"><span class="plogo" style="background:var(--ink-8)">↧</span>Rent · 4</button>
+              </div></div>
+          </div>
+          <div class="scores">
+            <div class="score gold"><b>8.1</b><span>TMDB</span></div>
+            <div class="score"><b>9.0</b><span>You</span></div>
+            <div class="score dim"><b>1</b><span>Rewatches</span></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Overview</span></div>
+            <p class="ov">Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family. <b>more</b></p></div>
+          <div class="cards2">
+            <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div><div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div>
+              <div class="ptx" style="margin-top:6px">Chalamet, Zendaya<br>+ 3 more</div></div>
+            <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Denis Villeneuve<br>Director</div></div>
+            <div class="pc"><div class="pc-h"><b>Themes</b><i>⌄</i></div><div class="ptx">chosen one, desert<br>+6 more</div></div>
+            <div class="pc"><div class="pc-h"><b>Details</b><i>⌄</i></div><div class="ptx">No IN certificate<br>Budget, language</div></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>More like this</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#F5A623,#C1440E)"><button class="sb">+</button></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"><button class="sb">+</button></div><div class="tt">Arrival</div><div class="yy">2016</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"><button class="sb">+</button></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+          </div><div style="height:18px"></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:7">
+          <li><b>Film statuses are Want to watch · Watched · Dropped only.</b> "Watching" is meaningless for a 2h film; forcing one vocabulary would degrade the film flow to serve the series flow.</li>
+          <li><b>Rating is locked until Watched or Rewatching.</b> Tapping ★ earlier offers "Mark as watched first?".</li>
+          <li><b>TMDB score and your score sit side by side, never merged.</b> The disagreement is the interesting number.</li>
+          <li><b>Four preview cards, always these four, always this order.</b> A card with no data renders empty with a reason rather than vanishing — a layout that reshuffles per title is worse than an empty box.</li>
+          <li><b>Region is stated, not implied.</b> "India" is printed next to Where to watch, because a silent wrong region is the most confusing failure available.</li>
+        </ol></div>
+      </div>
+
+      <!-- 4 TITLE SERIES -->
+      <div class="col">
+        <div class="col-h"><h3>4 · Title — series</h3><p>Same shell. Episode guide replaces nothing — it's a fifth card.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="hero" style="background:linear-gradient(150deg,#4A7C59,#1E3A28 55%,#0C1A12)">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head">
+            <div class="poster" style="background:linear-gradient(150deg,#6FAF80,#2E5B3E)"></div>
+            <div class="head-t"><h5>Breaking Bad</h5>
+              <div class="metaline"><span class="cert">A</span>2008–2013 · Drama, Crime · 5 seasons</div></div>
+          </div>
+          <div class="block">
+            <div class="arow">
+              <button class="spill" style="background:var(--st-ing-9);color:#06231C">▶ Watching <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button><button class="ibtn">✎</button>
+            </div>
+            <div style="margin-top:11px;border-top:1px solid var(--bd-sub);padding-top:11px">
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px">
+                <span style="color:var(--muted)">Progress</span><span style="font-family:var(--f-m);color:var(--acc-t)">11 of 62</span></div>
+              <div style="height:4px;border-radius:99px;background:var(--ink-5);overflow:hidden">
+                <i style="display:block;height:100%;width:18%;background:var(--acc)"></i></div>
+            </div>
+          </div>
+          <div class="seasonsw">
+            <button class="sw" aria-pressed="true">S1</button><button class="sw">S2</button>
+            <button class="sw">S3</button><button class="sw">S4</button><button class="sw">S5</button>
+            <button class="sw">Specials</button>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Season 1 · 7 episodes</span><a href="#a">Mark all</a></div>
+            <div class="eprow" style="border-top:none">
+              <div class="st" style="background:linear-gradient(150deg,#8A7A5A,#3A3220)"></div>
+              <div class="eb"><div class="en">S1 E1 · Pilot</div><div class="ed">20 Jan 2008 · 59m · 8.5</div></div>
+              <button class="epchk on">✓</button></div>
+            <div class="eprow">
+              <div class="st" style="background:linear-gradient(150deg,#5A7A8A,#203238)"></div>
+              <div class="eb"><div class="en">S1 E2 · Cat's in the Bag…</div><div class="ed">27 Jan 2008 · 49m · 8.2</div></div>
+              <button class="epchk on">✓</button></div>
+            <div class="eprow">
+              <div class="st" style="background:linear-gradient(150deg,#7A5A5A,#382020)"></div>
+              <div class="eb"><div class="en">S1 E3 · …And the Bag's in the River</div><div class="ed">10 Feb 2008 · 49m · 8.4</div></div>
+              <button class="epchk">○</button></div>
+            <div class="eprow">
+              <div class="st" style="background:linear-gradient(150deg,#5A6A5A,#202A20)"></div>
+              <div class="eb"><div class="en">S1 E4 · Cancer Man</div><div class="ed">17 Feb 2008 · 49m · 7.9</div></div>
+              <button class="epchk">○</button></div>
+          </div>
+          <div class="cards2">
+            <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div><div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div></div>
+            <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Vince Gilligan<br>+9 more</div></div>
+          </div><div style="height:18px"></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:12">
+          <li><b>Series get the full lifecycle</b> — Want to watch · Watching · On hold · Watched · Rewatching · Dropped.</li>
+          <li><b>Marking an episode watched sets series status to Watching automatically.</b> Nobody should have to set a status before they can log an episode.</li>
+          <li><b>Marking the final episode prompts "Mark series as watched?"</b> — it proposes, never assumes, because unaired seasons exist.</li>
+          <li><b>Episode ticks are individually reversible</b>; tapping a ticked episode un-ticks it. No undo toast needed here — the control is its own undo.</li>
+          <li><b>"Mark all" is per-season, never per-series.</b> A whole-series action is too destructive for a single tap.</li>
+          <li><b>Progress counts episodes, not seasons</b>, and is always <code>watched of total</code> across the whole run.</li>
+        </ol></div>
+      </div>
+
+      <!-- 4b EDITOR -->
+      <div class="col">
+        <div class="col-h"><h3>4b · The editor</h3><p>Behind the status pill. Everything you can record about a title.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div style="height:96px;background:linear-gradient(150deg,#4A7C59,#1E3A28);opacity:.35"></div>
+          <div class="sheet">
+            <div class="sh-grab"></div>
+            <div class="sh-head">
+              <div class="sh-po" style="background:linear-gradient(150deg,#6FAF80,#2E5B3E)"></div>
+              <div class="sh-t"><b>Breaking Bad</b><span>2008 · 5 seasons · 62 episodes</span></div>
+              <button class="ibtn like on" aria-pressed="true" style="width:34px;height:34px">♥</button>
+              <button class="btn" style="padding:8px 14px">Save</button>
+            </div>
+
+            <div class="fld"><label>Status</label>
+              <div class="segs">
+                <button class="seg" style="--c:var(--st-want-11);--b:var(--st-want-3)">◷<i>Want</i></button>
+                <button class="seg on" style="--c:var(--st-ing-11);--b:var(--st-ing-3)">▶<i>Watching</i></button>
+                <button class="seg" style="--c:var(--st-hold-11);--b:var(--st-hold-3)">‖<i>On hold</i></button>
+                <button class="seg" style="--c:var(--st-done-11);--b:var(--st-done-3)">✓<i>Watched</i></button>
+                <button class="seg" style="--c:var(--st-re-11);--b:var(--st-re-3)">↻<i>Rewatch</i></button>
+                <button class="seg" style="--c:var(--st-drop-11);--b:var(--st-drop-3)">✕<i>Dropped</i></button>
+              </div>
+            </div>
+
+            <div class="fld"><label>Progress</label>
+              <div class="prog">
+                <button class="stp">−</button>
+                <div class="prog-v"><b>11</b><span>of 62 episodes</span></div>
+                <button class="stp">+</button>
+              </div>
+              <div class="jump">Currently at <b>S2 E4</b> · <span>Jump to episode</span></div>
+            </div>
+
+            <div class="fld"><label>Your rating</label>
+              <div class="stars"><i class="on">★</i><i class="on">★</i><i class="on">★</i><i class="on">★</i><i>★</i>
+                <span class="sv">8 / 10</span></div>
+            </div>
+
+            <div class="fld2">
+              <div><label>Started</label><div class="inp">12 Aug 2026</div></div>
+              <div><label>Finished</label><div class="inp dim">—</div></div>
+            </div>
+
+            <div class="fld"><label>Rewatches</label>
+              <div class="prog compact"><button class="stp">−</button><div class="prog-v"><b>0</b></div><button class="stp">+</button></div>
+            </div>
+
+            <div class="fld"><label>Who recommended it?</label>
+              <div class="inp">Ravi · Mar 2026</div>
+              <div class="hint">Optional. Nobody else ships this.</div>
+            </div>
+
+            <div class="fld"><label>Notes</label>
+              <div class="inp dim" style="min-height:52px">Private to you…</div></div>
+
+            <div class="sh-foot"><button class="del">Remove from library</button></div>
+          </div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:32">
+          <li><b>The editor is a sheet, not a page.</b> You arrive from a title and return to it; it never takes a URL of its own.</li>
+          <li><b>Status is a six-up segmented control, not a dropdown.</b> All options visible at once — one tap instead of open-scan-tap. Films render three of the six.</li>
+          <li><b>Progress is a stepper plus a jump.</b> The stepper handles "one more"; "Jump to episode" handles "I binged seven".</li>
+          <li><b>The editor shows episode count; the title page shows S/E.</b> Editing is arithmetic, reading is orientation — <code>11 of 62</code> versus <code>S2 E4</code>.</li>
+          <li><b>Rating is 1–10 in half-stars</b>, matching TMDB's scale so your score and theirs are directly comparable.</li>
+          <li><b>"Who recommended it?" is free text with an auto-stamped month.</b> §7's differentiator, captured where the cost is near zero.</li>
+          <li><b>Save is explicit; Remove is footer-isolated and confirms.</b> Everything else is one tap from undoable.</li>
+        </ol></div>
+      </div>
+
+      <!-- 5 PERSON -->
+      <div class="col">
+        <div class="col-h"><h3>5 · Person</h3><p>Filmography first, bio last. Collection progress on top.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><button class="circ">‹</button><button class="circ">⋮</button></div>
+          <div class="phead">
+            <div class="pav"></div>
+            <div><div class="pn">Denis Villeneuve</div><div class="pr">Director · Writer · Producer</div></div>
+          </div>
+          <div class="collectbar">
+            <div class="cb-t"><b><i>6</i> of 10 directed</b><span>60%</span></div>
+            <div class="cb-track"><i style="width:60%"></i></div>
+            <div class="cb-sub">4 to go · 16 credits filtered out</div>
+          </div>
+          <div class="rolesw">
+            <button class="sw" aria-pressed="true">Director<em>10</em></button>
+            <button class="sw">Writer<em>6</em></button>
+            <button class="sw">Producer<em>4</em></button>
+          </div>
+          <div class="sect" style="margin-top:13px"><div class="sect-h"><span>As director</span><a href="#a">Year ▾</a></div></div>
+          <div style="margin:0 14px">
+            <div class="fgrid">
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"><button class="sb done">✓</button><span class="gb">8.2</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"><button class="sb done">✓</button><span class="gb">8.0</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#3A5A7A,#14243A)"><button class="sb done">✓</button><span class="gb">8.0</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(140deg,#8A6A3B,#3A2A15)"><button class="sb want">◷</button><span class="gb">7.6</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#6A4A6A,#241624)"><button class="sb">+</button><span class="gb">7.3</span></div><div class="nm">Prisoners</div><div class="yr">2013</div></div>
+            </div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Biography</span></div>
+            <p class="ov">Denis Villeneuve is a Canadian filmmaker known for atmospheric science fiction and crime dramas. <b>more</b></p></div>
+          <div style="height:18px"></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:18">
+          <li><b>Collection progress sits above the filmography</b>, not buried in stats. "6 of 11 directed" is the differentiator — it should be the first thing on a person page.</li>
+          <li><b>Roles are switchable tabs with counts</b>, not one merged list. A person who directs and writes has two distinct bodies of work.</li>
+          <li><b>Progress is counted per role.</b> "6 of 11 directed" changes when you switch to Writer — otherwise the number is meaningless.</li>
+          <li><b>Films before biography.</b> This is a collection product; the work is the point, the person is context.</li>
+        </ol></div>
+      </div>
+
+      <!-- 6 LIBRARY -->
+      <div class="col">
+        <div class="col-h"><h3>6 · Library</h3><p>Series as rows, films as grid, inside one filter.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>Library</h4><div style="display:flex;gap:6px"><button class="circ">⌕</button><button class="circ">⇅</button></div></div>
+          <div class="chips">
+            <button class="chip" aria-pressed="true">Watching<em>3</em></button>
+            <button class="chip">Want to watch<em>12</em></button>
+            <button class="chip">Watched<em>84</em></button>
+            <button class="chip">On hold<em>2</em></button>
+            <button class="chip">All</button>
+          </div>
+          <div class="grp">
+            <div class="grp-h"><b>Series</b><span>3 in progress</span></div>
+            <div class="srow"><div class="th" style="background:linear-gradient(150deg,#4A7C59,#1E3A28)"></div>
+              <div class="bd"><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:18%"></i></span></div>
+            <div class="srow"><div class="th" style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></div>
+              <div class="bd"><div class="nm">Severance</div><div class="ep">S2 E7 · 16 of 19</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:84%"></i></span></div>
+            <div class="srow"><div class="th" style="background:linear-gradient(150deg,#3B5A7A,#16243A)"></div>
+              <div class="bd"><div class="nm">Shōgun</div><div class="ep">S1 E2 · 2 of 10</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:20%"></i></span></div>
+          </div>
+          <div class="toast"><span>Breaking Bad · S2 E4 watched</span><b>Undo</b></div>
+          <div class="grp">
+            <div class="grp-h"><b>Films</b><span>none watching</span></div>
+            <div style="padding:16px 12px;border:1px dashed var(--bd);border-radius:10px;text-align:center;font-size:12px;color:var(--muted)">
+              Films don't have a "watching" state.<br><span style="color:var(--acc-t)">See your 12 saved films</span></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div><span>⌂</span>Home</div><div><span>⌕</span>Search</div><div class="on"><span>▤</span>Library</div><div><span>◍</span>You</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:22">
+          <li><b>Status chips with counts, not stacked sections.</b> Sections work at 40 titles and collapse at 400; counts make the library's shape readable without scrolling.</li>
+          <li><b>Default filter is Watching when anything is in progress</b>, otherwise Want to watch.</li>
+          <li><b>The <code>+</code> marks the next unwatched episode</b> — never "add one to a number" — so the toast can name the episode. Undo lasts 6 seconds.</li>
+          <li><b>When a filter is empty for one media type, say why.</b> "Films don't have a watching state" is a real answer; an empty grid is not.</li>
+        </ol></div>
+      </div>
+
+      <!-- 7 PROFILE -->
+      <div class="col">
+        <div class="col-h"><h3>7 · You — taste</h3><p>Private in MVP. All of it computed from your own records.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>You</h4><button class="circ">⚙</button></div>
+          <div class="stiles">
+            <div class="st-t"><b>97</b><span>Titles</span></div>
+            <div class="st-t"><b>412</b><span>Episodes</span></div>
+            <div class="st-t"><b>18.4</b><span>Days</span></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Your taste · by count</span><a href="#a">Score ▾</a></div></div>
+          <div class="tastecard">
+            <div class="tc-h"><b>Science Fiction</b><i>1</i></div>
+            <div class="tc-m">
+              <div><b>24</b><span>titles</span></div><div><b>8.1</b><span>avg</span></div><div><b>3d 4h</b><span>time</span></div></div>
+            <div class="tc-r"><i style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"></i><i style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"></i><i style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"></i><i style="background:linear-gradient(150deg,#3A5A7A,#14243A)"></i><i style="background:linear-gradient(150deg,#6A6A6A,#242424)"></i></div>
+          </div>
+          <div class="tastecard">
+            <div class="tc-h"><b>Denis Villeneuve</b><i>2</i></div>
+            <div class="tc-m">
+              <div><b>6</b><span>of 11</span></div><div><b>8.6</b><span>avg</span></div><div><b>13h</b><span>time</span></div></div>
+            <div class="tc-r"><i style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"></i><i style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"></i><i style="background:linear-gradient(150deg,#3A5A7A,#14243A)"></i><i style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"></i></div>
+          </div>
+          <div class="tastecard">
+            <div class="tc-h"><b>Drama</b><i>3</i></div>
+            <div class="tc-m">
+              <div><b>19</b><span>titles</span></div><div><b>7.8</b><span>avg</span></div><div><b>2d 9h</b><span>time</span></div></div>
+            <div class="tc-r"><i style="background:linear-gradient(150deg,#4A7C59,#1E3A28)"></i><i style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></i><i style="background:linear-gradient(150deg,#2B5A4A,#0F241C)"></i></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div><span>⌂</span>Home</div><div><span>⌕</span>Search</div><div><span>▤</span>Library</div><div class="on"><span>◍</span>You</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:26">
+          <li><b>One card shape serves genres, people and decades.</b> Name, rank, three measures, poster evidence. A person card shows <code>6 of 11</code> where a genre card shows a count — same component, different denominator.</li>
+          <li><b>Taste needs no other users</b>, so it ships in the MVP even though public profiles don't. It is the Tracker's payoff.</li>
+          <li><b>No streaks, no nudges, nothing that decays.</b> Every number here is cumulative; skipping a month costs nothing.</li>
+        </ol></div>
+      </div>
+
+      <!-- 8 STATES -->
+      <div class="col">
+        <div class="col-h"><h3>8 · States</h3><p>Empty, loading, error, no-results.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>Library</h4></div>
+          <div class="empty">
+            <div class="ic">▤</div><h6>Nothing here yet</h6>
+            <p>Titles you save or mark watched will collect here.</p>
+            <button class="btn">Browse trending</button>
+          </div>
+        </div></div>
+        <div class="phone" style="margin-top:14px"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>Search</h4></div>
+          <div class="sect"><div class="sect-h"><span>Loading</span></div></div>
+          <div style="margin:0 14px"><div class="fgrid">
+            <div class="fc"><div class="sk" style="aspect-ratio:2/3;margin-bottom:5px"></div><div class="sk" style="height:8px;width:80%"></div></div>
+            <div class="fc"><div class="sk" style="aspect-ratio:2/3;margin-bottom:5px"></div><div class="sk" style="height:8px;width:65%"></div></div>
+            <div class="fc"><div class="sk" style="aspect-ratio:2/3;margin-bottom:5px"></div><div class="sk" style="height:8px;width:72%"></div></div>
+          </div></div>
+        </div></div>
+        <div class="phone" style="margin-top:14px"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>Dune</h4></div>
+          <div class="errbox">
+            <b>Couldn't load where to watch</b>
+            <p>Everything else on this page is up to date. This section alone failed.</p>
+            <button class="btn q">Retry</button>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Overview</span></div>
+            <p class="ov">Paul Atreides unites with Chani and the Fremen…</p></div>
+        </div></div>
+        <div class="phone" style="margin-top:14px"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>Search</h4></div>
+          <div class="empty">
+            <div class="ic">⌕</div><h6>No results for "villenueve"</h6>
+            <p>Did you mean <span style="color:var(--acc-t)">Villeneuve</span>?</p>
+            <button class="btn q">Clear filters · 3 active</button>
+          </div>
+        </div></div>
+        <div class="phone" style="margin-top:14px"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>People</h4></div>
+          <div class="sect"><div class="sect-h"><span>Created by · fallbacks</span></div>
+            <button class="prow" style="margin-bottom:8px"><span class="pf i-vg"></span>
+              <span class="pb"><b>Vince Gilligan</b><span>Creator · Writing</span></span>
+              <span class="go">›</span></button>
+            <button class="prow" style="margin-bottom:8px"><span class="pf noimg">JD</span>
+              <span class="pb"><b>Jane Doe</b><span>Creator · no photo</span></span>
+              <span class="go">›</span></button>
+            <div class="prow nolink"><span class="pf noimg">AK</span>
+              <span class="pb"><b>A. Kaur</b><span>Name only · no person record</span></span></div>
+          </div>
+          <p class="ov" style="margin:12px 14px 0;font-size:11.5px">Photo missing → initials, still tappable.
+            No person record at all → initials, no chevron, not tappable.</p>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:29">
+          <li><b>Errors are scoped to the section that failed</b>, never the whole page. A dead provider call must not blank a title page that already has its synopsis.</li>
+          <li><b>Every empty state names one action.</b> Never a bare illustration.</li>
+          <li><b>No-results always offers a spelling suggestion and a filter escape</b>, with the active filter count shown — the most common cause of zero results is a filter the user forgot.</li>
+          <li><b>Skeletons mirror the layout that's coming</b>, so nothing shifts on arrival.</li>
+          <li><b>Any named person is a person row, never loose text.</b> Photo, name, role, chevron — the same
+            component whether it's a creator, a director or a cast member, so every name on every screen behaves
+            identically and lands on the same page shape.</li>
+          <li><b>Missing photo degrades to initials, and the row stays tappable</b> — a person page is still worth
+            opening without a headshot.</li>
+          <li><b>No person record at all → initials, no chevron, not tappable.</b> The name is still shown, because
+            the credit is true even when we can't navigate to it. A link that goes nowhere is worse than plain text.</li>
+        </ol></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ EDGE CASES ============ -->
+  <section>
+    <h2>Edge cases the data will actually produce</h2>
+    <p class="lede">From the verified TMDB inventory — these are not hypotheticals.</p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:230px">Case</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr><td><b>No providers in region</b></td><td>Show "Not streaming in India" plus a JustWatch link — never an empty card. Likely common for older and non-Hollywood titles.</td></tr>
+        <tr><td><b>No poster / no backdrop</b></td><td>Gradient placeholder seeded from the title, plus the title set in type. Never a broken-image icon, never a blank tile.</td></tr>
+        <tr><td><b>No person photo</b></td><td>Initials on a neutral circle. The row stays tappable — the filmography is still worth opening.</td></tr>
+        <tr><td><b>Credit with no person record</b></td><td>TMDB sometimes returns a crew name without a usable person id. Show the name with initials, drop the chevron, make it non-tappable. Never render a link that dead-ends.</td></tr>
+        <tr><td><b>Series still airing</b></td><td>Progress denominator counts <i>aired</i> episodes only; unaired ones render dimmed and un-tickable, with the air date shown.</td></tr>
+        <tr><td><b>New season added after you finished</b></td><td>Status flips Watched → Watching automatically and the title returns to Continue watching. It's the only behaviour that doesn't lose the user's place.</td></tr>
+        <tr><td><b>Specials / season 0</b></td><td>Excluded from the progress denominator, available on their own tab. Otherwise nobody ever reaches 100%.</td></tr>
+        <tr><td><b>Episode titles spoil</b></td><td>Titles of unwatched episodes past your progress point are blurred behind a tap-to-reveal, defaulting to on.</td></tr>
+        <tr><td><b>Title is both film and series</b></td><td>TMDB keys them separately; we follow. They are two records and never merge.</td></tr>
+        <tr><td><b>Rating without watching</b></td><td>Blocked. The ★ offers to mark watched first.</td></tr>
+        <tr><td><b>Offline / TMDB down</b></td><td>Library and all watch state remain readable — they're ours. Only TMDB-backed sections show the scoped error.</td></tr>
+        <tr><td><b>Save fails after optimistic <code>+1</code></b></td><td>Progress rolls back visibly and the toast becomes "Couldn't save · Retry". Silent loss is the one unacceptable outcome.</td></tr>
+        <tr><td><b>Guest browsing</b></td><td>Everything readable; every tracking control prompts sign-in on tap. No parallel local database.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ============ LIVE SCREENS ============ -->
+  <section>
+    <h2>Live screens · real posters, real numbers</h2>
+    <p class="lede">The same components, rendered with production data pulled from TMDB on <b>12 September 2026</b> —
+      real artwork, real titles, real scores, real episode stills, real Indian availability. Nothing here is a placeholder.</p>
+
+    <div class="screens" style="margin-top:28px">
+
+      <!-- LIVE: title film -->
+      <div class="col">
+        <div class="col-h"><h3>Title — Dune: Part Two</h3><p>Note the missing certificate: the meta line simply reflows.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="hero img i-dune_b">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head">
+            <div class="poster img i-dune_p"></div>
+            <div class="head-t"><h5>Dune: Part Two</h5>
+              <div class="metaline">2024 · Science Fiction, Adventure · 2h 47m</div></div>
+          </div>
+          <div class="block">
+            <div class="arow">
+              <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button><button class="ibtn">✎</button></div>
+            <div class="prov"><div class="prov-l">Where to watch · India</div>
+              <div class="provrow">
+                <button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button>
+                <button class="pchip" style="opacity:.75"><span class="plogo" style="background:var(--ink-8)">↧</span>Rent · 4</button>
+              </div></div>
+          </div>
+          <div class="scores">
+            <div class="score gold"><b>8.1</b><span>TMDB · 8.5k</span></div>
+            <div class="score"><b>9.0</b><span>You</span></div>
+            <div class="score dim"><b>1</b><span>Rewatches</span></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Overview</span></div>
+            <p class="ov">Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a
+              path of revenge against the conspirators who destroyed his family. <b>more</b></p></div>
+          <div class="sect"><div class="sect-h"><span>Cast</span><a href="#a">All 4</a></div></div>
+          <div class="rail">
+            <div class="rt" style="flex-basis:64px"><div class="im img i-cast0" style="aspect-ratio:1;border-radius:99px"></div><div class="tt">Timothée Chalamet</div><div class="yy">Paul Atreides</div></div>
+            <div class="rt" style="flex-basis:64px"><div class="im img i-cast1" style="aspect-ratio:1;border-radius:99px"></div><div class="tt">Zendaya</div><div class="yy">Chani</div></div>
+            <div class="rt" style="flex-basis:64px"><div class="im img i-cast2" style="aspect-ratio:1;border-radius:99px"></div><div class="tt">Rebecca Ferguson</div><div class="yy">Jessica</div></div>
+            <div class="rt" style="flex-basis:64px"><div class="im img i-cast3" style="aspect-ratio:1;border-radius:99px"></div><div class="tt">Javier Bardem</div><div class="yy">Stilgar</div></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Themes</span></div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <span class="chip" style="font-size:11px;padding:4px 9px">chosen one</span>
+              <span class="chip" style="font-size:11px;padding:4px 9px">sandstorm</span>
+              <span class="chip" style="font-size:11px;padding:4px 9px">desert</span>
+              <span class="chip" style="font-size:11px;padding:4px 9px">distant future</span>
+              <span class="chip" style="font-size:11px;padding:4px 9px">+4</span></div></div>
+          <div class="sect"><div class="sect-h"><span>Recommendations</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-rec0"><button class="sb">+</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+            <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-rec3"><button class="sb">+</button><span class="gb">6.3</span></div><div class="tt">Prince of Persia</div><div class="yy">2010</div></div>
+          </div><div style="height:18px"></div>
+        </div></div>
+      </div>
+
+      <!-- LIVE: title series -->
+      <div class="col">
+        <div class="col-h"><h3>Title — Breaking Bad</h3><p>Real episode stills, runtimes and per-episode scores.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="hero img i-bb_b">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head">
+            <div class="poster img i-bb_p"></div>
+            <div class="head-t"><h5>Breaking Bad</h5>
+              <div class="metaline"><span class="cert">A</span>2008–2013 · Drama, Crime · 5 seasons</div></div>
+          </div>
+          <div class="block">
+            <div class="arow">
+              <button class="spill" style="background:var(--st-ing-9);color:#06231C">▶ Watching <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button><button class="ibtn">✎</button></div>
+            <div style="margin-top:11px;border-top:1px solid var(--bd-sub);padding-top:11px">
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px">
+                <span style="color:var(--muted)">Progress</span><span style="font-family:var(--f-m);color:var(--acc-t)">11 of 62</span></div>
+              <div style="height:4px;border-radius:99px;background:var(--ink-5);overflow:hidden">
+                <i style="display:block;height:100%;width:17.7%;background:var(--acc)"></i></div></div>
+          </div>
+          <div class="scores">
+            <div class="score gold"><b>8.9</b><span>TMDB</span></div>
+            <div class="score dim"><b>—</b><span>You</span></div>
+            <div class="score"><b>62</b><span>Episodes</span></div>
+          </div>
+          <div class="seasonsw">
+            <button class="sw" aria-pressed="true">S1<em>7</em></button><button class="sw">S2<em>13</em></button>
+            <button class="sw">S3<em>13</em></button><button class="sw">S4<em>13</em></button>
+            <button class="sw">S5<em>16</em></button><button class="sw">Specials<em>9</em></button></div>
+          <div class="sect"><div class="sect-h"><span>Season 1 · 7 episodes</span><a href="#a">Mark all</a></div>
+            <div class="eprow" style="border-top:none">
+              <div class="st img i-ep0"></div>
+              <div class="eb"><div class="en">S1 E1 · Pilot</div><div class="ed">20 Jan 2008 · 59m · ★ 8.5</div></div>
+              <button class="epchk on">✓</button></div>
+            <div class="eprow">
+              <div class="st img i-ep1"></div>
+              <div class="eb"><div class="en">S1 E2 · Cat's in the Bag...</div><div class="ed">27 Jan 2008 · 49m · ★ 8.2</div></div>
+              <button class="epchk on">✓</button></div>
+            <div class="eprow">
+              <div class="st img i-ep2"></div>
+              <div class="eb"><div class="en">S1 E3 · ...And the Bag's in the River</div><div class="ed">10 Feb 2008 · 49m · ★ 8.4</div></div>
+              <button class="epchk">○</button></div>
+            <div class="eprow">
+              <div class="st img i-ep3"></div>
+              <div class="eb"><div class="en">S1 E4 · Cancer Man</div><div class="ed">17 Feb 2008 · 49m · ★ 7.9</div></div>
+              <button class="epchk">○</button></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Created by</span></div>
+            <button class="prow"><span class="pf i-vg"></span>
+              <span class="pb"><b>Vince Gilligan</b><span>Creator · Writing</span></span>
+              <span class="go">›</span></button>
+          </div>
+          <div style="height:18px"></div>
+        </div></div>
+      </div>
+
+      <!-- LIVE: person -->
+      <div class="col">
+        <div class="col-h"><h3>Person — Denis Villeneuve</h3><p>Denominator 10, per the ≥200-vote rule. That rule is a decision.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><button class="circ">‹</button><button class="circ">⋮</button></div>
+          <div class="phead">
+            <div class="pav img i-dv_face"></div>
+            <div><div class="pn">Denis Villeneuve</div><div class="pr">Directing · b. 1967, Québec</div></div></div>
+          <div class="collectbar">
+            <div class="cb-t"><b><i>4</i> of 10 directed</b><span>40%</span></div>
+            <div class="cb-track"><i style="width:40%"></i></div>
+            <div class="cb-sub">6 to go · 16 credits filtered out</div></div>
+          <div class="rolesw">
+            <button class="sw" aria-pressed="true">Director<em>10</em></button>
+            <button class="sw">Writer<em>7</em></button><button class="sw">Producer<em>5</em></button></div>
+          <div class="sect" style="margin-top:13px"><div class="sect-h"><span>As director</span><a href="#a">Year ▾</a></div></div>
+          <div style="margin:0 14px">
+            <div class="fgrid">
+              <div class="fc"><div class="im img i-dv0"><button class="sb done">✓</button><span class="gb">8.1</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im img i-dv1"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im img i-dv3"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="nm">Enemy</div><div class="yr">2014</div></div>
+            </div>
+            <div style="margin-top:10px;padding:9px 11px;border:1px dashed var(--bd);border-radius:9px;
+              font-size:11px;color:var(--muted);line-height:1.5">
+              <b style="color:var(--text)">16 more credits hidden</b> — shorts, documentaries and 2 unreleased projects.
+              <span style="color:var(--acc-t)">Show all 26</span></div>
+          </div>
+          <div style="height:18px"></div>
+        </div></div>
+      </div>
+
+      <!-- LIVE: home -->
+      <div class="col">
+        <div class="col-h"><h3>Home</h3><p>Continue watching over real artwork, then discovery.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>Tonight</h4><div style="display:flex;gap:6px"><button class="circ">⌕</button><button class="circ">◑</button></div></div>
+          <div class="grp" style="margin-top:14px">
+            <div class="grp-h"><b>Continue watching</b><span>1</span></div>
+            <div class="srow"><div class="th img i-bb_p"></div>
+              <div class="bd"><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:17.7%"></i></span></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Because you watched Dune: Part Two</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-rec0"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+            <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-rec3"><button class="sb">+</button><span class="gb">6.3</span></div><div class="tt">Prince of Persia</div><div class="yy">2010</div></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>More from Denis Villeneuve</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+            <div class="rt"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="tt">Enemy</div><div class="yy">2014</div></div>
+            <div class="rt"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+            <div class="rt"><div class="im img i-dv3"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="tt">Arrival</div><div class="yy">2016</div></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div class="on"><span>⌂</span>Home</div><div><span>⌕</span>Search</div><div><span>▤</span>Library</div><div><span>◍</span>You</div></div>
+        </div></div>
+      </div>
+
+    </div>
+
+    <div class="warnbox" style="margin-top:28px"><b>What real artwork changes.</b> Posters are far louder than the
+      gradients I mocked with — which is the argument for neutral chrome made concrete. Titles are also longer than
+      placeholders ("…And the Bag's in the River" wraps to two lines), episode stills are genuinely dark, and the gold
+      score badge has to survive being placed over any of it. That's why the badge keeps its own scrim rather than
+      trusting the theme.</div>
+  </section>
+
+  <!-- ============ ENTRY & GUEST ============ -->
+  <section>
+    <h2>Entry &amp; guest</h2>
+    <p class="lede">Three screens the eight didn't cover, all following from §12's decision that guests browse freely
+      and sign up to save. The governing constraint is §1: <b>"feel natural, like home — never forced."</b> A hard
+      login wall is the most forced thing an app can do, so none of these gate the catalogue.</p>
+
+    <div class="screens" style="margin-top:26px">
+
+      <!-- COVER -->
+      <div class="col">
+        <div class="col-h"><h3>1 · Cover</h3><p>First visit only. Skippable, and it doesn't come back.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="cover">
+            <div class="mosaic">
+              <div class="img i-dune_p"></div><div class="img i-bb_p"></div><div class="img i-dv2"></div>
+              <div class="img i-dv3"></div><div class="img i-rec0"></div><div class="img i-dv4"></div>
+              <div class="img i-dv5"></div><div class="img i-rec1"></div><div class="img i-dv1"></div>
+              <div class="img i-rec2"></div><div class="img i-rec3"></div><div class="img i-dv0"></div>
+            </div>
+            <div class="cover-scrim"></div>
+            <div class="cover-in">
+              <div class="cover-mark"><i></i>Cine Search</div>
+              <h5>Everything you've watched.<br>Everything you will.</h5>
+              <p>Track films and series, see where to watch them in India, and find out what your taste actually
+                looks like.</p>
+              <div class="cover-cta">
+                <button class="btn-lg">Create account</button>
+                <button class="btn-lg ghost">Sign in</button>
+              </div>
+              <div class="cover-skip"><button>Browse without an account →</button></div>
+              <div class="cover-fine">Film and TV data from TMDB.<br>Streaming availability by JustWatch.</div>
+            </div>
+          </div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:41">
+          <li><b>Shown once, on first visit only.</b> Set a flag locally and never show it again — returning guests go
+            straight to Discover. A cover page that reappears every visit is a wall, and §1 forbids walls.</li>
+          <li><b>"Browse without an account" is a real, visible action</b> — not grey 11px text in a corner. The Noob's
+            entire persona is browsing before committing; burying the skip loses them at the door.</li>
+          <li><b>Create account is primary, Sign in is secondary.</b> Most people hitting this screen are new. A
+            returning user recognises "Sign in" regardless of its weight.</li>
+          <li><b>The mosaic is real artwork, never stock illustration.</b> The catalogue is the product; showing it is
+            the most honest possible pitch.</li>
+          <li><b>Attribution lives here too.</b> TMDB and JustWatch credit is contractual, and this is the first screen
+            — cheapest possible place to satisfy it.</li>
+        </ol></div>
+      </div>
+
+      <!-- SIGN-IN PROMPT -->
+      <div class="col">
+        <div class="col-h"><h3>2 · Sign-in prompt</h3><p>A guest taps any tracking control. Same sheet shell as the editor.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div style="height:150px;background:linear-gradient(150deg,#C79B5B,#8A5A2B 50%,#2A1B10);opacity:.4"></div>
+          <div style="padding:0 14px;opacity:.4">
+            <div class="metaline" style="margin-top:8px">2024 · Science Fiction, Adventure · 2h 47m</div>
+          </div>
+          <div class="gsheet" style="margin-top:34px">
+            <div class="sh-grab"></div>
+            <div class="gs-art">
+              <div class="po img i-dune_p"></div>
+              <div class="tx"><b>Save Dune: Part Two?</b>
+                <span>You'll need an account to keep a library.</span></div>
+            </div>
+            <div class="gs-body">
+              <div class="gs-list">
+                <div><i>✓</i><span>Track films and series, episode by episode</span></div>
+                <div><i>✓</i><span>Rate what you've seen and see your taste</span></div>
+                <div><i>✓</i><span>Free, and your library is private by default</span></div>
+              </div>
+              <div class="cover-cta">
+                <button class="btn-lg">Create account</button>
+                <button class="btn-lg ghost">Sign in</button>
+              </div>
+              <div class="cover-skip"><button style="color:var(--muted)">Not now</button></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:46">
+          <li><b>It names the specific title and the specific action.</b> "Save Dune: Part Two?" — never a generic
+            "Sign in to continue". The user was doing something; the prompt should know what.</li>
+          <li><b>Intent survives sign-up.</b> After authenticating, the original action <i>completes automatically</i>
+            and the user lands back on the title with it saved. If they sign up to save something and it isn't saved,
+            we broke a promise in the first thirty seconds.</li>
+          <li><b>"Not now" dismisses with no penalty</b> and no repeat nag in the same session.</li>
+          <li><b>Same sheet shell as the editor</b> — grab handle, poster, title. It should feel like the thing they
+            were reaching for, with a sign-in step in front of it.</li>
+          <li><b>Three benefits, not a feature list.</b> Including "private by default", because §9.3 made that true
+            and it removes the most common objection to signing up.</li>
+        </ol></div>
+      </div>
+
+      <!-- GUEST HOME -->
+      <div class="col">
+        <div class="col-h"><h3>3 · Guest home</h3><p>No library, so no "Continue watching". Discovery leads.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>Discover</h4><div style="display:flex;gap:6px">
+            <button class="circ">⌕</button><button class="btn" style="padding:7px 14px;font-size:12.5px">Sign in</button></div></div>
+
+          <div class="sect" style="margin-top:14px"><div class="sect-h"><span>Trending in India</span><a href="#g">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-dune_p"><button class="sb">+</button><span class="gb">8.1</span></div><div class="tt">Dune: Part Two</div><div class="yy">2024</div></div>
+            <div class="rt"><div class="im img i-bb_p"><button class="sb">+</button><span class="gb">8.9</span></div><div class="tt">Breaking Bad</div><div class="yy">2008</div></div>
+            <div class="rt"><div class="im img i-rec0"><button class="sb">+</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-dv2"><button class="sb">+</button><span class="gb">7.6</span></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+          </div>
+
+          <div class="sect"><div class="sect-h"><span>In cinemas now</span><a href="#g">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-dv0"><button class="sb">+</button><span class="gb">8.1</span></div><div class="tt">Dune: Part Two</div><div class="yy">2024</div></div>
+            <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+            <div class="rt"><div class="im img i-dv4"><button class="sb">+</button><span class="gb">7.4</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+            <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+          </div>
+
+          <div style="margin:20px 14px 0;padding:14px;border-radius:12px;background:var(--surface)">
+            <div style="font-family:var(--f-d);font-size:14px;font-weight:700;margin-bottom:5px">Keep track of all this</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:11px">An account gives you a
+              library, episode progress and your taste profile. Private by default.</div>
+            <button class="btn" style="width:100%">Create account</button>
+          </div>
+
+          <div class="sect"><div class="sect-h"><span>Popular series</span><a href="#g">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-dv3"><button class="sb">+</button><span class="gb">7.6</span></div><div class="tt">Arrival</div><div class="yy">2016</div></div>
+            <div class="rt"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="tt">Enemy</div><div class="yy">2014</div></div>
+            <div class="rt"><div class="im img i-rec3"><button class="sb">+</button><span class="gb">6.3</span></div><div class="tt">Prince of Persia</div><div class="yy">2010</div></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div class="on"><span>⌂</span>Discover</div><div><span>⌕</span>Search</div><div><span>▤</span>Library</div><div><span>◍</span>Sign in</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:51">
+          <li><b>Discovery leads; nothing is hidden.</b> The whole catalogue, every title page, every person page,
+            search and filters all work signed-out. Only <i>saving</i> requires an account.</li>
+          <li><b>The tab is "Discover", not "Home".</b> A guest has no home — naming it Home and then showing someone
+            else's content is a small lie.</li>
+          <li><b>Tiles keep their <code>+</code>.</b> Hiding the quick-add would hide the product's main feature from
+            the exact people who haven't seen it yet. Tapping raises the sign-in sheet — which is how the feature gets
+            discovered in the first place.</li>
+          <li><b>Exactly one sign-up card, placed after the first two rails</b> — below the fold, after some value has
+            been delivered. Not a banner, not a modal, not repeated per rail.</li>
+          <li><b>Library tab stays visible and shows an empty state with a sign-in prompt</b>, rather than disappearing.
+            A nav that changes shape on sign-in is disorienting; a tab that explains itself is not.</li>
+        </ol></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:34px">Settings, About and 404 — spec, not drawing</h3>
+    <p class="lede" style="font-size:13.5px">These are conventional, and drawing them would add nothing a spec doesn't
+      say. What matters is that the contents are decided and nothing contractual gets forgotten.</p>
+    <div class="tw">
+      <table class="spec-t">
+        <thead><tr><th style="width:120px">Screen</th><th>Contents &amp; rules</th></tr></thead>
+        <tbody>
+          <tr><td>Settings</td><td>
+            <b>Account</b> — email (read-only), username, sign out, delete account (confirms, and states that the library
+            goes with it).<br>
+            <b>Preferences</b> — theme (System / Light / Dark, defaulting to System), region (drives watch providers;
+            stated explicitly rather than inferred from IP), spoiler protection for unwatched episode titles (on by
+            default).<br>
+            <b>Data</b> — export library as CSV. Cheap to build, and it's the honest answer to "am I locked in?".<br>
+            <b>About</b> — link out.<br>
+            <em>Rule:</em> destructive actions sit last, visually separated, and confirm.</td></tr>
+          <tr><td>About</td><td>
+            One paragraph on what the app is. Version and build. Links to source and to report a problem.<br>
+            <b>Attribution — contractual, not optional:</b> "This product uses the TMDB API but is not endorsed or
+            certified by TMDB", with their logo, plus JustWatch credit for availability data.<br>
+            <em>Rule:</em> this page is the canonical home for attribution. It also appears on the cover and beside
+            provider chips, but this is where the full notice lives.</td></tr>
+          <tr><td>404</td><td>
+            Plain: what happened, a search field, and a link back to Discover. No illustration, no joke.<br>
+            <em>Rule:</em> a 404 on a <code>/film/:id</code> or <code>/person/:id</code> route says
+            <b>"We couldn't find that title"</b> and offers a search prefilled with the slug — different copy from a
+            genuinely unknown route, because the cause is different and usually recoverable.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>The one decision worth your attention is the cover page's recurrence.</b> I've specified first-visit-only,
+      which respects §1 but means a returning guest never sees the pitch again. The alternative — showing it every
+      signed-out visit — converts better and feels more like a wall. Given that the stated failure condition is
+      "it gets harder for any persona", I'd hold the line on once-only, but it's a growth decision as much as a design
+      one, and it's genuinely arguable.</div>
+  </section>
+
+  <!-- ============ BUILD CONTRACT ============ -->
+  <section>
+    <h2>Build contract · how shape drifts, and how to stop it</h2>
+    <p class="lede">Auditing the running build surfaced a pattern worth naming: the screens were <i>right</i>, but
+      individual components came out a different shape from the design. Not because anyone disagreed — because the
+      design said what things should look like and never said what they must <b>measure</b>. These rules close that
+      gap. They are deliberately mechanical: a developer agent should be able to verify each one without judgement.</p>
+
+    <h3>The failure that produced both reported problems</h3>
+    <div class="warnbox warn" style="border-left-color:var(--st-drop-9);background:color-mix(in srgb,var(--st-drop-9) 9%,transparent)">
+      <b>A class name in the markup that has no box rule in the CSS fails silently.</b>
+      <code>Discover.jsx</code> renders <code>&lt;div className="card signup"&gt;</code>, but
+      <code>.card</code> is <b>never defined</b> — only <code>.card.signup{text-align:center}</code> and some font
+      sizes. So the element gets no background, no padding, no radius, no margin. Measured at 375px: box
+      <code>left:0 right:375</code>, <b>text starting at x&nbsp;=&nbsp;0</b>, flush against the screen edge, and
+      <code>margin-top:0</code> butting the rail above with zero separation — while every poster tile beside it is
+      inset to <code>left:14px</code>. There is no geometric overlap, but it reads as one, because the block breaks
+      the page's rhythm in both axes at once.</div>
+
+    <h3>Rule zero</h3>
+    <ol class="rl" style="--start:69;padding:0;gap:11px">
+      <li><b>Every class in the markup must resolve to a rule that sets box properties.</b> A class that only sets
+        typography on top of a base that doesn't exist is the single most common way a component silently loses its
+        shape. If <code>.card</code> is referenced, <code>.card</code> must define background, padding, radius and
+        margin — before any modifier tunes it.</li>
+      <li><b>One gutter token, obeyed by everything.</b> <code>--gutter: 14px</code> at mobile, <code>24px</code> from
+        700px, <code>40px</code> from 1100px. Every top-level block's content starts at exactly the gutter. Nothing
+        gets its own number. <i>(The build already implements exactly this, with the comment "One gutter, obeyed by
+        everything. No block gets its own number." — the rule is recorded here to keep it, not to introduce it.)</i></li>
+      <li><b>Full-bleed is opt-in and explicit.</b> Only backdrops, hero images and horizontally-scrolling rails may
+        touch the viewport edge, and they need a <code>.bleed</code> class to say so. <b>Even then, their text and
+        controls stay gutter-inset.</b> A rail's posters may run off the edge; a rail's title never does.</li>
+      <li><b>Vertical rhythm is never zero.</b> Consecutive top-level blocks are separated by at least
+        <code>--s6 (24px)</code>. Two blocks sharing an edge is always a bug, never a layout.</li>
+      <li><b>Build the base component before the instance.</b> No <code>.card.signup</code> without <code>.card</code>;
+        no <code>.sheet-title</code> without <code>.sheet</code>. Modifiers tune, they never constitute.</li>
+      <li><b>A contract records the ladder and the principle, never a lone number.</b> Where a value changes across
+        breakpoints, give every step <i>and</i> say what the steps are protecting. A bare measurement invites a future
+        reader to "fix" a correct implementation back to a worse one, because the number looked authoritative and the
+        reason was nowhere. If a rule can't state what breaks when it's violated, it isn't finished.</li>
+    </ol>
+
+    <h3>Component contracts — exact values, not descriptions</h3>
+    <p class="lede" style="font-size:13.5px">These are the numbers. Where the design and the build disagree, these win.</p>
+    <div class="tw">
+      <table class="spec-t">
+        <thead><tr><th style="width:130px">Component</th><th style="width:190px">Structure — in order</th><th>Measurements</th></tr></thead>
+        <tbody>
+          <tr><td><code>.card</code></td>
+            <td>container only</td>
+            <td>bg <code>ink-3</code> · padding <code>14px</code> · radius <code>12px</code> · inset to gutter ·
+              <code>margin-block 24px</code> · no border</td></tr>
+          <tr><td><code>.card.signup</code></td>
+            <td>h2 → p → button</td>
+            <td>h2 <code>15px/700</code>, margin-bottom <code>6px</code> · p <code>12.5px</code>, <code>--muted</code>,
+              margin-bottom <code>12px</code> · button full-width · text centred</td></tr>
+          <tr><td><code>.sheet</code><br>(sign-in prompt)</td>
+            <td><b>grab → poster+title row → body → benefits → actions → dismiss</b></td>
+            <td>bottom-anchored, <code>radius 16px 16px 0 0</code>, <code>max-width 460px</code>, padding-inline
+              <code>18px</code>, bottom padding <code>max(18px, safe-area)</code> · grab <code>34×4</code>, margin
+              <code>9px auto 14px</code> · <b>poster <code>52px</code> wide, 2:3, radius <code>8px</code>, gap
+              <code>11px</code></b> · title <code>18px/700</code> · body <code>13px --muted</code> · benefits
+              <code>12.5px</code>, gap <code>8px</code>, tick in <code>st-done-9</code> · actions grid, gap
+              <code>8px</code> · scrim <code>rgba(4,6,12,.62)</code>, <code>z 60</code></td></tr>
+          <tr><td><code>.sheet</code> ≥700px</td><td>same order</td>
+            <td>centres, <code>radius 16px</code> all corners, grab hidden, footer gains an explicit Cancel</td></tr>
+          <tr><td><code>.rail</code></td>
+            <td>title row → scroller</td>
+            <td>title gutter-inset · scroller <code>.bleed</code>, first tile starts at gutter, last may run off ·
+              gap <code>8px</code> · <code>overflow-x:auto</code>, no scrollbar ·
+              <b>tile width is a ladder, not a number</b> — see below</td></tr>
+          <tr><td><code>.quickadd</code></td>
+            <td>button on tile</td>
+            <td><code>26×26</code>, <b>top-right</b>, offset <code>6px</code>, radius full, scrim
+              <code>rgba(8,12,20,.62)</code>, ring <code>inset 0 0 0 1px rgba(255,255,255,.16)</code>, always
+              visible — never hover-revealed</td></tr>
+          <tr><td><code>.empty</code></td>
+            <td>icon → h → p → one button</td>
+            <td>centred in remaining height, max-width <code>34ch</code>, exactly one action</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Rail tile width — a ladder, and the reason for it</h3>
+    <p class="lede" style="font-size:13.5px">An earlier draft of this contract said <code>104px</code>, flat. That was
+      wrong, and wrong in a way worth explaining: it was a single number with no reasoning attached, so the next person
+      to read it would have "corrected" the build back to a worse value.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:170px">Breakpoint</th><th style="width:110px">Tile width</th><th>Tiles visible at that width</th></tr></thead>
+        <tbody>
+          <tr><td>base (&lt; 400px)</td><td><code>128px</code></td><td>2.2 at 320px</td></tr>
+          <tr><td>≥ 400px</td><td><code>148px</code></td><td>2.6 at 430px</td></tr>
+          <tr><td>≥ 600px</td><td><code>168px</code></td><td>3.3 at 600px</td></tr>
+          <tr><td>≥ 1120px</td><td><code>190px</code></td><td>desktop rails</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>The governing rule: a rail must always show a partial tile.</b> That fractional tile at the right edge is the
+      only thing telling a user the rail scrolls — there is no scrollbar and no arrow on touch. At 375px,
+      <code>104px</code> yields <b>3.17</b> tiles: three full ones and a sliver that reads as a complete set.
+      <code>128px</code> yields <b>2.61</b>: two full and an unmistakable two-thirds of a third.
+      <b>The ladder exists to hold that peek roughly constant as the viewport grows</b>, which is why the width steps
+      up rather than letting more tiles pack in. Tune the numbers if you like — but the constraint to preserve is
+      "never a whole number of tiles", not any particular pixel value.</div>
+
+    <h3>The sign-in sheet is missing its poster</h3>
+    <p class="lede" style="font-size:13.5px">The built sheet is otherwise faithful — bottom-anchored, grab handle,
+      names the action and title, three benefits, two buttons, "Not now", and it correctly becomes a centred modal
+      above 700px. <b>What's missing is the poster thumbnail in the header.</b> That isn't decoration: it's what makes
+      the sheet feel like the thing the user was reaching for rather than a generic interruption. Add the
+      <code>52px</code> poster to the left of the title, per the contract above.</p>
+
+    <h3>Verification checklist</h3>
+    <p class="lede" style="font-size:13.5px">Mechanical, and all of it checkable in the browser console at 375px:</p>
+    <ol class="rl" style="--start:74;padding:0;gap:11px">
+      <li><b>Every top-level block's content left edge equals the gutter.</b>
+        <code>[...document.querySelectorAll('main > *')].map(e =&gt; e.getBoundingClientRect().left)</code> — every
+        value is the gutter, or the element carries <code>.bleed</code>.</li>
+      <li><b>No block has a zero gap with its neighbour.</b> Compare each block's <code>bottom</code> with the next
+        block's <code>top</code>; the difference is never <code>0</code>.</li>
+      <li><b>No text sits within the gutter.</b> No text node's bounding box starts left of the gutter, on any screen.</li>
+      <li><b>Every referenced class exists.</b> For each <code>className</code> token in the JSX, a matching rule sets
+        at least one of background / padding / margin / border-radius.</li>
+      <li><b>Nothing overflows horizontally.</b> <code>document.documentElement.scrollWidth === innerWidth</code> at
+        320, 360, 390 and 430.</li>
+      <li><b>Both themes resolve.</b> Toggle theme and confirm no element keeps a literal hex — every colour traces
+        to a token.</li>
+    </ol>
+
+    <div class="warnbox"><b>Why mechanical rules and not principles.</b> "Cards should be inset and separated" is
+      something everyone agrees with and nobody can check. "Every top-level block's left edge equals the gutter, and
+      no two blocks share an edge" is something a build step can fail on. The drift you found came from the design
+      describing appearance without specifying measurement — so these rules give measurements, and the checklist gives
+      a way to prove them.</div>
+  </section>
+
+  <!-- ============ GUEST SPEC ============ -->
+  <section>
+    <h2>Guest state · implementation spec</h2>
+    <p class="lede">Audited against the running build on <b>2026-09-12</b>, route by route, at 375px. The new routes
+      follow the design closely. What follows is the explicit per-screen contract, plus the four defects the audit
+      found — all of which sit in components the guest journey passes <i>through</i> rather than in the guest routes
+      themselves.</p>
+
+    <h3>What a guest sees, route by route</h3>
+    <div class="tw">
+      <table class="spec-t">
+        <thead><tr><th style="width:150px">Route</th><th style="width:130px">Guest sees</th><th>Contract</th></tr></thead>
+        <tbody>
+          <tr><td><code>/welcome</code></td><td>Cover</td><td>First visit only. A shared link to a title or person goes straight there — the front door is the <i>only</i> thing the cover guards.</td></tr>
+          <tr><td><code>/</code> Discover</td><td>Everything</td><td>Full rails. Tab is labelled <b>Discover</b>, not Home. Exactly one sign-up card, after two rails.</td></tr>
+          <tr><td><code>/search</code></td><td>Everything</td><td>Full search, full filters. Result tiles keep their <code>+</code>.</td></tr>
+          <tr><td><code>/title/:type/:id</code></td><td>Everything</td><td>Synopsis, cast, crew, providers, episodes — all readable. Status pill, heart and episode ticks are <b>visible but raise the prompt</b>.</td></tr>
+          <tr><td><code>/person/:id</code></td><td>Almost everything</td><td>Full filmography and bio. <b>The collection meter is the one thing that changes</b> — see below.</td></tr>
+          <tr><td><code>/library</code></td><td>Empty state</td><td>Tab stays visible and explains itself. Never hidden, never disabled.</td></tr>
+          <tr><td><code>/you</code></td><td>Empty state</td><td>Same. Taste needs records; say so rather than showing zeros.</td></tr>
+          <tr><td><code>404</code></td><td>Same as signed-in</td><td>No guest variation.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Explicit rules</h3>
+    <ol class="rl" style="--start:62;padding:0;gap:11px">
+      <li><b>No route ever redirects a guest to sign-in. Only <i>actions</i> prompt.</b> Reading is always free;
+        writing is what needs an account. A redirect punishes someone for arriving.</li>
+      <li><b>Every tracking affordance stays visible to guests</b> — the <code>+</code>, the status pill, the heart,
+        episode ticks. Hiding them hides the product from the people who haven't bought into it yet. They are not
+        disabled, not greyed, not <code>aria-disabled</code>: they look live, because tapping them does something.</li>
+      <li><b>The prompt names the title and the action</b>, and the <b>intent resumes after authentication</b> — the
+        user lands back where they were with the action completed. This is the single most important rule here: if
+        someone signs up to save a title and it isn't saved, the first promise the product made was broken.</li>
+      <li><b>The person page shows the filmography, not a zeroed meter.</b> A guest must never see
+        <code>0 of 10 directed</code> — a real number that happens to be a lie about them. Replace the meter with one
+        quiet line: <i>"Sign in to track what you've seen"</i>. Everything else on the page is identical.</li>
+      <li><b>Empty states explain the account, they don't sell it.</b> One sentence on what an account stores, one
+        button. No feature lists, no second CTA, no repeated card per section.</li>
+      <li><b>A guest is someone who isn't signed in — never a fabricated user object.</b> No
+        <code>guest-local-id</code>, no mirrored localStorage library. §12 called that "a standing tax": two databases
+        to maintain forever the moment episode progress and rewatch counts land. <b>The current build gets this
+        right</b> and it should stay that way.</li>
+      <li><b>Sign-in entry points: exactly three, each with a different job.</b> Top bar (navigation), the one Discover
+        card (conversion), and the action prompts (intent). Anything beyond that is nagging.</li>
+    </ol>
+
+    <h3>What the audit found</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:200px">Finding</th><th>Detail &amp; fix</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill open">Contractual</span> <b>JustWatch is credited to TMDB</b></td>
+            <td><code>WatchProviders.jsx</code> reads <i>"Streaming availability powered by TMDB."</i> Provider data is
+              <b>JustWatch's</b>, and TMDB's own terms require crediting JustWatch for it. This is on the title page,
+              which is the screen guests see most. <b>Fix:</b> "Availability by JustWatch", and put the full notice on
+              the About route.</td></tr>
+          <tr><td><span class="pill open">Theme-breaking</span> <b>Legacy components bypass tokens</b></td>
+            <td><code>MovieCard.jsx</code> and <code>WatchProviders.jsx</code> still carry v0.1-era inline hex —
+              <code>#facc15</code>, <code>#94a3b8</code>, <code>#334155</code>, <code>#0f172a</code>,
+              <code>#64748b</code>. They cannot respond to the light theme, so a guest who switches themes gets a
+              half-migrated title page. These are the exact files the original audit flagged; the new routes were
+              built cleanly around them.</td></tr>
+          <tr><td><span class="pill part">Tidy-up</span> <b><code>Footer.jsx</code> is dead code</b></td>
+            <td>Imported nowhere, still carrying a hardcoded <code>#38bdf8</code>. Delete it, and move its attribution
+              text to About.</td></tr>
+          <tr><td><span class="pill part">Structural</span> <b>Attribution lives in three places</b></td>
+            <td>Cover, <code>ui.jsx</code> and the dead Footer each hold their own copy, and there is no About route to
+              be canonical. <b>Fix:</b> build About, make it the single full notice, and let the others be short
+              credits pointing at it.</td></tr>
+          <tr><td><span class="pill done">Correct</span> <b>Everything else</b></td>
+            <td>Cover-on-first-visit, ungated catalogue, visible <code>+</code>, one sign-up card after two rails,
+              tabs that stay and explain themselves, the prompt wired on both Discover and Title, and no fabricated
+              guest user. All match the spec.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warnbox"><b>A note on how this audit was done.</b> Two "bugs" I first reported from screenshots —
+      the cover not filling the viewport, and the tab bar floating mid-screen — were both artifacts of the preview
+      pane letterboxing an emulated viewport. Measured in the page, <code>.cover</code> is exactly 375×812 with no
+      overflow and <code>.tabs</code> is <code>position:fixed; bottom:0</code> with a zero gap. <b>Measure the
+      DOM; don't trust a screenshot's margins.</b></div>
+  </section>
+
+  <!-- ============ DESKTOP ============ -->
+  <section>
+    <h2>Desktop · the same components, given room</h2>
+    <p class="lede">Nothing below is new. Every element here already exists in the mobile screens — the poster, the
+      status pill, the provider chips, the preview cards, the rails, the rows, the meters. Desktop changes
+      <b>how many fit and where they sit</b>, not what they are. That's the whole argument for doing it inside one
+      product rather than forking a second one.</p>
+
+    <h3 style="margin-top:28px">Title page at 1120px</h3>
+    <div class="desk">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app/film/693134</b></div>
+      <div class="desk-body"><div class="desk-in">
+        <div class="dnav">
+          <span class="lg"><i></i>Cine Search</span>
+          <a href="#d">Home</a><a href="#d" class="on">Discover</a><a href="#d">Library</a>
+          <span class="sp"></span>
+          <span class="srch">⌕&nbsp; Search films and series</span>
+          <span class="circ">◍</span>
+        </div>
+        <div class="dhero img i-dune_b"></div>
+        <div class="dgrid">
+          <div><div class="dposter img i-dune_p"></div></div>
+
+          <div class="dmain">
+            <h3>Dune: Part Two</h3>
+            <div class="metaline" style="font-size:12px">2024 · Science Fiction, Adventure · 2h 47m</div>
+            <div class="scores" style="margin:18px 0 0;max-width:380px">
+              <div class="score gold"><b>8.1</b><span>TMDB · 8.5k</span></div>
+              <div class="score"><b>9.0</b><span>Your score</span></div>
+              <div class="score dim"><b>1</b><span>Rewatches</span></div>
+            </div>
+            <div style="margin-top:22px">
+              <div class="sect-h"><span>Overview</span></div>
+              <p class="ov" style="max-width:62ch;font-size:13.5px">Follow the mythic journey of Paul Atreides as he
+                unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his
+                family. Facing a choice between the love of his life and the fate of the known universe, he endeavors
+                to prevent a terrible future.</p>
+            </div>
+            <div class="dcards">
+              <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div>
+                <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div>
+                <div class="ptx" style="margin-top:6px">Chalamet, Zendaya<br>+3 more</div></div>
+              <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Denis Villeneuve<br>Director</div></div>
+              <div class="pc"><div class="pc-h"><b>Themes</b><i>⌄</i></div><div class="ptx">chosen one, desert<br>+6 more</div></div>
+              <div class="pc"><div class="pc-h"><b>Details</b><i>⌄</i></div><div class="ptx">No IN certificate<br>Budget, language</div></div>
+            </div>
+            <div style="margin-top:24px">
+              <div class="sect-h"><span>More like this</span><a href="#d">See all</a></div>
+              <div class="drail">
+                <div class="rt"><div class="im img i-rec0"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+                <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+                <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+                <div class="rt"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+                <div class="rt"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+                <div class="rt"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="tt">Enemy</div><div class="yy">2014</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dside">
+            <div class="arow" style="margin-bottom:12px">
+              <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button>
+            </div>
+            <div style="border-top:1px solid var(--bd-sub);padding-top:12px">
+              <div class="prov-l">Where to watch · India</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="pchip" style="justify-content:flex-start"><span class="plogo" style="background:#E50914">N</span>Netflix</button>
+                <button class="pchip" style="justify-content:flex-start;opacity:.8"><span class="plogo" style="background:var(--ink-8)">↧</span>Rent from ₹149</button>
+              </div>
+              <p style="font-size:10px;color:var(--ink-9);margin-top:9px">Availability by JustWatch</p>
+            </div>
+            <div style="border-top:1px solid var(--bd-sub);margin-top:12px;padding-top:12px">
+              <div class="prov-l">Directed by</div>
+              <button class="prow" style="padding:7px 8px"><span class="pf img i-dv_face"></span>
+                <span class="pb"><b>Denis Villeneuve</b><span>6 of 10 seen</span></span>
+                <span class="go">›</span></button>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <p class="lede" style="margin-top:14px;font-size:13.5px"><b>What changed:</b> the action block became a sticky
+      right rail, the four preview cards went from 2×2 to 1×4, and the recommendations rail shows six instead of three.
+      The director moved from a buried crew card into the rail as a person row, because there was room for it.
+      <b>No new component was designed.</b></p>
+
+    <h3 style="margin-top:34px">Library at 1120px</h3>
+    <div class="desk">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app/library</b></div>
+      <div class="desk-body"><div class="desk-in">
+        <div class="dnav">
+          <span class="lg"><i></i>Cine Search</span>
+          <a href="#d">Home</a><a href="#d">Discover</a><a href="#d" class="on">Library</a>
+          <span class="sp"></span>
+          <span class="srch">⌕&nbsp; Search films and series</span>
+          <span class="circ">◍</span>
+        </div>
+        <div class="dlib">
+          <div class="dfilters">
+            <button aria-pressed="true">Watching<em>3</em></button>
+            <button>Want to watch<em>12</em></button>
+            <button>Watched<em>84</em></button>
+            <button>On hold<em>2</em></button>
+            <button>Dropped<em>1</em></button>
+            <button style="margin-top:6px">Liked<em>9</em></button>
+            <button>All<em>102</em></button>
+          </div>
+          <div>
+            <div class="grp-h" style="margin:0 0 10px"><b>Series</b><span>3 in progress</span></div>
+            <div class="dsrow"><div class="th img i-bb_p"></div>
+              <div><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62 episodes</div></div>
+              <div><div class="dmeter"><i style="width:17.7%"></i></div>
+                <div class="ep" style="margin-top:5px">18% complete</div></div>
+              <button class="plus">+</button></div>
+            <div class="dsrow"><div class="th" style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></div>
+              <div><div class="nm">Severance</div><div class="ep">S2 E7 · 16 of 19 episodes</div></div>
+              <div><div class="dmeter"><i style="width:84%"></i></div>
+                <div class="ep" style="margin-top:5px">84% complete</div></div>
+              <button class="plus">+</button></div>
+            <div class="dsrow"><div class="th" style="background:linear-gradient(150deg,#3B5A7A,#16243A)"></div>
+              <div><div class="nm">Shōgun</div><div class="ep">S1 E2 · 2 of 10 episodes</div></div>
+              <div><div class="dmeter"><i style="width:20%"></i></div>
+                <div class="ep" style="margin-top:5px">20% complete</div></div>
+              <button class="plus">+</button></div>
+
+            <div class="grp-h" style="margin:24px 0 10px"><b>Films</b><span>want to watch · 12</span></div>
+            <div class="dfgrid">
+              <div class="fc"><div class="im img i-dune_p"><button class="sb want">◷</button><span class="gb">8.1</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im img i-rec0"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im img i-dv3"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="nm">Enemy</div><div class="yr">2014</div></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <p class="lede" style="margin-top:14px;font-size:13.5px"><b>What changed:</b> the horizontal filter chips became a
+      vertical sidebar — which also makes room for <code>Liked</code> and <code>Dropped</code> without a scroll. Series
+      rows gained a dedicated progress column instead of a hairline on the card edge. The film grid went from 3-up to
+      6-up. Again, <b>same components</b>.</p>
+
+    <h3 style="margin-top:34px">The editor — a modal, not a sheet</h3>
+    <p class="lede" style="font-size:13.5px">This is the one screen that genuinely changes shape. A bottom sheet is a
+      phone idiom; on desktop it becomes a centred modal, and the two-column form means every field is visible without
+      scrolling — so Save stops needing to live in the header.</p>
+    <div class="desk">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app/series/1396</b></div>
+      <div class="desk-body"><div class="desk-in"><div class="dmodal-wrap">
+        <div class="dmodal">
+          <div class="dm-head">
+            <div class="po img i-bb_p"></div>
+            <div class="tt"><b>Breaking Bad</b><span>2008–2013 · 5 seasons · 62 episodes</span></div>
+            <button class="ibtn like on" aria-pressed="true">♥</button>
+            <button class="circ">✕</button>
+          </div>
+          <div class="dm-body">
+            <div class="fld full" style="padding:0 0 14px"><label>Status</label>
+              <div class="segs" style="grid-template-columns:repeat(6,1fr)">
+                <button class="seg" style="--c:var(--st-want-11);--b:var(--st-want-3)">◷<i>Want</i></button>
+                <button class="seg on" style="--c:var(--st-ing-11);--b:var(--st-ing-3)">▶<i>Watching</i></button>
+                <button class="seg" style="--c:var(--st-hold-11);--b:var(--st-hold-3)">‖<i>On hold</i></button>
+                <button class="seg" style="--c:var(--st-done-11);--b:var(--st-done-3)">✓<i>Watched</i></button>
+                <button class="seg" style="--c:var(--st-re-11);--b:var(--st-re-3)">↻<i>Rewatch</i></button>
+                <button class="seg" style="--c:var(--st-drop-11);--b:var(--st-drop-3)">✕<i>Dropped</i></button>
+              </div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Progress</label>
+              <div class="prog"><button class="stp">−</button>
+                <div class="prog-v"><b>11</b><span>of 62 episodes</span></div>
+                <button class="stp">+</button></div>
+              <div class="jump">Currently at <b>S2 E4</b> · <span>Jump to episode</span></div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Your rating</label>
+              <div class="stars"><i class="on">★</i><i class="on">★</i><i class="on">★</i><i class="on">★</i><i>★</i>
+                <span class="sv">8 / 10</span></div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Started</label><div class="inp">12 Aug 2026</div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Finished</label><div class="inp dim">—</div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Rewatches</label>
+              <div class="prog compact" style="width:100%"><button class="stp">−</button>
+                <div class="prog-v"><b>0</b></div><button class="stp">+</button></div></div>
+            <div class="fld" style="padding:0 0 14px"><label>Who recommended it?</label>
+              <div class="inp">Ravi · Mar 2026</div></div>
+            <div class="fld full" style="padding:0"><label>Notes</label>
+              <div class="inp dim" style="min-height:56px">Private to you…</div></div>
+          </div>
+          <div class="dm-foot">
+            <button class="del" style="width:auto;padding:9px 15px">Remove from library</button>
+            <span class="sp"></span>
+            <button class="btn q">Cancel</button><button class="btn">Save</button>
+          </div>
+        </div>
+      </div></div></div>
+    </div>
+
+    <h3 style="margin-top:34px">Home and Person</h3>
+    <div class="desk">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app</b></div>
+      <div class="desk-body"><div class="desk-in">
+        <div class="dnav"><span class="lg"><i></i>Cine Search</span>
+          <a href="#d" class="on">Home</a><a href="#d">Discover</a><a href="#d">Library</a>
+          <span class="sp"></span><span class="srch">⌕&nbsp; Search films and series</span><span class="circ">◍</span></div>
+        <div class="dhome">
+          <div class="grp-h" style="margin:0 0 11px"><b>Continue watching</b><span>3</span></div>
+          <div class="dcw">
+            <div class="dcwcard"><div class="th img i-bb_p"></div>
+              <div class="bd"><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62</div>
+                <div class="dmeter" style="margin-top:5px"><i style="width:17.7%"></i></div></div>
+              <button class="plus" style="align-self:center">+</button></div>
+            <div class="dcwcard"><div class="th" style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></div>
+              <div class="bd"><div class="nm">Severance</div><div class="ep">S2 E7 · 16 of 19</div>
+                <div class="dmeter" style="margin-top:5px"><i style="width:84%"></i></div></div>
+              <button class="plus" style="align-self:center">+</button></div>
+            <div class="dcwcard"><div class="th" style="background:linear-gradient(150deg,#3B5A7A,#16243A)"></div>
+              <div class="bd"><div class="nm">Shōgun</div><div class="ep">S1 E2 · 2 of 10</div>
+                <div class="dmeter" style="margin-top:5px"><i style="width:20%"></i></div></div>
+              <button class="plus" style="align-self:center">+</button></div>
+          </div>
+          <div style="margin-top:24px"><div class="sect-h"><span>Because you watched Dune: Part Two</span><a href="#d">See all</a></div>
+            <div class="drail">
+              <div class="rt"><div class="im img i-rec0"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+              <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+              <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+              <div class="rt"><div class="im img i-rec3"><button class="sb">+</button><span class="gb">6.3</span></div><div class="tt">Prince of Persia</div><div class="yy">2010</div></div>
+              <div class="rt"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+              <div class="rt"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+              <div class="rt"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="tt">Enemy</div><div class="yy">2014</div></div>
+            </div></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="desk" style="margin-top:16px">
+      <div class="desk-chrome"><i></i><i></i><i></i><b>cinesearch.app/person/137427</b></div>
+      <div class="desk-body"><div class="desk-in">
+        <div class="dnav"><span class="lg"><i></i>Cine Search</span>
+          <a href="#d">Home</a><a href="#d" class="on">Discover</a><a href="#d">Library</a>
+          <span class="sp"></span><span class="srch">⌕&nbsp; Search films and series</span><span class="circ">◍</span></div>
+        <div class="dperson">
+          <div class="dpcard">
+            <div class="dpface img i-dv_face"></div>
+            <div style="font-family:var(--f-d);font-size:17px;font-weight:700;letter-spacing:-.02em">Denis Villeneuve</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-bottom:14px">Directing · b. 1967, Québec</div>
+            <div class="collectbar" style="margin:0">
+              <div class="cb-t"><b><i>6</i> of 10</b><span>60%</span></div>
+              <div class="cb-track"><i style="width:60%"></i></div>
+              <div class="cb-sub">4 to go · 16 filtered out</div></div>
+          </div>
+          <div>
+            <div class="seasonsw" style="margin:0 0 16px;display:inline-flex">
+              <button class="sw" aria-pressed="true">Director<em>10</em></button>
+              <button class="sw">Writer<em>7</em></button><button class="sw">Producer<em>5</em></button></div>
+            <div class="sect-h" style="margin-bottom:11px"><span>As director</span><a href="#d">Year ▾</a></div>
+            <div class="dfgrid">
+              <div class="fc"><div class="im img i-dv0"><button class="sb done">✓</button><span class="gb">8.1</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im img i-dv1"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im img i-dv3"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="nm">Enemy</div><div class="yr">2014</div></div>
+            </div>
+            <div style="margin-top:12px;padding:10px 13px;border:1px dashed var(--bd);border-radius:10px;
+              font-size:12px;color:var(--muted)"><b style="color:var(--text)">16 more credits hidden</b> — shorts,
+              documentaries and 2 unreleased projects. <span style="color:var(--acc-t)">Show all 26</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <h3 style="margin-top:34px">Cases that only exist on desktop</h3>
+    <p class="lede" style="font-size:13.5px">The screens above are layout. These are the genuinely new problems — the
+      ones a mobile-only design never has to answer.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:200px">Case</th><th>Decision</th></tr></thead>
+        <tbody>
+          <tr><td><b>Hover exists</b></td><td>The tile <code>+</code> stays <b>always visible</b>, not hover-revealed. Hidden-until-hover is undiscoverable, breaks on touch laptops, and the button is small enough that showing it costs nothing. Hover changes its <i>colour</i>, not its existence.</td></tr>
+          <tr><td><b>Keyboard navigation</b></td><td>Segmented controls are arrow-key navigable as a single tab stop, not six. <code>Esc</code> closes the editor; <code>⌘/Ctrl+Enter</code> saves. Every focusable element keeps the visible focus ring the system already defines.</td></tr>
+          <tr><td><b>Line length</b></td><td>The overview caps at ~65 characters even in a 1120px column. Full-width body text is the most common desktop failure and the easiest to avoid.</td></tr>
+          <tr><td><b>Very wide screens</b></td><td>Page content caps at <b>1280px</b> and centres. Rails may extend to the viewport edge; reading columns never do.</td></tr>
+          <tr><td><b>Sticky rail shorter than content</b></td><td>The action rail sticks to the top of the viewport. If the rail is <i>taller</i> than the viewport it scrolls normally and stops sticking — never traps its own content out of reach.</td></tr>
+          <tr><td><b>Nav has nowhere to go</b></td><td>Bottom tabs become a top bar. The fourth destination ("You") moves into the avatar menu, since profile and settings are a session concern rather than a browsing one.</td></tr>
+          <tr><td><b>Long episode lists</b></td><td>A 62-episode season stays a <b>single column</b> at desktop. Two columns break the natural reading order of a numbered sequence, and the list is scanned rather than read.</td></tr>
+          <tr><td><b>The editor</b></td><td>Bottom sheet → centred modal, two-column form. Every field visible without scrolling, so Save moves from the header to a proper footer with an explicit Cancel.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="lede" style="margin-top:16px;font-size:13.5px"><b>Search, Taste and the state screens</b> aren't drawn
+      separately because they're the patterns already shown — Search is the Library grid with a query bar, Taste is
+      the same taste cards at 3-up, and the state screens are unchanged apart from centring within the wider column.</p>
+
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>The day-one cost is small; the retrofit cost is not.</b> None of this needs designing now — it needs the
+      components to not assume a 430px container. Fluid widths, a column count driven by a variant rather than
+      hardcoded, a nav that can render as tabs or a bar, and the editor able to mount as either a sheet or a modal.
+      Get that right while building m-web and desktop is a layout pass. Hardcode 430px and it's a rewrite.</div>
+  </section>
+
+  <!-- ============ SMALL SCREENS ============ -->
+  <section>
+    <h2>Small screens · verified, not assumed</h2>
+    <p class="lede">Everything above is drawn at 430px, which proves nothing about narrow phones. So this was
+      <b>tested rather than asserted</b>: the page was served locally, rendered in a real browser at a 320px viewport,
+      and every element inside every phone frame measured for horizontal overflow.</p>
+
+    <h3>What the audit found</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:180px">Result</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td><b>Layout holds at 320px</b></td><td>No content is clipped or cut off. Titles wrap, meta lines reflow, the three-across score strip survives, and the episode row grows in height rather than truncating.</td></tr>
+          <tr><td><b>8 sub-pixel flags</b></td><td>Icon buttons report 3–4px of "overflow" — the glyph's intrinsic width against its box. Invisible in practice; <code>place-items:center</code> already handles it. Not a defect.</td></tr>
+          <tr><td><b>1 false positive</b></td><td>The cover page measured 318px box against 430px content. That's the mosaic's <code>transform: scale(1.35)</code> inflating <code>scrollWidth</code>; <code>overflow:hidden</code> clips it correctly. Confirmed by screenshot.</td></tr>
+          <tr><td><b>1 real bug — found and fixed</b></td><td>Not layout at all: the standalone file had <b>no <code>&lt;meta charset&gt;</code></b>, so all 36 non-ASCII characters (<code>→ ₹ ‖ ↻ ⌄</code>) rendered as mojibake when opened from disk. Invisible inside the published artifact, which supplies its own document head. Now wrapped in a proper HTML skeleton.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>320 against 430</h3>
+    <p class="lede" style="font-size:13.5px">The same two screens at both widths. What changes is wrapping and row
+      height — never what's present.</p>
+    <div class="sscmp">
+      <div class="sscol">
+        <div class="lbl">320 px <em>· iPhone SE, older Android</em></div>
+        <div class="phone w320"><div class="ph-top"><span></span></div><div class="ph-body" style="height:560px">
+          <div class="hero img i-dune_b" style="height:130px">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head"><div class="poster img i-dune_p"></div>
+            <div class="head-t"><h5>Dune: Part Two</h5>
+              <div class="metaline">2024 · Science Fiction, Adventure · 2h 47m</div></div></div>
+          <div class="block"><div class="arow">
+            <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+            <button class="ibtn like on" aria-pressed="true">♥</button></div>
+            <div class="prov"><div class="prov-l">Where to watch · India</div>
+              <div class="provrow"><button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button></div></div></div>
+          <div class="scores">
+            <div class="score gold"><b>8.1</b><span>TMDB</span></div>
+            <div class="score"><b>9.0</b><span>You</span></div>
+            <div class="score dim"><b>1</b><span>Rewatches</span></div></div>
+          <div class="cards2">
+            <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div>
+              <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div></div>
+            <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Denis Villeneuve<br>Director</div></div></div>
+          <div style="height:14px"></div>
+        </div></div>
+      </div>
+      <div class="sscol">
+        <div class="lbl">430 px <em>· iPhone Pro Max</em></div>
+        <div class="phone w430"><div class="ph-top"><span></span></div><div class="ph-body" style="height:560px">
+          <div class="hero img i-dune_b" style="height:130px">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head"><div class="poster img i-dune_p"></div>
+            <div class="head-t"><h5>Dune: Part Two</h5>
+              <div class="metaline">2024 · Science Fiction, Adventure · 2h 47m</div></div></div>
+          <div class="block"><div class="arow">
+            <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+            <button class="ibtn like on" aria-pressed="true">♥</button></div>
+            <div class="prov"><div class="prov-l">Where to watch · India</div>
+              <div class="provrow"><button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button></div></div></div>
+          <div class="scores">
+            <div class="score gold"><b>8.1</b><span>TMDB · 8.5k</span></div>
+            <div class="score"><b>9.0</b><span>Your score</span></div>
+            <div class="score dim"><b>1</b><span>Rewatches</span></div></div>
+          <div class="cards2">
+            <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div>
+              <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div>
+              <div class="ptx" style="margin-top:6px">Chalamet, Zendaya<br>+3 more</div></div>
+            <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Denis Villeneuve<br>Director</div></div></div>
+          <div style="height:14px"></div>
+        </div></div>
+      </div>
+    </div>
+
+    <h3>Rules</h3>
+    <ol class="rl" style="--start:55;padding:0;gap:11px">
+      <li><b>320px is the supported floor.</b> <code>src/index.css</code> already sets
+        <code>body{min-width:320px}</code>, so the app has effectively declared this. Keep it, and treat anything
+        narrower as out of scope.</li>
+      <li><b><code>white-space:nowrap</code> is permitted only inside a horizontal scroll container.</b> Chips and
+        the season switcher qualify because they scroll. Content text never does — it wraps.</li>
+      <li><b>Wrap, never truncate — except where clamping is deliberate.</b> The only intentional truncation is
+        <code>line-clamp:2</code> on grid tile titles, and it is a design choice with a tooltip and a full title on the
+        detail page behind it.</li>
+      <li><b>Rows grow in height rather than squeezing.</b> A long episode title takes three lines at 320px. That is
+        correct; the alternative is an ellipsis that hides which episode it is.</li>
+      <li><b>Secondary labels may shorten below 360px</b> — <code>TMDB · 8.5k</code> becomes <code>TMDB</code>,
+        <code>Your score</code> becomes <code>You</code>. Shorten the label, never the number.</li>
+      <li><b>Thumbnails are fixed-width and that is fine</b>, because they're small (40–82px) and everything beside
+        them is fluid. Fixed widths are only dangerous on text containers.</li>
+      <li><b>Test matrix: 320 / 360 / 390 / 430.</b> 360 is the most common Android width and 390 the most common
+        iPhone; neither is an edge case. This belongs in the acceptance criteria, not in a QA pass at the end.</li>
+    </ol>
+
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>The lesson worth keeping isn't about width.</b> The only genuine defect this pass found was a missing
+      <code>charset</code> — a bug that is invisible in the environment I was designing in and only appears in the
+      environment the file is actually used in. Rendering it somewhere real found in one minute what reading it
+      would never have found at all.</div>
+  </section>
+
+  <!-- ============ LIVE DATA ============ -->
+  <section>
+    <h2>Live data · what production actually returns</h2>
+    <p class="lede">Fetched from TMDB on <b>12 September 2026</b> using the project's own key, through
+      <code>api/_tmdbCore.mjs</code>. Not sample data, not remembered — the real response. Four of my design
+      assumptions did not survive it.</p>
+
+    <div class="live">
+      <div class="live-h"><b>/movie/693134 · Dune: Part Two</b><span>200 OK</span></div>
+      <dl class="kv">
+        <dt>Title</dt><dd>Dune: Part Two</dd>
+        <dt>Released</dt><dd>2024-02-27</dd>
+        <dt>Runtime</dt><dd>167 min → <b>2h 47m</b> <span style="color:var(--muted)">(I had drawn 2h 46m)</span></dd>
+        <dt>Genres</dt><dd>Science Fiction, Adventure <span style="color:var(--muted)">— two, not one</span></dd>
+        <dt>Tagline</dt><dd>"Long live the fighters."</dd>
+        <dt>TMDB score</dt><dd>8.1 from 8,535 votes <span style="color:var(--muted)">(I had drawn 8.2)</span></dd>
+        <dt>Director</dt><dd>Denis Villeneuve</dd>
+        <dt>Top cast</dt><dd>Timothée Chalamet (Paul Atreides) · Zendaya (Chani) · Rebecca Ferguson (Jessica) · Javier Bardem (Stilgar)</dd>
+        <dt>IN certification</dt><dd class="miss">"" — empty string</dd>
+        <dt>IN streaming</dt><dd>Netflix <span style="color:var(--muted)">— not JioHotstar, which I guessed</span></dd>
+        <dt>IN rent</dt><dd>Apple TV Store, Google Play, YouTube, Amazon Video</dd>
+        <dt>Keywords</dt><dd>based on novel or book, sandstorm, chosen one, sequel, distant future, creature, planet, desert</dd>
+      </dl>
+    </div>
+
+    <div class="live">
+      <div class="live-h"><b>/tv/1396 · Breaking Bad</b><span>200 OK</span></div>
+      <dl class="kv">
+        <dt>Run</dt><dd>2008-01-20 → 2013-09-29 · Ended</dd>
+        <dt>Counts</dt><dd>5 seasons · 62 episodes · score 8.9</dd>
+        <dt>Seasons</dt><dd>Specials (9) · S1 (7) · S2 (13) · S3 (13) · S4 (13) · S5 (16)</dd>
+        <dt>Creator</dt><dd>Vince Gilligan</dd>
+        <dt>Certification</dt><dd>IN <b>A</b> · US <b>TV-MA</b> <span style="color:var(--muted)">— present here, unlike the film</span></dd>
+        <dt>S1 episodes</dt><dd>
+          Pilot · 2008-01-20 · 59m · 8.5<br>
+          Cat's in the Bag… · 2008-01-27 · 49m · 8.2<br>
+          …And the Bag's in the River · 2008-02-10 · 49m · 8.4<br>
+          Cancer Man · 2008-02-17 · 49m · 7.9<br>
+          Gray Matter · 2008-02-24 · 49m · 8.2</dd>
+      </dl>
+    </div>
+
+    <div class="live">
+      <div class="live-h"><b>/person · filmography counts</b><span>200 OK</span></div>
+      <dl class="kv">
+        <dt>Villeneuve</dt><dd>26 raw <code>job=="Director"</code> → 24 with a release date → <b>10</b> with ≥200 votes</dd>
+        <dt>Scorsese</dt><dd>66 raw → 57 with a release date → <b>29</b> with ≥200 votes</dd>
+        <dt>In the 26</dt><dd class="miss">shorts, concert films, TV segments, and 2 unreleased projects with no date at all</dd>
+      </dl>
+    </div>
+
+    <h3>What this changes</h3>
+    <div class="tw"><table>
+      <thead><tr><th style="width:210px">Finding</th><th>Consequence</th></tr></thead>
+      <tbody>
+        <tr><td><b>Indian certification is often absent</b></td><td>My title page printed <code>U/A 16+</code>. TMDB returns an empty string for this film while returning <code>A</code> for Breaking Bad. <b>The cert chip must be conditional</b>, and the meta line has to reflow without it — not render an empty box.</td></tr>
+        <tr><td><b>The collection denominator is a policy, not a fact</b></td><td>R18's "6 of 11 directed" doesn't exist. Villeneuve is 26 / 24 / 10 depending on the rule. <code>TMDB_CAPABILITIES.md</code> generalised from Tarantino, whose filmography is unusually clean. <b>This needs a written rule before the person page can ship</b> — and it is a product decision, not an engineering one.</td></tr>
+        <tr><td><b>Providers must be fetched, never assumed</b></td><td>I guessed JioHotstar for an Indian viewer; it's Netflix. Obvious in hindsight, and exactly why R11 prints the region on screen.</td></tr>
+        <tr><td><b>Specials are already excluded</b></td><td><code>number_of_episodes</code> is 62 and seasons 1–5 sum to 62 — season 0's 9 episodes sit outside it. So R17 is <i>free</i>: TMDB has already made that decision for us.</td></tr>
+        <tr><td><b>Episode runtimes vary within a season</b></td><td>59m then 49m. Any "time watched" total must sum real runtimes, not multiply an average.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="warnbox"><b>Three questions this hands to your PRD.</b>
+      What counts as a film for collection progress — released only? feature-length only? a vote threshold?
+      What shows in place of a missing certification — nothing, or "Not rated"?
+      And does a person page count <i>all</i> directed work or only what we'd show in the grid?</div>
+  </section>
+
+  <footer>
+    Projector design system v1 — 2026-09-12. Consolidates the colour scales, watch-state palette, control set, nine MVP
+    screens, live TMDB data and the rules behind them. Dark is the theme you shipped, unchanged; light is derived by
+    step role. Business rules R1–R38 and every edge-case decision are reasoned proposals pending the detailed PRD.
+    Artwork and figures in the live section are real TMDB data fetched 12 September 2026; elsewhere they are illustrative.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.tog button');
+  function apply(m){root.setAttribute('data-theme',m);
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.set===m));});}
+  var init=root.getAttribute('data-theme');
+  if(!init){init=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
+  apply(init);
+  btns.forEach(function(b){b.addEventListener('click',function(){apply(b.dataset.set);});});
+  document.querySelectorAll('.chips,.rolesw,.seasonsw').forEach(function(g){
+    g.addEventListener('click',function(e){
+      var c=e.target.closest('.chip,.sw'); if(!c)return;
+      g.querySelectorAll('.chip,.sw').forEach(function(x){x.setAttribute('aria-pressed','false');});
+      c.setAttribute('aria-pressed','true');
+    });
+  });
+  document.querySelectorAll('.epchk').forEach(function(b){
+    b.addEventListener('click',function(){
+      var on=b.classList.toggle('on'); b.textContent=on?'\u2713':'\u25CB';
+    });
+  });
+  document.querySelectorAll('.ibtn.like').forEach(function(b){
+    b.addEventListener('click',function(){
+      var on=b.classList.toggle('on');
+      b.textContent=on?'\u2665':'\u2661';
+      b.setAttribute('aria-pressed',String(on));
+    });
+  });
+  document.querySelectorAll('.sb').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(b.classList.contains('done')){b.classList.remove('done');b.textContent='+';}
+      else if(b.classList.contains('want')){b.classList.remove('want');b.classList.add('done');b.textContent='\u2713';}
+      else {b.classList.add('want');b.textContent='\u25F7';}
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -75,7 +75,7 @@ export default function Title() {
 
     const t = data;
     const isTV = t.mediaType === 'tv';
-    const ask = (action) => setPrompt({ title: t.title, action });
+    const ask = (action) => setPrompt({ title: t.title, poster: t.poster, action });
     const toggle = (key) => setOpenCard((c) => (c === key ? null : key));
     const makers = t.crew.filter((c) => c.job === 'Director' || c.job === 'Creator');
     const lang = languageName(t.originalLanguage);

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Poster } from './ui.jsx';
 
 const VERBS = {
     save: 'Save',
@@ -17,7 +18,7 @@ const VERBS = {
  * Milestone 2 will carry the intent through sign-up so the action completes on
  * the way back. Until accounts exist, both buttons lead to the cover page.
  */
-export default function SignInPrompt({ title, action = 'save', onClose }) {
+export default function SignInPrompt({ title, poster, action = 'save', onClose }) {
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,7 +31,10 @@ export default function SignInPrompt({ title, action = 'save', onClose }) {
         <div className="scrim" role="dialog" aria-modal="true" aria-label={`${VERBS[action]} ${title}`} onClick={onClose}>
             <div className="sheet" onClick={(e) => e.stopPropagation()}>
                 <div className="grab" />
-                <h2 className="sheet-title">{VERBS[action]} {title}?</h2>
+                <div className="sheet-head">
+                    <div className="sheet-art"><Poster src={poster} title={title} /></div>
+                    <h2 className="sheet-title">{VERBS[action]} {title}?</h2>
+                </div>
                 <p className="sheet-body">You’ll need an account to keep track of what you watch.</p>
                 <ul className="benefits">
                     <li>Your watchlist, ratings and progress in one place</li>

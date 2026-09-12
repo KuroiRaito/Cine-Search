@@ -36,7 +36,7 @@ export default function Discover() {
     const [prompt, setPrompt] = useState(null);
 
     // Tapping + on any tile is how a guest discovers what the product is for.
-    const onAdd = (item) => setPrompt({ title: item.title, action: 'save' });
+    const onAdd = (item) => setPrompt({ title: item.title, poster: item.poster, action: 'save' });
 
     return (
         <div className="page">

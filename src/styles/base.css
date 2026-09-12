@@ -447,6 +447,26 @@ img { max-width: 100%; display: block; }
 .searchbox::placeholder { color: var(--muted); }
 .searchbox:focus { outline: none; box-shadow: inset 0 0 0 1px var(--acc); }
 
+/* ---------------- card ---------------- */
+
+/* A card must define its own box before any modifier tunes it. This base was
+   missing: .card.signup set only text-align and font sizes, so every .card in
+   the app rendered with no background, no padding and no margin — the sign-up
+   block's text landed at x=0 against the screen edge while the posters beside
+   it sat at the 14px gutter. The desktop rule below already expected .card to
+   exist; only the base was absent. */
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 14px;
+  margin: 24px 14px;
+}
+
+.card-label {
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+
 /* ---------------- sign-up card ---------------- */
 
 .card.signup { text-align: center; }
@@ -467,6 +487,16 @@ img { max-width: 100%; display: block; }
   box-shadow: var(--sh);
 }
 .grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 14px; }
+/* The poster is what makes this read as the thing you were reaching for,
+   rather than a generic interruption in front of it. */
+.sheet-head { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+.sheet-art {
+  width: 52px; flex: 0 0 auto; aspect-ratio: 2 / 3;
+  border-radius: 8px; overflow: hidden; background: var(--ink-4);
+}
+.sheet-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sheet-art .noart { font-size: 9px; padding: 4px; }
+.sheet-head .sheet-title { margin-bottom: 0; }
 .sheet-title { font-size: 18px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 6px; }
 .sheet-body { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 .benefits { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 8px; }

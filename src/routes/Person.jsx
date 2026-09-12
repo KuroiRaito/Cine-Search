@@ -5,6 +5,9 @@ import { toPersonView } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { Tile, Skeleton, Empty, initialsOf } from '../components/ui.jsx';
 import SignInPrompt from '../components/SignInPrompt.jsx';
+import { useAuth } from '../context/AuthProvider.jsx';
+import { useLibrary } from '../context/LibraryProvider.jsx';
+import { isSeen } from '../lib/library.js';
 
 const year = (d) => (d ? new Date(d).getFullYear() : null);
 
@@ -21,6 +24,8 @@ export default function Person() {
     const navigate = useNavigate();
     const [role, setRole] = useState(null);
     const [prompt, setPrompt] = useState(null);
+    const { isSignedIn } = useAuth();
+    const lib = useLibrary();
 
     const { data, error, loading, retry } = useAsync(
         ({ signal }) => fetchPerson(id, { signal }).then(toPersonView),
@@ -59,6 +64,14 @@ export default function Person() {
     const activeKey = role || p.roles[0]?.key;
     const active = p.roles.find((r) => r.key === activeKey) || p.roles[0];
 
+    // Free: the credits were fetched to draw this page, and the library is
+    // already in memory. No request is made to work this out.
+    const seen = active
+        ? active.items.filter((it) => isSeen(lib.entryFor(it.mediaType, it.id))).length
+        : 0;
+    const total = active?.items.length ?? 0;
+    const pct = total ? Math.round((seen / total) * 100) : 0;
+
     return (
         <div className="page">
             <div className="page-head">
@@ -78,10 +91,27 @@ export default function Person() {
                 </div>
             </div>
 
-            {/* A guest must never see "0 of 10 directed" — a real number that
-                happens to be a lie about them. One quiet line until there's a
-                library to measure against. */}
-            <p className="track-hint">Sign in to track what you&apos;ve seen</p>
+            {/* Above the filmography, not buried in stats: "6 of 10 directed"
+                is the differentiator, so it is the first thing on the page.
+                A guest must never see "0 of 10" — a real number that happens to
+                be a lie about them — so they get the invitation instead. */}
+            {isSignedIn && total > 0 ? (
+                <div className="collectbar">
+                    <div className="cb-t">
+                        <b><i>{seen}</i> of {total} {active.verb}</b>
+                        <span>{pct}%</span>
+                    </div>
+                    <div className="cb-track"><i style={{ width: `${pct}%` }} /></div>
+                    <div className="cb-sub">
+                        {seen === total
+                            ? 'All of it'
+                            : `${total - seen} to go`}
+                        {active.filteredOut > 0 && ` · ${active.filteredOut} credit${active.filteredOut === 1 ? '' : 's'} filtered out`}
+                    </div>
+                </div>
+            ) : (
+                !isSignedIn && <p className="track-hint">Sign in to track what you&apos;ve seen</p>
+            )}
 
             {/* Films before biography: this is a collection product, the work is the point. */}
             {p.roles.length > 0 && (

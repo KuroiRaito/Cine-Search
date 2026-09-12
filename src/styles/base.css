@@ -436,7 +436,6 @@ img { max-width: 100%; display: block; }
   /* A card whose text stops at the measure but whose box runs to the window
      is a half-empty box. The container follows the content. */
   .card { max-width: calc(var(--measure) + 28px); }
-  .rolesw, .track-hint { max-width: 440px; }
 
   /* The sign-in nudge is an aside, not a billboard. */
   .card.signup { max-width: 480px; margin-inline: auto; }
@@ -981,3 +980,28 @@ img { max-width: 100%; display: block; }
 /* Notes are the one field that takes more than a line, so it is the one input
    that grows. Resizing stays vertical — a sheet has a fixed width. */
 .inp.notes { min-height: 62px; line-height: 1.55; resize: vertical; }
+
+/* ---------------- collection progress ----------------
+
+   "6 of 10 directed" sits above the filmography rather than in a stats block:
+   it is the differentiator, so it is the first thing on a person page. The
+   fraction is per role — switch to Writer and both halves change, because it
+   is a different body of work.
+   ------------------------------------------------------------------ */
+
+.collectbar,
+.rolesw,
+.track-hint {
+  /* "6 of 10 directed" and "60%" are one sentence in two halves. A full-width
+     desktop bar puts 1200px between them and the pair stops reading as a pair.
+     The role tabs sit directly beneath, so they share the edge. */
+  max-width: 440px;
+}
+.collectbar { margin: 14px var(--gutter) 0; }
+.cb-t { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 10px; }
+.cb-t b { font-family: var(--f-d); font-size: 16px; font-weight: 700; letter-spacing: -.02em; color: var(--text); }
+.cb-t b i { font-style: normal; color: var(--st-done-9); }
+.cb-t span { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cb-track { height: 6px; border-radius: 99px; background: var(--ink-4); overflow: hidden; }
+.cb-track i { display: block; height: 100%; background: var(--st-done-9); border-radius: 99px; transition: width .18s; }
+.cb-sub { margin-top: 7px; font-size: 11.5px; color: var(--muted); }

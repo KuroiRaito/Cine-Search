@@ -48,6 +48,15 @@ export const statusTone = (key) => statusMeta(key)?.tone || 'st-want';
  */
 export const canRate = (status) => status === 'watched' || status === 'rewatching';
 
+/**
+ * Whether a library entry counts as seen.
+ *
+ * Collection progress measures what you have actually watched, so a title on
+ * the watchlist is not progress — "6 of 11" would otherwise mean "six I have
+ * heard of". Rewatching counts: you saw it the first time.
+ */
+export const isSeen = (entry) => canRate(entry?.status);
+
 export const keyOf = (mediaType, id) => `${mediaType}-${id}`;
 
 /** Half points, 0.5 to 10 — the range the database's own check constraint allows. */

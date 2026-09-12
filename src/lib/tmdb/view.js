@@ -242,17 +242,83 @@ export function toSeasonView(raw) {
  * Credits with no release date are dropped - verified, 2 of Villeneuve's 26
  * raw director credits are unreleased projects with no date at all.
  */
+/**
+ * How many votes a credit needs to count as part of someone's body of work.
+ *
+ * This is a policy, not a fact, and it is the number the design was drawn
+ * against: at 200, Villeneuve has exactly the 10 directed features the mock
+ * shows. It is a proxy for "is this a real release" and it is an imperfect one
+ * — it filters a 1990s Québécois short and a straight-to-video obscurity the
+ * same way. The screen says how many it removed, which is what makes an
+ * opinionated number honest.
+ *
+ * Known cost: Emilia Clarke reads 12 rather than the ~20 a viewer would name.
+ */
+const RELEVANCE_VOTES = 200;
+
+/**
+ * TMDB records talk-show appearances and archive footage as cast credits, with
+ * the character as "Self". Tom Cruise has 135 cast credits and 57 of them are
+ * films; the rest are him being interviewed. Appearing as yourself is not a
+ * part you played, so this is a correctness filter rather than a taste one —
+ * it runs before the vote threshold and does most of the work.
+ */
+const isSelf = (c) => /^(self|himself|herself|themselves)\b/i.test(c.character || '');
+
+const dateOf = (c) => c.release_date || c.first_air_date || '';
+
+/** Credits that count toward a body of work, newest first. */
+function notableCredits(list) {
+    const today = new Date().toISOString().slice(0, 10);
+    const seen = new Set();
+    return (list || [])
+        .filter((c) => {
+            const d = dateOf(c);
+            // An unreleased film is not something you have failed to watch.
+            if (!d || d > today) return false;
+            if (isSelf(c)) return false;
+            if ((c.vote_count || 0) < RELEVANCE_VOTES) return false;
+            // A film credited as both Writer and Screenplay is one film.
+            const key = `${c.media_type}-${c.id}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        })
+        .sort((a, b) => String(dateOf(b)).localeCompare(String(dateOf(a))));
+}
+
+/**
+ * A person, with their filmography split by role.
+ *
+ * Each role carries its own denominator. "6 of 11" means eleven films they
+ * directed, six of which you have seen; switching to Writer changes both halves
+ * because it is a different body of work.
+ */
 export function toPersonView(raw) {
     const credits = raw.combined_credits || {};
-    const dated = (list) => (list || []).filter((c) => c.release_date || c.first_air_date);
-    const byNewest = (a, b) =>
-        String(b.release_date || b.first_air_date || '').localeCompare(String(a.release_date || a.first_air_date || ''));
+    const crewFor = (...jobs) => (credits.crew || []).filter((c) => jobs.includes(c.job));
 
-    const crewFor = (job) => dated(credits.crew).filter((c) => c.job === job).sort(byNewest).map(toCard);
+    const build = (key, label, verb, all) => {
+        const items = notableCredits(all).map(toCard);
+        return {
+            key,
+            label,
+            // "6 of 10 directed" — the fraction reads as "six of the ten films
+            // they directed", so the verb goes last and stays past tense.
+            verb,
+            items,
+            // Everything the filter removed, counted so the screen can admit to
+            // it rather than quietly present an opinion as a total.
+            filteredOut: all.length - items.length,
+        };
+    };
+
     const roles = [
-        { key: 'director', label: 'Director', items: crewFor('Director') },
-        { key: 'writer', label: 'Writer', items: [...crewFor('Writer'), ...crewFor('Screenplay')].sort(byNewest) },
-        { key: 'cast', label: 'Cast', items: dated(credits.cast).sort(byNewest).map(toCard) },
+        build('director', 'Director', 'directed', crewFor('Director')),
+        build('writer', 'Writer', 'written', crewFor('Writer', 'Screenplay')),
+        build('cast', 'Cast', 'acted in', credits.cast || []),
+        // A role with nothing left after filtering shows no tab. An empty grid
+        // behind a tab that promised a count is worse than no tab.
     ].filter((r) => r.items.length);
 
     return {
@@ -268,11 +334,6 @@ export function toPersonView(raw) {
     };
 }
 
-/**
- * The app's normalised item shape (lib/tmdb/normalize.js) -> the shape tiles
- * render. Search results and the browse feeds both arrive that way, so this is
- * the one place the two vocabularies meet.
- */
 export const fromItem = (it) => ({
     id: it.id,
     mediaType: it.media_type || 'movie',

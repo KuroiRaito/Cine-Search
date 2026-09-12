@@ -4,6 +4,7 @@ import { person as fetchPerson } from '../lib/tmdb/endpoints.js';
 import { toPersonView } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { Tile, Skeleton, Empty, initialsOf } from '../components/ui.jsx';
+import SignInPrompt from '../components/SignInPrompt.jsx';
 
 const year = (d) => (d ? new Date(d).getFullYear() : null);
 
@@ -19,6 +20,7 @@ export default function Person() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [role, setRole] = useState(null);
+    const [prompt, setPrompt] = useState(null);
 
     const { data, error, loading, retry } = useAsync(
         ({ signal }) => fetchPerson(id, { signal }).then(toPersonView),
@@ -99,7 +101,13 @@ export default function Person() {
                         ))}
                     </div>
                     <div className="grid" style={{ marginTop: 14 }}>
-                        {active.items.map((it) => <Tile key={`${it.mediaType}-${it.id}`} item={it} />)}
+                        {active.items.map((it) => (
+                            <Tile
+                                key={`${it.mediaType}-${it.id}`}
+                                item={it}
+                                onAdd={(x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' })}
+                            />
+                        ))}
                     </div>
                 </>
             )}
@@ -111,6 +119,7 @@ export default function Person() {
                 </div>
             )}
 
+            {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
         </div>
     );
 }

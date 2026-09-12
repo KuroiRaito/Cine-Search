@@ -201,3 +201,51 @@ So it's free for a long time and becomes the largest table somewhere around **50
 5. **Retention.** Keep roughly twelve months live once there are real users. The feed only ever shows recent activity, and the durable signal — when someone started and finished something — is already on the library row, so pruning old activity loses nothing that matters.
 
 If it ever outgrows that, Postgres partitioning by month is the standard next step. Not needed at this scale.
+
+---
+
+## Amendment — 2026-09-13, Milestone 2 part two
+
+Three changes, all forced by building the library rather than by planning it.
+
+### `user_library.is_favourite boolean not null default false`
+
+The design system draws a heart with `aria-pressed` on the title page — a toggle
+a person can see. The original six tables had nowhere to put it. It is not a
+rating of 10 and it is not a status: a favourite says "this one matters to me"
+independently of whether it was any good. It is also the cleanest positive
+signal the taste work in Layer 2 will have.
+
+Partial index on `(user_id) where is_favourite`, because the only query is
+"this person's favourites" and that is a small slice of a large table.
+
+### `catalog_titles.seasons jsonb not null default '[]'`
+
+`[{"n":1,"c":7},{"n":2,"c":13}]` — how many episodes each season holds.
+
+`number_of_episodes` alone cannot name which episode comes next. "11 of 62"
+does not say whether that is S2 E4. Without this, any screen showing a series'
+progress would have to fetch the whole series from TMDB to draw one row, or
+guess where the season boundaries fall. A "next episode" button that marks the
+wrong episode is worse than no button.
+
+About 40 bytes per series. Movies store `[]`.
+
+### Writes go through functions, not tables
+
+`catalog_titles` stays read-only to clients. Five `SECURITY DEFINER` functions
+hold the privilege instead: `catalog_ensure`, `library_upsert`,
+`library_episodes_set`, `library_remove`, `library_clear_rating`.
+
+This replaces the planned service-role key in a server function. It is better
+on every axis: nothing secret ships anywhere, the catalogue write surface is
+exactly these functions, and catalogue + library entry + activity row commit in
+one transaction — a half-saved title is not a state the app can reach.
+
+The property that makes it safe: the catalogue insert is `ON CONFLICT DO
+NOTHING`. A signed-in user can create a row that is missing and can never
+overwrite one that exists. Refreshing stale catalogue data stays a server-side
+job, and is still to be built.
+
+Every function raises on a null `auth.uid()`, and `execute` is revoked from
+`anon` and `public`. The grant and the body agree.

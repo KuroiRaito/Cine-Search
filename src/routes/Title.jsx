@@ -4,8 +4,14 @@ import { titleFull, season as fetchSeason } from '../lib/tmdb/endpoints.js';
 import { toTitleView, toSeasonView, compactCount } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { useRegion } from '../hooks/useRegion.js';
-import { Poster, Tile, PersonRow, TitleSkeleton, ErrorBox, Empty, initialsOf } from '../components/ui.jsx';
+import { Poster, Tile, PersonRow, TitleSkeleton, ErrorBox, Empty, Toast, initialsOf } from '../components/ui.jsx';
 import SignInPrompt from '../components/SignInPrompt.jsx';
+import Editor from '../components/Editor.jsx';
+import { useAuth } from '../context/AuthProvider.jsx';
+import { useLibrary } from '../context/LibraryProvider.jsx';
+import {
+    statusMeta, statusTone, episodesWatched, isWatched, runningOrder, nextUnwatched,
+} from '../lib/library.js';
 
 const displayName = (type, code) => {
     if (!code) return null;
@@ -45,6 +51,11 @@ export default function Title() {
     const [expanded, setExpanded] = useState(false);
     const [openCard, setOpenCard] = useState(null);
     const [prompt, setPrompt] = useState(null);
+    const [editing, setEditing] = useState(false);
+    const [toast, setToast] = useState(null);
+    const dismissToast = useCallback(() => setToast(null), []);
+    const { isSignedIn } = useAuth();
+    const lib = useLibrary();
 
     const valid = mediaType === 'movie' || mediaType === 'tv';
 
@@ -75,7 +86,52 @@ export default function Title() {
 
     const t = data;
     const isTV = t.mediaType === 'tv';
+    const entry = lib.entryFor(t.mediaType, t.id);
+    const saved = Boolean(entry);
+    const state = entry ? statusMeta(entry.status) : null;
+
+    // A guest still sees every control. Hiding them would hide the product from
+    // exactly the people who haven't seen it yet — so they raise the sign-in
+    // sheet instead, naming the thing that was being reached for.
     const ask = (action) => setPrompt({ title: t.title, poster: t.poster, action });
+    const gate = (fn) => (isSignedIn ? fn() : ask(isTV ? 'track' : 'want'));
+
+    const order = isTV ? runningOrder(t.seasons, t.airedEpisodes) : [];
+    const seen = episodesWatched(entry?.watched_episodes);
+
+    const quickSave = async () => {
+        const ok = await lib.save(t, { status: 'want_to_watch' });
+        if (ok) setToast({ message: `${t.title} · want to watch` });
+    };
+
+    /** Ticking is its own undo — tapping a ticked episode un-ticks it. */
+    const tickEpisode = async (season, number, on) => {
+        const list = new Set(entry?.watched_episodes?.[String(season)] ?? []);
+        if (on) list.add(number); else list.delete(number);
+        const ok = await lib.setEpisodes(t, season, [...list]);
+        if (!ok || !on) return;
+
+        // "Marking the final episode prompts 'Mark series as watched?' — it
+        // proposes, never assumes, because unaired seasons exist."
+        const after = { ...(entry?.watched_episodes ?? {}), [String(season)]: [...list] };
+        const done = !nextUnwatched(order, after);
+        if (done && entry?.status !== 'watched') {
+            setToast({
+                message: 'That was the last aired episode.',
+                actionLabel: 'Mark watched',
+                onAction: () => lib.save(t, { status: 'watched' }),
+            });
+        } else {
+            setToast({ message: `${t.title} · S${season} E${number} watched` });
+        }
+    };
+
+    /** Per season, never per series — a whole-series action is too destructive
+        for a single tap. */
+    const markSeason = async (season, numbers, on) => {
+        const ok = await lib.setEpisodes(t, season, on ? numbers : []);
+        if (ok) setToast({ message: on ? `Season ${season} marked watched` : `Season ${season} cleared` });
+    };
     const toggle = (key) => setOpenCard((c) => (c === key ? null : key));
     const makers = t.crew.filter((c) => c.job === 'Director' || c.job === 'Creator');
     const lang = languageName(t.originalLanguage);
@@ -88,13 +144,48 @@ export default function Title() {
     // exactly the people who haven't seen it yet.
     const actions = (
         <>
-            <div className="arow">
-                <button type="button" className="spill" onClick={() => ask(isTV ? 'track' : 'want')}>
-                    {isTV ? 'Track this series' : '+ Want to watch'}
+            <div className={`arow ${statusTone(entry?.status)}`}>
+                {/* One button, two jobs: it invites while there is nothing to
+                    report, and reports once there is. Tapping a saved title
+                    opens the editor rather than toggling anything — a status is
+                    not a thing that has an opposite. */}
+                <button
+                    type="button"
+                    className={`spill${saved ? ' set' : ''}`}
+                    onClick={() => gate(() => (saved ? setEditing(true) : quickSave()))}
+                >
+                    {saved
+                        ? <>{state?.icon} {state?.label} <span className="caret" aria-hidden="true">▾</span></>
+                        : (isTV ? 'Track this series' : '+ Want to watch')}
                 </button>
-                <button type="button" className="ibtn like" aria-label="Like" onClick={() => ask('like')}>♥</button>
-                <button type="button" className="ibtn" aria-label="Edit" onClick={() => ask('edit')}>✎</button>
+                <button
+                    type="button"
+                    className={`ibtn like${entry?.is_favourite ? ' on' : ''}`}
+                    aria-pressed={isSignedIn ? Boolean(entry?.is_favourite) : undefined}
+                    aria-label={entry?.is_favourite ? 'Remove from favourites' : 'Mark as favourite'}
+                    onClick={() => gate(() => lib.save(t, { favourite: !entry?.is_favourite }))}
+                >♥</button>
+                <button
+                    type="button"
+                    className="ibtn"
+                    aria-label="Edit"
+                    onClick={() => gate(() => setEditing(true))}
+                >✎</button>
             </div>
+
+            {/* Episodes, never seasons: "3 of 5 seasons" hides that season three
+                is twenty-two episodes long. */}
+            {isTV && saved && order.length > 0 && (
+                <div className="prg">
+                    <div className="prg-h">
+                        <span>Progress</span>
+                        <b>{seen} of {order.length}</b>
+                    </div>
+                    <div className="prg-bar">
+                        <i style={{ width: `${Math.round((seen / order.length) * 100)}%` }} />
+                    </div>
+                </div>
+            )}
 
             <div className="prov">
                 <div className="prov-l">Where to watch · {countryName(t.providers.region)}</div>
@@ -229,8 +320,17 @@ export default function Title() {
                             <b>{t.voteAverage || '—'}</b>
                             <span>TMDB · {compactCount(t.voteCount)}</span>
                         </div>
-                        <div className="s dim"><b>—</b><span>Your score</span></div>
-                        <div className="s dim"><b>—</b><span>Rewatches</span></div>
+                        {/* Never merged with TMDB's. The disagreement is the
+                            interesting number. */}
+                        <div className={`s${entry?.rating != null ? ' gold' : ' dim'}`}>
+                            <b>{entry?.rating ?? '—'}</b>
+                            <span className="lbl-short">Yours</span>
+                            <span className="lbl-long">Your score</span>
+                        </div>
+                        <div className={`s${entry?.rewatch_count ? '' : ' dim'}`}>
+                            <b>{entry?.rewatch_count || '—'}</b>
+                            <span>Rewatches</span>
+                        </div>
                     </div>
 
                     {t.overview && (
@@ -245,7 +345,15 @@ export default function Title() {
 
                     {cards}
 
-                    {isTV && <Episodes showId={t.id} seasons={t.seasons} specials={t.specials} />}
+                    {isTV && (
+                        <Episodes
+                            title={t}
+                            entry={entry}
+                            order={order}
+                            onTick={tickEpisode}
+                            onMarkSeason={markSeason}
+                        />
+                    )}
 
                     {t.related.length > 0 && (
                         <div className="sect">
@@ -263,25 +371,58 @@ export default function Title() {
             </div>
 
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
+            {editing && <Editor title={t} onClose={() => setEditing(false)} />}
+            <Toast
+                message={toast?.message}
+                actionLabel={toast?.actionLabel}
+                onAction={() => { toast?.onAction?.(); setToast(null); }}
+                onDismiss={dismissToast}
+            />
         </div>
     );
 }
 
-function Episodes({ showId, seasons, specials }) {
-    const tabs = [...seasons, ...(specials ? [specials] : [])];
+function Episodes({ title, entry, order, onTick, onMarkSeason }) {
+    const { isSignedIn } = useAuth();
+    const [prompt, setPrompt] = useState(null);
+    const tabs = [...title.seasons, ...(title.specials ? [title.specials] : [])];
     const [active, setActive] = useState(tabs[0]?.season_number ?? 1);
 
     const load = useCallback(
-        ({ signal }) => fetchSeason(showId, active, { signal }).then(toSeasonView),
-        [showId, active],
+        ({ signal }) => fetchSeason(title.id, active, { signal }).then(toSeasonView),
+        [title.id, active],
     );
-    const { data, error, loading, retry } = useAsync(load, [showId, active]);
+    const { data, error, loading, retry } = useAsync(load, [title.id, active]);
 
     if (!tabs.length) return null;
 
+    const watched = entry?.watched_episodes;
+    const aired = (data?.episodes || []).filter((e) => e.aired);
+    const allSeen = aired.length > 0 && aired.every((e) => isWatched(watched, active, e.number));
+    const seenHere = aired.filter((e) => isWatched(watched, active, e.number)).length;
+
+    const tick = (e, on) => {
+        if (!isSignedIn) {
+            setPrompt({ title: title.title, poster: title.poster, action: 'watched' });
+            return;
+        }
+        onTick(active, e.number, on);
+    };
+
+    const markAll = () => {
+        if (!isSignedIn) {
+            setPrompt({ title: title.title, poster: title.poster, action: 'watched' });
+            return;
+        }
+        onMarkSeason(active, aired.map((e) => e.number), !allSeen);
+    };
+
     return (
         <div className="sect">
-            <div className="sect-h"><span>Episodes</span></div>
+            <div className="sect-h">
+                <span>Episodes</span>
+                {entry && seenHere > 0 && <span className="sect-note">{seenHere} of {order.length} watched</span>}
+            </div>
             <div className="seasonsw" role="tablist" aria-label="Seasons">
                 {tabs.map((s) => (
                     <button
@@ -298,23 +439,49 @@ function Episodes({ showId, seasons, specials }) {
                 ))}
             </div>
 
+            {aired.length > 0 && (
+                <div className="sect-h markrow">
+                    <span>{active === 0 ? 'Specials' : `Season ${active}`} · {aired.length} aired</span>
+                    {/* Per season, never per series. */}
+                    <button type="button" className="markall" onClick={markAll}>
+                        {allSeen ? 'Clear season' : 'Mark all'}
+                    </button>
+                </div>
+            )}
+
             <div className="eplist">
                 {loading && [0, 1, 2].map((i) => <div className="skel" key={i} style={{ height: 52, marginTop: 8 }} />)}
                 {error && <ErrorBox what="these episodes" onRetry={retry} />}
-                {data?.episodes.map((e) => (
-                    <div className={`eprow${e.aired ? '' : ' unaired'}`} key={e.id}>
-                        <div className="still">{e.still && <img src={e.still} alt="" loading="lazy" />}</div>
-                        <div className="body">
-                            <div className="en">{e.number}. {e.name}</div>
-                            <div className="ed">
-                                {[e.airDate || 'TBA', e.runtime].filter(Boolean).join(' · ')}
-                                {e.voteAverage > 0 && <> · <span className="sc">★ {e.voteAverage}</span></>}
+                {data?.episodes.map((e) => {
+                    const on = isWatched(watched, active, e.number);
+                    return (
+                        <div className={`eprow${e.aired ? '' : ' unaired'}`} key={e.id}>
+                            <div className="still">{e.still && <img src={e.still} alt="" loading="lazy" />}</div>
+                            <div className="body">
+                                <div className="en">{e.number}. {e.name}</div>
+                                <div className="ed">
+                                    {[e.airDate || 'TBA', e.runtime].filter(Boolean).join(' · ')}
+                                    {e.voteAverage > 0 && <> · <span className="sc">★ {e.voteAverage}</span></>}
+                                </div>
                             </div>
+                            {/* An unaired episode cannot be watched, so it cannot
+                                be ticked — and says so rather than failing. */}
+                            <button
+                                type="button"
+                                className={`epchk${on ? ' on' : ''}`}
+                                disabled={!e.aired}
+                                aria-pressed={on}
+                                aria-label={`${on ? 'Un-mark' : 'Mark'} episode ${e.number} watched`}
+                                title={e.aired ? undefined : 'Not aired yet'}
+                                onClick={() => tick(e, !on)}
+                            >{on ? '✓' : '○'}</button>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 {data && !data.episodes.length && <p className="prov-none">No episode information yet.</p>}
             </div>
+
+            {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
         </div>
     );
 }

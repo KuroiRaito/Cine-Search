@@ -4,6 +4,7 @@ import { search } from '../lib/search/index.js';
 import { fromItem } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { Tile, Skeleton, Empty, ErrorBox } from '../components/ui.jsx';
+import SignInPrompt from '../components/SignInPrompt.jsx';
 
 const DEBOUNCE_MS = 250;
 
@@ -13,6 +14,7 @@ export default function SearchPage() {
     const [params, setParams] = useSearchParams();
     const q = params.get('q') || '';
     const [draft, setDraft] = useState(q);
+    const [prompt, setPrompt] = useState(null);
 
     useEffect(() => { setDraft(q); }, [q]);
 
@@ -68,7 +70,13 @@ export default function SearchPage() {
 
             {data && data.length > 0 && (
                 <div className="grid" style={{ marginTop: 16 }}>
-                    {data.map((it) => <Tile key={`${it.mediaType}-${it.id}`} item={it} />)}
+                    {data.map((it) => (
+                        <Tile
+                            key={`${it.mediaType}-${it.id}`}
+                            item={it}
+                            onAdd={(x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' })}
+                        />
+                    ))}
                 </div>
             )}
 
@@ -80,6 +88,7 @@ export default function SearchPage() {
                 />
             )}
 
+            {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
         </div>
     );
 }

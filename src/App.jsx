@@ -5,6 +5,7 @@ import Title from './routes/Title.jsx';
 import Person from './routes/Person.jsx';
 import Cover from './routes/Cover.jsx';
 import Stub from './routes/Stub.jsx';
+import Library from './routes/Library.jsx';
 import NotFound from './routes/NotFound.jsx';
 import About from './routes/About.jsx';
 import Auth from './routes/Auth.jsx';
@@ -89,7 +90,7 @@ export default function App() {
                             <Route path="/search" element={<SearchPage />} />
                             <Route path="/title/:mediaType/:id" element={<Title />} />
                             <Route path="/person/:id" element={<Person />} />
-                            <Route path="/library" element={<Stub what="Library" />} />
+                            <Route path="/library" element={<Library />} />
                             <Route path="/you" element={<Stub what="You" />} />
                             <Route path="/about" element={<About />} />
                             <Route path="*" element={<NotFound />} />

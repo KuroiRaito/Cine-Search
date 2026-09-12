@@ -1,5 +1,9 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { posterSrcSet } from '../lib/tmdb/view.js';
+import { useAuth } from '../context/AuthProvider.jsx';
+import { useLibrary } from '../context/LibraryProvider.jsx';
+import { statusMeta, statusTone } from '../lib/library.js';
 
 /** A poster we have no artwork for still says which title it is. Never a broken image. */
 /**
@@ -32,8 +36,28 @@ export const TILE_SIZES =
  * The quick-add stays visible rather than appearing on hover. Hidden-until-hover
  * is undiscoverable, and on a guest's first visit this button IS the product —
  * tapping it is how the feature gets found.
+ *
+ * The control knows the library itself rather than being told by each screen,
+ * so a title saved on the title page is already marked on the poster behind it.
+ * `onAdd` is only called for a guest: it is the screen's job to raise the
+ * sign-in sheet, because the sheet belongs to the page, not to one tile.
  */
 export function Tile({ item, onAdd }) {
+    const { isSignedIn } = useAuth();
+    const lib = useLibrary();
+    const entry = lib?.entryFor(item.mediaType, item.id) ?? null;
+    const state = entry ? statusMeta(entry.status) : null;
+
+    const press = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!isSignedIn) { onAdd(item); return; }
+        // Already saved: the tile reports, and changing a status is a decision
+        // that belongs on the title page, not under a thumb on a poster.
+        if (entry) return;
+        lib.save(item, { status: 'want_to_watch' });
+    };
+
     return (
         <Link to={`/title/${item.mediaType}/${item.id}`} className="tile">
             <div className="art">
@@ -41,10 +65,11 @@ export function Tile({ item, onAdd }) {
                 {onAdd && (
                     <button
                         type="button"
-                        className="quickadd"
-                        aria-label={`Add ${item.title}`}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(item); }}
-                    >+</button>
+                        className={`quickadd${entry ? ` saved ${statusTone(entry.status)}` : ''}`}
+                        aria-label={entry ? `${item.title} — ${state?.label}` : `Add ${item.title}`}
+                        aria-disabled={entry ? true : undefined}
+                        onClick={press}
+                    >{entry ? state?.icon : '+'}</button>
                 )}
                 {item.voteAverage > 0 && (
                     <span className="score-badge">★ {Number(item.voteAverage).toFixed(1)}</span>
@@ -136,3 +161,29 @@ export function ErrorBox({ what, onRetry }) {
     );
 }
 
+
+/**
+ * Named, not generic. "Breaking Bad · S2 E4 watched" is worth reading; "Saved"
+ * is not — and an undo that doesn't say what it would undo is a dare.
+ *
+ * Six seconds, because that is roughly how long an undo stays plausible. The
+ * timer restarts whenever the message changes, so a run of quick actions never
+ * leaves the last one on screen for a fraction of a second.
+ */
+export function Toast({ message, actionLabel, onAction, onDismiss, ttl = 6000 }) {
+    useEffect(() => {
+        if (!message) return undefined;
+        const t = setTimeout(onDismiss, ttl);
+        return () => clearTimeout(t);
+    }, [message, onDismiss, ttl]);
+
+    if (!message) return null;
+    return (
+        <div className="toast" role="status">
+            <span>{message}</span>
+            {actionLabel
+                ? <button type="button" onClick={onAction}>{actionLabel}</button>
+                : <button type="button" onClick={onDismiss} aria-label="Dismiss">✕</button>}
+        </div>
+    );
+}

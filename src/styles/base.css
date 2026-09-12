@@ -566,10 +566,14 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: flex-end; justify-content: center;
 }
 .sheet {
+  /* A sheet is a fixed-width surface, not the page, so --gutter is the wrong
+     number for its insets: at desktop the page gutter is 40px and this box is
+     460px wide. It still gets exactly one number, declared here. */
+  --sheet-pad: 18px;
   width: 100%; max-width: 460px;
   background: var(--bg-sub); border-top: 1px solid var(--bd);
   border-radius: 16px 16px 0 0;
-  padding: 0 18px max(18px, env(safe-area-inset-bottom));
+  padding: 0 var(--sheet-pad) max(var(--sheet-pad), env(safe-area-inset-bottom));
   box-shadow: var(--sh);
 }
 .grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 14px; }
@@ -722,3 +726,251 @@ img { max-width: 100%; display: block; }
 
 .auth-alt { margin-top: 16px; font-size: 12.5px; color: var(--muted); text-align: center; }
 .auth-alt a { color: var(--acc-t); font-weight: 600; }
+
+/* ---------------- status colour ----------------
+
+   Six hues, one per watch state, straight from the design system's swatches.
+   Each state is carried by a class rather than an inline style so that a state
+   looks the same everywhere it appears — pill, segment, chip, library row.
+
+   The design system fills the title-page pill with the -9 hue and puts a
+   hardcoded near-black on top of it. That literal is right in dark mode and
+   unreadable in light, because -9 is a mid-tone in both. `var(--bg)` is the
+   fix: it is near-black in dark and near-white in light, so it is always the
+   pole furthest from a mid-tone. The fill stays as designed, and the label
+   stays legible in both themes without a single hardcoded value.
+   ------------------------------------------------------------------ */
+
+.st-want    { --stc: var(--st-want-11); --stb: var(--st-want-3); --stl: var(--st-want-9); }
+.st-ing     { --stc: var(--st-ing-11);  --stb: var(--st-ing-3);  --stl: var(--st-ing-9); }
+.st-hold    { --stc: var(--st-hold-11); --stb: var(--st-hold-3); --stl: var(--st-hold-9); }
+.st-done    { --stc: var(--st-done-11); --stb: var(--st-done-3); --stl: var(--st-done-9); }
+.st-re      { --stc: var(--st-re-11);   --stb: var(--st-re-3);   --stl: var(--st-re-9); }
+.st-drop    { --stc: var(--st-drop-11); --stb: var(--st-drop-3); --stl: var(--st-drop-9); }
+
+/* The primary button stops inviting and starts reporting once there is a state
+   to report. Same button, same place, same weight — only its job changes. A
+   primary action rendered as a pale tint reads as disabled. */
+.spill.set { background: var(--stl); color: var(--bg); box-shadow: inset 0 1px 0 var(--hl); }
+.spill.set:hover { filter: brightness(1.06); }
+.spill .caret { opacity: .55; font-size: 10px; margin-left: 2px; }
+
+.ibtn.on { background: var(--stb); color: var(--stc); box-shadow: inset 0 0 0 1px var(--stl); }
+.ibtn.like.on { --stb: var(--like-3); --stc: var(--like-11); --stl: var(--like-9); }
+
+/* ---------------- progress ---------------- */
+
+/* Episodes, never seasons, and always watched-of-total across the whole run:
+   "3 of 5 seasons" hides that season three is 22 episodes long. */
+.prg { margin-top: 11px; border-top: 1px solid var(--bd-sub); padding-top: 11px; }
+.prg-h { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 6px; }
+.prg-h span { color: var(--muted); }
+.prg-h b { font-family: var(--f-m); font-weight: 400; color: var(--acc-t); }
+.prg-bar { height: 4px; border-radius: 99px; background: var(--ink-5); overflow: hidden; }
+.prg-bar i { display: block; height: 100%; background: var(--acc); transition: width .18s; }
+
+/* ---------------- episode ticks ---------------- */
+
+/* Tapping a ticked episode un-ticks it, so the control is its own undo and no
+   toast is needed. */
+.epchk {
+  width: 28px; height: 28px; flex: 0 0 auto; border-radius: 99px; border: 0;
+  background: var(--ink-4); color: var(--ink-9); cursor: pointer;
+  display: grid; place-items: center; font-size: 13px; align-self: center;
+  transition: background .12s, color .12s;
+}
+.epchk:hover { background: var(--ink-5); color: var(--muted); }
+.epchk.on { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
+.epchk:disabled { opacity: .4; cursor: default; }
+.sect-h .markall {
+  background: none; border: 0; cursor: pointer; padding: 0;
+  font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--acc-t);
+}
+
+/* ---------------- editor sheet ----------------
+   Arrived at from a title and returned to it. Never takes a URL of its own. */
+
+/* The sign-in sheet pads its own sides; this one lets each field do it, so the
+   segmented control can run edge to edge. */
+.sheet.editor { --sheet-pad: 14px; padding-inline: 0; max-height: 88vh; overflow-y: auto; }
+.sh-grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 0; }
+.sh-head { display: flex; align-items: center; gap: 9px; padding: 11px var(--sheet-pad); border-bottom: 1px solid var(--bd-sub); }
+.sh-po { width: 34px; flex: 0 0 auto; aspect-ratio: 2/3; border-radius: 5px; border: 1px solid var(--bd-sub); overflow: hidden; }
+.sh-po img { width: 100%; height: 100%; object-fit: cover; }
+.sh-po .noart { font-size: 7px; padding: 2px; }
+.sh-t { flex: 1; min-width: 0; }
+.sh-t b { display: block; font-size: 13px; font-weight: 700; line-height: 1.25; }
+.sh-t span { display: block; font-family: var(--f-m); font-size: 9.5px; color: var(--muted); }
+
+.fld { padding: 12px var(--sheet-pad) 0; }
+.fld2 { padding: 12px var(--sheet-pad) 0; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.fld label, .fld2 label { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 7px; }
+
+/* All six visible at once: one tap, rather than open, scan, tap. Films render
+   three of the six — "watching" is meaningless for a two-hour film. */
+.segs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.seg {
+  background: var(--ink-3); border: 0; border-radius: 9px; padding: 8px 3px; cursor: pointer;
+  color: var(--muted); font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-family: var(--f-s); transition: background .12s, color .12s, box-shadow .12s;
+}
+.seg:hover { background: var(--ink-4); color: var(--text); }
+.seg i { font-style: normal; font-size: 9.5px; font-family: var(--f-s); }
+.seg.on { background: var(--stb); color: var(--stc); font-weight: 600; box-shadow: inset 0 0 0 1px var(--stc); }
+
+.prog {
+  display: flex; align-items: center; gap: 9px; background: var(--bg-sub);
+  box-shadow: inset 0 0 0 1px var(--bd-sub); border-radius: 10px; padding: 7px 9px;
+}
+.prog.compact { width: 150px; }
+.stp {
+  width: 32px; height: 32px; flex: 0 0 auto; border-radius: 8px; border: 0; background: var(--ink-4);
+  color: var(--text); font-size: 17px; cursor: pointer; display: grid; place-items: center; transition: background .12s;
+}
+.stp:hover { background: var(--ink-5); }
+.stp:disabled { opacity: .35; cursor: default; }
+.prog-v { flex: 1; text-align: center; }
+.prog-v b { display: block; font-family: var(--f-d); font-size: 18px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.prog-v span { display: block; font-family: var(--f-m); font-size: 9px; color: var(--muted); margin-top: 2px; }
+.jump { margin-top: 7px; font-size: 11px; color: var(--muted); }
+.jump b { color: var(--text); font-family: var(--f-m); font-weight: 400; }
+
+/* Half stars, 1–10, matching TMDB's scale so the two scores are comparable. */
+.stars {
+  display: flex; align-items: center; gap: 4px; background: var(--bg-sub);
+  box-shadow: inset 0 0 0 1px var(--bd-sub); border-radius: 10px; padding: 9px 11px;
+}
+.stars button {
+  background: none; border: 0; padding: 0; cursor: pointer; position: relative;
+  font-size: 19px; color: var(--ink-7); line-height: 1; width: 19px; height: 22px;
+}
+.stars button.on { color: var(--rate); }
+/* A half star is the full glyph clipped down the middle, over a dim one. */
+.stars button.half::after {
+  content: "★"; position: absolute; inset: 0; color: var(--rate);
+  clip-path: inset(0 50% 0 0);
+}
+.stars .sv { margin-left: auto; font-family: var(--f-m); font-size: 11.5px; color: var(--rate-t); font-weight: 600; }
+.stars .clear {
+  margin-left: 8px; width: auto; height: auto; font-family: var(--f-s); font-size: 11px;
+  font-weight: 600; color: var(--muted);
+}
+.stars .clear:hover { color: var(--text); }
+
+.inp {
+  width: 100%; background: var(--bg-sub); border: 0; box-shadow: inset 0 0 0 1px var(--bd-sub);
+  border-radius: 9px; padding: 10px 11px; font-size: 12.5px; color: var(--text);
+  font-family: var(--f-s); transition: box-shadow .12s;
+}
+.inp:hover { box-shadow: inset 0 0 0 1px var(--bd); }
+.inp:focus { outline: none; box-shadow: inset 0 0 0 1px var(--acc); }
+.inp.dim { color: var(--muted); }
+.hint { font-size: 10.5px; color: var(--muted); margin-top: 5px; }
+
+/* Remove is isolated in the footer and confirms. Everything above it is one
+   tap from undoable; this is not. */
+.sh-foot { padding: var(--sheet-pad) var(--sheet-pad) 4px; margin-top: 6px; border-top: 1px solid var(--bd-sub); }
+.del {
+  width: 100%; background: var(--st-drop-3); border: 0; color: var(--st-drop-11);
+  border-radius: 9px; padding: 10px; font-family: var(--f-s); font-size: 12.5px;
+  font-weight: 600; cursor: pointer; transition: filter .12s;
+}
+.del:hover { filter: brightness(1.1); }
+.del-confirm { font-size: 12px; color: var(--muted); margin-bottom: 9px; line-height: 1.5; }
+.del-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* ---------------- library ---------------- */
+
+/* Counts, not stacked sections: sections work at 40 titles and collapse at 400.
+   The count is what makes the shape of a library readable without scrolling. */
+.chips { display: flex; gap: 6px; overflow-x: auto; padding: 12px var(--gutter) 0; scrollbar-width: none; }
+.chips::-webkit-scrollbar { height: 0; }
+.chip {
+  flex: 0 0 auto; font-family: var(--f-s); font-size: 12.5px; font-weight: 500;
+  padding: 6px 13px; border-radius: 99px; border: 0; cursor: pointer;
+  background: var(--ink-3); color: var(--muted); white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.chip em { font-style: normal; opacity: .5; margin-left: 4px; font-variant-numeric: tabular-nums; }
+.chip:hover { background: var(--ink-4); color: var(--text); }
+.chip[aria-pressed="true"] { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
+.chip[aria-pressed="true"] em { opacity: .65; }
+
+.grp { margin: 15px var(--gutter) 0; }
+.grp-h { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 10px; }
+.grp-h b { font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em; color: var(--text); }
+.grp-h span { font-size: 11.5px; color: var(--muted); }
+
+/* Series are rows and films are a grid, inside one filter. A series carries
+   progress, which a poster cannot show and a row can. */
+.srow {
+  display: flex; gap: 10px; padding: 10px; border: 1px solid var(--bd); border-radius: 10px;
+  background: var(--surface); position: relative; overflow: hidden; align-items: stretch;
+}
+.srow + .srow { margin-top: 7px; }
+.srow:hover { background: var(--surface-hv); }
+.srow .th { width: 40px; flex: 0 0 auto; aspect-ratio: 2/3; border-radius: 5px; border: 1px solid var(--bd-sub); overflow: hidden; background: var(--ink-4); }
+.srow .th img { width: 100%; height: 100%; object-fit: cover; }
+.srow .th .noart { font-size: 7px; padding: 2px; }
+.srow .bd { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; justify-content: center; }
+.srow .nm { font-size: 12.5px; font-weight: 600; line-height: 1.25; }
+.srow .ep { font-family: var(--f-m); font-size: 10px; color: var(--muted); }
+.plus {
+  width: 32px; height: 32px; flex: 0 0 auto; align-self: center; border-radius: 99px; border: 0;
+  background: var(--acc); color: var(--on-acc); font-size: 16px; cursor: pointer;
+  display: grid; place-items: center; transition: filter .12s;
+}
+.plus:hover { filter: brightness(1.08); }
+.plus:disabled { opacity: .4; cursor: default; }
+.track { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--ink-5); }
+.track i { display: block; height: 100%; background: var(--acc); transition: width .18s; }
+
+/* An empty filter explains itself. "Films don't have a watching state" is a
+   real answer; an empty grid is not. */
+.whynot {
+  padding: 16px 12px; border: 1px dashed var(--bd); border-radius: 10px;
+  text-align: center; font-size: 12px; color: var(--muted); line-height: 1.6;
+  /* It is a sentence, not a container. A dashed box running the width of a
+     desktop window to hold eight words looks like a failure, not an answer. */
+  max-width: var(--measure);
+}
+.whynot a { color: var(--acc-t); font-weight: 600; }
+
+/* ---------------- toast ---------------- */
+
+/* Named, not generic: "Breaking Bad · S2 E4 watched" is worth reading, "Saved"
+   is not. Six seconds, because that is how long an undo stays plausible. */
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(78px + env(safe-area-inset-bottom)); z-index: 70;
+  width: calc(100% - (var(--gutter) * 2)); max-width: 420px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--ink-5); border-radius: 10px; padding: 10px 13px;
+  font-size: 12px; color: var(--text); box-shadow: var(--sh);
+}
+.toast button {
+  background: none; border: 0; cursor: pointer; padding: 4px 2px;
+  font-family: var(--f-s); font-size: 11.5px; font-weight: 600; color: var(--acc-t);
+}
+.toast span { min-width: 0; }
+
+/* The season header is a second heading inside one section — same type, but it
+   carries an action, so it needs its own rhythm above the list. */
+.sect-h.markrow { margin-top: 14px; font-family: var(--f-m); font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 400; }
+.sect-note { font-family: var(--f-m); font-size: 10px; color: var(--muted); font-weight: 400; }
+
+/* A saved tile reports its state where the invitation used to be. Same spot,
+   same size — only a poster that is already yours says so. */
+.quickadd.saved {
+  background: var(--stl); color: var(--bg);
+  box-shadow: none; cursor: default; backdrop-filter: none;
+}
+.quickadd.saved:hover { background: var(--stl); color: var(--bg); }
+
+/* A control that navigates within the screen rather than to a URL. It reads as
+   a link because that is what it does; it is a button because there is nothing
+   to link to. */
+.linkish {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--acc-t);
+}

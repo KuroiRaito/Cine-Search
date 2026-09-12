@@ -208,7 +208,10 @@ export default function Title() {
             </div>
 
             <div className="tgrid">
-                <div className="tposter"><Poster src={t.poster} title={t.title} eager /></div>
+                <div className="tposter">
+                    <Poster src={t.poster} path={t.posterPath} sizes="(min-width: 1100px) 210px, 82px"
+                        title={t.title} eager />
+                </div>
 
                 <div className="thead">
                     <h1>{t.title}</h1>

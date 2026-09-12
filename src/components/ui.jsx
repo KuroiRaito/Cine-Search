@@ -1,15 +1,18 @@
 import { Link } from 'react-router-dom';
+import { posterSrcSet } from '../lib/tmdb/view.js';
 
 /** A poster we have no artwork for still says which title it is. Never a broken image. */
 /**
  * `eager` for anything above the fold. A lazily-loaded hero or title poster
  * arrives late enough that the page looks broken while you wait for it.
  */
-export function Poster({ src, title, className = '', eager = false }) {
+export function Poster({ src, path, sizes, title, className = '', eager = false }) {
     if (src) {
         return (
             <img
                 src={src}
+                srcSet={path ? posterSrcSet(path) : undefined}
+                sizes={path ? sizes : undefined}
                 alt=""
                 className={className}
                 loading={eager ? 'eager' : 'lazy'}
@@ -20,6 +23,11 @@ export function Poster({ src, title, className = '', eager = false }) {
     return <div className="noart">{title}</div>;
 }
 
+// Matches the rail and grid tile widths in base.css, so the browser asks for a
+// source that fits rather than one that has to be stretched.
+export const TILE_SIZES =
+    '(min-width: 1100px) 190px, (min-width: 600px) 168px, (min-width: 400px) 148px, 128px';
+
 /**
  * The quick-add stays visible rather than appearing on hover. Hidden-until-hover
  * is undiscoverable, and on a guest's first visit this button IS the product —
@@ -29,7 +37,7 @@ export function Tile({ item, onAdd }) {
     return (
         <Link to={`/title/${item.mediaType}/${item.id}`} className="tile">
             <div className="art">
-                <Poster src={item.poster} title={item.title} />
+                <Poster src={item.poster} path={item.posterPath} sizes={TILE_SIZES} title={item.title} />
                 {onAdd && (
                     <button
                         type="button"

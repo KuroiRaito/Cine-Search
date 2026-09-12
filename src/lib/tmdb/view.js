@@ -7,6 +7,20 @@
 const IMG = 'https://image.tmdb.org/t/p';
 
 export const posterUrl = (path, size = 'w342') => (path ? `${IMG}/${size}${path}` : null);
+
+/**
+ * Candidate widths for a poster, so the browser can pick one that suits the
+ * device.
+ *
+ * A 128px tile on a 2x screen occupies 256 real pixels, and on a 3x Android
+ * 384 — so the w185 we were asking for was being stretched by up to 2.1x. That
+ * is the difference between a poster you can recognise and a smudge. Letting
+ * the browser choose also means a 1x screen doesn't pay for pixels it can't
+ * show.
+ */
+export const posterSrcSet = (path) => (path
+    ? ['w185', 'w342', 'w500'].map((s) => `${IMG}/${s}${path} ${s.slice(1)}w`).join(', ')
+    : null);
 // w1280 rather than w780: the hero runs the full width of a desktop window, and
 // an upscaled 780px backdrop is visibly soft there.
 export const backdropUrl = (path, size = 'w1280') => (path ? `${IMG}/${size}${path}` : null);
@@ -114,7 +128,8 @@ const toCard = (r) => ({
     mediaType: r.media_type || (r.first_air_date ? 'tv' : 'movie'),
     title: r.title || r.name || 'Untitled',
     year: yearOf(r.release_date || r.first_air_date),
-    poster: posterUrl(r.poster_path, 'w185'),
+    poster: posterUrl(r.poster_path, 'w342'),
+    posterPath: r.poster_path,
     voteAverage: r.vote_average || null,
 });
 
@@ -138,7 +153,8 @@ export function toTitleView(raw, mediaType, region) {
         certification: certificationFor(raw, region, mediaType),
         genres: (raw.genres || []).map((g) => g.name),
         overview: raw.overview?.trim() || null,
-        poster: posterUrl(raw.poster_path, 'w342'),
+        poster: posterUrl(raw.poster_path, 'w500'),
+        posterPath: raw.poster_path,
         backdrop: backdropUrl(raw.backdrop_path),
         voteAverage: raw.vote_average ? Number(raw.vote_average).toFixed(1) : null,
         voteCount: raw.vote_count || 0,
@@ -219,6 +235,7 @@ export const fromItem = (it) => ({
     mediaType: it.media_type || 'movie',
     title: it.title || 'Untitled',
     year: it.year && it.year !== 'Unknown' ? it.year : null,
-    poster: posterUrl(it.poster_path, 'w185'),
+    poster: posterUrl(it.poster_path, 'w342'),
+    posterPath: it.poster_path,
     voteAverage: it.vote_average || null,
 });

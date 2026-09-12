@@ -7,6 +7,7 @@ import Cover from './routes/Cover.jsx';
 import Stub from './routes/Stub.jsx';
 import NotFound from './routes/NotFound.jsx';
 import { hasSeenCover } from './lib/firstVisit.js';
+import ThemeToggle from './components/ThemeToggle.jsx';
 import './styles/tokens.css';
 import './styles/base.css';
 
@@ -39,6 +40,7 @@ function Shell({ children }) {
                         ))}
                     </nav>
                     <span className="topbar-spacer" />
+                    <ThemeToggle />
                     <NavLink to="/welcome" className="btn quiet">Sign in</NavLink>
                 </div>
             </header>

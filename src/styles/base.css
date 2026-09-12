@@ -272,8 +272,6 @@ img { max-width: 100%; display: block; }
 .errbox p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
 
 .attribution { padding: 28px 16px 12px; font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
-/* Small print, and it should read as small print. */
-.cover .attribution { font-size: 10px; line-height: 1.55; padding: 18px 0 0; color: var(--ink-10); }
 .attribution a { color: var(--acc-t); }
 
 /* Secondary labels shorten on very narrow phones; the number never does. */
@@ -299,6 +297,7 @@ img { max-width: 100%; display: block; }
   .topnav a { padding: 6px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--muted); }
   .topnav a.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
   .topbar-spacer { flex: 1; }
+  .topbar-in .circ { margin-right: 4px; }
 
   .app-main { padding-bottom: 40px; }
   .pad, .section, .card, .scores, .tagline, .seasonsw, .rolesw { margin-inline: 24px; }
@@ -368,58 +367,68 @@ img { max-width: 100%; display: block; }
 
 /* ---------------- cover ---------------- */
 
-/* dvh so the phone's address bar can't leave a gap under the small print. */
-.cover { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+/* The artwork is the pitch: a full-bleed mosaic of real posters, turned off
+   square and pushed past the edges so no single title reads as a promotion,
+   then held back to half opacity behind a scrim. */
+.cover { position: relative; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+
 .mosaic {
-  position: relative; height: 38vh; min-height: 200px; max-height: 320px; overflow: hidden;
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 10px;
-  transform: scale(1.08); transform-origin: top center;
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 5px;
+  transform: rotate(-8deg) scale(1.35); transform-origin: center;
+  opacity: .5;
 }
-.mosaic::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(to top, var(--bg) 22%, color-mix(in srgb, var(--bg) 35%, transparent) 62%, transparent 92%);
-}
-.mosaic img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
+.mosaic-cell { background-size: cover; background-position: center; border-radius: 6px; }
 
-.cover-body {
-  flex: 1; display: flex; flex-direction: column;
-  padding: 0 22px 20px; margin-top: -28px; position: relative; z-index: 1;
+.cover-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to top,
+    var(--bg) 34%,
+    color-mix(in srgb, var(--bg) 72%, transparent) 62%,
+    color-mix(in srgb, var(--bg) 30%, transparent)
+  );
 }
-.cover-body .wordmark {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
-  font-family: var(--f-d); font-weight: 800; font-size: 15px; letter-spacing: -.03em;
-}
-.cover-body .wordmark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
-.cover-body h1 { font-size: 30px; font-weight: 800; letter-spacing: -.04em; margin-bottom: 12px; }
-.cover-body > p { font-size: 14px; color: var(--muted); max-width: 42ch; margin-bottom: 24px; }
 
-/* The pitch sits under the artwork; the things you act on sit where your thumb
-   already is. Everything between them is the gap. */
-.cover-actions { display: grid; gap: 9px; max-width: 380px; margin-top: auto; }
-.skip {
-  display: block; width: 100%; max-width: 380px; margin-top: 14px; padding: 12px;
-  background: none; border: 1px solid var(--bd); border-radius: 10px; cursor: pointer;
-  color: var(--text); font-family: var(--f-s); font-size: 13.5px; font-weight: 600;
-  transition: border-color .12s;
+.cover-theme { position: absolute; top: 14px; right: 14px; z-index: 3; }
+
+/* Everything sits at the bottom, where the thumb already is. */
+.cover-in { position: relative; z-index: 2; margin-top: auto; padding: 22px 20px 20px; width: 100%; }
+
+.cover-mark {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  font-family: var(--f-d); font-weight: 800; font-size: 17px; letter-spacing: -.03em;
 }
-.skip:hover { border-color: var(--bd-str); }
+.cover-mark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
+
+.cover-in h1 { font-size: 27px; font-weight: 800; letter-spacing: -.035em; margin-bottom: 10px; }
+.cover-in > p { font-size: 13.5px; color: var(--muted); max-width: 44ch; margin-bottom: 20px; }
+
+.cover-cta { display: flex; flex-direction: column; gap: 9px; }
+.btn-lg { width: 100%; padding: 13px 20px; font-size: 14.5px; }
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--bd-str); }
+.btn.ghost:hover { background: var(--surface-hv); filter: none; }
+
+.cover-skip { margin-top: 14px; text-align: center; }
+.cover-skip button {
+  background: none; border: 0; cursor: pointer; padding: 6px 10px;
+  color: var(--acc-t); font-family: var(--f-s); font-size: 13px; font-weight: 600;
+}
+
+.cover-fine {
+  margin-top: 14px; font-size: 10.5px; color: var(--ink-9);
+  text-align: center; line-height: 1.5;
+}
+.cover-fine a { color: var(--ink-10); }
 
 @media (min-width: 760px) {
-  .cover-body {
-    width: 100%; max-width: 620px; margin-inline: auto;
-    text-align: center; padding-inline: 24px;
-  }
-  .cover-body .wordmark { justify-content: center; }
-  .cover-body > p { margin-inline: auto; }
-  .cover-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 100%; }
-  .skip { max-width: 100%; }
-  /* On a phone the actions belong under the thumb. On a tall desktop window
-     that same rule opens a void, so the block stays together and only the
-     small print sinks. */
-  .cover-actions { margin-top: 8px; }
-  .cover .attribution { margin-top: auto; }
+  .cover-in { max-width: 560px; margin-inline: auto; text-align: center; padding-bottom: 32px; }
+  .cover-mark { justify-content: center; }
+  .cover-in > p { margin-inline: auto; }
+  .cover-cta { flex-direction: row; }
+  .mosaic { grid-template-columns: repeat(6, 1fr); }
 }
 @media (min-width: 1120px) {
-  .cover-body h1 { font-size: 46px; }
+  .cover-in h1 { font-size: 40px; }
   .mosaic { grid-template-columns: repeat(8, 1fr); }
 }

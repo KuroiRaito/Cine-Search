@@ -2,15 +2,18 @@ import { useNavigate } from 'react-router-dom';
 import { trending } from '../lib/tmdb/endpoints.js';
 import { posterUrl } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
-import { Attribution } from '../components/ui.jsx';
 import { markSeen } from '../lib/firstVisit.js';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 
 /**
  * First visit only. Skippable, and it never comes back.
  *
- * The mosaic is real artwork rather than stock illustration: the catalogue is
- * the product, so showing it is the most honest pitch available. Attribution
- * lives here too — it's contractual, and this is the cheapest place to satisfy it.
+ * The backdrop is a full-bleed mosaic of real artwork — rotated, scaled past
+ * the edges and held at half opacity behind a scrim. Never stock illustration:
+ * the catalogue is the product, so showing it is the most honest pitch there is.
+ *
+ * Attribution lives here too. It's contractual, and this is the first screen —
+ * the cheapest possible place to satisfy it.
  */
 export default function Cover() {
     const navigate = useNavigate();
@@ -25,25 +28,39 @@ export default function Cover() {
         <div className="cover">
             <div className="mosaic" aria-hidden="true">
                 {(data || []).map((it) => (
-                    <img key={`${it.media_type}-${it.id}`} src={posterUrl(it.poster_path, 'w185')} alt="" />
+                    <div
+                        key={`${it.media_type}-${it.id}`}
+                        className="mosaic-cell"
+                        style={{ backgroundImage: `url(${posterUrl(it.poster_path, 'w342')})` }}
+                    />
                 ))}
             </div>
+            <div className="cover-scrim" aria-hidden="true" />
 
-            <div className="cover-body">
-                <div className="wordmark"><i />Cine Search</div>
-                <h1>Everything you watch,<br />in one place.</h1>
-                <p>Films and series together. Track what you&apos;re watching, remember what you loved, and find the next thing.</p>
+            <div className="cover-theme"><ThemeToggle /></div>
 
-                <div className="cover-actions">
-                    <button type="button" className="btn" onClick={() => go('/welcome/signup')}>Create account</button>
-                    <button type="button" className="btn quiet" onClick={() => go('/welcome/signin')}>Sign in</button>
+            <div className="cover-in">
+                <div className="cover-mark"><i />Cine Search</div>
+
+                <h1>Everything you&apos;ve watched.<br />Everything you will.</h1>
+                <p>Track films and series, see where to watch them, and keep the whole lot in one place.</p>
+
+                <div className="cover-cta">
+                    <button type="button" className="btn btn-lg" onClick={() => go('/welcome/signup')}>Create account</button>
+                    <button type="button" className="btn btn-lg ghost" onClick={() => go('/welcome/signin')}>Sign in</button>
                 </div>
 
-                {/* A real, visible action — the Noob's whole persona is browsing
-                    before committing, and burying the skip loses them at the door. */}
-                <button type="button" className="skip" onClick={() => go('/')}>Browse without an account</button>
+                {/* A real, visible action — the whole point of this persona is
+                    browsing before committing, and burying the skip loses them
+                    at the door. */}
+                <div className="cover-skip">
+                    <button type="button" onClick={() => go('/')}>Browse without an account →</button>
+                </div>
 
-                <Attribution />
+                <div className="cover-fine">
+                    Film and TV data from <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer noopener">TMDB</a>.
+                    <br />Streaming availability by <a href="https://www.justwatch.com" target="_blank" rel="noreferrer noopener">JustWatch</a>.
+                </div>
             </div>
         </div>
     );

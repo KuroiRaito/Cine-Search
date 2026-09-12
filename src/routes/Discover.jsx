@@ -6,6 +6,7 @@ import { useAsync } from '../hooks/useAsync.js';
 import { useRegion } from '../hooks/useRegion.js';
 import { Rail, Skeleton, ErrorBox, Attribution } from '../components/ui.jsx';
 import SignInPrompt from '../components/SignInPrompt.jsx';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 
 function FeedRail({ title, load, deps, onAdd }) {
     const { data, error, loading, retry } = useAsync(load, deps);
@@ -43,6 +44,7 @@ export default function Discover() {
                 <h1>Discover</h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Link to="/search" className="circ" aria-label="Search">⌕</Link>
+                    <ThemeToggle />
                     <Link to="/welcome" className="btn quiet">Sign in</Link>
                 </div>
             </div>

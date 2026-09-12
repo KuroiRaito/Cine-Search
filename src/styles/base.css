@@ -1,0 +1,384 @@
+/* ============================================================
+   Projector — base, shell and shared components.
+   Every value comes from a token in tokens.css. No raw hex here.
+   Mobile first; 320px is the supported floor.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--f-s);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5 { font-family: var(--f-d); margin: 0; letter-spacing: -.022em; line-height: 1.14; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+img { max-width: 100%; display: block; }
+
+:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; border-radius: 5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ---------------- shell ---------------- */
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+.app-main { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding-bottom: 78px; }
+
+/* Bottom tabs are a phone idiom. At desktop they become a top bar. */
+.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: flex;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--bd-sub);
+  padding: 7px 0 max(9px, env(safe-area-inset-bottom));
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--muted); font-family: var(--f-m); font-size: 9.5px; letter-spacing: .03em;
+  padding: 2px 4px;
+}
+.tab-item .ico { font-size: 16px; font-family: var(--f-s); line-height: 1; }
+.tab-item.on { color: var(--acc-t); }
+
+.topbar { display: none; }
+
+/* ---------------- page furniture ---------------- */
+
+.page { padding: 0 0 24px; }
+.pad { padding-inline: 14px; }
+
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 14px 0; }
+.page-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -.03em; }
+
+.circ {
+  width: 32px; height: 32px; flex: 0 0 auto; border-radius: 99px;
+  background: var(--ink-3); border: 0; color: var(--muted);
+  display: grid; place-items: center; font-size: 15px; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.circ:hover { background: var(--ink-4); color: var(--text); }
+.circ.on-image { background: rgba(4,6,12,.6); backdrop-filter: blur(6px); color: #fff; }
+
+.btn {
+  font-family: var(--f-s); font-size: 13px; font-weight: 600;
+  padding: 10px 18px; border-radius: 10px; border: 0; cursor: pointer;
+  background: var(--acc); color: var(--on-acc);
+  box-shadow: inset 0 1px 0 var(--hl); transition: filter .12s;
+}
+.btn:hover { filter: brightness(1.06); }
+.btn.quiet { background: var(--ink-4); color: var(--text); box-shadow: none; }
+.btn.quiet:hover { background: var(--ink-5); filter: none; }
+
+.section { margin: 18px 14px 0; }
+.section-h {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em;
+  margin-bottom: 8px;
+}
+
+/* ---------------- rails and tiles ---------------- */
+
+.rail { display: flex; gap: 8px; overflow-x: auto; padding: 0 14px 4px; scrollbar-width: none; }
+.rail::-webkit-scrollbar { height: 0; }
+.rail > * { flex: 0 0 auto; }
+
+.tile { width: 108px; }
+.tile .art {
+  aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; position: relative;
+  background: var(--ink-4); border: 1px solid var(--bd-sub); margin-bottom: 5px;
+}
+.tile .art img { width: 100%; height: 100%; object-fit: cover; }
+.tile .name {
+  font-size: 12px; line-height: 1.3; color: var(--text);
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tile .meta { font-family: var(--f-m); font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* A poster we have no artwork for still has to say which title it is. */
+.noart {
+  width: 100%; height: 100%; display: grid; place-items: center; padding: 8px; text-align: center;
+  background: linear-gradient(150deg, var(--ink-5), var(--ink-3));
+  font-family: var(--f-d); font-size: 11px; font-weight: 700; color: var(--muted); line-height: 1.25;
+}
+
+.score-badge {
+  position: absolute; left: 4px; bottom: 4px;
+  font-family: var(--f-m); font-size: 9px; font-weight: 600; color: var(--mar-9);
+  background: rgba(4,6,12,.68); padding: 1px 5px; border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 0 14px;
+}
+.grid .tile { width: auto; }
+
+/* ---------------- title page ---------------- */
+
+.hero { position: relative; height: 170px; background: var(--ink-3); }
+.hero img { width: 100%; height: 100%; object-fit: cover; }
+.hero::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, var(--bg), transparent 72%);
+}
+.hero-nav { position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: space-between; padding: 10px 12px; }
+
+.title-head { padding: 0 14px; margin-top: -46px; position: relative; z-index: 2; display: flex; gap: 12px; align-items: flex-end; }
+.title-head .poster {
+  width: 82px; flex: 0 0 auto; aspect-ratio: 2/3; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--bd-sub); box-shadow: var(--sh); background: var(--ink-4);
+}
+.title-head .poster img { width: 100%; height: 100%; object-fit: cover; }
+.title-head .who { min-width: 0; padding-bottom: 3px; }
+.title-head h1 { font-size: 19px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 4px; }
+.metaline { font-family: var(--f-m); font-size: 10.5px; color: var(--muted); line-height: 1.55; }
+.cert { border: 1px solid var(--bd-str); border-radius: 3px; padding: 0 3px; margin-right: 5px; }
+
+.tagline { margin: 12px 14px 0; font-size: 13px; font-style: italic; color: var(--muted); }
+
+.card { margin: 14px 14px 0; border: 1px solid var(--bd); border-radius: 11px; background: var(--surface); padding: 12px; }
+.card-label { font-family: var(--f-m); font-size: 9px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+
+.scores { display: flex; margin: 16px 14px 0; }
+.scores .s { flex: 1; padding: 2px 8px; text-align: center; border-left: 1px solid var(--bd-sub); }
+.scores .s:first-child { border-left: 0; text-align: left; padding-left: 0; }
+.scores .s b { display: block; font-family: var(--f-d); font-size: 21px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.scores .s.gold b { color: var(--rate); }
+.scores .s.dim b { color: var(--ink-9); }
+.scores .s span { display: block; font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+
+.overview { font-size: 13.5px; line-height: 1.62; color: var(--muted); }
+.overview.clamped { display: -webkit-box; -webkit-line-clamp: 5; line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.more {
+  background: none; border: 0; color: var(--acc-t); cursor: pointer;
+  font-size: 12.5px; font-weight: 600; padding: 8px 0 0; font-family: var(--f-s);
+}
+
+.provrow { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.pchip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--ink-3); border: 0; color: var(--text); border-radius: 9px;
+  padding: 5px 10px 5px 6px; font-size: 11.5px; font-weight: 500;
+}
+.pchip img { width: 18px; height: 18px; border-radius: 4px; }
+.prov-none { font-size: 12.5px; color: var(--muted); }
+.prov-none a { color: var(--acc-t); font-weight: 600; }
+
+.people { display: flex; gap: 10px; overflow-x: auto; padding: 0 14px 4px; scrollbar-width: none; }
+.people::-webkit-scrollbar { height: 0; }
+.person-chip { flex: 0 0 auto; width: 72px; text-align: center; }
+.person-chip .pic {
+  width: 60px; height: 60px; border-radius: 99px; margin: 0 auto 5px; overflow: hidden;
+  background: linear-gradient(140deg, var(--ink-7), var(--ink-5));
+  display: grid; place-items: center;
+  font-family: var(--f-d); font-size: 15px; font-weight: 700; color: var(--muted);
+}
+.person-chip .pic img { width: 100%; height: 100%; object-fit: cover; }
+.person-chip .nm { font-size: 11px; line-height: 1.25; }
+.person-chip .role { font-size: 10px; color: var(--muted); line-height: 1.25; margin-top: 1px; }
+
+.keywords { display: flex; gap: 6px; flex-wrap: wrap; }
+.kw {
+  font-size: 11.5px; padding: 5px 10px; border-radius: 99px;
+  background: var(--ink-3); color: var(--muted);
+}
+
+/* ---------------- episodes ---------------- */
+
+.seasonsw { display: flex; gap: 2px; overflow-x: auto; margin: 14px 14px 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
+.seasonsw::-webkit-scrollbar { height: 0; }
+.sw {
+  flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
+  font-family: var(--f-s); font-size: 12.5px; font-weight: 500; padding: 6px 11px;
+  border-radius: 8px; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.sw em { font-style: normal; opacity: .55; margin-left: 4px; font-size: 11px; }
+.sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 1px var(--acc-bd); }
+
+.eprow { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--bd-sub); align-items: flex-start; }
+.eprow:first-child { border-top: 0; }
+.eprow.unaired { opacity: .45; }
+.eprow .still { width: 64px; flex: 0 0 auto; aspect-ratio: 16/9; border-radius: 5px; overflow: hidden; background: var(--ink-4); border: 1px solid var(--bd-sub); }
+.eprow .still img { width: 100%; height: 100%; object-fit: cover; }
+.eprow .body { flex: 1; min-width: 0; }
+/* Rows grow rather than truncate: a long episode title takes three lines at 320px. */
+.eprow .en { font-size: 12.5px; font-weight: 600; line-height: 1.35; }
+.eprow .ed { font-family: var(--f-m); font-size: 10px; color: var(--muted); margin-top: 2px; }
+.eprow .ed .sc { color: var(--rate); }
+
+/* ---------------- person page ---------------- */
+
+.phead { display: flex; gap: 12px; padding: 16px 14px 0; align-items: center; }
+.phead .avatar {
+  width: 68px; height: 68px; flex: 0 0 auto; border-radius: 99px; overflow: hidden;
+  background: linear-gradient(140deg, var(--ink-7), var(--ink-5));
+  display: grid; place-items: center; font-family: var(--f-d); font-size: 20px; font-weight: 700; color: var(--muted);
+}
+.phead .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.phead h1 { font-size: 20px; font-weight: 700; letter-spacing: -.03em; }
+.phead .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.rolesw { display: flex; gap: 2px; overflow-x: auto; margin: 14px 14px 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
+.rolesw::-webkit-scrollbar { height: 0; }
+
+.bio { font-size: 13px; line-height: 1.65; color: var(--muted); }
+
+/* ---------------- states ---------------- */
+
+.skel {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: 6px;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.empty { padding: 48px 24px; text-align: center; }
+.empty h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.empty p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+.errbox { margin: 14px; border: 1px solid var(--st-drop-9); background: var(--st-drop-3); border-radius: 11px; padding: 14px; }
+.errbox b { display: block; font-size: 13px; color: var(--st-drop-11); margin-bottom: 4px; }
+.errbox p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+
+.attribution { padding: 28px 16px 12px; font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
+.attribution a { color: var(--acc-t); }
+
+/* Secondary labels shorten on very narrow phones; the number never does. */
+.wide-only { display: none; }
+@media (min-width: 360px) { .wide-only { display: inline; } }
+
+/* ---------------- desktop ---------------- */
+
+@media (min-width: 1120px) {
+  .tabs { display: none; }
+  .topbar {
+    display: block; position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--bd-sub);
+  }
+  .topbar-in {
+    max-width: 1280px; margin: 0 auto; padding: 12px 24px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .wordmark { display: flex; align-items: center; gap: 8px; font-family: var(--f-d); font-weight: 800; font-size: 16px; letter-spacing: -.03em; }
+  .wordmark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
+  .topnav { display: flex; gap: 4px; }
+  .topnav a { padding: 6px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--muted); }
+  .topnav a.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+  .topbar-spacer { flex: 1; }
+
+  .app-main { padding-bottom: 40px; }
+  .pad, .section, .card, .scores, .tagline, .seasonsw, .rolesw { margin-inline: 24px; }
+  .rail, .people, .grid, .page-head { padding-inline: 24px; }
+
+  .hero { height: 320px; }
+  .title-head { padding-inline: 24px; margin-top: -70px; gap: 20px; }
+  .title-head .poster { width: 150px; }
+  .title-head h1 { font-size: 32px; }
+
+  /* Reading columns never go full width, however wide the screen. */
+  .overview { max-width: 65ch; }
+  .bio { max-width: 65ch; }
+
+  .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .tile { width: 150px; }
+}
+
+/* ---------------- search box ---------------- */
+
+.searchbox {
+  width: 100%; font-family: var(--f-s); font-size: 15px; color: var(--text);
+  background: var(--bg-sub); border: 0; box-shadow: inset 0 0 0 1px var(--bd-sub);
+  border-radius: 11px; padding: 12px 14px; transition: box-shadow .12s;
+}
+.searchbox::placeholder { color: var(--muted); }
+.searchbox:focus { outline: none; box-shadow: inset 0 0 0 1px var(--acc); }
+
+/* ---------------- sign-up card ---------------- */
+
+.card.signup { text-align: center; }
+.card.signup h2 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.card.signup p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+
+/* ---------------- sign-in sheet ---------------- */
+
+.scrim {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(4, 6, 12, .62);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.sheet {
+  width: 100%; max-width: 460px;
+  background: var(--bg-sub); border-top: 1px solid var(--bd);
+  border-radius: 16px 16px 0 0; padding: 0 18px max(18px, env(safe-area-inset-bottom));
+  box-shadow: var(--sh);
+}
+.grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 14px; }
+.sheet-title { font-size: 18px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 6px; }
+.sheet-body { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.benefits { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 8px; }
+.benefits li { font-size: 12.5px; color: var(--muted); padding-left: 20px; position: relative; line-height: 1.5; }
+.benefits li::before { content: "✓"; position: absolute; left: 0; color: var(--st-done-9); font-weight: 700; }
+.sheet-actions { display: grid; gap: 8px; }
+.dismiss {
+  display: block; width: 100%; margin-top: 12px; padding: 10px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--muted); font-family: var(--f-s); font-size: 13px; font-weight: 500;
+}
+.dismiss:hover { color: var(--text); }
+
+@media (min-width: 700px) {
+  .scrim { align-items: center; }
+  .sheet { border-radius: 16px; border: 1px solid var(--bd); padding-bottom: 18px; }
+  .grab { display: none; }
+}
+
+/* ---------------- cover ---------------- */
+
+.cover { min-height: 100vh; display: flex; flex-direction: column; }
+.mosaic {
+  position: relative; height: 38vh; min-height: 200px; max-height: 320px; overflow: hidden;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 10px;
+  transform: scale(1.08); transform-origin: top center;
+}
+.mosaic::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, var(--bg) 8%, transparent 75%);
+}
+.mosaic img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
+
+.cover-body { flex: 1; padding: 0 22px 24px; margin-top: -28px; position: relative; z-index: 1; }
+.cover-body .wordmark {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
+  font-family: var(--f-d); font-weight: 800; font-size: 15px; letter-spacing: -.03em;
+}
+.cover-body .wordmark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
+.cover-body h1 { font-size: 30px; font-weight: 800; letter-spacing: -.04em; margin-bottom: 12px; }
+.cover-body > p { font-size: 14px; color: var(--muted); max-width: 42ch; margin-bottom: 24px; }
+
+.cover-actions { display: grid; gap: 9px; max-width: 380px; }
+.skip {
+  display: block; width: 100%; max-width: 380px; margin-top: 14px; padding: 12px;
+  background: none; border: 1px solid var(--bd); border-radius: 10px; cursor: pointer;
+  color: var(--text); font-family: var(--f-s); font-size: 13.5px; font-weight: 600;
+  transition: border-color .12s;
+}
+.skip:hover { border-color: var(--bd-str); }
+
+@media (min-width: 1120px) {
+  .cover-body { padding-inline: 24px; max-width: 1280px; margin-inline: auto; width: 100%; }
+  .cover-body h1 { font-size: 44px; }
+  .cover-actions { grid-template-columns: repeat(2, minmax(0, 180px)); }
+  .mosaic { grid-template-columns: repeat(8, 1fr); }
+}

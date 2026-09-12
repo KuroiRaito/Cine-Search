@@ -62,3 +62,37 @@ export const watchProviders = (id, mediaType, opts) =>
 export const keywords = (id, mediaType, opts) =>
     get(`/${mediaType === 'tv' ? 'tv' : 'movie'}/${id}/keywords`, {}, opts)
         .then((d) => d.keywords || d.results || []);
+
+/**
+ * One call for a whole title page: details plus everything hanging off it.
+ * Replaces the three separate round trips the detail modal used to make.
+ * `details` above is left alone - existing callers depend on its signature.
+ */
+const TITLE_APPEND = 'credits,watch/providers,similar,recommendations,keywords,videos,external_ids';
+
+export const titleFull = (id, mediaType, opts) => {
+    const type = mediaType === 'tv' ? 'tv' : 'movie';
+    const append = type === 'tv'
+        ? TITLE_APPEND.replace('credits', 'aggregate_credits') + ',content_ratings'
+        : TITLE_APPEND + ',release_dates';
+    return get(`/${type}/${id}`, { append_to_response: append }, opts);
+};
+
+/** A person, with their full filmography across film and TV. */
+export const person = (personId, opts) =>
+    get(`/person/${personId}`, { append_to_response: 'combined_credits,external_ids' }, opts);
+
+/* ---- Browse feeds. None of these need a query, which is what lets the home
+   screen show something before anyone types. ---- */
+
+export const trending = (window = 'week', opts) =>
+    get(`/trending/all/${window}`, {}, opts).then((d) => toItems(d.results));
+
+export const nowPlaying = (region, opts) =>
+    get('/movie/now_playing', { region }, opts).then((d) => toItems(d.results, 'movie'));
+
+export const upcoming = (region, opts) =>
+    get('/movie/upcoming', { region }, opts).then((d) => toItems(d.results, 'movie'));
+
+export const onTheAir = (opts) =>
+    get('/tv/on_the_air', {}, opts).then((d) => toItems(d.results, 'tv'));

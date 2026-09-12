@@ -1,0 +1,83 @@
+/* ============================================================
+   Projector — design tokens
+   Extracted verbatim from the published design system:
+   https://claude.ai/code/artifact/c188dd0f-3615-4a98-8d47-f48ec0ee90ec
+
+   Do not hand-edit values here. Change them in the design system
+   and re-extract, so the two cannot drift apart.
+   ============================================================ */
+
+:root{
+  color-scheme:dark;
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-1:#071318;--beam-2:#08191F;--beam-3:#0A2530;--beam-4:#0B2E3C;--beam-5:#0D3848;
+  --beam-6:#114659;--beam-7:#155A72;--beam-8:#1A7794;--beam-9:#25BADF;--beam-10:#3DC7E8;
+  --beam-11:#6FDCF5;--beam-12:#C5F2FD;
+  --mar-1:#17120A;--mar-2:#1D1709;--mar-3:#2B210B;--mar-4:#35290C;--mar-5:#40320E;
+  --mar-6:#513F12;--mar-7:#6B5316;--mar-8:#93721C;--mar-9:#F5C45C;--mar-10:#F9D283;
+  --mar-11:#F0C468;--mar-12:#FDF0D5;
+  --on-beam-9:#06333F;--on-mar-9:#3D2D06;
+  --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
+  --hl:rgba(255,255,255,.08);
+  /* watch-state palette */
+  --st-want-9:#7C8AA8;--st-want-11:#A8B4CC;--st-want-3:#151C2A;
+  --st-ing-9:#2ABFA0;--st-ing-11:#6FE0C8;--st-ing-3:#07241F;
+  --st-done-9:#4BA85C;--st-done-11:#86D493;--st-done-3:#0C2412;
+  --st-re-9:#9B7BD4;--st-re-11:#C0A8EC;--st-re-3:#1A1230;
+  --st-hold-9:#C87A3C;--st-hold-11:#E2A468;--st-hold-3:#261607;
+  --st-drop-9:#B5594A;--st-drop-11:#DC8E7F;--st-drop-3:#26100C;
+
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);--on-rate:var(--on-mar-9);
+  --f-d:'Archivo',sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',monospace;
+  --sh:0 6px 16px -4px rgba(0,0,0,.6);
+}
+
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-1:#FAFEFF;--beam-2:#F2FBFD;--beam-3:#E1F6FB;--beam-4:#CFEFF7;--beam-5:#BAE6F2;
+  --beam-6:#A0DAEB;--beam-7:#7EC9E0;--beam-8:#4FB2CE;--beam-9:#25BADF;--beam-10:#17A6CA;
+  --beam-11:#0B6B84;--beam-12:#06333F;
+  --mar-1:#FEFDFB;--mar-2:#FDFAF3;--mar-3:#FBF3E0;--mar-4:#F8EACA;--mar-5:#F4E0B4;
+  --mar-6:#EED29A;--mar-7:#E4BF78;--mar-8:#D5A648;--mar-9:#F5C45C;--mar-10:#EDB845;
+  --mar-11:#7A5A0B;--mar-12:#3D2D06;
+  --st-want-9:#6B7994;--st-want-11:#4C566B;--st-want-3:#EEF0F5;
+  --st-ing-9:#159E82;--st-ing-11:#0A6152;--st-ing-3:#E2F6F1;
+  --st-done-9:#3F8F4E;--st-done-11:#2C6B38;--st-done-3:#E6F4E9;
+  --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
+  --st-hold-9:#B0642A;--st-hold-11:#7A4415;--st-hold-3:#FBEDE0;
+  --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --hl:rgba(255,255,255,.7);
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --hl:rgba(255,255,255,.7);
+  --sh:0 6px 16px -4px rgba(23,27,38,.13);
+}}
+
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-1:#FAFEFF;--beam-2:#F2FBFD;--beam-3:#E1F6FB;--beam-4:#CFEFF7;--beam-5:#BAE6F2;
+  --beam-6:#A0DAEB;--beam-7:#7EC9E0;--beam-8:#4FB2CE;--beam-9:#25BADF;--beam-10:#17A6CA;
+  --beam-11:#0B6B84;--beam-12:#06333F;
+  --mar-1:#FEFDFB;--mar-2:#FDFAF3;--mar-3:#FBF3E0;--mar-4:#F8EACA;--mar-5:#F4E0B4;
+  --mar-6:#EED29A;--mar-7:#E4BF78;--mar-8:#D5A648;--mar-9:#F5C45C;--mar-10:#EDB845;
+  --mar-11:#7A5A0B;--mar-12:#3D2D06;
+  --st-want-9:#6B7994;--st-want-11:#4C566B;--st-want-3:#EEF0F5;
+  --st-ing-9:#159E82;--st-ing-11:#0A6152;--st-ing-3:#E2F6F1;
+  --st-done-9:#3F8F4E;--st-done-11:#2C6B38;--st-done-3:#E6F4E9;
+  --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
+  --st-hold-9:#B0642A;--st-hold-11:#7A4415;--st-hold-3:#FBEDE0;
+  --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
+  --sh:0 6px 16px -4px rgba(23,27,38,.13);
+}

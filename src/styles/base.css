@@ -390,7 +390,35 @@ img { max-width: 100%; display: block; }
   );
 }
 
+/* Light needs its own recipe rather than the dark one with the tokens swapped.
+   Fading artwork into near-white turns it pale instead of moody, so the posters
+   carry more opacity and the veil above the text is thinner - while the band
+   the text actually sits on goes fully opaque, because dark type on light needs
+   more separation than light type on dark. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .cover-scrim {
+    background: linear-gradient(
+      to top,
+      var(--bg) 42%,
+      color-mix(in srgb, var(--bg) 58%, transparent) 64%,
+      color-mix(in srgb, var(--bg) 14%, transparent)
+    );
+  }
+  :root:not([data-theme="dark"]) .mosaic { opacity: .82; }
+}
+:root[data-theme="light"] .cover-scrim {
+  background: linear-gradient(
+    to top,
+    var(--bg) 42%,
+    color-mix(in srgb, var(--bg) 58%, transparent) 64%,
+    color-mix(in srgb, var(--bg) 14%, transparent)
+  );
+}
+:root[data-theme="light"] .mosaic { opacity: .82; }
+
 .cover-theme { position: absolute; top: 14px; right: 14px; z-index: 3; }
+.cover-theme .circ { background: rgba(4, 6, 12, .55); backdrop-filter: blur(6px); color: #fff; }
+.cover-theme .circ:hover { background: rgba(4, 6, 12, .72); color: #fff; }
 
 /* Everything sits at the bottom, where the thumb already is. */
 .cover-in { position: relative; z-index: 2; margin-top: auto; padding: 22px 20px 20px; width: 100%; }

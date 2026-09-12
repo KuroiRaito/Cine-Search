@@ -129,6 +129,7 @@ export function toTitleView(raw, mediaType, region) {
         mediaType,
         title: raw.title || raw.name || 'Untitled',
         originalTitle: raw.original_title || raw.original_name || null,
+        originalLanguage: raw.original_language || null,
         tagline: raw.tagline?.trim() || null,
         year: yearOf(raw.release_date || raw.first_air_date),
         runtime: formatRuntime(isTV ? raw.episode_run_time?.[0] : raw.runtime),

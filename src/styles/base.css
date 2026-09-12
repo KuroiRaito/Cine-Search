@@ -4,7 +4,20 @@
    Mobile first; 320px is the supported floor.
    ============================================================ */
 
+/* One gutter, obeyed by everything. No block gets its own number. */
+:root {
+  --gutter: 14px;
+  --s6: 24px;
+}
+@media (min-width: 700px)  { :root { --gutter: 24px; } }
+@media (min-width: 1100px) { :root { --gutter: 40px; } }
+
 *, *::before, *::after { box-sizing: border-box; }
+
+/* Full-bleed is opt-in and explicit: only backdrops, heroes and horizontally
+   scrolling rails may touch the viewport edge, and they must say so. Their
+   text and controls stay gutter-inset regardless. */
+.bleed { margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
 
 body {
   margin: 0;
@@ -57,9 +70,9 @@ img { max-width: 100%; display: block; }
 /* ---------------- page furniture ---------------- */
 
 .page { padding: 0 0 24px; }
-.pad { padding-inline: 14px; }
+.pad { padding-inline: var(--gutter); }
 
-.page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 14px 0; }
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px var(--gutter) 0; }
 .page-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -.03em; }
 .head-actions { display: flex; align-items: center; gap: 8px; }
 
@@ -83,7 +96,7 @@ img { max-width: 100%; display: block; }
 .btn.quiet { background: var(--ink-4); color: var(--text); box-shadow: none; }
 .btn.quiet:hover { background: var(--ink-5); filter: none; }
 
-.section { margin: 18px 14px 0; }
+.section { margin: var(--s6) var(--gutter) 0; }
 .section-h {
   display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
   font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em;
@@ -92,7 +105,7 @@ img { max-width: 100%; display: block; }
 
 /* ---------------- rails and tiles ---------------- */
 
-.rail { display: flex; gap: 12px; overflow-x: auto; padding: 0 14px 6px; scrollbar-width: none; }
+.rail { display: flex; gap: 8px; overflow-x: auto; padding: 0 var(--gutter) 6px; scrollbar-width: none; }
 .rail::-webkit-scrollbar { height: 0; }
 .rail > * { flex: 0 0 auto; }
 
@@ -128,7 +141,7 @@ img { max-width: 100%; display: block; }
 }
 
 .quickadd {
-  position: absolute; top: 5px; right: 5px; width: 24px; height: 24px;
+  position: absolute; top: 6px; right: 6px; width: 26px; height: 26px;
   border-radius: 99px; border: 0; cursor: pointer;
   display: grid; place-items: center; font-size: 14px; line-height: 1; font-weight: 500;
   color: #fff; background: rgba(8, 12, 20, .62); backdrop-filter: blur(6px);
@@ -146,7 +159,7 @@ img { max-width: 100%; display: block; }
 }
 
 .grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0 14px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding-inline: var(--gutter);
 }
 @media (min-width: 480px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 760px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
@@ -155,7 +168,11 @@ img { max-width: 100%; display: block; }
 /* ---------------- title page ---------------- */
 
 .hero { position: relative; height: 190px; }
-.hero img { width: 100%; height: 100%; object-fit: cover; }
+/* A 16:9 backdrop cropped into a 4:1 desktop hero loses most of its height, and
+   centring that crop cuts faces in half — subjects sit above the midline far
+   more often than below it. Biasing the crop upward keeps the part of the image
+   that carries the meaning. */
+.hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
 .hero::after {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(to top, var(--bg), transparent 70%);
@@ -164,7 +181,7 @@ img { max-width: 100%; display: block; }
 
 /* One grid for both layouts. On a phone it's a single column with the poster
    floated beside the title; on desktop it becomes poster / main / sticky rail. */
-.tgrid { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 0 12px; padding: 0 14px; margin-top: -52px; position: relative; z-index: 2; align-items: start; }
+.tgrid { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 0 12px; padding-inline: var(--gutter); margin-top: -52px; position: relative; z-index: 2; align-items: start; }
 .tposter { aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; border: 1px solid var(--bd-sub); box-shadow: var(--sh); }
 .tposter img { width: 100%; height: 100%; object-fit: cover; }
 .thead { min-width: 0; padding-top: 56px; }
@@ -222,12 +239,13 @@ img { max-width: 100%; display: block; }
   font-family: var(--f-d); font-size: 13px; font-weight: 700; color: var(--ink-11);
 }
 .prow .pf img { width: 100%; height: 100%; object-fit: cover; }
+.prow .pf.noimg { background: var(--ink-5); }
 .prow .pb { flex: 1; min-width: 0; }
 .prow .pb b { display: block; font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--text); }
 .prow .pb span { display: block; font-size: 11px; color: var(--muted); }
 .prow .go { color: var(--ink-9); font-size: 14px; flex: 0 0 auto; }
 
-.scores { display: flex; margin-top: 18px; }
+.scores { display: flex; margin-top: var(--s6); }
 .scores .s { flex: 1; padding: 2px 8px; text-align: center; border-left: 1px solid var(--bd-sub); }
 .scores .s:first-child { border-left: 0; text-align: left; padding-left: 0; }
 .scores .s b { display: block; font-family: var(--f-d); font-size: 21px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
@@ -235,7 +253,7 @@ img { max-width: 100%; display: block; }
 .scores .s.dim b { color: var(--ink-9); }
 .scores .s span { display: block; font-size: 10.5px; color: var(--muted); margin-top: 3px; white-space: nowrap; }
 
-.sect { margin-top: 20px; }
+.sect { margin-top: var(--s6); }
 .sect-h { font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em; color: var(--text); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .ov { font-size: 12.5px; line-height: 1.6; color: var(--muted); }
 .ov.clamped { display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
@@ -246,7 +264,7 @@ img { max-width: 100%; display: block; }
 }
 
 /* Four preview cards, 2x2 on a phone and 1x4 on desktop. */
-.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; align-items: start; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: var(--s6); align-items: start; }
 .pc { border: 1px solid var(--bd); border-radius: 10px; background: var(--surface); padding: 10px; }
 .pc.open { grid-column: 1 / -1; }
 .pc-top {
@@ -279,7 +297,7 @@ img { max-width: 100%; display: block; }
 
 /* ---------------- episodes ---------------- */
 
-.seasonsw { display: flex; gap: 2px; overflow-x: auto; margin: 14px 14px 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
+.seasonsw { display: flex; gap: 2px; overflow-x: auto; margin: 12px 0 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
 .seasonsw::-webkit-scrollbar { height: 0; }
 .sw {
   flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
@@ -290,6 +308,7 @@ img { max-width: 100%; display: block; }
 .sw em { font-style: normal; opacity: .55; margin-left: 4px; font-size: 11px; }
 .sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 1px var(--acc-bd); }
 
+.eplist { margin-top: 10px; }
 .eprow { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--bd-sub); align-items: flex-start; }
 .eprow:first-child { border-top: 0; }
 .eprow.unaired { opacity: .45; }
@@ -303,7 +322,7 @@ img { max-width: 100%; display: block; }
 
 /* ---------------- person page ---------------- */
 
-.phead { display: flex; gap: 12px; padding: 16px 14px 0; align-items: center; }
+.phead { display: flex; gap: 12px; padding-inline: var(--gutter); margin-top: var(--s6); align-items: center; }
 .phead .avatar {
   width: 68px; height: 68px; flex: 0 0 auto; border-radius: 99px; overflow: hidden;
   background: linear-gradient(140deg, var(--ink-7), var(--ink-5));
@@ -313,7 +332,10 @@ img { max-width: 100%; display: block; }
 .phead h1 { font-size: 20px; font-weight: 700; letter-spacing: -.03em; }
 .phead .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-.rolesw { display: flex; gap: 2px; overflow-x: auto; margin: 14px 14px 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
+.track-hint {
+  margin: var(--s6) var(--gutter) 0; font-size: 12.5px; color: var(--muted);
+}
+.rolesw { display: flex; gap: 2px; overflow-x: auto; margin: 12px var(--gutter) 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
 .rolesw::-webkit-scrollbar { height: 0; }
 
 .bio { font-size: 13px; line-height: 1.65; color: var(--muted); }
@@ -333,15 +355,22 @@ img { max-width: 100%; display: block; }
 .skel { border-radius: 6px; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
-.empty { padding: 48px 24px; text-align: center; }
+.empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 40px var(--gutter); max-width: 34ch;
+  margin: var(--s6) auto 0; min-height: 40vh;
+}
 .empty h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
 .empty p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 
-.errbox { margin: 14px; border: 1px solid var(--st-drop-9); background: var(--st-drop-3); border-radius: 11px; padding: 14px; }
+.errbox { margin: var(--s6) var(--gutter); border: 1px solid var(--st-drop-9); background: var(--st-drop-3); border-radius: 11px; padding: 14px; }
 .errbox b { display: block; font-size: 13px; color: var(--st-drop-11); margin-bottom: 4px; }
 .errbox p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
 
-.attribution { padding: 28px 16px 12px; font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
+.about-h { font-family: var(--f-d); font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.about-p { font-size: 13px; line-height: 1.65; color: var(--muted); }
+.about-p + .about-p { margin-top: 10px; }
+.about-p a { color: var(--acc-t); }
 .attribution a { color: var(--acc-t); }
 
 /* Secondary labels shorten until there's room for them on one line. The number
@@ -385,10 +414,6 @@ img { max-width: 100%; display: block; }
   .app-main { padding-bottom: 40px; }
   /* Generous, equal margins either side so the content reads as a column
      rather than as edge-to-edge clutter. */
-  .pad, .section, .card, .scores, .tagline, .seasonsw, .rolesw { margin-inline: 40px; }
-  .rail, .people, .grid, .page-head { padding-inline: 40px; }
-  .rail { gap: 16px; }
-  .grid { gap: 18px; }
 
   .hero { height: 320px; }
   .title-head { padding-inline: 24px; margin-top: -70px; gap: 20px; }
@@ -408,7 +433,7 @@ img { max-width: 100%; display: block; }
   .hero { height: 300px; }
   .tgrid {
     grid-template-columns: 210px minmax(0, 1fr) 260px;
-    gap: 0 28px; padding-inline: 40px; margin-top: -78px;
+    gap: 0 28px; margin-top: -78px;
   }
   /* The poster spans both rows so the first row is sized by the title block,
      not by the poster — otherwise everything below it starts at the poster's
@@ -456,10 +481,11 @@ img { max-width: 100%; display: block; }
    it sat at the 14px gutter. The desktop rule below already expected .card to
    exist; only the base was absent. */
 .card {
-  background: var(--surface);
-  border-radius: 12px;
+  background: var(--ink-3);
   padding: 14px;
-  margin: 24px 14px;
+  border-radius: 12px;
+  margin: var(--s6) var(--gutter);
+  border: 0;
 }
 
 .card-label {
@@ -472,6 +498,7 @@ img { max-width: 100%; display: block; }
 .card.signup { text-align: center; }
 .card.signup h2 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .card.signup p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+.card.signup .btn { width: 100%; }
 
 /* ---------------- sign-in sheet ---------------- */
 
@@ -483,7 +510,8 @@ img { max-width: 100%; display: block; }
 .sheet {
   width: 100%; max-width: 460px;
   background: var(--bg-sub); border-top: 1px solid var(--bd);
-  border-radius: 16px 16px 0 0; padding: 0 18px max(18px, env(safe-area-inset-bottom));
+  border-radius: 16px 16px 0 0;
+  padding: 0 18px max(18px, env(safe-area-inset-bottom));
   box-shadow: var(--sh);
 }
 .grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 14px; }

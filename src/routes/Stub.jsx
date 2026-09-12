@@ -12,10 +12,10 @@ export default function Stub({ what }) {
         <div className="page">
             <div className="page-head"><h1>{what}</h1></div>
             <Empty
-                title={what === 'Library' ? 'Nothing saved yet' : 'Your taste, once you’ve watched a few things'}
+                title={what === 'Library' ? 'Nothing saved yet' : 'Nothing to work from yet'}
                 body={what === 'Library'
-                    ? 'Create an account to keep a watchlist, rate what you’ve seen, and track series episode by episode.'
-                    : 'Genres, directors and decades, worked out from your own records. Private by default.'}
+                    ? 'An account keeps your watchlist, ratings and episode progress.'
+                    : 'Your taste is worked out from what you’ve watched and rated.'}
                 action={<Link className="btn" to="/welcome">Create an account</Link>}
             />
         </div>

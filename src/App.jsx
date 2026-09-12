@@ -6,6 +6,7 @@ import Person from './routes/Person.jsx';
 import Cover from './routes/Cover.jsx';
 import Stub from './routes/Stub.jsx';
 import NotFound from './routes/NotFound.jsx';
+import About from './routes/About.jsx';
 import { hasSeenCover } from './lib/firstVisit.js';
 import ThemeToggle from './components/ThemeToggle.jsx';
 import './styles/tokens.css';
@@ -84,6 +85,7 @@ export default function App() {
                             <Route path="/person/:id" element={<Person />} />
                             <Route path="/library" element={<Stub what="Library" />} />
                             <Route path="/you" element={<Stub what="You" />} />
+                            <Route path="/about" element={<About />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </Shell>

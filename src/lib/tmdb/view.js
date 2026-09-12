@@ -7,7 +7,9 @@
 const IMG = 'https://image.tmdb.org/t/p';
 
 export const posterUrl = (path, size = 'w342') => (path ? `${IMG}/${size}${path}` : null);
-export const backdropUrl = (path, size = 'w780') => (path ? `${IMG}/${size}${path}` : null);
+// w1280 rather than w780: the hero runs the full width of a desktop window, and
+// an upscaled 780px backdrop is visibly soft there.
+export const backdropUrl = (path, size = 'w1280') => (path ? `${IMG}/${size}${path}` : null);
 export const profileUrl = (path, size = 'w185') => (path ? `${IMG}/${size}${path}` : null);
 export const stillUrl = (path, size = 'w185') => (path ? `${IMG}/${size}${path}` : null);
 

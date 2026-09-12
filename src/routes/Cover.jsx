@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { trending } from '../lib/tmdb/endpoints.js';
 import { posterUrl } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
@@ -58,7 +58,7 @@ export default function Cover() {
                 </div>
 
                 <div className="cover-fine">
-                    Data from <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer noopener">TMDB</a>
+                    Data from <Link to="/about" onClick={markSeen}>TMDB and JustWatch</Link>
                 </div>
             </div>
         </div>

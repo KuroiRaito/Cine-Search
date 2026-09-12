@@ -76,6 +76,11 @@ export default function Person() {
                 </div>
             </div>
 
+            {/* A guest must never see "0 of 10 directed" — a real number that
+                happens to be a lie about them. One quiet line until there's a
+                library to measure against. */}
+            <p className="track-hint">Sign in to track what you&apos;ve seen</p>
+
             {/* Films before biography: this is a collection product, the work is the point. */}
             {p.roles.length > 0 && (
                 <>

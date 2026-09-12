@@ -65,18 +65,6 @@ export function Rail({ title, action, items, onAdd }) {
 export const initialsOf = (name = '') =>
     name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 
-export function PersonChip({ person, sub }) {
-    return (
-        <Link to={`/person/${person.id}`} className="person-chip">
-            <div className="pic">
-                {person.photo ? <img src={person.photo} alt="" loading="lazy" /> : initialsOf(person.name)}
-            </div>
-            <div className="nm">{person.name}</div>
-            {sub && <div className="role">{sub}</div>}
-        </Link>
-    );
-}
-
 /**
  * A person as a row rather than a chip — name, role, and somewhere to go. Used
  * wherever there's horizontal room, which is most places once the cast list
@@ -140,15 +128,3 @@ export function ErrorBox({ what, onRetry }) {
     );
 }
 
-/**
- * Kept deliberately quiet. TMDB asks to be credited; it doesn't ask to be
- * shouted, and a paragraph of small print on every screen was in the way of
- * the product. One short line, on the cover only.
- */
-export function Attribution() {
-    return (
-        <p className="attribution">
-            Data from <a href="https://www.themoviedb.org" target="_blank" rel="noreferrer noopener">TMDB</a>
-        </p>
-    );
-}

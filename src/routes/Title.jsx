@@ -199,7 +199,7 @@ export default function Title() {
     );
 
     return (
-        <div className="page title-page">
+        <div className="page">
             <div className="hero">
                 {t.backdrop && <img src={t.backdrop} alt="" fetchPriority="high" />}
                 <div className="hero-nav">
@@ -277,7 +277,7 @@ function Episodes({ showId, seasons, specials }) {
     if (!tabs.length) return null;
 
     return (
-        <div className="sect episodes">
+        <div className="sect">
             <div className="sect-h"><span>Episodes</span></div>
             <div className="seasonsw" role="tablist" aria-label="Seasons">
                 {tabs.map((s) => (

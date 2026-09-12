@@ -6,11 +6,24 @@ export function Poster({ src, title, className = '' }) {
     return <div className="noart">{title}</div>;
 }
 
-export function Tile({ item }) {
+/**
+ * The quick-add stays visible rather than appearing on hover. Hidden-until-hover
+ * is undiscoverable, and on a guest's first visit this button IS the product —
+ * tapping it is how the feature gets found.
+ */
+export function Tile({ item, onAdd }) {
     return (
         <Link to={`/title/${item.mediaType}/${item.id}`} className="tile">
             <div className="art">
                 <Poster src={item.poster} title={item.title} />
+                {onAdd && (
+                    <button
+                        type="button"
+                        className="quickadd"
+                        aria-label={`Add ${item.title}`}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(item); }}
+                    >+</button>
+                )}
                 {item.voteAverage > 0 && (
                     <span className="score-badge">★ {Number(item.voteAverage).toFixed(1)}</span>
                 )}
@@ -21,7 +34,7 @@ export function Tile({ item }) {
     );
 }
 
-export function Rail({ title, action, items }) {
+export function Rail({ title, action, items, onAdd }) {
     if (!items?.length) return null;
     return (
         <>
@@ -29,7 +42,7 @@ export function Rail({ title, action, items }) {
                 <div className="section-h"><span>{title}</span>{action}</div>
             </div>
             <div className="rail">
-                {items.map((it) => <Tile key={`${it.mediaType}-${it.id}`} item={it} />)}
+                {items.map((it) => <Tile key={`${it.mediaType}-${it.id}`} item={it} onAdd={onAdd} />)}
             </div>
         </>
     );

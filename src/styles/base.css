@@ -95,6 +95,16 @@ img { max-width: 100%; display: block; }
 .rail > * { flex: 0 0 auto; }
 
 .tile { width: 108px; }
+/* Rail tiles are deliberately small — the design's .rt. Bigger ones turn a
+   browsable row into a wall of posters. */
+.rail .tile { width: 76px; }
+.rail .tile .name {
+  font-size: 10.5px;
+  /* Reserve both lines so the year sits on the same baseline right along the
+     row, whether the title wrapped or not. */
+  min-height: calc(2 * 1.3em);
+}
+.rail .tile .meta { font-size: 9px; }
 .tile .art {
   aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; position: relative;
   background: var(--ink-4); border: 1px solid var(--bd-sub); margin-bottom: 5px;
@@ -112,6 +122,16 @@ img { max-width: 100%; display: block; }
   background: linear-gradient(150deg, var(--ink-5), var(--ink-3));
   font-family: var(--f-d); font-size: 11px; font-weight: 700; color: var(--muted); line-height: 1.25;
 }
+
+.quickadd {
+  position: absolute; top: 5px; right: 5px; width: 24px; height: 24px;
+  border-radius: 99px; border: 0; cursor: pointer;
+  display: grid; place-items: center; font-size: 14px; line-height: 1; font-weight: 500;
+  color: #fff; background: rgba(8, 12, 20, .62); backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+  transition: background .13s, color .13s, box-shadow .13s;
+}
+.quickadd:hover { background: var(--acc); color: var(--on-acc); box-shadow: none; }
 
 .score-badge {
   position: absolute; left: 4px; bottom: 4px;
@@ -354,7 +374,7 @@ img { max-width: 100%; display: block; }
 }
 .mosaic::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(to top, var(--bg) 8%, transparent 75%);
+  background: linear-gradient(to top, var(--bg) 22%, color-mix(in srgb, var(--bg) 35%, transparent) 62%, transparent 92%);
 }
 .mosaic img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 
@@ -376,9 +396,17 @@ img { max-width: 100%; display: block; }
 }
 .skip:hover { border-color: var(--bd-str); }
 
+@media (min-width: 760px) {
+  .cover-body {
+    width: 100%; max-width: 620px; margin-inline: auto;
+    text-align: center; padding-inline: 24px;
+  }
+  .cover-body .wordmark { justify-content: center; }
+  .cover-body > p { margin-inline: auto; }
+  .cover-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 100%; }
+  .skip { max-width: 100%; }
+}
 @media (min-width: 1120px) {
-  .cover-body { padding-inline: 24px; max-width: 1280px; margin-inline: auto; width: 100%; }
-  .cover-body h1 { font-size: 44px; }
-  .cover-actions { grid-template-columns: repeat(2, minmax(0, 180px)); }
+  .cover-body h1 { font-size: 46px; }
   .mosaic { grid-template-columns: repeat(8, 1fr); }
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Cine Search design system: colour scales, watch-state palette, controls, screens and rules.">
+<meta name="description" content="Cine Search design system: colour scales, watch-state palette, controls, screens, guest spec and build contract.">
 <meta name="color-scheme" content="dark light">
 <title>Projector Design System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1659,6 +1659,200 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
       signed-out visit — converts better and feels more like a wall. Given that the stated failure condition is
       "it gets harder for any persona", I'd hold the line on once-only, but it's a growth decision as much as a design
       one, and it's genuinely arguable.</div>
+  </section>
+
+  <!-- ============ BUILD CONTRACT ============ -->
+  <section>
+    <h2>Build contract · how shape drifts, and how to stop it</h2>
+    <p class="lede">Auditing the running build surfaced a pattern worth naming: the screens were <i>right</i>, but
+      individual components came out a different shape from the design. Not because anyone disagreed — because the
+      design said what things should look like and never said what they must <b>measure</b>. These rules close that
+      gap. They are deliberately mechanical: a developer agent should be able to verify each one without judgement.</p>
+
+    <h3>The failure that produced both reported problems</h3>
+    <div class="warnbox warn" style="border-left-color:var(--st-drop-9);background:color-mix(in srgb,var(--st-drop-9) 9%,transparent)">
+      <b>A class name in the markup that has no box rule in the CSS fails silently.</b>
+      <code>Discover.jsx</code> renders <code>&lt;div className="card signup"&gt;</code>, but
+      <code>.card</code> is <b>never defined</b> — only <code>.card.signup{text-align:center}</code> and some font
+      sizes. So the element gets no background, no padding, no radius, no margin. Measured at 375px: box
+      <code>left:0 right:375</code>, <b>text starting at x&nbsp;=&nbsp;0</b>, flush against the screen edge, and
+      <code>margin-top:0</code> butting the rail above with zero separation — while every poster tile beside it is
+      inset to <code>left:14px</code>. There is no geometric overlap, but it reads as one, because the block breaks
+      the page's rhythm in both axes at once.</div>
+
+    <h3>Rule zero</h3>
+    <ol class="rl" style="--start:69;padding:0;gap:11px">
+      <li><b>Every class in the markup must resolve to a rule that sets box properties.</b> A class that only sets
+        typography on top of a base that doesn't exist is the single most common way a component silently loses its
+        shape. If <code>.card</code> is referenced, <code>.card</code> must define background, padding, radius and
+        margin — before any modifier tunes it.</li>
+      <li><b>One gutter token, obeyed by everything.</b> <code>--gutter: 14px</code> at mobile, <code>24px</code> from
+        700px, <code>40px</code> from 1100px. Every top-level block's content starts at exactly the gutter. Nothing
+        gets its own number.</li>
+      <li><b>Full-bleed is opt-in and explicit.</b> Only backdrops, hero images and horizontally-scrolling rails may
+        touch the viewport edge, and they need a <code>.bleed</code> class to say so. <b>Even then, their text and
+        controls stay gutter-inset.</b> A rail's posters may run off the edge; a rail's title never does.</li>
+      <li><b>Vertical rhythm is never zero.</b> Consecutive top-level blocks are separated by at least
+        <code>--s6 (24px)</code>. Two blocks sharing an edge is always a bug, never a layout.</li>
+      <li><b>Build the base component before the instance.</b> No <code>.card.signup</code> without <code>.card</code>;
+        no <code>.sheet-title</code> without <code>.sheet</code>. Modifiers tune, they never constitute.</li>
+    </ol>
+
+    <h3>Component contracts — exact values, not descriptions</h3>
+    <p class="lede" style="font-size:13.5px">These are the numbers. Where the design and the build disagree, these win.</p>
+    <div class="tw">
+      <table class="spec-t">
+        <thead><tr><th style="width:130px">Component</th><th style="width:190px">Structure — in order</th><th>Measurements</th></tr></thead>
+        <tbody>
+          <tr><td><code>.card</code></td>
+            <td>container only</td>
+            <td>bg <code>ink-3</code> · padding <code>14px</code> · radius <code>12px</code> · inset to gutter ·
+              <code>margin-block 24px</code> · no border</td></tr>
+          <tr><td><code>.card.signup</code></td>
+            <td>h2 → p → button</td>
+            <td>h2 <code>15px/700</code>, margin-bottom <code>6px</code> · p <code>12.5px</code>, <code>--muted</code>,
+              margin-bottom <code>12px</code> · button full-width · text centred</td></tr>
+          <tr><td><code>.sheet</code><br>(sign-in prompt)</td>
+            <td><b>grab → poster+title row → body → benefits → actions → dismiss</b></td>
+            <td>bottom-anchored, <code>radius 16px 16px 0 0</code>, <code>max-width 460px</code>, padding-inline
+              <code>18px</code>, bottom padding <code>max(18px, safe-area)</code> · grab <code>34×4</code>, margin
+              <code>9px auto 14px</code> · <b>poster <code>52px</code> wide, 2:3, radius <code>8px</code>, gap
+              <code>11px</code></b> · title <code>18px/700</code> · body <code>13px --muted</code> · benefits
+              <code>12.5px</code>, gap <code>8px</code>, tick in <code>st-done-9</code> · actions grid, gap
+              <code>8px</code> · scrim <code>rgba(4,6,12,.62)</code>, <code>z 60</code></td></tr>
+          <tr><td><code>.sheet</code> ≥700px</td><td>same order</td>
+            <td>centres, <code>radius 16px</code> all corners, grab hidden, footer gains an explicit Cancel</td></tr>
+          <tr><td><code>.rail</code></td>
+            <td>title row → scroller</td>
+            <td>title gutter-inset · scroller <code>.bleed</code>, first tile starts at gutter, last may run off ·
+              tile <code>104px</code> at mobile · gap <code>8px</code> · <code>overflow-x:auto</code>, no scrollbar</td></tr>
+          <tr><td><code>.quickadd</code></td>
+            <td>button on tile</td>
+            <td><code>26×26</code>, <b>top-right</b>, offset <code>6px</code>, radius full, scrim
+              <code>rgba(8,12,20,.62)</code>, ring <code>inset 0 0 0 1px rgba(255,255,255,.16)</code>, always
+              visible — never hover-revealed</td></tr>
+          <tr><td><code>.empty</code></td>
+            <td>icon → h → p → one button</td>
+            <td>centred in remaining height, max-width <code>34ch</code>, exactly one action</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>The sign-in sheet is missing its poster</h3>
+    <p class="lede" style="font-size:13.5px">The built sheet is otherwise faithful — bottom-anchored, grab handle,
+      names the action and title, three benefits, two buttons, "Not now", and it correctly becomes a centred modal
+      above 700px. <b>What's missing is the poster thumbnail in the header.</b> That isn't decoration: it's what makes
+      the sheet feel like the thing the user was reaching for rather than a generic interruption. Add the
+      <code>52px</code> poster to the left of the title, per the contract above.</p>
+
+    <h3>Verification checklist</h3>
+    <p class="lede" style="font-size:13.5px">Mechanical, and all of it checkable in the browser console at 375px:</p>
+    <ol class="rl" style="--start:74;padding:0;gap:11px">
+      <li><b>Every top-level block's content left edge equals the gutter.</b>
+        <code>[...document.querySelectorAll('main > *')].map(e =&gt; e.getBoundingClientRect().left)</code> — every
+        value is the gutter, or the element carries <code>.bleed</code>.</li>
+      <li><b>No block has a zero gap with its neighbour.</b> Compare each block's <code>bottom</code> with the next
+        block's <code>top</code>; the difference is never <code>0</code>.</li>
+      <li><b>No text sits within the gutter.</b> No text node's bounding box starts left of the gutter, on any screen.</li>
+      <li><b>Every referenced class exists.</b> For each <code>className</code> token in the JSX, a matching rule sets
+        at least one of background / padding / margin / border-radius.</li>
+      <li><b>Nothing overflows horizontally.</b> <code>document.documentElement.scrollWidth === innerWidth</code> at
+        320, 360, 390 and 430.</li>
+      <li><b>Both themes resolve.</b> Toggle theme and confirm no element keeps a literal hex — every colour traces
+        to a token.</li>
+    </ol>
+
+    <div class="warnbox"><b>Why mechanical rules and not principles.</b> "Cards should be inset and separated" is
+      something everyone agrees with and nobody can check. "Every top-level block's left edge equals the gutter, and
+      no two blocks share an edge" is something a build step can fail on. The drift you found came from the design
+      describing appearance without specifying measurement — so these rules give measurements, and the checklist gives
+      a way to prove them.</div>
+  </section>
+
+  <!-- ============ GUEST SPEC ============ -->
+  <section>
+    <h2>Guest state · implementation spec</h2>
+    <p class="lede">Audited against the running build on <b>2026-09-12</b>, route by route, at 375px. The new routes
+      follow the design closely. What follows is the explicit per-screen contract, plus the four defects the audit
+      found — all of which sit in components the guest journey passes <i>through</i> rather than in the guest routes
+      themselves.</p>
+
+    <h3>What a guest sees, route by route</h3>
+    <div class="tw">
+      <table class="spec-t">
+        <thead><tr><th style="width:150px">Route</th><th style="width:130px">Guest sees</th><th>Contract</th></tr></thead>
+        <tbody>
+          <tr><td><code>/welcome</code></td><td>Cover</td><td>First visit only. A shared link to a title or person goes straight there — the front door is the <i>only</i> thing the cover guards.</td></tr>
+          <tr><td><code>/</code> Discover</td><td>Everything</td><td>Full rails. Tab is labelled <b>Discover</b>, not Home. Exactly one sign-up card, after two rails.</td></tr>
+          <tr><td><code>/search</code></td><td>Everything</td><td>Full search, full filters. Result tiles keep their <code>+</code>.</td></tr>
+          <tr><td><code>/title/:type/:id</code></td><td>Everything</td><td>Synopsis, cast, crew, providers, episodes — all readable. Status pill, heart and episode ticks are <b>visible but raise the prompt</b>.</td></tr>
+          <tr><td><code>/person/:id</code></td><td>Almost everything</td><td>Full filmography and bio. <b>The collection meter is the one thing that changes</b> — see below.</td></tr>
+          <tr><td><code>/library</code></td><td>Empty state</td><td>Tab stays visible and explains itself. Never hidden, never disabled.</td></tr>
+          <tr><td><code>/you</code></td><td>Empty state</td><td>Same. Taste needs records; say so rather than showing zeros.</td></tr>
+          <tr><td><code>404</code></td><td>Same as signed-in</td><td>No guest variation.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Explicit rules</h3>
+    <ol class="rl" style="--start:62;padding:0;gap:11px">
+      <li><b>No route ever redirects a guest to sign-in. Only <i>actions</i> prompt.</b> Reading is always free;
+        writing is what needs an account. A redirect punishes someone for arriving.</li>
+      <li><b>Every tracking affordance stays visible to guests</b> — the <code>+</code>, the status pill, the heart,
+        episode ticks. Hiding them hides the product from the people who haven't bought into it yet. They are not
+        disabled, not greyed, not <code>aria-disabled</code>: they look live, because tapping them does something.</li>
+      <li><b>The prompt names the title and the action</b>, and the <b>intent resumes after authentication</b> — the
+        user lands back where they were with the action completed. This is the single most important rule here: if
+        someone signs up to save a title and it isn't saved, the first promise the product made was broken.</li>
+      <li><b>The person page shows the filmography, not a zeroed meter.</b> A guest must never see
+        <code>0 of 10 directed</code> — a real number that happens to be a lie about them. Replace the meter with one
+        quiet line: <i>"Sign in to track what you've seen"</i>. Everything else on the page is identical.</li>
+      <li><b>Empty states explain the account, they don't sell it.</b> One sentence on what an account stores, one
+        button. No feature lists, no second CTA, no repeated card per section.</li>
+      <li><b>A guest is someone who isn't signed in — never a fabricated user object.</b> No
+        <code>guest-local-id</code>, no mirrored localStorage library. §12 called that "a standing tax": two databases
+        to maintain forever the moment episode progress and rewatch counts land. <b>The current build gets this
+        right</b> and it should stay that way.</li>
+      <li><b>Sign-in entry points: exactly three, each with a different job.</b> Top bar (navigation), the one Discover
+        card (conversion), and the action prompts (intent). Anything beyond that is nagging.</li>
+    </ol>
+
+    <h3>What the audit found</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:200px">Finding</th><th>Detail &amp; fix</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill open">Contractual</span> <b>JustWatch is credited to TMDB</b></td>
+            <td><code>WatchProviders.jsx</code> reads <i>"Streaming availability powered by TMDB."</i> Provider data is
+              <b>JustWatch's</b>, and TMDB's own terms require crediting JustWatch for it. This is on the title page,
+              which is the screen guests see most. <b>Fix:</b> "Availability by JustWatch", and put the full notice on
+              the About route.</td></tr>
+          <tr><td><span class="pill open">Theme-breaking</span> <b>Legacy components bypass tokens</b></td>
+            <td><code>MovieCard.jsx</code> and <code>WatchProviders.jsx</code> still carry v0.1-era inline hex —
+              <code>#facc15</code>, <code>#94a3b8</code>, <code>#334155</code>, <code>#0f172a</code>,
+              <code>#64748b</code>. They cannot respond to the light theme, so a guest who switches themes gets a
+              half-migrated title page. These are the exact files the original audit flagged; the new routes were
+              built cleanly around them.</td></tr>
+          <tr><td><span class="pill part">Tidy-up</span> <b><code>Footer.jsx</code> is dead code</b></td>
+            <td>Imported nowhere, still carrying a hardcoded <code>#38bdf8</code>. Delete it, and move its attribution
+              text to About.</td></tr>
+          <tr><td><span class="pill part">Structural</span> <b>Attribution lives in three places</b></td>
+            <td>Cover, <code>ui.jsx</code> and the dead Footer each hold their own copy, and there is no About route to
+              be canonical. <b>Fix:</b> build About, make it the single full notice, and let the others be short
+              credits pointing at it.</td></tr>
+          <tr><td><span class="pill done">Correct</span> <b>Everything else</b></td>
+            <td>Cover-on-first-visit, ungated catalogue, visible <code>+</code>, one sign-up card after two rails,
+              tabs that stay and explain themselves, the prompt wired on both Discover and Title, and no fabricated
+              guest user. All match the spec.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warnbox"><b>A note on how this audit was done.</b> Two "bugs" I first reported from screenshots —
+      the cover not filling the viewport, and the tab bar floating mid-screen — were both artifacts of the preview
+      pane letterboxing an emulated viewport. Measured in the page, <code>.cover</code> is exactly 375×812 with no
+      overflow and <code>.tabs</code> is <code>position:fixed; bottom:0</code> with a zero gap. <b>Measure the
+      DOM; don't trust a screenshot's margins.</b></div>
   </section>
 
   <!-- ============ DESKTOP ============ -->

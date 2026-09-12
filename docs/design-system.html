@@ -1,0 +1,1452 @@
+<title>Projector Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+:root{
+  color-scheme:dark;
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-1:#071318;--beam-2:#08191F;--beam-3:#0A2530;--beam-4:#0B2E3C;--beam-5:#0D3848;
+  --beam-6:#114659;--beam-7:#155A72;--beam-8:#1A7794;--beam-9:#25BADF;--beam-10:#3DC7E8;
+  --beam-11:#6FDCF5;--beam-12:#C5F2FD;
+  --mar-1:#17120A;--mar-2:#1D1709;--mar-3:#2B210B;--mar-4:#35290C;--mar-5:#40320E;
+  --mar-6:#513F12;--mar-7:#6B5316;--mar-8:#93721C;--mar-9:#F5C45C;--mar-10:#F9D283;
+  --mar-11:#F0C468;--mar-12:#FDF0D5;
+  --on-beam-9:#06333F;--on-mar-9:#3D2D06;
+  --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
+  --hl:rgba(255,255,255,.08);
+  /* watch-state palette */
+  --st-want-9:#7C8AA8;--st-want-11:#A8B4CC;--st-want-3:#151C2A;
+  --st-ing-9:#2ABFA0;--st-ing-11:#6FE0C8;--st-ing-3:#07241F;
+  --st-done-9:#4BA85C;--st-done-11:#86D493;--st-done-3:#0C2412;
+  --st-re-9:#9B7BD4;--st-re-11:#C0A8EC;--st-re-3:#1A1230;
+  --st-hold-9:#C87A3C;--st-hold-11:#E2A468;--st-hold-3:#261607;
+  --st-drop-9:#B5594A;--st-drop-11:#DC8E7F;--st-drop-3:#26100C;
+
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);--on-rate:var(--on-mar-9);
+  --f-d:'Archivo',sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',monospace;
+  --sh:0 6px 16px -4px rgba(0,0,0,.6);
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-1:#FAFEFF;--beam-2:#F2FBFD;--beam-3:#E1F6FB;--beam-4:#CFEFF7;--beam-5:#BAE6F2;
+  --beam-6:#A0DAEB;--beam-7:#7EC9E0;--beam-8:#4FB2CE;--beam-9:#25BADF;--beam-10:#17A6CA;
+  --beam-11:#0B6B84;--beam-12:#06333F;
+  --mar-1:#FEFDFB;--mar-2:#FDFAF3;--mar-3:#FBF3E0;--mar-4:#F8EACA;--mar-5:#F4E0B4;
+  --mar-6:#EED29A;--mar-7:#E4BF78;--mar-8:#D5A648;--mar-9:#F5C45C;--mar-10:#EDB845;
+  --mar-11:#7A5A0B;--mar-12:#3D2D06;
+  --st-want-9:#6B7994;--st-want-11:#4C566B;--st-want-3:#EEF0F5;
+  --st-ing-9:#159E82;--st-ing-11:#0A6152;--st-ing-3:#E2F6F1;
+  --st-done-9:#3F8F4E;--st-done-11:#2C6B38;--st-done-3:#E6F4E9;
+  --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
+  --st-hold-9:#B0642A;--st-hold-11:#7A4415;--st-hold-3:#FBEDE0;
+  --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --hl:rgba(255,255,255,.7);
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --hl:rgba(255,255,255,.7);
+  --sh:0 6px 16px -4px rgba(23,27,38,.13);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-1:#FAFEFF;--beam-2:#F2FBFD;--beam-3:#E1F6FB;--beam-4:#CFEFF7;--beam-5:#BAE6F2;
+  --beam-6:#A0DAEB;--beam-7:#7EC9E0;--beam-8:#4FB2CE;--beam-9:#25BADF;--beam-10:#17A6CA;
+  --beam-11:#0B6B84;--beam-12:#06333F;
+  --mar-1:#FEFDFB;--mar-2:#FDFAF3;--mar-3:#FBF3E0;--mar-4:#F8EACA;--mar-5:#F4E0B4;
+  --mar-6:#EED29A;--mar-7:#E4BF78;--mar-8:#D5A648;--mar-9:#F5C45C;--mar-10:#EDB845;
+  --mar-11:#7A5A0B;--mar-12:#3D2D06;
+  --st-want-9:#6B7994;--st-want-11:#4C566B;--st-want-3:#EEF0F5;
+  --st-ing-9:#159E82;--st-ing-11:#0A6152;--st-ing-3:#E2F6F1;
+  --st-done-9:#3F8F4E;--st-done-11:#2C6B38;--st-done-3:#E6F4E9;
+  --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
+  --st-hold-9:#B0642A;--st-hold-11:#7A4415;--st-hold-3:#FBEDE0;
+  --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
+  --sh:0 6px 16px -4px rgba(23,27,38,.13);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-s);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-d);margin:0;letter-spacing:-.022em;line-height:1.14}
+p{margin:0}
+code{font-family:var(--f-m);font-size:.88em;background:var(--surface-hv);padding:1px 5px;border-radius:4px;color:var(--muted)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:5px}
+
+.bar{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 90%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--bd-sub)}
+.bar-in{max-width:1240px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.mark{display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-weight:800;font-size:16px;letter-spacing:-.03em}
+.mark i{width:6px;height:6px;border-radius:99px;background:var(--acc);font-style:normal}
+.mark em{font-style:normal;font-family:var(--f-m);font-weight:400;font-size:11px;color:var(--muted)}
+.tog{display:inline-flex;background:var(--surface);border:1px solid var(--bd);border-radius:99px;padding:3px;gap:2px}
+.tog button{font-family:var(--f-m);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:4px 11px;
+  border-radius:99px;border:none;background:none;color:var(--muted);cursor:pointer}
+.tog button[aria-pressed="true"]{background:var(--acc);color:var(--on-acc);font-weight:600}
+
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px 80px}
+.intro{padding:48px 0 8px;max-width:66ch}
+.eyebrow{font-family:var(--f-m);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t);margin-bottom:12px}
+.intro h1{font-size:44px;font-weight:800;letter-spacing:-.04em;margin-bottom:16px}
+.intro h1 em{font-style:normal;color:var(--acc-t)}
+.lede{color:var(--muted)}
+.warnbox{border-left:3px solid var(--rate);background:var(--rate-bg);padding:16px 20px;border-radius:0 9px 9px 0;
+  font-size:14px;color:var(--muted);margin-top:24px}
+.warnbox b{color:var(--text)}
+
+section{padding-block:48px;border-top:1px solid var(--bd-sub);margin-top:40px}
+h2{font-size:26px;font-weight:700;margin-bottom:8px}
+h3{font-size:17px;font-weight:700;margin:32px 0 10px}
+
+/* colour scales */
+.scale{margin-top:18px}
+.scale-h{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.scale-h b{font-family:var(--f-d);font-size:15px;font-weight:700;letter-spacing:-.02em}
+.scale-h span{font-size:12.5px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(12,1fr);border-radius:10px;overflow:hidden}
+.stp-c{aspect-ratio:1/1.6;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;
+  font-family:var(--f-m);font-size:10px;font-weight:500}
+.jobs{display:grid;grid-template-columns:repeat(12,1fr);margin-top:5px}
+.job{font-size:9.5px;line-height:1.25;color:var(--muted);text-align:center;padding:0 2px;opacity:.7}
+
+/* primitives showcase */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:20px}
+.pbox{background:var(--surface);border-radius:12px;padding:15px}
+.pbox h4{font-family:var(--f-d);font-size:13.5px;font-weight:700;margin:0 0 11px;letter-spacing:-.02em}
+.pbox .r{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* state palette */
+.stgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:20px}
+.stcard{border:1px solid var(--bd);border-radius:11px;overflow:hidden;background:var(--surface)}
+.stswatch{height:52px;display:grid;place-items:center;font-size:20px;font-weight:700}
+.stbody{padding:9px 10px}
+.stbody b{display:block;font-size:12.5px;font-weight:600;margin-bottom:2px}
+.stbody span{font-family:var(--f-m);font-size:9.5px;color:var(--muted);line-height:1.35;display:block}
+
+/* screens grid */
+.screens{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:40px;margin-top:28px;align-items:start}
+.col{min-width:0}
+.col-h{margin-bottom:14px}
+.col-h h3{font-size:19px;font-weight:700;margin:0 0 3px}
+.col-h p{font-size:13px;color:var(--muted);line-height:1.5}
+
+.phone{width:100%;border:1px solid var(--bd-str);border-radius:20px;overflow:hidden;background:var(--bg);box-shadow:var(--sh)}
+.ph-top{height:22px;background:var(--bg-sub);border-bottom:1px solid var(--bd-sub);display:flex;align-items:center;justify-content:center}
+.ph-top span{width:46px;height:3px;border-radius:99px;background:var(--bd-str)}
+.ph-body{height:620px;overflow-y:auto;position:relative;font-size:14px}
+.ph-body.short{height:430px}
+.ph-body::-webkit-scrollbar{width:0}
+
+/* shared bits */
+.tbar{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 0}
+.tbar h4{font-family:var(--f-d);font-size:20px;font-weight:800;letter-spacing:-.03em;margin:0}
+.circ{width:32px;height:32px;border-radius:99px;background:var(--ink-3);border:none;
+  color:var(--muted);display:grid;place-items:center;font-size:14px;cursor:pointer;transition:background .12s}
+.circ:hover{background:var(--ink-4);color:var(--text)}
+.circ.dark{background:rgba(4,6,12,.6);backdrop-filter:blur(6px);color:#fff;border:none}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 14px 4px}
+.chips::-webkit-scrollbar{height:0}
+.chip{flex:0 0 auto;font-family:var(--f-s);font-size:12.5px;font-weight:500;padding:6px 13px;border-radius:99px;
+  background:var(--ink-3);border:none;color:var(--muted);cursor:pointer;white-space:nowrap;
+  font-variant-numeric:tabular-nums;transition:all .12s}
+.chip em{font-style:normal;opacity:.5;margin-left:4px}
+.chip:hover{background:var(--ink-4);color:var(--text)}
+.chip[aria-pressed="true"]{background:var(--acc);color:var(--on-beam-9);font-weight:600;box-shadow:inset 0 1px 0 var(--hl)}
+.chip[aria-pressed="true"] em{opacity:.65}
+.sect{margin:16px 14px 0}
+.sect-h{font-family:var(--f-d);font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--text);
+  margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sect-h a{color:var(--acc-t);text-decoration:none;font-family:var(--f-s);font-size:12px;font-weight:500}
+.rail{display:flex;gap:8px;overflow-x:auto;padding:0 14px 4px;margin-top:7px}
+.rail::-webkit-scrollbar{height:0}
+.rt{flex:0 0 76px}
+.rt .im{aspect-ratio:2/3;border-radius:7px;border:1px solid var(--bd-sub);margin-bottom:4px;position:relative;overflow:hidden}
+.rt .tt{font-size:10.5px;line-height:1.25;color:var(--text)}
+.rt .yy{font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.gb{position:absolute;left:4px;bottom:4px;font-family:var(--f-m);font-size:8.5px;font-weight:600;color:var(--mar-9);
+  background:rgba(4,6,12,.68);padding:1px 4px;border-radius:3px}
+.sb{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:99px;border:none;cursor:pointer;
+  display:grid;place-items:center;font-size:14px;line-height:1;font-weight:500;color:#fff;
+  background:rgba(8,12,20,.62);backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);
+  transition:all .13s}
+.sb:hover{background:var(--acc);color:var(--on-beam-9);box-shadow:none}
+.sb.done{background:var(--st-done-9);color:#04170A;box-shadow:none;font-size:12px}
+.sb.want{color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+
+/* bottom nav */
+.bnav{position:sticky;bottom:0;display:flex;background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(10px);border-top:1px solid var(--bd-sub);padding:7px 0 9px;margin-top:16px}
+.bnav div{flex:1;text-align:center;font-size:9.5px;color:var(--muted);font-family:var(--f-m);letter-spacing:.03em}
+.bnav div span{display:block;font-size:16px;margin-bottom:1px;font-family:var(--f-s)}
+.bnav div.on{color:var(--acc-t)}
+
+/* title page */
+.hero{position:relative;height:160px}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 72%)}
+.hero-nav{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;justify-content:space-between;padding:10px 12px}
+.head{padding:0 14px;margin-top:-46px;position:relative;z-index:2;display:flex;gap:12px;align-items:flex-end}
+.poster{width:82px;flex:0 0 auto;aspect-ratio:2/3;border-radius:8px;border:1px solid var(--bd-sub);box-shadow:var(--sh)}
+.head-t{padding-bottom:3px;min-width:0}
+.head-t h5{font-family:var(--f-d);font-size:17px;font-weight:700;letter-spacing:-.03em;margin:0 0 3px}
+.metaline{font-family:var(--f-m);font-size:10px;color:var(--muted);line-height:1.5}
+.cert{border:1px solid var(--bd-str);border-radius:3px;padding:0 3px;margin-right:4px}
+.block{margin:14px 14px 0;border:1px solid var(--bd);border-radius:11px;background:var(--surface);padding:12px}
+.arow{display:flex;gap:7px}
+.spill{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--rate);color:var(--on-rate);
+  border:none;border-radius:10px;font-size:13.5px;font-weight:600;letter-spacing:-.01em;padding:10px;cursor:pointer;
+  box-shadow:inset 0 1px 0 var(--hl);transition:filter .12s}
+.spill:hover{filter:brightness(1.06)}
+.ibtn{width:40px;border:none;background:var(--ink-4);color:var(--muted);border-radius:10px;
+  cursor:pointer;display:grid;place-items:center;font-size:15px;transition:background .12s,color .12s}
+.ibtn:hover{background:var(--ink-5);color:var(--text)}
+.ibtn.like{color:var(--ink-10)}
+.ibtn.like:hover{color:var(--like-9)}
+.ibtn.like.on{background:var(--like-3);color:var(--like-9)}
+.prov{margin-top:11px;border-top:1px solid var(--bd-sub);padding-top:11px}
+.prov-l{font-family:var(--f-m);font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.provrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pchip{display:inline-flex;align-items:center;gap:6px;background:var(--ink-3);border:none;color:var(--text);
+  border-radius:9px;padding:5px 10px 5px 6px;font-size:11.5px;font-weight:500;cursor:pointer;
+  font-family:var(--f-s);transition:background .12s}
+.pchip:hover{background:var(--ink-4)}
+.plogo{width:16px;height:16px;border-radius:3px;display:grid;place-items:center;font-family:var(--f-d);font-size:8px;font-weight:800;color:#fff}
+.scores{display:flex;margin:16px 14px 0}
+.score{flex:1;padding:2px 8px;text-align:center;border-left:1px solid var(--bd-sub)}
+.score:first-child{border-left:none;text-align:left;padding-left:0}
+.score b{display:block;font-family:var(--f-d);font-size:21px;letter-spacing:-.03em;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.score span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}
+.score.gold b{color:var(--rate)}
+.score.dim b{color:var(--ink-9)}
+.ov{font-size:12.5px;line-height:1.6;color:var(--muted)}
+.ov b{color:var(--acc-t);font-weight:500}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 14px 0}
+.pc{border:1px solid var(--bd);border-radius:10px;background:var(--surface);padding:10px;cursor:pointer}
+.pc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.pc-h b{font-size:12px;font-weight:600}
+.pc-h i{font-style:normal;color:var(--muted);font-size:10px}
+.faces{display:flex}
+.face{width:23px;height:23px;border-radius:99px;border:2px solid var(--surface);margin-right:-6px;
+  background:linear-gradient(140deg,var(--ink-8),var(--ink-6))}
+.ptx{font-size:10.5px;color:var(--muted);line-height:1.4}
+
+/* episode rows */
+.eprow{display:flex;gap:9px;padding:9px 0;border-top:1px solid var(--bd-sub);align-items:center}
+.eprow .st{width:56px;flex:0 0 auto;aspect-ratio:16/9;border-radius:5px;border:1px solid var(--bd-sub)}
+.eprow .eb{flex:1;min-width:0}
+.eprow .en{font-size:12px;font-weight:600;line-height:1.3}
+.eprow .ed{font-family:var(--f-m);font-size:9.5px;color:var(--muted)}
+.epchk{width:28px;height:28px;flex:0 0 auto;border-radius:99px;border:none;background:var(--ink-4);
+  color:var(--ink-10);font-size:13px;cursor:pointer;display:grid;place-items:center;transition:all .13s}
+.epchk:hover{background:var(--ink-5);color:var(--muted)}
+.epchk.on{background:var(--st-done-9);color:#04170A;font-weight:700}
+.seasonsw,.rolesw{display:flex;gap:2px;overflow-x:auto;margin:12px 14px 0;background:var(--bg-sub);
+  border-radius:11px;padding:3px}
+.seasonsw::-webkit-scrollbar,.rolesw::-webkit-scrollbar{height:0}
+.sw{flex:0 0 auto;border:none;background:none;cursor:pointer;color:var(--muted);font-family:var(--f-s);
+  font-size:12.5px;font-weight:500;padding:6px 11px;border-radius:8px;white-space:nowrap;
+  font-variant-numeric:tabular-nums;transition:color .12s}
+.sw em{font-style:normal;opacity:.55;margin-left:4px;font-size:11px}
+.sw[aria-pressed="true"]{background:var(--acc-bg);color:var(--acc-t);font-weight:600;
+  box-shadow:inset 0 0 0 1px var(--acc-bd),0 1px 2px rgba(0,0,0,.25)}
+.sw[aria-pressed="true"] em{opacity:.8}
+.sw:hover:not([aria-pressed="true"]){color:var(--text)}
+
+/* library */
+.grp{margin:15px 14px 0}
+.grp-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.grp-h b{font-family:var(--f-d);font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.grp-h span{font-size:11.5px;color:var(--muted)}
+.srow{display:flex;gap:10px;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--surface);
+  margin-bottom:7px;position:relative;overflow:hidden}
+.srow .th{width:40px;flex:0 0 auto;aspect-ratio:2/3;border-radius:5px;border:1px solid var(--bd-sub)}
+.srow .bd{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.srow .nm{font-size:12.5px;font-weight:600;line-height:1.25}
+.srow .ep{font-family:var(--f-m);font-size:10px;color:var(--muted)}
+.plus{width:32px;height:32px;flex:0 0 auto;align-self:center;border-radius:99px;border:none;
+  background:var(--acc);color:var(--on-beam-9);font-size:16px;font-weight:600;cursor:pointer;
+  display:grid;place-items:center;box-shadow:inset 0 1px 0 var(--hl);transition:filter .12s}
+.plus:hover{filter:brightness(1.08)}
+.track{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--ink-5)}
+.track i{display:block;height:100%;background:var(--acc)}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.fc .im{aspect-ratio:2/3;border-radius:7px;border:1px solid var(--bd-sub);box-shadow:var(--sh);margin-bottom:5px;position:relative;overflow:hidden}
+.fc .nm{font-size:10.5px;line-height:1.3;color:var(--text)}
+.fc .yr{font-family:var(--f-m);font-size:8.5px;color:var(--muted)}
+.toast{margin:13px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--ink-5);
+  border:none;border-radius:11px;padding:11px 13px;font-size:12px;box-shadow:var(--sh),inset 0 1px 0 var(--hl)}
+.toast b{color:var(--acc-t);cursor:pointer;font-size:11.5px}
+
+/* person */
+.phead{display:flex;gap:12px;padding:14px 14px 0;align-items:center}
+.pav{width:62px;height:62px;flex:0 0 auto;border-radius:99px;border:1px solid var(--bd-sub);
+  background:linear-gradient(140deg,var(--ink-7),var(--ink-5))}
+.phead .pn{font-family:var(--f-d);font-size:18px;font-weight:700;letter-spacing:-.03em}
+.phead .pr{font-size:11.5px;color:var(--muted)}
+.collectbar{margin:14px 14px 0}
+.cb-t{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.cb-t b{font-family:var(--f-d);font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.cb-t b i{font-style:normal;color:var(--st-done-9)}
+.cb-t span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cb-track{height:6px;border-radius:99px;background:var(--ink-4);overflow:hidden}
+.cb-track i{display:block;height:100%;background:var(--st-done-9);border-radius:99px}
+.cb-sub{margin-top:7px;font-size:11.5px;color:var(--muted)}
+
+/* profile */
+.stiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:13px 14px 0}
+.st-t{border:none;border-left:1px solid var(--bd-sub);border-radius:0;padding:2px 8px;text-align:center}
+.stiles>.st-t:first-child{border-left:none;text-align:left;padding-left:0}
+.st-t b{display:block;font-family:var(--f-d);font-size:19px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.st-t span{display:block;font-size:10.5px;color:var(--muted);margin-top:3px}
+.tastecard{margin:8px 14px 0;border:none;border-radius:11px;background:var(--surface);padding:12px}
+.tc-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tc-h b{font-family:var(--f-d);font-size:14px;font-weight:700;color:var(--acc-t)}
+.tc-h i{font-style:normal;font-size:10.5px;font-weight:600;color:var(--acc-t);background:var(--acc-bg);
+  border-radius:99px;width:20px;height:20px;display:grid;place-items:center}
+.tc-m{display:flex;gap:14px;margin-bottom:9px}
+.tc-m div b{display:block;font-family:var(--f-m);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.tc-m div span{display:block;font-family:var(--f-m);font-size:8.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tc-r{display:flex;gap:5px;overflow:hidden}
+.tc-r i{display:block;width:30px;aspect-ratio:2/3;border-radius:4px;border:1px solid var(--bd-sub);flex:0 0 auto}
+
+/* states */
+.empty{padding:44px 20px;text-align:center}
+.empty .ic{font-size:26px;color:var(--ink-9);margin-bottom:10px}
+.empty h6{font-family:var(--f-d);font-size:15px;font-weight:700;margin:0 0 5px}
+.empty p{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.55}
+.btn{font-family:var(--f-s);font-size:13px;font-weight:600;padding:10px 18px;border-radius:10px;border:none;
+  cursor:pointer;background:var(--acc);color:var(--on-acc);box-shadow:inset 0 1px 0 var(--hl);transition:filter .12s}
+.btn:hover{filter:brightness(1.06)}
+.btn.q{background:var(--ink-4);color:var(--text);box-shadow:none}
+.btn.q:hover{background:var(--ink-5);filter:none}
+.sk{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-hv) 50%,var(--surface) 75%);
+  background-size:200% 100%;animation:sh 1.4s linear infinite;border-radius:5px}
+@keyframes sh{to{background-position:-200% 0}}
+.errbox{margin:14px;border:1px solid var(--st-drop-9);background:var(--st-drop-3);border-radius:10px;padding:14px}
+.errbox b{display:block;font-size:13px;color:var(--st-drop-11);margin-bottom:4px;font-weight:700}
+.errbox p{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:11px}
+
+/* editor sheet */
+.sheet{background:var(--bg-sub);border-top:1px solid var(--bd);border-radius:16px 16px 0 0;
+  margin-top:-16px;position:relative;padding-bottom:10px}
+.sh-grab{width:34px;height:4px;border-radius:99px;background:var(--bd-str);margin:9px auto 0}
+.sh-head{display:flex;align-items:center;gap:9px;padding:11px 14px;border-bottom:1px solid var(--bd-sub)}
+.sh-po{width:34px;flex:0 0 auto;aspect-ratio:2/3;border-radius:5px;border:1px solid var(--bd-sub)}
+.sh-t{flex:1;min-width:0}
+.sh-t b{display:block;font-size:13px;font-weight:700;line-height:1.25}
+.sh-t span{display:block;font-family:var(--f-m);font-size:9.5px;color:var(--muted)}
+.fld{padding:12px 14px 0}
+.fld2{padding:12px 14px 0;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fld label,.fld2 label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.segs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.seg{background:var(--ink-3);border:none;border-radius:9px;padding:8px 3px;cursor:pointer;
+  color:var(--muted);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-family:var(--f-s);transition:all .12s}
+.seg:hover{background:var(--ink-4);color:var(--text)}
+.seg i{font-style:normal;font-size:9.5px;font-family:var(--f-s)}
+.seg.on{background:var(--b);color:var(--c);font-weight:600;box-shadow:inset 0 0 0 1px var(--c)}
+.prog{display:flex;align-items:center;gap:9px;background:var(--bg-sub);box-shadow:inset 0 0 0 1px var(--bd-sub);
+  border-radius:10px;padding:7px 9px}
+.prog.compact{width:150px}
+.stp{width:32px;height:32px;flex:0 0 auto;border-radius:8px;border:none;background:var(--ink-4);
+  color:var(--text);font-size:17px;cursor:pointer;display:grid;place-items:center;transition:background .12s}
+.stp:hover{background:var(--ink-5)}
+.prog-v{flex:1;text-align:center}
+.prog-v b{display:block;font-family:var(--f-d);font-size:18px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.prog-v span{display:block;font-family:var(--f-m);font-size:9px;color:var(--muted);margin-top:2px}
+.jump{margin-top:7px;font-size:11px;color:var(--muted)}
+.jump b{color:var(--text);font-family:var(--f-m)}
+.jump span{color:var(--acc-t);cursor:pointer}
+.stars{display:flex;align-items:center;gap:4px;background:var(--bg-sub);box-shadow:inset 0 0 0 1px var(--bd-sub);
+  border-radius:10px;padding:9px 11px}
+.stars i{font-style:normal;font-size:19px;color:var(--ink-7);cursor:pointer}
+.stars i.on{color:var(--rate)}
+.stars .sv{margin-left:auto;font-family:var(--f-m);font-size:11.5px;color:var(--rate-t);font-weight:600}
+.inp{background:var(--bg-sub);border:none;box-shadow:inset 0 0 0 1px var(--bd-sub);border-radius:9px;
+  padding:10px 11px;font-size:12.5px;color:var(--text);font-family:var(--f-s);transition:box-shadow .12s}
+.inp:hover{box-shadow:inset 0 0 0 1px var(--bd)}
+.inp.dim{color:var(--muted)}
+.hint{font-size:10.5px;color:var(--muted);margin-top:5px}
+.sh-foot{padding:14px 14px 4px;margin-top:6px;border-top:1px solid var(--bd-sub)}
+.del{width:100%;background:var(--st-drop-3);border:none;color:var(--st-drop-11);
+  border-radius:9px;padding:10px;font-size:12.5px;font-weight:600;cursor:pointer;transition:filter .12s}
+.del:hover{filter:brightness(1.1)}
+
+/* live data */
+.live{border:1px solid var(--bd);border-radius:11px;overflow:hidden;background:var(--surface);margin-top:16px}
+.live-h{padding:9px 14px;border-bottom:1px solid var(--bd-sub);background:var(--bg-sub);
+  display:flex;justify-content:space-between;align-items:center;gap:10px}
+.live-h b{font-family:var(--f-m);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.live-h span{font-family:var(--f-m);font-size:9.5px;color:var(--st-done-11)}
+.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:2px 14px;padding:12px 14px;font-size:12.5px}
+.kv dt{font-family:var(--f-m);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-top:3px}
+.kv dd{margin:0;color:var(--text);padding-bottom:7px}
+.kv dd.miss{color:var(--st-drop-11);font-family:var(--f-m);font-size:11.5px}
+
+/* rules */
+.rules{margin-top:20px;border:1px solid var(--bd);border-radius:11px;background:var(--bg-sub);overflow:hidden}
+.rules-h{padding:9px 14px;border-bottom:1px solid var(--bd-sub);background:var(--surface);font-family:var(--f-m);
+  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+ol.rl{list-style:none;counter-reset:r var(--start,0);margin:0;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+ol.rl li{counter-increment:r;position:relative;padding-left:28px;font-size:12.5px;color:var(--muted);line-height:1.55}
+ol.rl li::before{content:"R" counter(r);position:absolute;left:0;top:1px;font-family:var(--f-m);font-size:9px;
+  font-weight:600;color:var(--rate-t);background:var(--rate-bg);border:1px solid var(--rate-bd);border-radius:4px;padding:1px 3px}
+ol.rl b{color:var(--text);font-weight:600}
+
+.tw{overflow-x:auto;margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-family:var(--f-m);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  font-weight:500;padding:0 14px 7px 0;border-bottom:1px solid var(--bd)}
+td{padding:9px 14px 9px 0;border-bottom:1px solid var(--bd-sub);vertical-align:top;color:var(--muted)}
+td b{color:var(--text)}
+td:last-child,th:last-child{padding-right:0}
+tbody tr:last-child td{border-bottom:none}
+
+footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-size:12px;color:var(--muted);max-width:66ch}
+@media (max-width:900px){.stgrid{grid-template-columns:repeat(3,1fr)}.intro h1{font-size:32px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+.img{background-size:cover;background-position:center;background-repeat:no-repeat}
+.i-dune_p{background-image:url(https://image.tmdb.org/t/p/w342/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg)}
+.i-dune_b{background-image:url(https://image.tmdb.org/t/p/w780/eZ239CUp1d6OryZEBPnO2n87gMG.jpg)}
+.i-cast0{background-image:url(https://image.tmdb.org/t/p/w185/dFxpwRpmzpVfP1zjluH68DeQhyj.jpg)}
+.i-cast1{background-image:url(https://image.tmdb.org/t/p/w185/3WdOloHpjtjL96uVOhFRRCcYSwq.jpg)}
+.i-cast2{background-image:url(https://image.tmdb.org/t/p/w185/ra53cM1aNmdH0aFhj8yBqPOj2fb.jpg)}
+.i-cast3{background-image:url(https://image.tmdb.org/t/p/w185/zfRID0jx8DKBluPGU9xtk9sZWUt.jpg)}
+.i-rec0{background-image:url(https://image.tmdb.org/t/p/w185/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg)}
+.i-rec1{background-image:url(https://image.tmdb.org/t/p/w185/xfSAoBEm9MNBjmlNcDYLvLSMlnq.jpg)}
+.i-rec2{background-image:url(https://image.tmdb.org/t/p/w185/xAYGdGBGptNkisXRpmhZSry6SPF.jpg)}
+.i-rec3{background-image:url(https://image.tmdb.org/t/p/w185/siNGMLdOUNYLEGtlsnmQcpO2XZX.jpg)}
+.i-bb_p{background-image:url(https://image.tmdb.org/t/p/w342/anFx9aTOOYqgS3v7x3R84Kz67ly.jpg)}
+.i-bb_b{background-image:url(https://image.tmdb.org/t/p/w780/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg)}
+.i-ep0{background-image:url(https://image.tmdb.org/t/p/w300/88Z0fMP8a88EpQWMCs1593G0ngu.jpg)}
+.i-ep1{background-image:url(https://image.tmdb.org/t/p/w300/AbMoecO0ZZio0LcgeLxlzdyGs6X.jpg)}
+.i-ep2{background-image:url(https://image.tmdb.org/t/p/w300/vlgGfjtuO2WSLT7qYDVlvTpSVW.jpg)}
+.i-ep3{background-image:url(https://image.tmdb.org/t/p/w300/2UbRgW6apE4XPzhHPA726wUFyaR.jpg)}
+.i-dv0{background-image:url(https://image.tmdb.org/t/p/w185/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg)}
+.i-dv1{background-image:url(https://image.tmdb.org/t/p/w185/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg)}
+.i-dv2{background-image:url(https://image.tmdb.org/t/p/w185/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg)}
+.i-dv3{background-image:url(https://image.tmdb.org/t/p/w185/pEzNVQfdzYDzVK0XqxERIw2x2se.jpg)}
+.i-dv4{background-image:url(https://image.tmdb.org/t/p/w185/lz8vNyXeidqqOdJW9ZjnDAMb5Vr.jpg)}
+.i-dv5{background-image:url(https://image.tmdb.org/t/p/w185/vf40tyDRKZsBmaLsYeopzfFLzLx.jpg)}
+.i-dv_face{background-image:url(https://image.tmdb.org/t/p/w185/zdDx9Xs93UIrJFWYApYR28J8M6b.jpg)}
+.prow{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;background:var(--surface);
+  cursor:pointer;transition:background .12s;width:100%;border:none;text-align:left;font-family:var(--f-s)}
+.prow:hover{background:var(--surface-hv)}
+.prow .pf{width:38px;height:38px;flex:0 0 auto;border-radius:99px;background-size:cover;background-position:center;
+  background-color:var(--ink-5)}
+.prow .pf.noimg{display:grid;place-items:center;font-family:var(--f-d);font-size:13px;font-weight:700;color:var(--ink-11)}
+.prow .pb{flex:1;min-width:0}
+.prow .pb b{display:block;font-size:13px;font-weight:600;line-height:1.25;color:var(--text)}
+.prow .pb span{display:block;font-size:11px;color:var(--muted)}
+.prow .go{color:var(--ink-9);font-size:14px;flex:0 0 auto}
+.prow.nolink{cursor:default;background:var(--bg-sub)}
+.prow.nolink:hover{background:var(--bg-sub)}
+.i-vg{background-image:url(https://image.tmdb.org/t/p/w185/wJIxATESjzsjSgvRhVavOmdamXc.jpg)}
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="mark"><i></i>Projector<em>· design system v1</em></div>
+    <div class="tog" role="group" aria-label="Theme">
+      <button type="button" data-set="dark" aria-pressed="true">Dark</button>
+      <button type="button" data-set="light" aria-pressed="false">Light</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    <div class="eyebrow">Cine Search · everything in one place</div>
+    <h1>Tokens, controls,<br>and eight <em>screens</em>.</h1>
+    <p class="lede">The complete system: three twelve-step colour scales, a six-state watch palette, the control set,
+      all nine MVP screens, and a live section rendered with real TMDB data. Every screen is the same handful of
+      components recombined — which is the point of having a system at all.</p>
+    <div class="warnbox"><b>All business rules here are mine.</b> Reasoned from the personas, the data inventory and the
+      benchmark — not from a PRD, because there isn't one yet. They're numbered <code>R1…R26</code> so you can reject one
+      by number. Sample data is illustrative; where I've assumed a field exists, the rules say so.</div>
+  </div>
+
+  <!-- ============ SCALES ============ -->
+  <section>
+    <h2>Colour scales</h2>
+    <p class="lede">Three scales, twelve steps each, every step with one job. Semantic tokens alias <b>steps, not hex
+      values</b> — so switching theme swaps which scale is active rather than re-tuning colours by hand. The dark theme
+      is unchanged from what you shipped: <code>ink-1</code> is <code>#0A0F1B</code>, <code>beam-9</code> is
+      <code>#25BADF</code>, <code>marquee-9</code> is <code>#F5C45C</code>.</p>
+
+    <div class="scale">
+      <div class="scale-h"><b>Ink</b><span>blue-biased neutral · surfaces, borders, text</span></div>
+      <div class="steps">
+        <div class="stp-c" style="background:var(--ink-1);color:var(--ink-11)">1</div>
+        <div class="stp-c" style="background:var(--ink-2);color:var(--ink-11)">2</div>
+        <div class="stp-c" style="background:var(--ink-3);color:var(--ink-11)">3</div>
+        <div class="stp-c" style="background:var(--ink-4);color:var(--ink-11)">4</div>
+        <div class="stp-c" style="background:var(--ink-5);color:var(--ink-11)">5</div>
+        <div class="stp-c" style="background:var(--ink-6);color:var(--ink-11)">6</div>
+        <div class="stp-c" style="background:var(--ink-7);color:var(--ink-12)">7</div>
+        <div class="stp-c" style="background:var(--ink-8);color:var(--ink-12)">8</div>
+        <div class="stp-c" style="background:var(--ink-9);color:var(--ink-1)">9</div>
+        <div class="stp-c" style="background:var(--ink-10);color:var(--ink-1)">10</div>
+        <div class="stp-c" style="background:var(--ink-11);color:var(--ink-1)">11</div>
+        <div class="stp-c" style="background:var(--ink-12);color:var(--ink-1)">12</div>
+      </div>
+      <div class="jobs">
+        <div class="job">app bg</div><div class="job">subtle</div><div class="job">fill</div>
+        <div class="job">hover</div><div class="job">active</div><div class="job">divider</div>
+        <div class="job">border</div><div class="job">strong</div><div class="job">solid</div>
+        <div class="job">solid hv</div><div class="job">muted text</div><div class="job">text</div>
+      </div>
+    </div>
+
+    <div class="scale">
+      <div class="scale-h"><b>Beam</b><span>cyan · <b style="color:var(--acc-t)">acts</b> — buttons, links, focus, selection</span></div>
+      <div class="steps">
+        <div class="stp-c" style="background:var(--beam-1);color:var(--beam-11)">1</div>
+        <div class="stp-c" style="background:var(--beam-2);color:var(--beam-11)">2</div>
+        <div class="stp-c" style="background:var(--beam-3);color:var(--beam-11)">3</div>
+        <div class="stp-c" style="background:var(--beam-4);color:var(--beam-11)">4</div>
+        <div class="stp-c" style="background:var(--beam-5);color:var(--beam-12)">5</div>
+        <div class="stp-c" style="background:var(--beam-6);color:var(--beam-12)">6</div>
+        <div class="stp-c" style="background:var(--beam-7);color:var(--beam-12)">7</div>
+        <div class="stp-c" style="background:var(--beam-8);color:var(--beam-12)">8</div>
+        <div class="stp-c" style="background:var(--beam-9);color:var(--on-beam-9)">9</div>
+        <div class="stp-c" style="background:var(--beam-10);color:var(--on-beam-9)">10</div>
+        <div class="stp-c" style="background:var(--beam-11);color:var(--beam-1)">11</div>
+        <div class="stp-c" style="background:var(--beam-12);color:var(--beam-1)">12</div>
+      </div>
+    </div>
+
+    <div class="scale">
+      <div class="scale-h"><b>Marquee</b><span>gold · <b style="color:var(--rate-t)">rates</b> — scores only. Never a button.</span></div>
+      <div class="steps">
+        <div class="stp-c" style="background:var(--mar-1);color:var(--mar-11)">1</div>
+        <div class="stp-c" style="background:var(--mar-2);color:var(--mar-11)">2</div>
+        <div class="stp-c" style="background:var(--mar-3);color:var(--mar-11)">3</div>
+        <div class="stp-c" style="background:var(--mar-4);color:var(--mar-12)">4</div>
+        <div class="stp-c" style="background:var(--mar-5);color:var(--mar-12)">5</div>
+        <div class="stp-c" style="background:var(--mar-6);color:var(--mar-12)">6</div>
+        <div class="stp-c" style="background:var(--mar-7);color:var(--mar-12)">7</div>
+        <div class="stp-c" style="background:var(--mar-8);color:var(--mar-12)">8</div>
+        <div class="stp-c" style="background:var(--mar-9);color:var(--on-mar-9)">9</div>
+        <div class="stp-c" style="background:var(--mar-10);color:var(--on-mar-9)">10</div>
+        <div class="stp-c" style="background:var(--mar-11);color:var(--mar-1)">11</div>
+        <div class="stp-c" style="background:var(--mar-12);color:var(--mar-1)">12</div>
+      </div>
+    </div>
+
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>Solid and text are different steps — that separation is what makes light mode work.</b> Gold step 9
+      (<code>#F5C45C</code>) is ~1.7:1 on white, unreadable as text; step 11 flips to <code>#7A5A0B</code> at ~5.4:1.
+      The star <i>icon</i> keeps step 9, because icons need only 3:1. Step 9 itself is identical in both themes — it's
+      where the brand lives, so the product still reads as itself in light.</div>
+  </section>
+
+  <!-- ============ STATE PALETTE ============ -->
+  <section>
+    <h2>Watch-state palette</h2>
+    <p class="lede">Six states is past the point where colour alone is safely distinguishable, so each carries a hue
+      <b>and</b> a distinct icon shape <b>and</b> a label. Colour is the fast channel, never the only one.</p>
+    <div class="stgrid">
+      <div class="stcard"><div class="stswatch" style="background:var(--st-want-3);color:var(--st-want-11)">◷</div>
+        <div class="stbody"><b>Want to watch</b><span>st-want</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-ing-3);color:var(--st-ing-11)">▶</div>
+        <div class="stbody"><b>Watching</b><span>st-ing · series</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-done-3);color:var(--st-done-11)">✓</div>
+        <div class="stbody"><b>Watched</b><span>st-done</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-re-3);color:var(--st-re-11)">↻</div>
+        <div class="stbody"><b>Rewatching</b><span>st-re</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-hold-3);color:var(--st-hold-11)">‖</div>
+        <div class="stbody"><b>On hold</b><span>st-hold · series</span></div></div>
+      <div class="stcard"><div class="stswatch" style="background:var(--st-drop-3);color:var(--st-drop-11)">✕</div>
+        <div class="stbody"><b>Dropped</b><span>st-drop</span></div></div>
+    </div>
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>Gold is not in this palette.</b> Marquee stays reserved for ratings and scores. If a status borrowed gold,
+      "saved" and "rated 9" would read as the same kind of thing — and they aren't.</div>
+  </section>
+
+  <!-- ============ PRIMITIVES ============ -->
+  <section>
+    <h2>Primitives</h2>
+    <p class="lede">The controls every screen is built from, live. Two rules govern all of them: <b>a border and a fill
+      together is one signal too many</b>, and <b>colour goes on the content, not the container</b>.</p>
+
+    <div class="pgrid">
+      <div class="pbox"><h4>Actions</h4><div class="r">
+        <button class="spill" style="flex:0 0 auto;padding:10px 18px">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+        <button class="ibtn like on" aria-pressed="true">♥</button>
+        <button class="ibtn">✎</button></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Gold status pill; heart marks
+          liked; neutral fill, coloured glyph.</p></div>
+
+      <div class="pbox"><h4>Segmented — one choice</h4>
+        <div class="seasonsw" style="margin:0">
+          <button class="sw" aria-pressed="true">S1<em>7</em></button><button class="sw">S2<em>13</em></button>
+          <button class="sw">S3<em>13</em></button><button class="sw">Specials<em>9</em></button></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Recessed track, raised selection
+          <i>plus</i> accent tint and ring. Shape says "this one"; colour says "and it's active".</p></div>
+
+      <div class="pbox"><h4>Filter chips</h4><div class="r">
+        <button class="chip" aria-pressed="true">Watching<em>3</em></button>
+        <button class="chip">Watched<em>84</em></button>
+        <button class="chip">All</button></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Borderless. Selected is a solid
+          accent, so selection reads instantly.</p></div>
+
+      <div class="pbox"><h4>Tile quick-add</h4>
+        <div class="r" style="align-items:flex-start">
+          <div style="width:66px"><div class="im img i-rec2" style="aspect-ratio:2/3;border-radius:8px;position:relative;overflow:hidden;margin-bottom:5px;background-size:cover">
+            <button class="sb">+</button><span class="gb">6.5</span></div>
+            <div style="font-size:10.5px">Not saved</div></div>
+          <div style="width:66px"><div class="im img i-dv1" style="aspect-ratio:2/3;border-radius:8px;position:relative;overflow:hidden;margin-bottom:5px;background-size:cover">
+            <button class="sb want">◷</button><span class="gb">7.8</span></div>
+            <div style="font-size:10.5px">Saved</div></div>
+          <div style="width:66px"><div class="im img i-dv3" style="aspect-ratio:2/3;border-radius:8px;position:relative;overflow:hidden;margin-bottom:5px;background-size:cover">
+            <button class="sb done">✓</button><span class="gb">7.6</span></div>
+            <div style="font-size:10.5px">Watched</div></div></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">One slot, three jobs, top-right
+          so a thumb doesn't cover the poster. Tap them.</p></div>
+
+      <div class="pbox"><h4>Episode ticks</h4><div class="r">
+        <button class="epchk on">✓</button><button class="epchk on">✓</button>
+        <button class="epchk">○</button><button class="epchk">○</button></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Solid fill when watched, so a
+          season scans as a column of solid marks.</p></div>
+
+      <div class="pbox"><h4>Providers &amp; inputs</h4>
+        <div class="r" style="margin-bottom:9px">
+          <button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button>
+          <button class="pchip"><span class="plogo" style="background:#00A8E1">P</span>Prime</button></div>
+        <div class="inp">Ravi · Mar 2026</div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Providers are real buttons —
+          they link out. Inputs use an inset ring, not a border.</p></div>
+
+      <div class="pbox"><h4>Meters</h4>
+        <div class="collectbar" style="margin:0">
+          <div class="cb-t"><b><i>6</i> of 10 directed</b><span>60%</span></div>
+          <div class="cb-track"><i style="width:60%"></i></div>
+          <div class="cb-sub">4 to go · 16 credits filtered out</div></div></div>
+
+      <div class="pbox"><h4>Stats</h4>
+        <div class="scores" style="margin:0">
+          <div class="score gold"><b>8.1</b><span>TMDB</span></div>
+          <div class="score"><b>9.0</b><span>You</span></div>
+          <div class="score dim"><b>1</b><span>Rewatches</span></div></div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5">Hairline dividers, no box.</p></div>
+
+      <div class="pbox"><h4>Feedback</h4>
+        <div class="toast" style="margin:0 0 9px"><span>S2 E4 watched</span><b>Undo</b></div>
+        <div class="r"><button class="btn">Browse</button><button class="btn q">Retry</button></div></div>
+    </div>
+  </section>
+
+  <!-- ============ SCREENS ============ -->
+  <section>
+    <h2>The screens</h2>
+    <p class="lede">Scroll inside each frame. Bottom navigation is shown on the four top-level destinations only.</p>
+
+    <div class="screens">
+
+      <!-- 1 HOME -->
+      <div class="col">
+        <div class="col-h"><h3>1 · Home</h3><p>Lands on what you're mid-way through, then discovery.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>Tonight</h4><div style="display:flex;gap:6px"><button class="circ">⌕</button><button class="circ">◑</button></div></div>
+
+          <div class="grp" style="margin-top:14px">
+            <div class="grp-h"><b>Continue watching</b><span>3</span></div>
+            <div class="srow">
+              <div class="th" style="background:linear-gradient(150deg,#4A7C59,#1E3A28)"></div>
+              <div class="bd"><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:18%"></i></span>
+            </div>
+            <div class="srow">
+              <div class="th" style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></div>
+              <div class="bd"><div class="nm">Severance</div><div class="ep">S2 E7 · 16 of 19</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:84%"></i></span>
+            </div>
+          </div>
+
+          <div class="sect"><div class="sect-h"><span>Trending in India</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"><button class="sb">+</button><span class="gb">8.2</span></div><div class="tt">Dune: Part Two</div><div class="yy">2024</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#B5483C,#3A1512)"><button class="sb">+</button><span class="gb">7.1</span></div><div class="tt">Mirzapur</div><div class="yy">2024</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"><button class="sb">+</button><span class="gb">7.6</span></div><div class="tt">Arrival</div><div class="yy">2016</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"><button class="sb">+</button><span class="gb">8.0</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+          </div>
+
+          <div class="sect"><div class="sect-h"><span>On your services</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#2B5A4A,#0F241C)"><button class="sb want">◷</button><span class="gb">7.9</span></div><div class="tt">Past Lives</div><div class="yy">2023</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#6A6A6A,#242424)"><button class="sb">+</button><span class="gb">8.5</span></div><div class="tt">Oppenheimer</div><div class="yy">2023</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(140deg,#8A6A3B,#3A2A15)"><button class="sb">+</button><span class="gb">7.6</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div class="on"><span>⌂</span>Home</div><div><span>⌕</span>Search</div><div><span>▤</span>Library</div><div><span>◍</span>You</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl">
+          <li><b>Home leads with Continue watching, never a search box.</b> The habit loop is "open, see what I'm mid-way through, tap +". Discovery sits below it.</li>
+          <li><b>If nothing is in progress, that section is replaced</b> by "Pick up something new" — not left as an empty shelf.</li>
+          <li><b>"On your services" filters by the user's declared providers.</b> Region comes from the profile, not the IP, so a trip abroad doesn't scramble the home screen.</li>
+        </ol></div>
+      </div>
+
+      <!-- 2 SEARCH -->
+      <div class="col">
+        <div class="col-h"><h3>2 · Search results</h3><p>Grid with state badges. Filters expand in place.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div style="padding:12px 14px 0;display:flex;gap:7px;align-items:center">
+            <div style="flex:1;background:var(--surface);border:1px solid var(--bd-str);border-radius:9px;padding:9px 11px;font-size:13px">
+              denis villeneuve</div>
+            <button class="circ">⚙</button>
+          </div>
+          <div class="chips">
+            <button class="chip" aria-pressed="true">All</button>
+            <button class="chip">Films</button>
+            <button class="chip">Series</button>
+            <button class="chip">People</button>
+          </div>
+          <div class="sect"><div class="sect-h"><span>24 results · most relevant</span></div></div>
+          <div style="margin:0 14px">
+            <div class="fgrid">
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"><button class="sb done">✓</button><span class="gb">8.2</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"><button class="sb done">✓</button><span class="gb">8.0</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"><button class="sb want">◷</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(140deg,#8A6A3B,#3A2A15)"><button class="sb">+</button><span class="gb">7.6</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#3A5A7A,#14243A)"><button class="sb">+</button><span class="gb">8.0</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#6A4A6A,#241624)"><button class="sb">+</button><span class="gb">7.3</span></div><div class="nm">Prisoners</div><div class="yr">2013</div></div>
+            </div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>People</span></div></div>
+          <div style="margin:0 14px 14px">
+            <div class="srow" style="align-items:center">
+              <div class="th" style="width:36px;aspect-ratio:1;border-radius:99px;background:linear-gradient(140deg,var(--ink-7),var(--ink-5))"></div>
+              <div class="bd"><div class="nm">Denis Villeneuve</div><div class="ep">Director · 6 of 10 seen</div></div>
+            </div>
+          </div>
+          <div class="bnav"><div><span>⌂</span>Home</div><div class="on"><span>⌕</span>Search</div><div><span>▤</span>Library</div><div><span>◍</span>You</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:3">
+          <li><b>Results are a grid, not rows.</b> Search is "find the thing"; a state badge answers "have I seen it?" at a fraction of a row's height.</li>
+          <li><b>People rank alongside titles, never above them.</b> A person result appears only when the query plausibly names one, and sits after the titles.</li>
+          <li><b>A person row carries collection progress</b> — "6 of 11 seen". This is the wedge, surfaced at the first possible moment.</li>
+          <li><b>Filters expand in place</b>, pushing results down, rather than opening a sheet — so you see results change as you filter.</li>
+        </ol></div>
+      </div>
+
+      <!-- 3 TITLE FILM -->
+      <div class="col">
+        <div class="col-h"><h3>3 · Title — film</h3><p>Watched and rated. One bit of state on the page.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="hero" style="background:linear-gradient(150deg,#C79B5B,#8A5A2B 50%,#2A1B10)">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head">
+            <div class="poster" style="background:linear-gradient(150deg,#E8C98F,#C79B5B 55%,#8A5A2B)"></div>
+            <div class="head-t"><h5>Dune: Part Two</h5>
+              <div class="metaline">2024 · Science Fiction, Adventure · 2h 47m</div></div>
+          </div>
+          <div class="block">
+            <div class="arow">
+              <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button><button class="ibtn">✎</button>
+            </div>
+            <div class="prov"><div class="prov-l">Where to watch · India</div>
+              <div class="provrow">
+                <button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button>
+                <button class="pchip" style="opacity:.75"><span class="plogo" style="background:var(--ink-8)">↧</span>Rent · 4</button>
+              </div></div>
+          </div>
+          <div class="scores">
+            <div class="score gold"><b>8.1</b><span>TMDB</span></div>
+            <div class="score"><b>9.0</b><span>You</span></div>
+            <div class="score dim"><b>1</b><span>Rewatches</span></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Overview</span></div>
+            <p class="ov">Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family. <b>more</b></p></div>
+          <div class="cards2">
+            <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div><div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div>
+              <div class="ptx" style="margin-top:6px">Chalamet, Zendaya<br>+ 3 more</div></div>
+            <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Denis Villeneuve<br>Director</div></div>
+            <div class="pc"><div class="pc-h"><b>Themes</b><i>⌄</i></div><div class="ptx">chosen one, desert<br>+6 more</div></div>
+            <div class="pc"><div class="pc-h"><b>Details</b><i>⌄</i></div><div class="ptx">No IN certificate<br>Budget, language</div></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>More like this</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im" style="background:linear-gradient(150deg,#F5A623,#C1440E)"><button class="sb">+</button></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"><button class="sb">+</button></div><div class="tt">Arrival</div><div class="yy">2016</div></div>
+            <div class="rt"><div class="im" style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"><button class="sb">+</button></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+          </div><div style="height:18px"></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:7">
+          <li><b>Film statuses are Want to watch · Watched · Dropped only.</b> "Watching" is meaningless for a 2h film; forcing one vocabulary would degrade the film flow to serve the series flow.</li>
+          <li><b>Rating is locked until Watched or Rewatching.</b> Tapping ★ earlier offers "Mark as watched first?".</li>
+          <li><b>TMDB score and your score sit side by side, never merged.</b> The disagreement is the interesting number.</li>
+          <li><b>Four preview cards, always these four, always this order.</b> A card with no data renders empty with a reason rather than vanishing — a layout that reshuffles per title is worse than an empty box.</li>
+          <li><b>Region is stated, not implied.</b> "India" is printed next to Where to watch, because a silent wrong region is the most confusing failure available.</li>
+        </ol></div>
+      </div>
+
+      <!-- 4 TITLE SERIES -->
+      <div class="col">
+        <div class="col-h"><h3>4 · Title — series</h3><p>Same shell. Episode guide replaces nothing — it's a fifth card.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="hero" style="background:linear-gradient(150deg,#4A7C59,#1E3A28 55%,#0C1A12)">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head">
+            <div class="poster" style="background:linear-gradient(150deg,#6FAF80,#2E5B3E)"></div>
+            <div class="head-t"><h5>Breaking Bad</h5>
+              <div class="metaline"><span class="cert">A</span>2008–2013 · Drama, Crime · 5 seasons</div></div>
+          </div>
+          <div class="block">
+            <div class="arow">
+              <button class="spill" style="background:var(--st-ing-9);color:#06231C">▶ Watching <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button><button class="ibtn">✎</button>
+            </div>
+            <div style="margin-top:11px;border-top:1px solid var(--bd-sub);padding-top:11px">
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px">
+                <span style="color:var(--muted)">Progress</span><span style="font-family:var(--f-m);color:var(--acc-t)">11 of 62</span></div>
+              <div style="height:4px;border-radius:99px;background:var(--ink-5);overflow:hidden">
+                <i style="display:block;height:100%;width:18%;background:var(--acc)"></i></div>
+            </div>
+          </div>
+          <div class="seasonsw">
+            <button class="sw" aria-pressed="true">S1</button><button class="sw">S2</button>
+            <button class="sw">S3</button><button class="sw">S4</button><button class="sw">S5</button>
+            <button class="sw">Specials</button>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Season 1 · 7 episodes</span><a href="#a">Mark all</a></div>
+            <div class="eprow" style="border-top:none">
+              <div class="st" style="background:linear-gradient(150deg,#8A7A5A,#3A3220)"></div>
+              <div class="eb"><div class="en">S1 E1 · Pilot</div><div class="ed">20 Jan 2008 · 59m · 8.5</div></div>
+              <button class="epchk on">✓</button></div>
+            <div class="eprow">
+              <div class="st" style="background:linear-gradient(150deg,#5A7A8A,#203238)"></div>
+              <div class="eb"><div class="en">S1 E2 · Cat's in the Bag…</div><div class="ed">27 Jan 2008 · 49m · 8.2</div></div>
+              <button class="epchk on">✓</button></div>
+            <div class="eprow">
+              <div class="st" style="background:linear-gradient(150deg,#7A5A5A,#382020)"></div>
+              <div class="eb"><div class="en">S1 E3 · …And the Bag's in the River</div><div class="ed">10 Feb 2008 · 49m · 8.4</div></div>
+              <button class="epchk">○</button></div>
+            <div class="eprow">
+              <div class="st" style="background:linear-gradient(150deg,#5A6A5A,#202A20)"></div>
+              <div class="eb"><div class="en">S1 E4 · Cancer Man</div><div class="ed">17 Feb 2008 · 49m · 7.9</div></div>
+              <button class="epchk">○</button></div>
+          </div>
+          <div class="cards2">
+            <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div><div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div></div>
+            <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Vince Gilligan<br>+9 more</div></div>
+          </div><div style="height:18px"></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:12">
+          <li><b>Series get the full lifecycle</b> — Want to watch · Watching · On hold · Watched · Rewatching · Dropped.</li>
+          <li><b>Marking an episode watched sets series status to Watching automatically.</b> Nobody should have to set a status before they can log an episode.</li>
+          <li><b>Marking the final episode prompts "Mark series as watched?"</b> — it proposes, never assumes, because unaired seasons exist.</li>
+          <li><b>Episode ticks are individually reversible</b>; tapping a ticked episode un-ticks it. No undo toast needed here — the control is its own undo.</li>
+          <li><b>"Mark all" is per-season, never per-series.</b> A whole-series action is too destructive for a single tap.</li>
+          <li><b>Progress counts episodes, not seasons</b>, and is always <code>watched of total</code> across the whole run.</li>
+        </ol></div>
+      </div>
+
+      <!-- 4b EDITOR -->
+      <div class="col">
+        <div class="col-h"><h3>4b · The editor</h3><p>Behind the status pill. Everything you can record about a title.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div style="height:96px;background:linear-gradient(150deg,#4A7C59,#1E3A28);opacity:.35"></div>
+          <div class="sheet">
+            <div class="sh-grab"></div>
+            <div class="sh-head">
+              <div class="sh-po" style="background:linear-gradient(150deg,#6FAF80,#2E5B3E)"></div>
+              <div class="sh-t"><b>Breaking Bad</b><span>2008 · 5 seasons · 62 episodes</span></div>
+              <button class="ibtn like on" aria-pressed="true" style="width:34px;height:34px">♥</button>
+              <button class="btn" style="padding:8px 14px">Save</button>
+            </div>
+
+            <div class="fld"><label>Status</label>
+              <div class="segs">
+                <button class="seg" style="--c:var(--st-want-11);--b:var(--st-want-3)">◷<i>Want</i></button>
+                <button class="seg on" style="--c:var(--st-ing-11);--b:var(--st-ing-3)">▶<i>Watching</i></button>
+                <button class="seg" style="--c:var(--st-hold-11);--b:var(--st-hold-3)">‖<i>On hold</i></button>
+                <button class="seg" style="--c:var(--st-done-11);--b:var(--st-done-3)">✓<i>Watched</i></button>
+                <button class="seg" style="--c:var(--st-re-11);--b:var(--st-re-3)">↻<i>Rewatch</i></button>
+                <button class="seg" style="--c:var(--st-drop-11);--b:var(--st-drop-3)">✕<i>Dropped</i></button>
+              </div>
+            </div>
+
+            <div class="fld"><label>Progress</label>
+              <div class="prog">
+                <button class="stp">−</button>
+                <div class="prog-v"><b>11</b><span>of 62 episodes</span></div>
+                <button class="stp">+</button>
+              </div>
+              <div class="jump">Currently at <b>S2 E4</b> · <span>Jump to episode</span></div>
+            </div>
+
+            <div class="fld"><label>Your rating</label>
+              <div class="stars"><i class="on">★</i><i class="on">★</i><i class="on">★</i><i class="on">★</i><i>★</i>
+                <span class="sv">8 / 10</span></div>
+            </div>
+
+            <div class="fld2">
+              <div><label>Started</label><div class="inp">12 Aug 2026</div></div>
+              <div><label>Finished</label><div class="inp dim">—</div></div>
+            </div>
+
+            <div class="fld"><label>Rewatches</label>
+              <div class="prog compact"><button class="stp">−</button><div class="prog-v"><b>0</b></div><button class="stp">+</button></div>
+            </div>
+
+            <div class="fld"><label>Who recommended it?</label>
+              <div class="inp">Ravi · Mar 2026</div>
+              <div class="hint">Optional. Nobody else ships this.</div>
+            </div>
+
+            <div class="fld"><label>Notes</label>
+              <div class="inp dim" style="min-height:52px">Private to you…</div></div>
+
+            <div class="sh-foot"><button class="del">Remove from library</button></div>
+          </div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:32">
+          <li><b>The editor is a sheet, not a page.</b> You arrive from a title and return to it; it never takes a URL of its own.</li>
+          <li><b>Status is a six-up segmented control, not a dropdown.</b> All options visible at once — one tap instead of open-scan-tap. Films render three of the six.</li>
+          <li><b>Progress is a stepper plus a jump.</b> The stepper handles "one more"; "Jump to episode" handles "I binged seven".</li>
+          <li><b>The editor shows episode count; the title page shows S/E.</b> Editing is arithmetic, reading is orientation — <code>11 of 62</code> versus <code>S2 E4</code>.</li>
+          <li><b>Rating is 1–10 in half-stars</b>, matching TMDB's scale so your score and theirs are directly comparable.</li>
+          <li><b>"Who recommended it?" is free text with an auto-stamped month.</b> §7's differentiator, captured where the cost is near zero.</li>
+          <li><b>Save is explicit; Remove is footer-isolated and confirms.</b> Everything else is one tap from undoable.</li>
+        </ol></div>
+      </div>
+
+      <!-- 5 PERSON -->
+      <div class="col">
+        <div class="col-h"><h3>5 · Person</h3><p>Filmography first, bio last. Collection progress on top.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><button class="circ">‹</button><button class="circ">⋮</button></div>
+          <div class="phead">
+            <div class="pav"></div>
+            <div><div class="pn">Denis Villeneuve</div><div class="pr">Director · Writer · Producer</div></div>
+          </div>
+          <div class="collectbar">
+            <div class="cb-t"><b><i>6</i> of 10 directed</b><span>60%</span></div>
+            <div class="cb-track"><i style="width:60%"></i></div>
+            <div class="cb-sub">4 to go · 16 credits filtered out</div>
+          </div>
+          <div class="rolesw">
+            <button class="sw" aria-pressed="true">Director<em>10</em></button>
+            <button class="sw">Writer<em>6</em></button>
+            <button class="sw">Producer<em>4</em></button>
+          </div>
+          <div class="sect" style="margin-top:13px"><div class="sect-h"><span>As director</span><a href="#a">Year ▾</a></div></div>
+          <div style="margin:0 14px">
+            <div class="fgrid">
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"><button class="sb done">✓</button><span class="gb">8.2</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"><button class="sb done">✓</button><span class="gb">8.0</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#3A5A7A,#14243A)"><button class="sb done">✓</button><span class="gb">8.0</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(140deg,#8A6A3B,#3A2A15)"><button class="sb want">◷</button><span class="gb">7.6</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im" style="background:linear-gradient(150deg,#6A4A6A,#241624)"><button class="sb">+</button><span class="gb">7.3</span></div><div class="nm">Prisoners</div><div class="yr">2013</div></div>
+            </div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Biography</span></div>
+            <p class="ov">Denis Villeneuve is a Canadian filmmaker known for atmospheric science fiction and crime dramas. <b>more</b></p></div>
+          <div style="height:18px"></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:18">
+          <li><b>Collection progress sits above the filmography</b>, not buried in stats. "6 of 11 directed" is the differentiator — it should be the first thing on a person page.</li>
+          <li><b>Roles are switchable tabs with counts</b>, not one merged list. A person who directs and writes has two distinct bodies of work.</li>
+          <li><b>Progress is counted per role.</b> "6 of 11 directed" changes when you switch to Writer — otherwise the number is meaningless.</li>
+          <li><b>Films before biography.</b> This is a collection product; the work is the point, the person is context.</li>
+        </ol></div>
+      </div>
+
+      <!-- 6 LIBRARY -->
+      <div class="col">
+        <div class="col-h"><h3>6 · Library</h3><p>Series as rows, films as grid, inside one filter.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>Library</h4><div style="display:flex;gap:6px"><button class="circ">⌕</button><button class="circ">⇅</button></div></div>
+          <div class="chips">
+            <button class="chip" aria-pressed="true">Watching<em>3</em></button>
+            <button class="chip">Want to watch<em>12</em></button>
+            <button class="chip">Watched<em>84</em></button>
+            <button class="chip">On hold<em>2</em></button>
+            <button class="chip">All</button>
+          </div>
+          <div class="grp">
+            <div class="grp-h"><b>Series</b><span>3 in progress</span></div>
+            <div class="srow"><div class="th" style="background:linear-gradient(150deg,#4A7C59,#1E3A28)"></div>
+              <div class="bd"><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:18%"></i></span></div>
+            <div class="srow"><div class="th" style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></div>
+              <div class="bd"><div class="nm">Severance</div><div class="ep">S2 E7 · 16 of 19</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:84%"></i></span></div>
+            <div class="srow"><div class="th" style="background:linear-gradient(150deg,#3B5A7A,#16243A)"></div>
+              <div class="bd"><div class="nm">Shōgun</div><div class="ep">S1 E2 · 2 of 10</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:20%"></i></span></div>
+          </div>
+          <div class="toast"><span>Breaking Bad · S2 E4 watched</span><b>Undo</b></div>
+          <div class="grp">
+            <div class="grp-h"><b>Films</b><span>none watching</span></div>
+            <div style="padding:16px 12px;border:1px dashed var(--bd);border-radius:10px;text-align:center;font-size:12px;color:var(--muted)">
+              Films don't have a "watching" state.<br><span style="color:var(--acc-t)">See your 12 saved films</span></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div><span>⌂</span>Home</div><div><span>⌕</span>Search</div><div class="on"><span>▤</span>Library</div><div><span>◍</span>You</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:22">
+          <li><b>Status chips with counts, not stacked sections.</b> Sections work at 40 titles and collapse at 400; counts make the library's shape readable without scrolling.</li>
+          <li><b>Default filter is Watching when anything is in progress</b>, otherwise Want to watch.</li>
+          <li><b>The <code>+</code> marks the next unwatched episode</b> — never "add one to a number" — so the toast can name the episode. Undo lasts 6 seconds.</li>
+          <li><b>When a filter is empty for one media type, say why.</b> "Films don't have a watching state" is a real answer; an empty grid is not.</li>
+        </ol></div>
+      </div>
+
+      <!-- 7 PROFILE -->
+      <div class="col">
+        <div class="col-h"><h3>7 · You — taste</h3><p>Private in MVP. All of it computed from your own records.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>You</h4><button class="circ">⚙</button></div>
+          <div class="stiles">
+            <div class="st-t"><b>97</b><span>Titles</span></div>
+            <div class="st-t"><b>412</b><span>Episodes</span></div>
+            <div class="st-t"><b>18.4</b><span>Days</span></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Your taste · by count</span><a href="#a">Score ▾</a></div></div>
+          <div class="tastecard">
+            <div class="tc-h"><b>Science Fiction</b><i>1</i></div>
+            <div class="tc-m">
+              <div><b>24</b><span>titles</span></div><div><b>8.1</b><span>avg</span></div><div><b>3d 4h</b><span>time</span></div></div>
+            <div class="tc-r"><i style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"></i><i style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"></i><i style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"></i><i style="background:linear-gradient(150deg,#3A5A7A,#14243A)"></i><i style="background:linear-gradient(150deg,#6A6A6A,#242424)"></i></div>
+          </div>
+          <div class="tastecard">
+            <div class="tc-h"><b>Denis Villeneuve</b><i>2</i></div>
+            <div class="tc-m">
+              <div><b>6</b><span>of 11</span></div><div><b>8.6</b><span>avg</span></div><div><b>13h</b><span>time</span></div></div>
+            <div class="tc-r"><i style="background:linear-gradient(150deg,#C79B5B,#8A5A2B)"></i><i style="background:linear-gradient(145deg,#5A3B7A,#2B1B3F)"></i><i style="background:linear-gradient(150deg,#3A5A7A,#14243A)"></i><i style="background:linear-gradient(160deg,#1B3B5A,#0A1A2F)"></i></div>
+          </div>
+          <div class="tastecard">
+            <div class="tc-h"><b>Drama</b><i>3</i></div>
+            <div class="tc-m">
+              <div><b>19</b><span>titles</span></div><div><b>7.8</b><span>avg</span></div><div><b>2d 9h</b><span>time</span></div></div>
+            <div class="tc-r"><i style="background:linear-gradient(150deg,#4A7C59,#1E3A28)"></i><i style="background:linear-gradient(150deg,#7A4A4A,#2E1A1A)"></i><i style="background:linear-gradient(150deg,#2B5A4A,#0F241C)"></i></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div><span>⌂</span>Home</div><div><span>⌕</span>Search</div><div><span>▤</span>Library</div><div class="on"><span>◍</span>You</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:26">
+          <li><b>One card shape serves genres, people and decades.</b> Name, rank, three measures, poster evidence. A person card shows <code>6 of 11</code> where a genre card shows a count — same component, different denominator.</li>
+          <li><b>Taste needs no other users</b>, so it ships in the MVP even though public profiles don't. It is the Tracker's payoff.</li>
+          <li><b>No streaks, no nudges, nothing that decays.</b> Every number here is cumulative; skipping a month costs nothing.</li>
+        </ol></div>
+      </div>
+
+      <!-- 8 STATES -->
+      <div class="col">
+        <div class="col-h"><h3>8 · States</h3><p>Empty, loading, error, no-results.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>Library</h4></div>
+          <div class="empty">
+            <div class="ic">▤</div><h6>Nothing here yet</h6>
+            <p>Titles you save or mark watched will collect here.</p>
+            <button class="btn">Browse trending</button>
+          </div>
+        </div></div>
+        <div class="phone" style="margin-top:14px"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>Search</h4></div>
+          <div class="sect"><div class="sect-h"><span>Loading</span></div></div>
+          <div style="margin:0 14px"><div class="fgrid">
+            <div class="fc"><div class="sk" style="aspect-ratio:2/3;margin-bottom:5px"></div><div class="sk" style="height:8px;width:80%"></div></div>
+            <div class="fc"><div class="sk" style="aspect-ratio:2/3;margin-bottom:5px"></div><div class="sk" style="height:8px;width:65%"></div></div>
+            <div class="fc"><div class="sk" style="aspect-ratio:2/3;margin-bottom:5px"></div><div class="sk" style="height:8px;width:72%"></div></div>
+          </div></div>
+        </div></div>
+        <div class="phone" style="margin-top:14px"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>Dune</h4></div>
+          <div class="errbox">
+            <b>Couldn't load where to watch</b>
+            <p>Everything else on this page is up to date. This section alone failed.</p>
+            <button class="btn q">Retry</button>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Overview</span></div>
+            <p class="ov">Paul Atreides unites with Chani and the Fremen…</p></div>
+        </div></div>
+        <div class="phone" style="margin-top:14px"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>Search</h4></div>
+          <div class="empty">
+            <div class="ic">⌕</div><h6>No results for "villenueve"</h6>
+            <p>Did you mean <span style="color:var(--acc-t)">Villeneuve</span>?</p>
+            <button class="btn q">Clear filters · 3 active</button>
+          </div>
+        </div></div>
+        <div class="phone" style="margin-top:14px"><div class="ph-top"><span></span></div><div class="ph-body short">
+          <div class="tbar"><h4>People</h4></div>
+          <div class="sect"><div class="sect-h"><span>Created by · fallbacks</span></div>
+            <button class="prow" style="margin-bottom:8px"><span class="pf i-vg"></span>
+              <span class="pb"><b>Vince Gilligan</b><span>Creator · Writing</span></span>
+              <span class="go">›</span></button>
+            <button class="prow" style="margin-bottom:8px"><span class="pf noimg">JD</span>
+              <span class="pb"><b>Jane Doe</b><span>Creator · no photo</span></span>
+              <span class="go">›</span></button>
+            <div class="prow nolink"><span class="pf noimg">AK</span>
+              <span class="pb"><b>A. Kaur</b><span>Name only · no person record</span></span></div>
+          </div>
+          <p class="ov" style="margin:12px 14px 0;font-size:11.5px">Photo missing → initials, still tappable.
+            No person record at all → initials, no chevron, not tappable.</p>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:29">
+          <li><b>Errors are scoped to the section that failed</b>, never the whole page. A dead provider call must not blank a title page that already has its synopsis.</li>
+          <li><b>Every empty state names one action.</b> Never a bare illustration.</li>
+          <li><b>No-results always offers a spelling suggestion and a filter escape</b>, with the active filter count shown — the most common cause of zero results is a filter the user forgot.</li>
+          <li><b>Skeletons mirror the layout that's coming</b>, so nothing shifts on arrival.</li>
+          <li><b>Any named person is a person row, never loose text.</b> Photo, name, role, chevron — the same
+            component whether it's a creator, a director or a cast member, so every name on every screen behaves
+            identically and lands on the same page shape.</li>
+          <li><b>Missing photo degrades to initials, and the row stays tappable</b> — a person page is still worth
+            opening without a headshot.</li>
+          <li><b>No person record at all → initials, no chevron, not tappable.</b> The name is still shown, because
+            the credit is true even when we can't navigate to it. A link that goes nowhere is worse than plain text.</li>
+        </ol></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ EDGE CASES ============ -->
+  <section>
+    <h2>Edge cases the data will actually produce</h2>
+    <p class="lede">From the verified TMDB inventory — these are not hypotheticals.</p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:230px">Case</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr><td><b>No providers in region</b></td><td>Show "Not streaming in India" plus a JustWatch link — never an empty card. Likely common for older and non-Hollywood titles.</td></tr>
+        <tr><td><b>No poster / no backdrop</b></td><td>Gradient placeholder seeded from the title, plus the title set in type. Never a broken-image icon, never a blank tile.</td></tr>
+        <tr><td><b>No person photo</b></td><td>Initials on a neutral circle. The row stays tappable — the filmography is still worth opening.</td></tr>
+        <tr><td><b>Credit with no person record</b></td><td>TMDB sometimes returns a crew name without a usable person id. Show the name with initials, drop the chevron, make it non-tappable. Never render a link that dead-ends.</td></tr>
+        <tr><td><b>Series still airing</b></td><td>Progress denominator counts <i>aired</i> episodes only; unaired ones render dimmed and un-tickable, with the air date shown.</td></tr>
+        <tr><td><b>New season added after you finished</b></td><td>Status flips Watched → Watching automatically and the title returns to Continue watching. It's the only behaviour that doesn't lose the user's place.</td></tr>
+        <tr><td><b>Specials / season 0</b></td><td>Excluded from the progress denominator, available on their own tab. Otherwise nobody ever reaches 100%.</td></tr>
+        <tr><td><b>Episode titles spoil</b></td><td>Titles of unwatched episodes past your progress point are blurred behind a tap-to-reveal, defaulting to on.</td></tr>
+        <tr><td><b>Title is both film and series</b></td><td>TMDB keys them separately; we follow. They are two records and never merge.</td></tr>
+        <tr><td><b>Rating without watching</b></td><td>Blocked. The ★ offers to mark watched first.</td></tr>
+        <tr><td><b>Offline / TMDB down</b></td><td>Library and all watch state remain readable — they're ours. Only TMDB-backed sections show the scoped error.</td></tr>
+        <tr><td><b>Save fails after optimistic <code>+1</code></b></td><td>Progress rolls back visibly and the toast becomes "Couldn't save · Retry". Silent loss is the one unacceptable outcome.</td></tr>
+        <tr><td><b>Guest browsing</b></td><td>Everything readable; every tracking control prompts sign-in on tap. No parallel local database.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ============ LIVE SCREENS ============ -->
+  <section>
+    <h2>Live screens · real posters, real numbers</h2>
+    <p class="lede">The same components, rendered with production data pulled from TMDB on <b>12 September 2026</b> —
+      real artwork, real titles, real scores, real episode stills, real Indian availability. Nothing here is a placeholder.</p>
+
+    <div class="screens" style="margin-top:28px">
+
+      <!-- LIVE: title film -->
+      <div class="col">
+        <div class="col-h"><h3>Title — Dune: Part Two</h3><p>Note the missing certificate: the meta line simply reflows.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="hero img i-dune_b">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head">
+            <div class="poster img i-dune_p"></div>
+            <div class="head-t"><h5>Dune: Part Two</h5>
+              <div class="metaline">2024 · Science Fiction, Adventure · 2h 47m</div></div>
+          </div>
+          <div class="block">
+            <div class="arow">
+              <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button><button class="ibtn">✎</button></div>
+            <div class="prov"><div class="prov-l">Where to watch · India</div>
+              <div class="provrow">
+                <button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button>
+                <button class="pchip" style="opacity:.75"><span class="plogo" style="background:var(--ink-8)">↧</span>Rent · 4</button>
+              </div></div>
+          </div>
+          <div class="scores">
+            <div class="score gold"><b>8.1</b><span>TMDB · 8.5k</span></div>
+            <div class="score"><b>9.0</b><span>You</span></div>
+            <div class="score dim"><b>1</b><span>Rewatches</span></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Overview</span></div>
+            <p class="ov">Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a
+              path of revenge against the conspirators who destroyed his family. <b>more</b></p></div>
+          <div class="sect"><div class="sect-h"><span>Cast</span><a href="#a">All 4</a></div></div>
+          <div class="rail">
+            <div class="rt" style="flex-basis:64px"><div class="im img i-cast0" style="aspect-ratio:1;border-radius:99px"></div><div class="tt">Timothée Chalamet</div><div class="yy">Paul Atreides</div></div>
+            <div class="rt" style="flex-basis:64px"><div class="im img i-cast1" style="aspect-ratio:1;border-radius:99px"></div><div class="tt">Zendaya</div><div class="yy">Chani</div></div>
+            <div class="rt" style="flex-basis:64px"><div class="im img i-cast2" style="aspect-ratio:1;border-radius:99px"></div><div class="tt">Rebecca Ferguson</div><div class="yy">Jessica</div></div>
+            <div class="rt" style="flex-basis:64px"><div class="im img i-cast3" style="aspect-ratio:1;border-radius:99px"></div><div class="tt">Javier Bardem</div><div class="yy">Stilgar</div></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Themes</span></div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <span class="chip" style="font-size:11px;padding:4px 9px">chosen one</span>
+              <span class="chip" style="font-size:11px;padding:4px 9px">sandstorm</span>
+              <span class="chip" style="font-size:11px;padding:4px 9px">desert</span>
+              <span class="chip" style="font-size:11px;padding:4px 9px">distant future</span>
+              <span class="chip" style="font-size:11px;padding:4px 9px">+4</span></div></div>
+          <div class="sect"><div class="sect-h"><span>Recommendations</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-rec0"><button class="sb">+</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+            <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-rec3"><button class="sb">+</button><span class="gb">6.3</span></div><div class="tt">Prince of Persia</div><div class="yy">2010</div></div>
+          </div><div style="height:18px"></div>
+        </div></div>
+      </div>
+
+      <!-- LIVE: title series -->
+      <div class="col">
+        <div class="col-h"><h3>Title — Breaking Bad</h3><p>Real episode stills, runtimes and per-episode scores.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="hero img i-bb_b">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head">
+            <div class="poster img i-bb_p"></div>
+            <div class="head-t"><h5>Breaking Bad</h5>
+              <div class="metaline"><span class="cert">A</span>2008–2013 · Drama, Crime · 5 seasons</div></div>
+          </div>
+          <div class="block">
+            <div class="arow">
+              <button class="spill" style="background:var(--st-ing-9);color:#06231C">▶ Watching <span style="opacity:.6;font-size:10px">▾</span></button>
+              <button class="ibtn like on" aria-pressed="true">♥</button><button class="ibtn">✎</button></div>
+            <div style="margin-top:11px;border-top:1px solid var(--bd-sub);padding-top:11px">
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px">
+                <span style="color:var(--muted)">Progress</span><span style="font-family:var(--f-m);color:var(--acc-t)">11 of 62</span></div>
+              <div style="height:4px;border-radius:99px;background:var(--ink-5);overflow:hidden">
+                <i style="display:block;height:100%;width:17.7%;background:var(--acc)"></i></div></div>
+          </div>
+          <div class="scores">
+            <div class="score gold"><b>8.9</b><span>TMDB</span></div>
+            <div class="score dim"><b>—</b><span>You</span></div>
+            <div class="score"><b>62</b><span>Episodes</span></div>
+          </div>
+          <div class="seasonsw">
+            <button class="sw" aria-pressed="true">S1<em>7</em></button><button class="sw">S2<em>13</em></button>
+            <button class="sw">S3<em>13</em></button><button class="sw">S4<em>13</em></button>
+            <button class="sw">S5<em>16</em></button><button class="sw">Specials<em>9</em></button></div>
+          <div class="sect"><div class="sect-h"><span>Season 1 · 7 episodes</span><a href="#a">Mark all</a></div>
+            <div class="eprow" style="border-top:none">
+              <div class="st img i-ep0"></div>
+              <div class="eb"><div class="en">S1 E1 · Pilot</div><div class="ed">20 Jan 2008 · 59m · ★ 8.5</div></div>
+              <button class="epchk on">✓</button></div>
+            <div class="eprow">
+              <div class="st img i-ep1"></div>
+              <div class="eb"><div class="en">S1 E2 · Cat's in the Bag...</div><div class="ed">27 Jan 2008 · 49m · ★ 8.2</div></div>
+              <button class="epchk on">✓</button></div>
+            <div class="eprow">
+              <div class="st img i-ep2"></div>
+              <div class="eb"><div class="en">S1 E3 · ...And the Bag's in the River</div><div class="ed">10 Feb 2008 · 49m · ★ 8.4</div></div>
+              <button class="epchk">○</button></div>
+            <div class="eprow">
+              <div class="st img i-ep3"></div>
+              <div class="eb"><div class="en">S1 E4 · Cancer Man</div><div class="ed">17 Feb 2008 · 49m · ★ 7.9</div></div>
+              <button class="epchk">○</button></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Created by</span></div>
+            <button class="prow"><span class="pf i-vg"></span>
+              <span class="pb"><b>Vince Gilligan</b><span>Creator · Writing</span></span>
+              <span class="go">›</span></button>
+          </div>
+          <div style="height:18px"></div>
+        </div></div>
+      </div>
+
+      <!-- LIVE: person -->
+      <div class="col">
+        <div class="col-h"><h3>Person — Denis Villeneuve</h3><p>Denominator 10, per the ≥200-vote rule. That rule is a decision.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><button class="circ">‹</button><button class="circ">⋮</button></div>
+          <div class="phead">
+            <div class="pav img i-dv_face"></div>
+            <div><div class="pn">Denis Villeneuve</div><div class="pr">Directing · b. 1967, Québec</div></div></div>
+          <div class="collectbar">
+            <div class="cb-t"><b><i>4</i> of 10 directed</b><span>40%</span></div>
+            <div class="cb-track"><i style="width:40%"></i></div>
+            <div class="cb-sub">6 to go · 16 credits filtered out</div></div>
+          <div class="rolesw">
+            <button class="sw" aria-pressed="true">Director<em>10</em></button>
+            <button class="sw">Writer<em>7</em></button><button class="sw">Producer<em>5</em></button></div>
+          <div class="sect" style="margin-top:13px"><div class="sect-h"><span>As director</span><a href="#a">Year ▾</a></div></div>
+          <div style="margin:0 14px">
+            <div class="fgrid">
+              <div class="fc"><div class="im img i-dv0"><button class="sb done">✓</button><span class="gb">8.1</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+              <div class="fc"><div class="im img i-dv1"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+              <div class="fc"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Blade Runner 2049</div><div class="yr">2017</div></div>
+              <div class="fc"><div class="im img i-dv3"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+              <div class="fc"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="nm">Sicario</div><div class="yr">2015</div></div>
+              <div class="fc"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="nm">Enemy</div><div class="yr">2014</div></div>
+            </div>
+            <div style="margin-top:10px;padding:9px 11px;border:1px dashed var(--bd);border-radius:9px;
+              font-size:11px;color:var(--muted);line-height:1.5">
+              <b style="color:var(--text)">16 more credits hidden</b> — shorts, documentaries and 2 unreleased projects.
+              <span style="color:var(--acc-t)">Show all 26</span></div>
+          </div>
+          <div style="height:18px"></div>
+        </div></div>
+      </div>
+
+      <!-- LIVE: home -->
+      <div class="col">
+        <div class="col-h"><h3>Home</h3><p>Continue watching over real artwork, then discovery.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>Tonight</h4><div style="display:flex;gap:6px"><button class="circ">⌕</button><button class="circ">◑</button></div></div>
+          <div class="grp" style="margin-top:14px">
+            <div class="grp-h"><b>Continue watching</b><span>1</span></div>
+            <div class="srow"><div class="th img i-bb_p"></div>
+              <div class="bd"><div class="nm">Breaking Bad</div><div class="ep">S2 E4 · 11 of 62</div></div>
+              <button class="plus">+</button><span class="track"><i style="width:17.7%"></i></span></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>Because you watched Dune: Part Two</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-rec0"><button class="sb done">✓</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+            <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-rec3"><button class="sb">+</button><span class="gb">6.3</span></div><div class="tt">Prince of Persia</div><div class="yy">2010</div></div>
+          </div>
+          <div class="sect"><div class="sect-h"><span>More from Denis Villeneuve</span><a href="#a">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-dv4"><button class="sb want">◷</button><span class="gb">7.4</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+            <div class="rt"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="tt">Enemy</div><div class="yy">2014</div></div>
+            <div class="rt"><div class="im img i-dv2"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+            <div class="rt"><div class="im img i-dv3"><button class="sb done">✓</button><span class="gb">7.6</span></div><div class="tt">Arrival</div><div class="yy">2016</div></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div class="on"><span>⌂</span>Home</div><div><span>⌕</span>Search</div><div><span>▤</span>Library</div><div><span>◍</span>You</div></div>
+        </div></div>
+      </div>
+
+    </div>
+
+    <div class="warnbox" style="margin-top:28px"><b>What real artwork changes.</b> Posters are far louder than the
+      gradients I mocked with — which is the argument for neutral chrome made concrete. Titles are also longer than
+      placeholders ("…And the Bag's in the River" wraps to two lines), episode stills are genuinely dark, and the gold
+      score badge has to survive being placed over any of it. That's why the badge keeps its own scrim rather than
+      trusting the theme.</div>
+  </section>
+
+  <!-- ============ LIVE DATA ============ -->
+  <section>
+    <h2>Live data · what production actually returns</h2>
+    <p class="lede">Fetched from TMDB on <b>12 September 2026</b> using the project's own key, through
+      <code>api/_tmdbCore.mjs</code>. Not sample data, not remembered — the real response. Four of my design
+      assumptions did not survive it.</p>
+
+    <div class="live">
+      <div class="live-h"><b>/movie/693134 · Dune: Part Two</b><span>200 OK</span></div>
+      <dl class="kv">
+        <dt>Title</dt><dd>Dune: Part Two</dd>
+        <dt>Released</dt><dd>2024-02-27</dd>
+        <dt>Runtime</dt><dd>167 min → <b>2h 47m</b> <span style="color:var(--muted)">(I had drawn 2h 46m)</span></dd>
+        <dt>Genres</dt><dd>Science Fiction, Adventure <span style="color:var(--muted)">— two, not one</span></dd>
+        <dt>Tagline</dt><dd>"Long live the fighters."</dd>
+        <dt>TMDB score</dt><dd>8.1 from 8,535 votes <span style="color:var(--muted)">(I had drawn 8.2)</span></dd>
+        <dt>Director</dt><dd>Denis Villeneuve</dd>
+        <dt>Top cast</dt><dd>Timothée Chalamet (Paul Atreides) · Zendaya (Chani) · Rebecca Ferguson (Jessica) · Javier Bardem (Stilgar)</dd>
+        <dt>IN certification</dt><dd class="miss">"" — empty string</dd>
+        <dt>IN streaming</dt><dd>Netflix <span style="color:var(--muted)">— not JioHotstar, which I guessed</span></dd>
+        <dt>IN rent</dt><dd>Apple TV Store, Google Play, YouTube, Amazon Video</dd>
+        <dt>Keywords</dt><dd>based on novel or book, sandstorm, chosen one, sequel, distant future, creature, planet, desert</dd>
+      </dl>
+    </div>
+
+    <div class="live">
+      <div class="live-h"><b>/tv/1396 · Breaking Bad</b><span>200 OK</span></div>
+      <dl class="kv">
+        <dt>Run</dt><dd>2008-01-20 → 2013-09-29 · Ended</dd>
+        <dt>Counts</dt><dd>5 seasons · 62 episodes · score 8.9</dd>
+        <dt>Seasons</dt><dd>Specials (9) · S1 (7) · S2 (13) · S3 (13) · S4 (13) · S5 (16)</dd>
+        <dt>Creator</dt><dd>Vince Gilligan</dd>
+        <dt>Certification</dt><dd>IN <b>A</b> · US <b>TV-MA</b> <span style="color:var(--muted)">— present here, unlike the film</span></dd>
+        <dt>S1 episodes</dt><dd>
+          Pilot · 2008-01-20 · 59m · 8.5<br>
+          Cat's in the Bag… · 2008-01-27 · 49m · 8.2<br>
+          …And the Bag's in the River · 2008-02-10 · 49m · 8.4<br>
+          Cancer Man · 2008-02-17 · 49m · 7.9<br>
+          Gray Matter · 2008-02-24 · 49m · 8.2</dd>
+      </dl>
+    </div>
+
+    <div class="live">
+      <div class="live-h"><b>/person · filmography counts</b><span>200 OK</span></div>
+      <dl class="kv">
+        <dt>Villeneuve</dt><dd>26 raw <code>job=="Director"</code> → 24 with a release date → <b>10</b> with ≥200 votes</dd>
+        <dt>Scorsese</dt><dd>66 raw → 57 with a release date → <b>29</b> with ≥200 votes</dd>
+        <dt>In the 26</dt><dd class="miss">shorts, concert films, TV segments, and 2 unreleased projects with no date at all</dd>
+      </dl>
+    </div>
+
+    <h3>What this changes</h3>
+    <div class="tw"><table>
+      <thead><tr><th style="width:210px">Finding</th><th>Consequence</th></tr></thead>
+      <tbody>
+        <tr><td><b>Indian certification is often absent</b></td><td>My title page printed <code>U/A 16+</code>. TMDB returns an empty string for this film while returning <code>A</code> for Breaking Bad. <b>The cert chip must be conditional</b>, and the meta line has to reflow without it — not render an empty box.</td></tr>
+        <tr><td><b>The collection denominator is a policy, not a fact</b></td><td>R18's "6 of 11 directed" doesn't exist. Villeneuve is 26 / 24 / 10 depending on the rule. <code>TMDB_CAPABILITIES.md</code> generalised from Tarantino, whose filmography is unusually clean. <b>This needs a written rule before the person page can ship</b> — and it is a product decision, not an engineering one.</td></tr>
+        <tr><td><b>Providers must be fetched, never assumed</b></td><td>I guessed JioHotstar for an Indian viewer; it's Netflix. Obvious in hindsight, and exactly why R11 prints the region on screen.</td></tr>
+        <tr><td><b>Specials are already excluded</b></td><td><code>number_of_episodes</code> is 62 and seasons 1–5 sum to 62 — season 0's 9 episodes sit outside it. So R17 is <i>free</i>: TMDB has already made that decision for us.</td></tr>
+        <tr><td><b>Episode runtimes vary within a season</b></td><td>59m then 49m. Any "time watched" total must sum real runtimes, not multiply an average.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="warnbox"><b>Three questions this hands to your PRD.</b>
+      What counts as a film for collection progress — released only? feature-length only? a vote threshold?
+      What shows in place of a missing certification — nothing, or "Not rated"?
+      And does a person page count <i>all</i> directed work or only what we'd show in the grid?</div>
+  </section>
+
+  <footer>
+    Projector design system v1 — 2026-09-12. Consolidates the colour scales, watch-state palette, control set, nine MVP
+    screens, live TMDB data and the rules behind them. Dark is the theme you shipped, unchanged; light is derived by
+    step role. Business rules R1–R38 and every edge-case decision are reasoned proposals pending the detailed PRD.
+    Artwork and figures in the live section are real TMDB data fetched 12 September 2026; elsewhere they are illustrative.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.tog button');
+  function apply(m){root.setAttribute('data-theme',m);
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.set===m));});}
+  var init=root.getAttribute('data-theme');
+  if(!init){init=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
+  apply(init);
+  btns.forEach(function(b){b.addEventListener('click',function(){apply(b.dataset.set);});});
+  document.querySelectorAll('.chips,.rolesw,.seasonsw').forEach(function(g){
+    g.addEventListener('click',function(e){
+      var c=e.target.closest('.chip,.sw'); if(!c)return;
+      g.querySelectorAll('.chip,.sw').forEach(function(x){x.setAttribute('aria-pressed','false');});
+      c.setAttribute('aria-pressed','true');
+    });
+  });
+  document.querySelectorAll('.epchk').forEach(function(b){
+    b.addEventListener('click',function(){
+      var on=b.classList.toggle('on'); b.textContent=on?'\u2713':'\u25CB';
+    });
+  });
+  document.querySelectorAll('.ibtn.like').forEach(function(b){
+    b.addEventListener('click',function(){
+      var on=b.classList.toggle('on');
+      b.textContent=on?'\u2665':'\u2661';
+      b.setAttribute('aria-pressed',String(on));
+    });
+  });
+  document.querySelectorAll('.sb').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(b.classList.contains('done')){b.classList.remove('done');b.textContent='+';}
+      else if(b.classList.contains('want')){b.classList.remove('want');b.classList.add('done');b.textContent='\u2713';}
+      else {b.classList.add('want');b.textContent='\u25F7';}
+    });
+  });
+})();
+</script>

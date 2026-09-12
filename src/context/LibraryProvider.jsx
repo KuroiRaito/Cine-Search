@@ -86,7 +86,7 @@ export function LibraryProvider({ children }) {
 
     const save = useCallback(async (item, {
         status = null, rating = null, favourite = null,
-        rewatches = null, recommendedBy = null, episodes = null,
+        rewatches = null, recommendedBy = null, notes = null, episodes = null,
     } = {}) => {
         const key = api.keyOf(item.mediaType, item.id);
         const before = latest.current[key] ?? null;
@@ -99,6 +99,7 @@ export function LibraryProvider({ children }) {
             is_favourite: favourite ?? before?.is_favourite ?? false,
             rewatch_count: rewatches ?? before?.rewatch_count ?? 0,
             recommended_by: recommendedBy ?? before?.recommended_by ?? null,
+            notes: notes ?? before?.notes ?? null,
             watched_episodes: episodes ?? before?.watched_episodes ?? {},
         };
         if (!api.validRating(rating)) return false;
@@ -106,7 +107,7 @@ export function LibraryProvider({ children }) {
             const catalog = await api.catalogFor(item.id, item.mediaType, item.catalog, { exists: Boolean(before) });
             let row = await api.upsert({
                 id: item.id, mediaType: item.mediaType, catalog,
-                status, rating, favourite, rewatches, recommendedBy,
+                status, rating, favourite, rewatches, recommendedBy, notes,
             });
             // Episodes live in their own function because the client sends the
             // whole season rather than a delta. Only seasons that actually
@@ -201,6 +202,7 @@ const normalise = (r) => ({
     watched_episodes: r.watched_episodes ?? {},
     rewatch_count: r.rewatch_count ?? 0,
     recommended_by: r.recommended_by ?? null,
+    notes: r.notes ?? null,
     added_at: r.added_at,
     started_at: r.started_at ?? null,
     completed_at: r.completed_at ?? null,

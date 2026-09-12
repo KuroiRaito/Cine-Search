@@ -30,6 +30,7 @@ export default function Editor({ title, onClose }) {
     const [watched, setWatched] = useState(entry?.watched_episodes ?? {});
     const [rewatches, setRewatches] = useState(entry?.rewatch_count ?? 0);
     const [by, setBy] = useState(entry?.recommended_by ?? '');
+    const [notes, setNotes] = useState(entry?.notes ?? '');
     const [rateNote, setRateNote] = useState(false);
     // Whether the person actually took their score off, as opposed to the score
     // merely not being editable under the status they just chose.
@@ -82,6 +83,9 @@ export default function Editor({ title, onClose }) {
             favourite,
             rewatches,
             recommendedBy: by.trim() || null,
+            // Empty string rather than null: emptying the box is an
+            // instruction to delete the note, not an absence of one.
+            notes: notes.trim(),
             episodes: isTV ? watched : null,
         });
         // Clearing is a different intention from not passing one, so it is a
@@ -240,6 +244,21 @@ export default function Editor({ title, onClose }) {
                     <p className="hint">Optional. Only you ever see this.</p>
                 </div>
 
+                {/* Private, and staying that way: publishing was parked with
+                    Layer 3, so a note is never a review in waiting. */}
+                <div className="fld">
+                    <label htmlFor="ed-notes">Notes</label>
+                    <textarea
+                        id="ed-notes"
+                        className="inp notes"
+                        value={notes}
+                        maxLength={2000}
+                        rows={3}
+                        placeholder="Private to you…"
+                        onChange={(e) => setNotes(e.target.value)}
+                    />
+                </div>
+
                 <div className="sh-foot">
                     {confirming ? (
                         <>
@@ -248,6 +267,7 @@ export default function Editor({ title, onClose }) {
                                     'its status',
                                     rating != null && 'your rating',
                                     favourite && 'the favourite',
+                                    notes.trim() && 'your notes',
                                     isTV && seen > 0 && `all ${seen} watched episode${seen === 1 ? '' : 's'}`,
                                 ].filter(Boolean).join(', ').replace(/,([^,]*)$/, ' and$1')} — not just from this screen.
                             </p>

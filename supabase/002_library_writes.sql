@@ -39,6 +39,14 @@ alter table public.user_library
 alter table public.catalog_titles
   add column if not exists seasons jsonb not null default '[]'::jsonb;
 
+-- Private notes. The column waited on a scope question rather than a technical
+-- one: if notes are ever published they are reviews, which is a different
+-- feature with a moderation problem attached. Layers 3 and 4 are parked
+-- indefinitely (owner's call, 2026-09-13), so notes are private and only ever
+-- private.
+alter table public.user_library
+  add column if not exists notes text;
+
 create index if not exists user_library_favourites
   on public.user_library (user_id) where is_favourite;
 
@@ -104,6 +112,7 @@ end $$;
 -- so it is dropped rather than replaced.
 drop function if exists public.library_upsert(integer, text, jsonb, text, numeric);
 drop function if exists public.library_upsert(integer, text, jsonb, text, numeric, boolean);
+drop function if exists public.library_upsert(integer, text, jsonb, text, numeric, boolean, integer, text);
 
 -- Add a title to the library, or change its status, rating or favourite flag.
 -- Null status or rating means "leave it alone", so one entry point serves the
@@ -116,7 +125,8 @@ create or replace function public.library_upsert(
   p_rating     numeric default null,
   p_favourite  boolean default null,
   p_rewatches  integer default null,
-  p_recommended_by text default null
+  p_recommended_by text default null,
+  p_notes      text    default null
 ) returns public.user_library
 language plpgsql
 security definer
@@ -152,7 +162,7 @@ begin
 
   insert into public.user_library as l (
     user_id, tmdb_id, media_type, status, rating, is_favourite,
-    rewatch_count, recommended_by, recommended_at,
+    rewatch_count, recommended_by, recommended_at, notes,
     started_at, completed_at, episodes_at_completion
   )
   values (
@@ -162,6 +172,7 @@ begin
     -- Stamped rather than asked for. "Ravi, some time in March" is the whole
     -- value; making someone pick a date to record it would cost more than it.
     case when nullif(p_recommended_by, '') is not null then current_date end,
+    nullif(p_notes, ''),
     case when v_status in ('watching', 'watched', 'rewatching') then now() end,
     case when v_status = 'watched' then now() end,
     case when v_status = 'watched' then v_episodes end
@@ -177,6 +188,10 @@ begin
        and nullif(p_recommended_by, '') is distinct from l.recommended_by
       then current_date else l.recommended_at
     end,
+    -- Notes are the one field where an empty box is a real instruction: a
+    -- person who selects their note and deletes it means to delete it. Null
+    -- means "not passed"; empty string means "emptied".
+    notes = case when p_notes is null then l.notes else nullif(p_notes, '') end,
     -- The first time it moved out of "want to watch" is the real start date,
     -- and it must survive every later status change.
     started_at = coalesce(
@@ -195,6 +210,9 @@ begin
 
   -- What the row says now is the truth; activity is the record of how it got
   -- there. Only ever appended, never corrected.
+  --
+  -- Notes are deliberately absent from it. What someone wrote privately about a
+  -- film is not an event to be replayed, and the taste work has no use for it.
   v_kind := case
     when v_existing.id is null then 'added'
     when p_rating is not null and p_rating is distinct from v_existing.rating then 'rated'
@@ -323,13 +341,13 @@ end $$;
 -- Guests get nothing. Every one of these raises on a null auth.uid() as well,
 -- so the grant and the body agree.
 revoke execute on function public.catalog_ensure(integer, text, jsonb)                from public, anon;
-revoke execute on function public.library_upsert(integer, text, jsonb, text, numeric, boolean, integer, text) from public, anon;
+revoke execute on function public.library_upsert(integer, text, jsonb, text, numeric, boolean, integer, text, text) from public, anon;
 revoke execute on function public.library_episodes_set(integer, integer, integer[], jsonb)  from public, anon;
 revoke execute on function public.library_remove(integer, text)                       from public, anon;
 revoke execute on function public.library_clear_rating(integer, text)                 from public, anon;
 
 grant execute on function public.catalog_ensure(integer, text, jsonb)                 to authenticated;
-grant execute on function public.library_upsert(integer, text, jsonb, text, numeric, boolean, integer, text) to authenticated;
+grant execute on function public.library_upsert(integer, text, jsonb, text, numeric, boolean, integer, text, text) to authenticated;
 grant execute on function public.library_episodes_set(integer, integer, integer[], jsonb)     to authenticated;
 grant execute on function public.library_remove(integer, text)                        to authenticated;
 grant execute on function public.library_clear_rating(integer, text)                  to authenticated;

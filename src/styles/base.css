@@ -977,3 +977,7 @@ img { max-width: 100%; display: block; }
   background: none; border: 0; padding: 0; cursor: pointer;
   font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--acc-t);
 }
+
+/* Notes are the one field that takes more than a line, so it is the one input
+   that grows. Resizing stays vertical — a sheet has a fixed width. */
+.inp.notes { min-height: 62px; line-height: 1.55; resize: vertical; }

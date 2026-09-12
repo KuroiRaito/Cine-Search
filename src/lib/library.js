@@ -80,7 +80,7 @@ const unwrap = ({ data, error }) => {
 export async function upsert({
     id, mediaType, catalog,
     status = null, rating = null, favourite = null,
-    rewatches = null, recommendedBy = null,
+    rewatches = null, recommendedBy = null, notes = null,
 }) {
     return supabase.rpc('library_upsert', {
         p_tmdb_id: id,
@@ -91,6 +91,7 @@ export async function upsert({
         p_favourite: favourite,
         p_rewatches: rewatches,
         p_recommended_by: recommendedBy,
+        p_notes: notes,
     }).then(unwrap);
 }
 
@@ -119,7 +120,7 @@ export async function setEpisodes({ id, season, episodes, catalog }) {
 export async function loadAll() {
     return supabase
         .from('user_library')
-        .select('tmdb_id, media_type, status, rating, is_favourite, watched_episodes, rewatch_count, recommended_by, recommended_at, added_at, started_at, completed_at, updated_at')
+        .select('tmdb_id, media_type, status, rating, is_favourite, watched_episodes, rewatch_count, recommended_by, recommended_at, notes, added_at, started_at, completed_at, updated_at')
         .order('updated_at', { ascending: false })
         .then(unwrap);
 }

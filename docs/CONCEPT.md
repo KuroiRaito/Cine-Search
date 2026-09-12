@@ -122,12 +122,50 @@ Rich detail pages: cast, crew, similar work, connections, context. New releases.
 Creator collections and filmography progress ("8 of 10 Tarantino"). Canons and user-made lists. The taste profile: genres, directors, actors, decades — built from Layer 0.
 **Closes:** Cinephile's record-keeping half. Gives the Tracker a payoff.
 
-### Layer 3 — Standing
+### Layer 3 — Standing *(parked)*
 Public profiles, published opinions and reviews, shareable collections and lists.
 **Closes:** Cinephile's *"no social validation, nowhere to post"*; Critic's *"no discovery for thoughts."*
 
-### Layer 4 — Social mechanics
+### Layer 4 — Social mechanics *(parked)*
 Follows, activity feed, replies, likes. Only once Layer 3 has produced enough to read.
+
+---
+
+### Scope decision — 2026-09-13: the product ends at Layer 2
+
+**Owner's call:** Layers 3 and 4 are parked indefinitely. Both need a community
+to be worth anything, and there is no rollout to users planned. A public profile
+with nobody reading it, and a feed with nobody in it, are worse than their own
+absence — they advertise that the room is empty.
+
+**The horizon is Layer 2.** Three milestones, all shipped or in flight:
+
+| | Layer | State |
+|---|---|---|
+| M1 | 1 — The catalogue | shipped |
+| M2 | 0 — The record | in review |
+| M3 | 2 — Collection & taste | next, and last |
+
+This is not "social later, after M3". It is a different product: a private
+instrument for one film enthusiast to record and understand their own watching.
+AL-chan remains the reference for *how a tracker should feel*, not for what it
+should eventually become.
+
+**What this settles, and what it does not:**
+
+- **Settles.** Nothing a person records is ever published, so private-by-default
+  becomes simply private. No public profile route, no username collision
+  problem, no moderation, no cross-user RLS policy, no share surface, no
+  follower model, no notification system. `user_activity` is a private
+  substrate for taste, never a feed anyone reads.
+- **Does not settle.** The record stays the record. Layers 3 and 4 were always
+  *downstream* of Layer 0, so nothing built for them was built early — parking
+  them costs no rework. If the decision reverses, the data is already the right
+  shape, and the work is new screens rather than a migration.
+
+The personas whose *leaves if* those layers were to close — the Cinephile's
+social half and the Critic — are consciously not served. That is the price, and
+it is stated here so nobody rediscovers it as a surprise later.
 
 ---
 

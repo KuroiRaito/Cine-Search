@@ -35,7 +35,8 @@ This is Layer 0 in the concept doc — the substrate every later layer reads fro
 - **2.3.2** Every status the title can hold is visible at once. No dropdown — one tap instead of open, scan, tap. Films render three, series six.
 - **2.3.3** The current status is visibly current.
 - **2.3.4** Rating is set in half points and can be cleared without removing the title. Whole star = two points, right-click or long-press = the half below it.
-- **2.3.4a** The editor also carries **rewatches** and **who recommended it** — free text, with the month stamped automatically rather than asked for.
+- **2.3.4a** The editor also carries **rewatches**, **who recommended it** (free text, with the month stamped automatically rather than asked for) and **notes**.
+- **2.3.4b** Notes are private and stay private. Emptying the box deletes the note — an empty box is an instruction, not an absence.
 - **2.3.5** Remove asks once before it acts, and says what will be lost.
 - **2.3.6** The sheet closes on save, on escape, and on tapping outside it.
 
@@ -57,7 +58,7 @@ This is Layer 0 in the concept doc — the substrate every later layer reads fro
 - **2.5.4** **Series are rows, films are a grid**, inside one filter. A series carries progress, which a poster cannot show and a row can.
 - **2.5.4a** A series row's `+` marks the **next unwatched episode** and the confirmation names it — never "add one to a number". Undo lasts six seconds.
 - **2.5.5** Tapping an entry opens its title page.
-- **2.5.6** The status can be changed from this screen without opening the title page.
+- ~~**2.5.6** The status can be changed from this screen without opening the title page.~~ **Struck.** The design system doesn't specify the interaction, and every candidate costs something: a long-press is invisible until found, and a tap-target on the row adds furniture to something already carrying poster, title, progress and the `+`. Two taps via the title page is not a hardship at this size. Revisit when the library is large enough for the friction to be real.
 - **2.5.7** A signed-out visitor sees the sign-in invitation, not an error.
 
 ## M2.6 — Honesty of state
@@ -92,6 +93,12 @@ This is Layer 0 in the concept doc — the substrate every later layer reads fro
 
 ## Deliberately not in this milestone
 
-- **Notes.** The design system's editor has a Notes field; there is no column for it, and adding one is a decision about whether notes are ever published later. Left out rather than half-built.
 - **"Jump to episode."** The stepper covers "one more"; jumping covers "I binged seven". The second is a screen of its own.
 - **Search and sort inside the library.** Both are in the design; neither matters at three saved titles, and both want real data to be designed against.
+- **Changing status from the Library screen** — see 2.5.6 above.
+
+## Resolved after the first pass
+
+**Notes are built.** They were held back because adding the column was really a question about Layer 3: published notes are reviews, which is a different feature with a moderation problem attached. Layers 3 and 4 were parked indefinitely on 2026-09-13, so the question is settled — notes are private, only ever private, and deliberately absent from `user_activity`. What someone wrote privately about a film is not an event to replay, and the taste work has no use for it.
+
+**Six defects found sweeping the finished work,** all fixed and re-verified: specials counted against a total that excluded them ("63 of 62"); the sign-in sheet used the wrong verb for the heart and the pencil; demoting a status silently erased a rating; the season header counted one season against the whole run; every Library `+` re-fetched the entire series from TMDB; the toast cleared a tab bar that isn't present at desktop.

@@ -8,6 +8,9 @@
 :root {
   --gutter: 14px;
   --s6: 24px;
+  /* The longest a line of body text may run. Prose past ~65 characters costs
+     the reader the return sweep, so no column exceeds it at any width. */
+  --measure: 65ch;
 }
 @media (min-width: 700px)  { :root { --gutter: 24px; } }
 @media (min-width: 1100px) { :root { --gutter: 40px; } }
@@ -255,7 +258,7 @@ img { max-width: 100%; display: block; }
 
 .sect { margin-top: var(--s6); }
 .sect-h { font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em; color: var(--text); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.ov { font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+.ov { font-size: 12.5px; line-height: 1.6; color: var(--muted); max-width: var(--measure); }
 .ov.clamped { display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .more {
   background: none; border: 0; color: var(--acc-t); cursor: pointer;
@@ -338,7 +341,7 @@ img { max-width: 100%; display: block; }
 .rolesw { display: flex; gap: 2px; overflow-x: auto; margin: 12px var(--gutter) 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
 .rolesw::-webkit-scrollbar { height: 0; }
 
-.bio { font-size: 13px; line-height: 1.65; color: var(--muted); }
+.bio { font-size: 13px; line-height: 1.65; color: var(--muted); max-width: var(--measure); }
 
 /* ---------------- states ---------------- */
 
@@ -386,6 +389,74 @@ img { max-width: 100%; display: block; }
   .scores .s .lbl-long { display: inline; }
 }
 
+/* ---------------- tablet ----------------
+
+   700px to the desktop breakpoint: the gutter has already widened but the
+   three-column desktop layout has not arrived, so this band used to get the
+   phone layout stretched across a landscape window. Nothing here is new
+   structure — it is the phone's own components given sizes that suit the
+   width. Controls stop growing once they are big enough to hit; artwork keeps
+   growing, because artwork is what is being browsed.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 700px) and (max-width: 1119.98px) {
+  /* A 16:9 backdrop in a 190px-tall band is a letterbox slot at this width.
+     Give it back enough height to read as an image. */
+  .hero { height: 260px; }
+
+  /* An 82px poster beside 700px of page reads as a thumbnail that failed to
+     load. It is the second most important image on the screen; size it so. */
+  .tgrid { grid-template-columns: 132px minmax(0, 1fr); gap: 0 20px; margin-top: -72px; }
+  .thead { padding-top: 82px; }
+  .thead h1 { font-size: 26px; letter-spacing: -.032em; margin-bottom: 6px; }
+  .metaline { font-size: 11px; }
+  .tagline { font-size: 13.5px; }
+
+  /* A 700px-wide primary button is not more tappable than a 440px one, only
+     louder. Controls cap; artwork does not.
+
+     One width for all of them, so the block under the title has a single right
+     edge instead of four ragged ones. Prose keeps its own measure — a reading
+     column and a control column are allowed to differ, so long as each is
+     deliberate. */
+  .arow, .scores, .prov, .cards,
+  .tside-inline .prow,
+  .seasonsw, .eplist { max-width: 440px; }
+  /* The episode still earns a little more of that width than it gets on a
+     phone — it is the only thing in the row that identifies the episode
+     before you have read its name. */
+  .eprow .still { width: 84px; }
+  .scores .s b { font-size: 23px; }
+
+  /* At the top of this band the page is already full; at the bottom of it
+     there is slack, and an 1100px window should not leave 600px of void on
+     one side. Centre the column rather than letting it drift left. */
+  .tgrid { max-width: 860px; margin-inline: auto; }
+
+  /* A card whose text stops at the measure but whose box runs to the window
+     is a half-empty box. The container follows the content. */
+  .card { max-width: calc(var(--measure) + 28px); }
+  .rolesw, .track-hint { max-width: 440px; }
+
+  /* The sign-in nudge is an aside, not a billboard. */
+  .card.signup { max-width: 480px; margin-inline: auto; }
+  .card.signup .btn { width: auto; min-width: 220px; }
+
+  /* Four tab targets spread over a landscape window leaves each icon stranded
+     in its own quarter. Hold them together in the middle, thumb-width apart. */
+  .tabs { justify-content: center; }
+  .tab-item { flex: 0 1 132px; }
+
+  /* The person header carries a face — at this width it can be seen. */
+  .phead .avatar { width: 92px; height: 92px; }
+  .phead h1 { font-size: 25px; }
+  .phead .sub { font-size: 13px; }
+
+  /* Artwork keeps growing with the window; the rail still shows a half tile at
+     the edge, which is the only thing telling anyone the row scrolls. */
+  .rail .tile { width: 182px; }
+}
+
 /* ---------------- desktop ---------------- */
 
 @media (min-width: 1120px) {
@@ -413,8 +484,6 @@ img { max-width: 100%; display: block; }
 
   .app-main { padding-bottom: 40px; }
   /* Reading columns never go full width, however wide the screen. */
-  .ov, .bio { max-width: 65ch; }
-  .bio { max-width: 65ch; }
 
   .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .rail .tile { width: 190px; }
@@ -447,9 +516,6 @@ img { max-width: 100%; display: block; }
   /* The four cards go one across rather than two by two. */
   .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
   .pc.open { grid-column: 1 / -1; }
-
-  /* The reading column never runs full width, however wide the window. */
-  .ov { max-width: 65ch; }
 
   .rail.related .tile { width: 132px; }
 }

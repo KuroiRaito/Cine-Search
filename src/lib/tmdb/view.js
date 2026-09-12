@@ -142,6 +142,71 @@ const toCard = (r) => ({
  * this from the full payload rather than from a poster tile is what keeps the
  * genres and keywords in it, which is the whole basis of the taste work later.
  */
+/**
+ * The crew jobs worth storing, for a film.
+ *
+ * A title's full crew is not a list anyone reads: Inception alone credits 736
+ * people, almost all of them gaffers, assistant editors and drivers. These six
+ * are the ones a person actually tracks — the ones they would say made it.
+ */
+const KEY_JOBS = [
+    'Director', 'Writer', 'Screenplay',
+    'Original Music Composer', 'Director of Photography',
+];
+
+/** Billing order is the only ranking TMDB gives, and it is the right one. */
+const CAST_DEPTH = 15;
+
+/**
+ * The people behind a title, flattened for storage.
+ *
+ * Film and television need different rules, because the same job name means
+ * different things in each. Breaking Bad lists 25 Directors and 10 Writers in
+ * `aggregate_credits` — those are per-episode credits, and storing them would
+ * make "your most-watched director" a list of people who did one episode each.
+ * A series has one author and TMDB names them in `created_by`.
+ *
+ * So: a film keeps its key crew; a series keeps its creators, and nothing else
+ * from crew. Cast is billing order in both, capped.
+ */
+export function toCredits(raw, mediaType) {
+    const out = [];
+    const push = (p, role, job, character, order) => {
+        if (!p?.id || !p?.name) return;
+        out.push({
+            id: p.id,
+            name: p.name,
+            profile_path: p.profile_path || null,
+            department: p.known_for_department || null,
+            role,
+            job: job || '',
+            character: character || null,
+            credit_order: order ?? null,
+        });
+    };
+
+    if (mediaType === 'tv') {
+        (raw.aggregate_credits?.cast || [])
+            .slice(0, CAST_DEPTH)
+            .forEach((p, i) => push(p, 'cast', '', p.roles?.[0]?.character, p.order ?? i));
+        (raw.created_by || []).forEach((p) => push(p, 'crew', 'Creator', null, null));
+        return out;
+    }
+
+    (raw.credits?.cast || [])
+        .slice(0, CAST_DEPTH)
+        .forEach((p, i) => push(p, 'cast', '', p.character, p.order ?? i));
+
+    // One person can hold two of these jobs on the same film — Nolan writes and
+    // directs — and that is two credits, not a duplicate. The table's key is
+    // (title, person, role, job), so both are kept and neither collides.
+    (raw.credits?.crew || [])
+        .filter((c) => KEY_JOBS.includes(c.job))
+        .forEach((c) => push(c, 'crew', c.job, null, null));
+
+    return out;
+}
+
 export function toCatalog(raw, mediaType) {
     const isTV = mediaType === 'tv';
     return {
@@ -171,6 +236,9 @@ export function toCatalog(raw, mediaType) {
                 .filter((s) => s.season_number > 0)
                 .map((s) => ({ n: s.season_number, c: s.episode_count || 0 }))
             : [],
+        // Carried on the catalogue payload rather than as another argument, so
+        // saving a title stays one call and one transaction.
+        credits: toCredits(raw, mediaType),
     };
 }
 

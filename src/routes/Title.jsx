@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { titleFull, season as fetchSeason } from '../lib/tmdb/endpoints.js';
 import { toTitleView, toSeasonView, compactCount } from '../lib/tmdb/view.js';
@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthProvider.jsx';
 import { useLibrary } from '../context/LibraryProvider.jsx';
 import {
     statusMeta, statusTone, episodesWatched, isWatched, runningOrder, nextUnwatched,
+    rememberSeasonRuntime,
 } from '../lib/library.js';
 
 const displayName = (type, code) => {
@@ -396,6 +397,17 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
         [title.id, active],
     );
     const { data, error, loading, retry } = useAsync(load, [title.id, active]);
+
+    // Once per season per session: the update fills a blank and never overwrites,
+    // so repeating it would only cost a round trip.
+    const recorded = useRef(new Set());
+    useEffect(() => {
+        if (!isSignedIn || !data?.episodes?.length) return;
+        const key = `${title.id}-${active}`;
+        if (recorded.current.has(key)) return;
+        recorded.current.add(key);
+        rememberSeasonRuntime(title.id, active, data.episodes);
+    }, [isSignedIn, data, title.id, active]);
 
     if (!tabs.length) return null;
 

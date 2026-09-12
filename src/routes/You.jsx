@@ -125,7 +125,14 @@ export default function You() {
                 </p>
             ) : (
                 ranked.map((c, i) => (
-                    <TasteCard key={c.key} card={c} rank={i + 1} total={filmographies[c.person_id]} />
+                    // A genre and a decade are identified by their name; a
+                    // person is not, and had no key at all until this.
+                    <TasteCard
+                        key={c.person_id ? `p${c.person_id}-${c.job || c.role}` : c.key}
+                        card={c}
+                        rank={i + 1}
+                        total={filmographies[c.person_id]}
+                    />
                 ))
             )}
         </div>
@@ -196,7 +203,13 @@ function TasteCard({ card, rank, total }) {
                     </span>
                 </div>
                 <div><b>{card.avg ?? '—'}</b><span>avg</span></div>
-                <div><b>{formatSpan(card.minutes)}</b><span>time</span></div>
+                {/* A season whose runtime has not been gathered yet contributes
+                    nothing, so the figure is a floor. The "+" says so without
+                    turning a card into a footnote. */}
+                <div>
+                    <b>{formatSpan(card.minutes)}{card.partial && card.minutes > 0 ? '+' : ''}</b>
+                    <span>time</span>
+                </div>
             </div>
             {card.posters?.length > 0 && (
                 <div className="tc-r" aria-hidden="true">

@@ -207,6 +207,30 @@ export function lastWatched(order, watched) {
 
 export const epLabel = ({ season, episode }) => `S${season} E${episode}`;
 
+/**
+ * Record how long an episode of this season runs.
+ *
+ * TMDB has retired `episode_run_time`, so the only place these numbers exist is
+ * the season endpoint — which the app fetches anyway when someone opens a
+ * season. The data arrives as a side effect of the thing that makes it matter:
+ * you cannot tick an episode without opening its season.
+ *
+ * Fire and forget. A season whose runtime is missing costs a number on a screen
+ * nobody is currently looking at, and is never worth interrupting anyone for.
+ */
+export function rememberSeasonRuntime(tmdbId, season, episodes) {
+    const mins = (episodes || []).map((e) => e.minutes).filter((m) => m > 0);
+    if (mins.length < 1) return;
+    const average = Math.round(mins.reduce((a, b) => a + b, 0) / mins.length);
+    supabase.rpc('season_runtime_set', {
+        p_tmdb_id: tmdbId,
+        p_season: season,
+        p_minutes: average,
+    }).then(({ error }) => {
+        if (error && import.meta.env.DEV) console.warn('season runtime not saved', error);
+    });
+}
+
 /** Everything the You screen draws, in one round trip. */
 export async function tasteSummary() {
     return supabase.rpc('taste_summary').then(unwrap);

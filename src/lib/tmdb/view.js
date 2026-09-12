@@ -297,6 +297,8 @@ export function toSeasonView(raw) {
             // Unaired episodes render dimmed and can't be ticked (design edge case).
             aired: Boolean(e.air_date && e.air_date <= today),
             runtime: formatRuntime(e.runtime),
+            // The formatted string is for reading; the number is for adding up.
+            minutes: e.runtime || null,
             voteAverage: e.vote_average ? Number(e.vote_average).toFixed(1) : null,
             still: stillUrl(e.still_path),
             overview: e.overview?.trim() || null,

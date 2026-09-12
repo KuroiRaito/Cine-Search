@@ -1688,7 +1688,8 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
         margin — before any modifier tunes it.</li>
       <li><b>One gutter token, obeyed by everything.</b> <code>--gutter: 14px</code> at mobile, <code>24px</code> from
         700px, <code>40px</code> from 1100px. Every top-level block's content starts at exactly the gutter. Nothing
-        gets its own number.</li>
+        gets its own number. <i>(The build already implements exactly this, with the comment "One gutter, obeyed by
+        everything. No block gets its own number." — the rule is recorded here to keep it, not to introduce it.)</i></li>
       <li><b>Full-bleed is opt-in and explicit.</b> Only backdrops, hero images and horizontally-scrolling rails may
         touch the viewport edge, and they need a <code>.bleed</code> class to say so. <b>Even then, their text and
         controls stay gutter-inset.</b> A rail's posters may run off the edge; a rail's title never does.</li>
@@ -1696,6 +1697,10 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
         <code>--s6 (24px)</code>. Two blocks sharing an edge is always a bug, never a layout.</li>
       <li><b>Build the base component before the instance.</b> No <code>.card.signup</code> without <code>.card</code>;
         no <code>.sheet-title</code> without <code>.sheet</code>. Modifiers tune, they never constitute.</li>
+      <li><b>A contract records the ladder and the principle, never a lone number.</b> Where a value changes across
+        breakpoints, give every step <i>and</i> say what the steps are protecting. A bare measurement invites a future
+        reader to "fix" a correct implementation back to a worse one, because the number looked authoritative and the
+        reason was nowhere. If a rule can't state what breaks when it's violated, it isn't finished.</li>
     </ol>
 
     <h3>Component contracts — exact values, not descriptions</h3>
@@ -1725,7 +1730,8 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
           <tr><td><code>.rail</code></td>
             <td>title row → scroller</td>
             <td>title gutter-inset · scroller <code>.bleed</code>, first tile starts at gutter, last may run off ·
-              tile <code>104px</code> at mobile · gap <code>8px</code> · <code>overflow-x:auto</code>, no scrollbar</td></tr>
+              gap <code>8px</code> · <code>overflow-x:auto</code>, no scrollbar ·
+              <b>tile width is a ladder, not a number</b> — see below</td></tr>
           <tr><td><code>.quickadd</code></td>
             <td>button on tile</td>
             <td><code>26×26</code>, <b>top-right</b>, offset <code>6px</code>, radius full, scrim
@@ -1737,6 +1743,30 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
         </tbody>
       </table>
     </div>
+
+    <h3>Rail tile width — a ladder, and the reason for it</h3>
+    <p class="lede" style="font-size:13.5px">An earlier draft of this contract said <code>104px</code>, flat. That was
+      wrong, and wrong in a way worth explaining: it was a single number with no reasoning attached, so the next person
+      to read it would have "corrected" the build back to a worse value.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:170px">Breakpoint</th><th style="width:110px">Tile width</th><th>Tiles visible at that width</th></tr></thead>
+        <tbody>
+          <tr><td>base (&lt; 400px)</td><td><code>128px</code></td><td>2.2 at 320px</td></tr>
+          <tr><td>≥ 400px</td><td><code>148px</code></td><td>2.6 at 430px</td></tr>
+          <tr><td>≥ 600px</td><td><code>168px</code></td><td>3.3 at 600px</td></tr>
+          <tr><td>≥ 1120px</td><td><code>190px</code></td><td>desktop rails</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>The governing rule: a rail must always show a partial tile.</b> That fractional tile at the right edge is the
+      only thing telling a user the rail scrolls — there is no scrollbar and no arrow on touch. At 375px,
+      <code>104px</code> yields <b>3.17</b> tiles: three full ones and a sliver that reads as a complete set.
+      <code>128px</code> yields <b>2.61</b>: two full and an unmistakable two-thirds of a third.
+      <b>The ladder exists to hold that peek roughly constant as the viewport grows</b>, which is why the width steps
+      up rather than letting more tiles pack in. Tune the numbers if you like — but the constraint to preserve is
+      "never a whole number of tiles", not any particular pixel value.</div>
 
     <h3>The sign-in sheet is missing its poster</h3>
     <p class="lede" style="font-size:13.5px">The built sheet is otherwise faithful — bottom-anchored, grab handle,

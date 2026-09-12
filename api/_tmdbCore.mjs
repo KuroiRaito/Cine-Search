@@ -13,11 +13,18 @@ export function validatePath(path) {
 /**
  * Fetch from TMDB with retry.
  *
- * TMDB connections drop intermittently (ECONNRESET). Without a retry every drop
- * surfaces as a 500 to the user - measured at roughly 40% of dev requests before
- * this existed.
+ * TMDB drops connections constantly (ECONNRESET). Measured 2026-09-12 from
+ * ap-south: 2 of 3 direct requests were reset, while 6 of 6 through this
+ * function succeeded - the retry is doing real work, not defending against a
+ * hypothetical.
+ *
+ * At that failure rate 3 retries still leaves roughly one dead request per
+ * page that loads four rails, which is exactly how often a rail was rendering
+ * its error state. Hence 5, with the backoff capped so the worst case stays
+ * near three seconds rather than eight, and a per-attempt timeout so one hung
+ * connection can't eat the whole chain.
  */
-export async function fetchTmdb(path, queryParams, apiKey, { retries = 3 } = {}) {
+export async function fetchTmdb(path, queryParams, apiKey, { retries = 5, timeoutMs = 8000 } = {}) {
     const params = new URLSearchParams({ api_key: apiKey, ...queryParams });
     const clean = path.startsWith('/') ? path.slice(1) : path;
     const url = `https://api.themoviedb.org/3/${clean}?${params}`;
@@ -25,7 +32,7 @@ export async function fetchTmdb(path, queryParams, apiKey, { retries = 3 } = {})
     let lastErr;
     for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-            const res = await fetch(url);
+            const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
             if (res.status >= 500 || res.status === 429) {
                 lastErr = new Error(`TMDB ${res.status}`);
             } else {
@@ -34,7 +41,9 @@ export async function fetchTmdb(path, queryParams, apiKey, { retries = 3 } = {})
         } catch (err) {
             lastErr = err;
         }
-        if (attempt < retries) await new Promise(r => setTimeout(r, 250 * 2 ** attempt));
+        if (attempt < retries) {
+            await new Promise((r) => setTimeout(r, Math.min(250 * 2 ** attempt, 800)));
+        }
     }
     throw lastErr ?? new Error('TMDB request failed');
 }

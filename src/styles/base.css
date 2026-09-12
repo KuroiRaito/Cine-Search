@@ -1,0 +1,641 @@
+/* ============================================================
+   Projector — base, shell and shared components.
+   Every value comes from a token in tokens.css. No raw hex here.
+   Mobile first; 320px is the supported floor.
+   ============================================================ */
+
+/* One gutter, obeyed by everything. No block gets its own number. */
+:root {
+  --gutter: 14px;
+  --s6: 24px;
+}
+@media (min-width: 700px)  { :root { --gutter: 24px; } }
+@media (min-width: 1100px) { :root { --gutter: 40px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Full-bleed is opt-in and explicit: only backdrops, heroes and horizontally
+   scrolling rails may touch the viewport edge, and they must say so. Their
+   text and controls stay gutter-inset regardless. */
+.bleed { margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--f-s);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5 { font-family: var(--f-d); margin: 0; letter-spacing: -.022em; line-height: 1.14; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+img { max-width: 100%; display: block; }
+
+:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; border-radius: 5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* ---------------- shell ---------------- */
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+.app-main { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding-bottom: 78px; }
+
+/* Bottom tabs are a phone idiom. At desktop they become a top bar. */
+.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: flex;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--bd-sub);
+  padding: 7px 0 max(9px, env(safe-area-inset-bottom));
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--muted); font-family: var(--f-m); font-size: 9.5px; letter-spacing: .03em;
+  padding: 2px 4px;
+}
+.tab-item .ico { font-size: 16px; font-family: var(--f-s); line-height: 1; }
+.tab-item.on { color: var(--acc-t); }
+
+.topbar { display: none; }
+
+/* ---------------- page furniture ---------------- */
+
+.page { padding: 0 0 24px; }
+.pad { padding-inline: var(--gutter); }
+
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px var(--gutter) 0; }
+.page-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -.03em; }
+.head-actions { display: flex; align-items: center; gap: 8px; }
+
+.circ {
+  width: 38px; height: 38px; flex: 0 0 auto; border-radius: 99px;
+  background: var(--ink-3); border: 0; color: var(--muted);
+  display: grid; place-items: center; font-size: 15px; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.circ:hover { background: var(--ink-4); color: var(--text); }
+.circ.on-image { background: rgba(4,6,12,.6); backdrop-filter: blur(6px); color: #fff; }
+
+.btn {
+  font-family: var(--f-s); font-size: 13px; font-weight: 600;
+  padding: 11px 18px; min-height: 42px; border-radius: 10px; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--acc); color: var(--on-acc);
+  box-shadow: inset 0 1px 0 var(--hl); transition: filter .12s;
+}
+.btn:hover { filter: brightness(1.06); }
+.btn.quiet { background: var(--ink-4); color: var(--text); box-shadow: none; }
+.btn.quiet:hover { background: var(--ink-5); filter: none; }
+
+.section { margin: var(--s6) var(--gutter) 0; }
+.section-h {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em;
+  margin-bottom: 8px;
+}
+
+/* ---------------- rails and tiles ---------------- */
+
+.rail { display: flex; gap: 8px; overflow-x: auto; padding: 0 var(--gutter) 6px; scrollbar-width: none; }
+.rail::-webkit-scrollbar { height: 0; }
+.rail > * { flex: 0 0 auto; }
+
+.tile { width: 108px; }
+
+/* Rails show about two and a half posters. The artwork is the thing being
+   browsed, so it has to be big enough to actually recognise — and the half
+   tile at the edge is what tells you the row scrolls. */
+.rail .tile { width: 128px; }
+.rail .tile .name {
+  /* Reserve both lines so the year sits on the same baseline along the row,
+     whether the title wrapped or not. */
+  min-height: calc(2 * 1.3em);
+}
+@media (min-width: 400px) { .rail .tile { width: 148px; } }
+@media (min-width: 600px) { .rail .tile { width: 168px; } }
+.tile .art {
+  aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; position: relative;
+  background: var(--ink-4); border: 1px solid var(--bd-sub); margin-bottom: 5px;
+}
+.tile .art img { width: 100%; height: 100%; object-fit: cover; }
+.tile .name {
+  font-size: 12px; line-height: 1.3; color: var(--text);
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tile .meta { font-family: var(--f-m); font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* A poster we have no artwork for still has to say which title it is. */
+.noart {
+  width: 100%; height: 100%; display: grid; place-items: center; padding: 8px; text-align: center;
+  background: linear-gradient(150deg, var(--ink-5), var(--ink-3));
+  font-family: var(--f-d); font-size: 11px; font-weight: 700; color: var(--muted); line-height: 1.25;
+}
+
+.quickadd {
+  position: absolute; top: 6px; right: 6px; width: 26px; height: 26px;
+  border-radius: 99px; border: 0; cursor: pointer;
+  display: grid; place-items: center; font-size: 14px; line-height: 1; font-weight: 500;
+  color: #fff; background: rgba(8, 12, 20, .62); backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+  transition: background .13s, color .13s, box-shadow .13s;
+}
+.quickadd:hover { background: var(--acc); color: var(--on-acc); box-shadow: none; }
+.quickadd::after { content: ""; position: absolute; inset: -9px; }
+
+.score-badge {
+  position: absolute; left: 4px; bottom: 4px;
+  font-family: var(--f-m); font-size: 9px; font-weight: 600; color: var(--mar-9);
+  background: rgba(4,6,12,.68); padding: 1px 5px; border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding-inline: var(--gutter);
+}
+@media (min-width: 480px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 760px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.grid .tile { width: auto; }
+
+/* ---------------- title page ---------------- */
+
+.hero { position: relative; height: 190px; }
+/* A 16:9 backdrop cropped into a 4:1 desktop hero loses most of its height, and
+   centring that crop cuts faces in half — subjects sit above the midline far
+   more often than below it. Biasing the crop upward keeps the part of the image
+   that carries the meaning. */
+.hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
+.hero::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, var(--bg), transparent 70%);
+}
+.hero-nav { position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: space-between; padding: 10px 12px; }
+
+/* One grid for both layouts. On a phone it's a single column with the poster
+   floated beside the title; on desktop it becomes poster / main / sticky rail. */
+.tgrid { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 0 12px; padding-inline: var(--gutter); margin-top: -52px; position: relative; z-index: 2; align-items: start; }
+.tposter { aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; border: 1px solid var(--bd-sub); box-shadow: var(--sh); }
+.tposter img { width: 100%; height: 100%; object-fit: cover; }
+.thead { min-width: 0; padding-top: 56px; }
+.thead h1 { font-size: 21px; font-weight: 800; letter-spacing: -.03em; margin-bottom: 5px; }
+/* Everything below the title runs the full width of the phone, rather than
+   staying trapped in the narrow column beside the poster. */
+.tbody { grid-column: 1 / -1; min-width: 0; }
+.metaline { font-family: var(--f-m); font-size: 10.5px; color: var(--muted); line-height: 1.55; }
+.cert { border: 1px solid var(--bd-str); border-radius: 3px; padding: 0 3px; margin-right: 5px; }
+.tagline { margin-top: 9px; font-size: 12.5px; font-style: italic; color: var(--muted); }
+
+/* The action rail lives inline on a phone and moves into the sidebar on
+   desktop. Only one copy is ever visible. */
+.tside { display: none; }
+.tside-inline { margin-top: 16px; }
+
+.arow { display: flex; gap: 7px; }
+.spill {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: var(--rate); color: var(--on-rate); border: 0; border-radius: 10px;
+  font-family: var(--f-s); font-size: 13.5px; font-weight: 600; letter-spacing: -.01em;
+  padding: 11px 10px; min-height: 44px; cursor: pointer;
+  box-shadow: inset 0 1px 0 var(--hl); transition: filter .12s;
+}
+.spill:hover { filter: brightness(1.06); }
+.ibtn {
+  width: 44px; min-height: 44px; border: 0; background: var(--ink-4); color: var(--muted);
+  border-radius: 10px; cursor: pointer; display: grid; place-items: center; font-size: 15px;
+  transition: background .12s, color .12s;
+}
+.ibtn:hover { background: var(--ink-5); color: var(--text); }
+.ibtn.like:hover { color: var(--like-9); }
+
+.prov { margin-top: 13px; border-top: 1px solid var(--bd-sub); padding-top: 12px; }
+.prov-l { font-family: var(--f-m); font-size: 9px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.provrow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.pchip {
+  display: inline-flex; align-items: center; gap: 6px; background: var(--ink-3); border: 0;
+  color: var(--text); border-radius: 9px; padding: 5px 10px 5px 6px;
+  font-family: var(--f-s); font-size: 11.5px; font-weight: 500;
+}
+.plogo { width: 18px; height: 18px; border-radius: 4px; }
+.prov-none { font-size: 12.5px; color: var(--muted); }
+.prov-none a { color: var(--acc-t); font-weight: 600; }
+
+.prow {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 11px;
+  background: var(--surface); transition: background .12s; width: 100%; text-align: left;
+}
+.prow + .prow { margin-top: 6px; }
+.prow:hover { background: var(--surface-hv); }
+.prow .pf {
+  width: 38px; height: 38px; flex: 0 0 auto; border-radius: 99px; overflow: hidden;
+  background: var(--ink-5); display: grid; place-items: center;
+  font-family: var(--f-d); font-size: 13px; font-weight: 700; color: var(--ink-11);
+}
+.prow .pf img { width: 100%; height: 100%; object-fit: cover; }
+.prow .pf.noimg { background: var(--ink-5); }
+.prow .pb { flex: 1; min-width: 0; }
+.prow .pb b { display: block; font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--text); }
+.prow .pb span { display: block; font-size: 11px; color: var(--muted); }
+.prow .go { color: var(--ink-9); font-size: 14px; flex: 0 0 auto; }
+
+.scores { display: flex; margin-top: var(--s6); }
+.scores .s { flex: 1; padding: 2px 8px; text-align: center; border-left: 1px solid var(--bd-sub); }
+.scores .s:first-child { border-left: 0; text-align: left; padding-left: 0; }
+.scores .s b { display: block; font-family: var(--f-d); font-size: 21px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.scores .s.gold b { color: var(--rate); }
+.scores .s.dim b { color: var(--ink-9); }
+.scores .s span { display: block; font-size: 10.5px; color: var(--muted); margin-top: 3px; white-space: nowrap; }
+
+.sect { margin-top: var(--s6); }
+.sect-h { font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em; color: var(--text); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ov { font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+.ov.clamped { display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.more {
+  background: none; border: 0; color: var(--acc-t); cursor: pointer;
+  font-family: var(--f-s); font-size: 12.5px; font-weight: 600;
+  padding: 10px 16px 0 0; min-height: 38px; min-width: 48px; text-align: left;
+}
+
+/* Four preview cards, 2x2 on a phone and 1x4 on desktop. */
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: var(--s6); align-items: start; }
+.pc { border: 1px solid var(--bd); border-radius: 10px; background: var(--surface); padding: 10px; }
+.pc.open { grid-column: 1 / -1; }
+.pc-top {
+  display: block; width: 100%; background: none; border: 0; padding: 0; cursor: pointer;
+  text-align: left; font-family: var(--f-s);
+}
+.pc-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; min-height: 24px; }
+.pc-h b { font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--text); }
+.pc-h i { font-style: normal; color: var(--muted); font-size: 10px; }
+.faces { display: flex; margin-bottom: 6px; }
+.ptx { display: block; }
+.face {
+  width: 24px; height: 24px; border-radius: 99px; border: 2px solid var(--surface); margin-right: -7px;
+  overflow: hidden; background: linear-gradient(140deg, var(--ink-8), var(--ink-6));
+  display: grid; place-items: center; font-size: 9px; font-weight: 700; color: var(--ink-11);
+}
+.face img { width: 100%; height: 100%; object-fit: cover; }
+.ptx { font-size: 10.5px; color: var(--muted); line-height: 1.45; }
+.pc-body { margin-top: 10px; border-top: 1px solid var(--bd-sub); padding-top: 10px; }
+
+.facts { margin: 0; display: grid; gap: 7px; }
+.facts > div { display: flex; gap: 10px; font-size: 12px; }
+.facts dt { flex: 0 0 92px; color: var(--muted); font-family: var(--f-m); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+.facts dd { margin: 0; color: var(--text); }
+
+.keywords { display: flex; gap: 6px; flex-wrap: wrap; }
+.kw { font-size: 11.5px; padding: 5px 10px; border-radius: 99px; background: var(--ink-3); color: var(--muted); }
+
+.rail.related { padding-inline: 0; margin-top: 2px; }
+
+/* ---------------- episodes ---------------- */
+
+.seasonsw { display: flex; gap: 2px; overflow-x: auto; margin: 12px 0 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
+.seasonsw::-webkit-scrollbar { height: 0; }
+.sw {
+  flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
+  font-family: var(--f-s); font-size: 12.5px; font-weight: 500; padding: 0 13px;
+  min-height: 38px; display: inline-flex; align-items: center;
+  border-radius: 8px; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.sw em { font-style: normal; opacity: .55; margin-left: 4px; font-size: 11px; }
+.sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 1px var(--acc-bd); }
+
+.eplist { margin-top: 10px; }
+.eprow { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--bd-sub); align-items: flex-start; }
+.eprow:first-child { border-top: 0; }
+.eprow.unaired { opacity: .45; }
+.eprow .still { width: 64px; flex: 0 0 auto; aspect-ratio: 16/9; border-radius: 5px; overflow: hidden; background: var(--ink-4); border: 1px solid var(--bd-sub); }
+.eprow .still img { width: 100%; height: 100%; object-fit: cover; }
+.eprow .body { flex: 1; min-width: 0; }
+/* Rows grow rather than truncate: a long episode title takes three lines at 320px. */
+.eprow .en { font-size: 12.5px; font-weight: 600; line-height: 1.35; }
+.eprow .ed { font-family: var(--f-m); font-size: 10px; color: var(--muted); margin-top: 2px; }
+.eprow .ed .sc { color: var(--rate); }
+
+/* ---------------- person page ---------------- */
+
+.phead { display: flex; gap: 12px; padding-inline: var(--gutter); margin-top: var(--s6); align-items: center; }
+.phead .avatar {
+  width: 68px; height: 68px; flex: 0 0 auto; border-radius: 99px; overflow: hidden;
+  background: linear-gradient(140deg, var(--ink-7), var(--ink-5));
+  display: grid; place-items: center; font-family: var(--f-d); font-size: 20px; font-weight: 700; color: var(--muted);
+}
+.phead .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.phead h1 { font-size: 20px; font-weight: 700; letter-spacing: -.03em; }
+.phead .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.track-hint {
+  margin: var(--s6) var(--gutter) 0; font-size: 12.5px; color: var(--muted);
+}
+.rolesw { display: flex; gap: 2px; overflow-x: auto; margin: 12px var(--gutter) 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
+.rolesw::-webkit-scrollbar { height: 0; }
+
+.bio { font-size: 13px; line-height: 1.65; color: var(--muted); }
+
+/* ---------------- states ---------------- */
+
+.skel,
+.tile .art,
+.title-head .poster,
+.hero,
+.eprow .still,
+.person-chip .pic,
+.phead .avatar {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
+}
+.skel { border-radius: 6px; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 40px var(--gutter); max-width: 34ch;
+  margin: var(--s6) auto 0; min-height: 40vh;
+}
+.empty h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.empty p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+.errbox { margin: var(--s6) var(--gutter); border: 1px solid var(--st-drop-9); background: var(--st-drop-3); border-radius: 11px; padding: 14px; }
+.errbox b { display: block; font-size: 13px; color: var(--st-drop-11); margin-bottom: 4px; }
+.errbox p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+
+.about-h { font-family: var(--f-d); font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.about-p { font-size: 13px; line-height: 1.65; color: var(--muted); }
+.about-p + .about-p { margin-top: 10px; }
+.about-p a { color: var(--acc-t); }
+.attribution a { color: var(--acc-t); }
+
+/* Secondary labels shorten until there's room for them on one line. The number
+   never shortens — only the words around it.
+   Specificity matters here: .scores .s span sets display:block, so a bare
+   .wide-only class was losing and both halves rendered. These match it. */
+.scores .s span { white-space: nowrap; }
+.lbl-long { display: none; }
+.scores .s .lbl-short { display: inline; }
+.scores .s .lbl-long { display: none; }
+@media (min-width: 430px) {
+  .scores .s .lbl-short { display: none; }
+  .scores .s .lbl-long { display: inline; }
+}
+
+/* ---------------- desktop ---------------- */
+
+@media (min-width: 1120px) {
+  .tabs { display: none; }
+  .topbar {
+    display: block; position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--bd-sub);
+  }
+  .topbar-in {
+    max-width: 1280px; margin: 0 auto; padding: 12px 24px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .wordmark { display: flex; align-items: center; gap: 8px; font-family: var(--f-d); font-weight: 800; font-size: 16px; letter-spacing: -.03em; }
+  .wordmark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
+  .topnav { display: flex; gap: 4px; }
+  .topnav a { padding: 6px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--muted); }
+  .topnav a.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+  .topbar-spacer { flex: 1; }
+  .topbar-in .circ { margin-right: 4px; }
+  /* The top bar already carries search, theme and sign-in. Repeating them in
+     the page heading is noise. */
+  .head-actions { display: none; }
+  .page-head h1 { font-size: 30px; }
+
+  .app-main { padding-bottom: 40px; }
+  /* Generous, equal margins either side so the content reads as a column
+     rather than as edge-to-edge clutter. */
+
+  .hero { height: 320px; }
+  .title-head { padding-inline: 24px; margin-top: -70px; gap: 20px; }
+  .title-head .poster { width: 150px; }
+  .title-head h1 { font-size: 32px; }
+
+  /* Reading columns never go full width, however wide the screen. */
+  .overview { max-width: 65ch; }
+  .bio { max-width: 65ch; }
+
+  .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .rail .tile { width: 190px; }
+
+  /* Title page: poster, the reading column, and a sticky action rail. Same
+     components as the phone — desktop changes how many fit and where they sit,
+     not what they are. */
+  .hero { height: 300px; }
+  .tgrid {
+    grid-template-columns: 210px minmax(0, 1fr) 260px;
+    gap: 0 28px; margin-top: -78px;
+  }
+  /* The poster spans both rows so the first row is sized by the title block,
+     not by the poster — otherwise everything below it starts at the poster's
+     foot and leaves a hole. */
+  .tposter { grid-column: 1; grid-row: 1 / span 2; }
+  .thead { grid-column: 2; grid-row: 1; padding-top: 48px; }
+  .thead h1 { font-size: 30px; letter-spacing: -.035em; margin-bottom: 7px; }
+  .tbody { grid-column: 2; grid-row: 2; }
+  .tside { grid-column: 3; grid-row: 1 / span 2; }
+  .metaline { font-size: 11.5px; }
+  .tside-inline { display: none; }
+  .tside {
+    display: block; position: sticky; top: 78px;
+    background: var(--surface); border-radius: 12px; padding: 14px;
+  }
+  .tside .prow { background: var(--bg-sub); }
+  .tside .pchip { background: var(--ink-4); }
+
+  /* The four cards go one across rather than two by two. */
+  .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .pc.open { grid-column: 1 / -1; }
+
+  /* The reading column never runs full width, however wide the window. */
+  .ov { max-width: 65ch; }
+
+  .rail.related .tile { width: 132px; }
+}
+
+/* ---------------- search box ---------------- */
+
+.searchbox {
+  width: 100%; font-family: var(--f-s); font-size: 15px; color: var(--text);
+  background: var(--bg-sub); border: 0; box-shadow: inset 0 0 0 1px var(--bd-sub);
+  border-radius: 11px; padding: 12px 14px; transition: box-shadow .12s;
+}
+.searchbox::placeholder { color: var(--muted); }
+.searchbox:focus { outline: none; box-shadow: inset 0 0 0 1px var(--acc); }
+
+/* ---------------- card ---------------- */
+
+/* A card must define its own box before any modifier tunes it. This base was
+   missing: .card.signup set only text-align and font sizes, so every .card in
+   the app rendered with no background, no padding and no margin — the sign-up
+   block's text landed at x=0 against the screen edge while the posters beside
+   it sat at the 14px gutter. The desktop rule below already expected .card to
+   exist; only the base was absent. */
+.card {
+  background: var(--ink-3);
+  padding: 14px;
+  border-radius: 12px;
+  margin: var(--s6) var(--gutter);
+  border: 0;
+}
+
+.card-label {
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+
+/* ---------------- sign-up card ---------------- */
+
+.card.signup { text-align: center; }
+.card.signup h2 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.card.signup p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+.card.signup .btn { width: 100%; }
+
+/* ---------------- sign-in sheet ---------------- */
+
+.scrim {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(4, 6, 12, .62);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.sheet {
+  width: 100%; max-width: 460px;
+  background: var(--bg-sub); border-top: 1px solid var(--bd);
+  border-radius: 16px 16px 0 0;
+  padding: 0 18px max(18px, env(safe-area-inset-bottom));
+  box-shadow: var(--sh);
+}
+.grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 14px; }
+/* The poster is what makes this read as the thing you were reaching for,
+   rather than a generic interruption in front of it. */
+.sheet-head { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+.sheet-art {
+  width: 52px; flex: 0 0 auto; aspect-ratio: 2 / 3;
+  border-radius: 8px; overflow: hidden; background: var(--ink-4);
+}
+.sheet-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sheet-art .noart { font-size: 9px; padding: 4px; }
+.sheet-head .sheet-title { margin-bottom: 0; }
+.sheet-title { font-size: 18px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 6px; }
+.sheet-body { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.benefits { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 8px; }
+.benefits li { font-size: 12.5px; color: var(--muted); padding-left: 20px; position: relative; line-height: 1.5; }
+.benefits li::before { content: "✓"; position: absolute; left: 0; color: var(--st-done-9); font-weight: 700; }
+.sheet-actions { display: grid; gap: 8px; }
+.dismiss {
+  display: block; width: 100%; margin-top: 12px; padding: 10px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--muted); font-family: var(--f-s); font-size: 13px; font-weight: 500;
+}
+.dismiss:hover { color: var(--text); }
+
+@media (min-width: 700px) {
+  .scrim { align-items: center; }
+  .sheet { border-radius: 16px; border: 1px solid var(--bd); padding-bottom: 18px; }
+  .grab { display: none; }
+}
+
+/* ---------------- cover ---------------- */
+
+/* The artwork is the pitch: a full-bleed mosaic of real posters, turned off
+   square and pushed past the edges so no single title reads as a promotion,
+   then held back to half opacity behind a scrim. */
+.cover { position: relative; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+
+.mosaic {
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 5px;
+  transform: rotate(-8deg) scale(1.35); transform-origin: center;
+  opacity: .5;
+}
+.mosaic-cell { background-size: cover; background-position: center; border-radius: 6px; }
+
+.cover-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to top,
+    var(--bg) 34%,
+    color-mix(in srgb, var(--bg) 72%, transparent) 62%,
+    color-mix(in srgb, var(--bg) 30%, transparent)
+  );
+}
+
+/* Light needs its own recipe rather than the dark one with the tokens swapped.
+   Fading artwork into near-white turns it pale instead of moody, so the posters
+   carry more opacity and the veil above the text is thinner - while the band
+   the text actually sits on goes fully opaque, because dark type on light needs
+   more separation than light type on dark. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .cover-scrim {
+    background: linear-gradient(
+      to top,
+      var(--bg) 42%,
+      color-mix(in srgb, var(--bg) 58%, transparent) 64%,
+      color-mix(in srgb, var(--bg) 14%, transparent)
+    );
+  }
+  :root:not([data-theme="dark"]) .mosaic { opacity: .82; }
+}
+:root[data-theme="light"] .cover-scrim {
+  background: linear-gradient(
+    to top,
+    var(--bg) 42%,
+    color-mix(in srgb, var(--bg) 58%, transparent) 64%,
+    color-mix(in srgb, var(--bg) 14%, transparent)
+  );
+}
+:root[data-theme="light"] .mosaic { opacity: .82; }
+
+.cover-theme { position: absolute; top: 14px; right: 14px; z-index: 3; }
+.cover-theme .circ { background: rgba(4, 6, 12, .55); backdrop-filter: blur(6px); color: #fff; }
+.cover-theme .circ:hover { background: rgba(4, 6, 12, .72); color: #fff; }
+
+/* Everything sits at the bottom, where the thumb already is. */
+.cover-in { position: relative; z-index: 2; margin-top: auto; padding: 22px 20px 20px; width: 100%; }
+
+.cover-mark {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  font-family: var(--f-d); font-weight: 800; font-size: 17px; letter-spacing: -.03em;
+}
+.cover-mark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
+
+.cover-in h1 { font-size: 27px; font-weight: 800; letter-spacing: -.035em; margin-bottom: 10px; }
+.cover-in > p { font-size: 13.5px; color: var(--muted); max-width: 44ch; margin-bottom: 20px; }
+
+.cover-cta { display: flex; flex-direction: column; gap: 9px; }
+.btn-lg { width: 100%; padding: 13px 20px; font-size: 14.5px; }
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--bd-str); }
+.btn.ghost:hover { background: var(--surface-hv); filter: none; }
+
+.cover-skip { margin-top: 14px; text-align: center; }
+.cover-skip button {
+  background: none; border: 0; cursor: pointer; padding: 6px 10px;
+  color: var(--acc-t); font-family: var(--f-s); font-size: 13px; font-weight: 600;
+}
+
+.cover-fine {
+  margin-top: 14px; font-size: 10.5px; color: var(--ink-9);
+  text-align: center; line-height: 1.5;
+}
+.cover-fine a { color: var(--ink-10); }
+
+@media (min-width: 760px) {
+  .cover-in { max-width: 560px; margin-inline: auto; text-align: center; padding-bottom: 32px; }
+  .cover-mark { justify-content: center; }
+  .cover-in > p { margin-inline: auto; }
+  .cover-cta { flex-direction: row; }
+  .mosaic { grid-template-columns: repeat(6, 1fr); }
+}
+@media (min-width: 1120px) {
+  .cover-in h1 { font-size: 40px; }
+  .mosaic { grid-template-columns: repeat(8, 1fr); }
+}

@@ -11,3 +11,6 @@ dist/
 
 # eval
 eval/.cache/
+
+# supabase cli scratch
+supabase/.temp/

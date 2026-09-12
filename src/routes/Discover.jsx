@@ -42,7 +42,7 @@ export default function Discover() {
         <div className="page">
             <div className="page-head">
                 <h1>Discover</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div className="head-actions">
                     <Link to="/search" className="circ" aria-label="Search">⌕</Link>
                     <ThemeToggle />
                     <Link to="/welcome" className="btn quiet">Sign in</Link>

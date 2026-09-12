@@ -32,7 +32,7 @@ img { max-width: 100%; display: block; }
 /* ---------------- shell ---------------- */
 
 .app { min-height: 100vh; display: flex; flex-direction: column; }
-.app-main { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding-bottom: 78px; }
+.app-main { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding-bottom: 78px; }
 
 /* Bottom tabs are a phone idiom. At desktop they become a top bar. */
 .tabs {
@@ -61,6 +61,7 @@ img { max-width: 100%; display: block; }
 
 .page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 14px 0; }
 .page-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -.03em; }
+.head-actions { display: flex; align-items: center; gap: 8px; }
 
 .circ {
   width: 32px; height: 32px; flex: 0 0 auto; border-radius: 99px;
@@ -90,21 +91,23 @@ img { max-width: 100%; display: block; }
 
 /* ---------------- rails and tiles ---------------- */
 
-.rail { display: flex; gap: 8px; overflow-x: auto; padding: 0 14px 4px; scrollbar-width: none; }
+.rail { display: flex; gap: 12px; overflow-x: auto; padding: 0 14px 6px; scrollbar-width: none; }
 .rail::-webkit-scrollbar { height: 0; }
 .rail > * { flex: 0 0 auto; }
 
 .tile { width: 108px; }
-/* Rail tiles are deliberately small — the design's .rt. Bigger ones turn a
-   browsable row into a wall of posters. */
-.rail .tile { width: 76px; }
+
+/* Rails show about two and a half posters. The artwork is the thing being
+   browsed, so it has to be big enough to actually recognise — and the half
+   tile at the edge is what tells you the row scrolls. */
+.rail .tile { width: 128px; }
 .rail .tile .name {
-  font-size: 10.5px;
-  /* Reserve both lines so the year sits on the same baseline right along the
-     row, whether the title wrapped or not. */
+  /* Reserve both lines so the year sits on the same baseline along the row,
+     whether the title wrapped or not. */
   min-height: calc(2 * 1.3em);
 }
-.rail .tile .meta { font-size: 9px; }
+@media (min-width: 400px) { .rail .tile { width: 148px; } }
+@media (min-width: 600px) { .rail .tile { width: 168px; } }
 .tile .art {
   aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; position: relative;
   background: var(--ink-4); border: 1px solid var(--bd-sub); margin-bottom: 5px;
@@ -141,8 +144,10 @@ img { max-width: 100%; display: block; }
 }
 
 .grid {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 0 14px;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0 14px;
 }
+@media (min-width: 480px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 760px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .grid .tile { width: auto; }
 
 /* ---------------- title page ---------------- */
@@ -298,10 +303,18 @@ img { max-width: 100%; display: block; }
   .topnav a.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
   .topbar-spacer { flex: 1; }
   .topbar-in .circ { margin-right: 4px; }
+  /* The top bar already carries search, theme and sign-in. Repeating them in
+     the page heading is noise. */
+  .head-actions { display: none; }
+  .page-head h1 { font-size: 30px; }
 
   .app-main { padding-bottom: 40px; }
-  .pad, .section, .card, .scores, .tagline, .seasonsw, .rolesw { margin-inline: 24px; }
-  .rail, .people, .grid, .page-head { padding-inline: 24px; }
+  /* Generous, equal margins either side so the content reads as a column
+     rather than as edge-to-edge clutter. */
+  .pad, .section, .card, .scores, .tagline, .seasonsw, .rolesw { margin-inline: 40px; }
+  .rail, .people, .grid, .page-head { padding-inline: 40px; }
+  .rail { gap: 16px; }
+  .grid { gap: 18px; }
 
   .hero { height: 320px; }
   .title-head { padding-inline: 24px; margin-top: -70px; gap: 20px; }
@@ -312,8 +325,8 @@ img { max-width: 100%; display: block; }
   .overview { max-width: 65ch; }
   .bio { max-width: 65ch; }
 
-  .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .tile { width: 150px; }
+  .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .rail .tile { width: 190px; }
 }
 
 /* ---------------- search box ---------------- */

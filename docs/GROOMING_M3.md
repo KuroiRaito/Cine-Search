@@ -231,3 +231,42 @@ stop after 3 and still be worth having.
   discussion and never settled. Currently dormant: `rewatch_count` is a manual
   stepper, so nothing depends on the answer yet.
 - **Leaked-password protection** is still disabled in Supabase Auth.
+
+---
+
+## Owner decisions — 2026-09-13. Grooming is closed.
+
+**B1 — lists and canons are cut.** Accepted as recommended. Not deferred to a
+later milestone: there is no later milestone. If a real need appears, it is new
+work against a new design.
+
+**B2 — "Self" exclusion in, threshold stays 200.** Accepted as recommended.
+Emilia Clarke reading 12 instead of ~20 is the known cost, stated here so it is
+not rediscovered as a bug.
+
+**B3 — store the runtime, sum it in the database.** Accepted, with an addition
+from the owner that settles where the arithmetic lives:
+
+> "The runtime can be in minutes or hours depending. What we can do is on the
+> profile, we can just create a function which basically sums up the runtime of
+> all the episodes or shows and movies the user has watched. That one
+> transformation layer is simple."
+
+This is the right shape and it is now the rule for every derived number on the
+taste screen:
+
+- **Store canonical minutes.** Integers, never hours, never a formatted string.
+  A stored "2h 15m" is a number you have to parse back before you can add it.
+- **Aggregate in Postgres.** The library, the catalogue and the season runtimes
+  are all in the database; summing them there is one round trip instead of
+  shipping every row to the browser to add up. It also means the per-genre and
+  per-person rollups the taste cards need come from the same query as the total.
+- **Format at the edge.** Minutes become "18.4 days", "3d 4h" or "13h" in the
+  component that draws them. The same stored number serves all three.
+
+**B4 — top-15 cast plus the six key crew jobs.** Accepted as recommended.
+
+**B5 — "Score" sorts by average rating, minimum three rated titles.** Accepted
+as recommended.
+
+**B6 — decades are in scope.** Confirmed.

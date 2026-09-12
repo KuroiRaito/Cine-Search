@@ -133,6 +133,47 @@ const toCard = (r) => ({
     voteAverage: r.vote_average || null,
 });
 
+/**
+ * The shared catalogue row for a title, taken from the raw TMDB payload.
+ *
+ * catalog_titles is world-readable and written once per title for everyone, so
+ * a thin row saved by the first person to tap "+" is a thin row for every user
+ * after them — the database rejects a second, better write by design. Building
+ * this from the full payload rather than from a poster tile is what keeps the
+ * genres and keywords in it, which is the whole basis of the taste work later.
+ */
+export function toCatalog(raw, mediaType) {
+    const isTV = mediaType === 'tv';
+    return {
+        title: raw.title || raw.name || 'Untitled',
+        original_title: raw.original_title || raw.original_name || null,
+        original_language: raw.original_language || null,
+        release_date: raw.release_date || raw.first_air_date || null,
+        runtime: (isTV ? raw.episode_run_time?.[0] : raw.runtime) ?? null,
+        overview: raw.overview?.trim() || null,
+        genres: (raw.genres || []).map((g) => g.name).filter(Boolean),
+        keywords: ((raw.keywords?.keywords || raw.keywords?.results) || [])
+            .map((k) => k.name).filter(Boolean).slice(0, 25),
+        vote_average: raw.vote_average ?? null,
+        vote_count: raw.vote_count ?? null,
+        popularity: raw.popularity ?? null,
+        poster_path: raw.poster_path || null,
+        backdrop_path: raw.backdrop_path || null,
+        number_of_seasons: isTV ? raw.number_of_seasons ?? null : null,
+        // The aired count, not the announced one: a series is "complete" against
+        // what exists, and episodes_at_completion has to mean something later.
+        number_of_episodes: isTV ? airedEpisodeCount(raw) : null,
+        // Season boundaries, so any screen can say which episode comes next
+        // without fetching the series again. Specials are excluded: they are
+        // not part of the running order.
+        seasons: isTV
+            ? (raw.seasons || [])
+                .filter((s) => s.season_number > 0)
+                .map((s) => ({ n: s.season_number, c: s.episode_count || 0 }))
+            : [],
+    };
+}
+
 export function toTitleView(raw, mediaType, region) {
     const isTV = mediaType === 'tv';
     const { cast, crew } = peopleFromCredits(raw, mediaType);
@@ -170,6 +211,8 @@ export function toTitleView(raw, mediaType, region) {
         episodeCount: isTV ? raw.number_of_episodes : null,
         airedEpisodes: isTV ? airedEpisodeCount(raw) : null,
         status: raw.status || null,
+        // Carried along so saving never needs a second fetch of what we have.
+        catalog: toCatalog(raw, mediaType),
     };
 }
 

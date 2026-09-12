@@ -68,7 +68,7 @@ export default function Auth() {
     }
 
     return (
-        <div className="page auth-page">
+        <div className="page">
             <div className="page-head">
                 <button type="button" className="circ" onClick={() => navigate(-1)} aria-label="Back">‹</button>
             </div>

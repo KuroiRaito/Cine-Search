@@ -412,16 +412,8 @@ img { max-width: 100%; display: block; }
   .page-head h1 { font-size: 30px; }
 
   .app-main { padding-bottom: 40px; }
-  /* Generous, equal margins either side so the content reads as a column
-     rather than as edge-to-edge clutter. */
-
-  .hero { height: 320px; }
-  .title-head { padding-inline: 24px; margin-top: -70px; gap: 20px; }
-  .title-head .poster { width: 150px; }
-  .title-head h1 { font-size: 32px; }
-
   /* Reading columns never go full width, however wide the screen. */
-  .overview { max-width: 65ch; }
+  .ov, .bio { max-width: 65ch; }
   .bio { max-width: 65ch; }
 
   .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }

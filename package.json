@@ -16,7 +16,8 @@
     "eval:resolve": "node --env-file=.env eval/resolve.mjs",
     "eval:label": "node --env-file=.env eval/label-server.mjs",
     "eval:bench": "vite-node eval/bench.mjs --",
-    "test:api": "node scripts/smoke-api.mjs"
+    "test:api": "node scripts/smoke-api.mjs",
+    "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",

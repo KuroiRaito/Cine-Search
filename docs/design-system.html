@@ -1,8 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Cine Search design system: colour scales, watch-state palette, controls, screens and rules.">
+<meta name="color-scheme" content="dark light">
 <title>Projector Design System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 
+</head>
+<body>
 <style>
 :root{
   color-scheme:dark;
@@ -534,6 +543,55 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
 .dperson{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;padding:24px 28px 28px}
 .dpcard{background:var(--surface);border-radius:13px;padding:16px;position:sticky;top:12px}
 .dpface{width:100%;aspect-ratio:1;border-radius:13px;margin-bottom:12px;background-size:cover;background-position:center}
+
+/* ---------- cover page ---------- */
+.cover{position:relative;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.mosaic{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);
+  grid-auto-rows:1fr;gap:5px;transform:rotate(-8deg) scale(1.35);transform-origin:center;opacity:.5}
+.mosaic div{background-size:cover;background-position:center;border-radius:7px}
+.cover-scrim{position:absolute;inset:0;
+  background:linear-gradient(to top,var(--bg) 34%,color-mix(in srgb,var(--bg) 72%,transparent) 62%,color-mix(in srgb,var(--bg) 30%,transparent))}
+.cover-in{position:relative;z-index:2;margin-top:auto;padding:22px 20px 20px}
+.cover-mark{display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-weight:800;
+  font-size:17px;letter-spacing:-.03em;margin-bottom:14px}
+.cover-mark i{width:7px;height:7px;border-radius:99px;background:var(--acc);font-style:normal;
+  box-shadow:0 0 12px var(--acc)}
+.cover h5{font-family:var(--f-d);font-size:25px;font-weight:800;letter-spacing:-.035em;
+  line-height:1.14;margin:0 0 9px}
+.cover p{font-size:13.5px;color:var(--muted);line-height:1.55;margin-bottom:20px}
+.cover-cta{display:flex;flex-direction:column;gap:9px}
+.btn-lg{width:100%;font-family:var(--f-s);font-size:14.5px;font-weight:600;padding:13px;border-radius:11px;
+  border:none;cursor:pointer;background:var(--acc);color:var(--on-acc);box-shadow:inset 0 1px 0 var(--hl)}
+.btn-lg.ghost{background:var(--ink-4);color:var(--text);box-shadow:none}
+.cover-skip{margin-top:14px;text-align:center}
+.cover-skip button{background:none;border:none;color:var(--acc-t);font-family:var(--f-s);
+  font-size:13.5px;font-weight:500;cursor:pointer;padding:7px}
+.cover-fine{margin-top:12px;font-size:10.5px;color:var(--ink-9);text-align:center;line-height:1.5}
+
+/* ---------- sign-in sheet ---------- */
+.gsheet{background:var(--bg-sub);border-radius:16px 16px 0 0;padding-bottom:16px;position:relative}
+.gs-art{display:flex;gap:11px;align-items:center;padding:18px 16px 14px}
+.gs-art .po{width:52px;flex:0 0 auto;aspect-ratio:2/3;border-radius:8px;border:1px solid var(--bd-sub)}
+.gs-art .tx b{display:block;font-family:var(--f-d);font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.gs-art .tx span{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.gs-body{padding:0 16px}
+.gs-list{display:flex;flex-direction:column;gap:9px;margin:4px 0 16px}
+.gs-list div{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.45}
+.gs-list i{font-style:normal;color:var(--acc-t);flex:0 0 auto;font-size:13px}
+
+/* ---------- spec table ---------- */
+.spec-t td:first-child{white-space:nowrap;color:var(--text);font-weight:600}
+.spec-t code{font-size:11px}
+
+/* small-screen comparison */
+.sscmp{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;margin-top:20px}
+.sscol{flex:0 0 auto}
+.sscol>.lbl{font-family:var(--f-m);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.sscol>.lbl em{font-style:normal;color:var(--ink-9);letter-spacing:0;text-transform:none;font-size:11px}
+.phone.w320{width:320px}
+.phone.w430{width:430px}
+@media (max-width:800px){.phone.w430{width:100%;max-width:430px}.phone.w320{width:100%;max-width:320px}}
 </style>
 
 <div class="bar">
@@ -1417,6 +1475,192 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
       trusting the theme.</div>
   </section>
 
+  <!-- ============ ENTRY & GUEST ============ -->
+  <section>
+    <h2>Entry &amp; guest</h2>
+    <p class="lede">Three screens the eight didn't cover, all following from §12's decision that guests browse freely
+      and sign up to save. The governing constraint is §1: <b>"feel natural, like home — never forced."</b> A hard
+      login wall is the most forced thing an app can do, so none of these gate the catalogue.</p>
+
+    <div class="screens" style="margin-top:26px">
+
+      <!-- COVER -->
+      <div class="col">
+        <div class="col-h"><h3>1 · Cover</h3><p>First visit only. Skippable, and it doesn't come back.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="cover">
+            <div class="mosaic">
+              <div class="img i-dune_p"></div><div class="img i-bb_p"></div><div class="img i-dv2"></div>
+              <div class="img i-dv3"></div><div class="img i-rec0"></div><div class="img i-dv4"></div>
+              <div class="img i-dv5"></div><div class="img i-rec1"></div><div class="img i-dv1"></div>
+              <div class="img i-rec2"></div><div class="img i-rec3"></div><div class="img i-dv0"></div>
+            </div>
+            <div class="cover-scrim"></div>
+            <div class="cover-in">
+              <div class="cover-mark"><i></i>Cine Search</div>
+              <h5>Everything you've watched.<br>Everything you will.</h5>
+              <p>Track films and series, see where to watch them in India, and find out what your taste actually
+                looks like.</p>
+              <div class="cover-cta">
+                <button class="btn-lg">Create account</button>
+                <button class="btn-lg ghost">Sign in</button>
+              </div>
+              <div class="cover-skip"><button>Browse without an account →</button></div>
+              <div class="cover-fine">Film and TV data from TMDB.<br>Streaming availability by JustWatch.</div>
+            </div>
+          </div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:41">
+          <li><b>Shown once, on first visit only.</b> Set a flag locally and never show it again — returning guests go
+            straight to Discover. A cover page that reappears every visit is a wall, and §1 forbids walls.</li>
+          <li><b>"Browse without an account" is a real, visible action</b> — not grey 11px text in a corner. The Noob's
+            entire persona is browsing before committing; burying the skip loses them at the door.</li>
+          <li><b>Create account is primary, Sign in is secondary.</b> Most people hitting this screen are new. A
+            returning user recognises "Sign in" regardless of its weight.</li>
+          <li><b>The mosaic is real artwork, never stock illustration.</b> The catalogue is the product; showing it is
+            the most honest possible pitch.</li>
+          <li><b>Attribution lives here too.</b> TMDB and JustWatch credit is contractual, and this is the first screen
+            — cheapest possible place to satisfy it.</li>
+        </ol></div>
+      </div>
+
+      <!-- SIGN-IN PROMPT -->
+      <div class="col">
+        <div class="col-h"><h3>2 · Sign-in prompt</h3><p>A guest taps any tracking control. Same sheet shell as the editor.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div style="height:150px;background:linear-gradient(150deg,#C79B5B,#8A5A2B 50%,#2A1B10);opacity:.4"></div>
+          <div style="padding:0 14px;opacity:.4">
+            <div class="metaline" style="margin-top:8px">2024 · Science Fiction, Adventure · 2h 47m</div>
+          </div>
+          <div class="gsheet" style="margin-top:34px">
+            <div class="sh-grab"></div>
+            <div class="gs-art">
+              <div class="po img i-dune_p"></div>
+              <div class="tx"><b>Save Dune: Part Two?</b>
+                <span>You'll need an account to keep a library.</span></div>
+            </div>
+            <div class="gs-body">
+              <div class="gs-list">
+                <div><i>✓</i><span>Track films and series, episode by episode</span></div>
+                <div><i>✓</i><span>Rate what you've seen and see your taste</span></div>
+                <div><i>✓</i><span>Free, and your library is private by default</span></div>
+              </div>
+              <div class="cover-cta">
+                <button class="btn-lg">Create account</button>
+                <button class="btn-lg ghost">Sign in</button>
+              </div>
+              <div class="cover-skip"><button style="color:var(--muted)">Not now</button></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:46">
+          <li><b>It names the specific title and the specific action.</b> "Save Dune: Part Two?" — never a generic
+            "Sign in to continue". The user was doing something; the prompt should know what.</li>
+          <li><b>Intent survives sign-up.</b> After authenticating, the original action <i>completes automatically</i>
+            and the user lands back on the title with it saved. If they sign up to save something and it isn't saved,
+            we broke a promise in the first thirty seconds.</li>
+          <li><b>"Not now" dismisses with no penalty</b> and no repeat nag in the same session.</li>
+          <li><b>Same sheet shell as the editor</b> — grab handle, poster, title. It should feel like the thing they
+            were reaching for, with a sign-in step in front of it.</li>
+          <li><b>Three benefits, not a feature list.</b> Including "private by default", because §9.3 made that true
+            and it removes the most common objection to signing up.</li>
+        </ol></div>
+      </div>
+
+      <!-- GUEST HOME -->
+      <div class="col">
+        <div class="col-h"><h3>3 · Guest home</h3><p>No library, so no "Continue watching". Discovery leads.</p></div>
+        <div class="phone"><div class="ph-top"><span></span></div><div class="ph-body">
+          <div class="tbar"><h4>Discover</h4><div style="display:flex;gap:6px">
+            <button class="circ">⌕</button><button class="btn" style="padding:7px 14px;font-size:12.5px">Sign in</button></div></div>
+
+          <div class="sect" style="margin-top:14px"><div class="sect-h"><span>Trending in India</span><a href="#g">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-dune_p"><button class="sb">+</button><span class="gb">8.1</span></div><div class="tt">Dune: Part Two</div><div class="yy">2024</div></div>
+            <div class="rt"><div class="im img i-bb_p"><button class="sb">+</button><span class="gb">8.9</span></div><div class="tt">Breaking Bad</div><div class="yy">2008</div></div>
+            <div class="rt"><div class="im img i-rec0"><button class="sb">+</button><span class="gb">7.8</span></div><div class="tt">Dune</div><div class="yy">2021</div></div>
+            <div class="rt"><div class="im img i-dv2"><button class="sb">+</button><span class="gb">7.6</span></div><div class="tt">Blade Runner 2049</div><div class="yy">2017</div></div>
+          </div>
+
+          <div class="sect"><div class="sect-h"><span>In cinemas now</span><a href="#g">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-dv0"><button class="sb">+</button><span class="gb">8.1</span></div><div class="tt">Dune: Part Two</div><div class="yy">2024</div></div>
+            <div class="rt"><div class="im img i-rec1"><button class="sb">+</button><span class="gb">7.5</span></div><div class="tt">Revenge of the Sith</div><div class="yy">2005</div></div>
+            <div class="rt"><div class="im img i-dv4"><button class="sb">+</button><span class="gb">7.4</span></div><div class="tt">Sicario</div><div class="yy">2015</div></div>
+            <div class="rt"><div class="im img i-rec2"><button class="sb">+</button><span class="gb">6.5</span></div><div class="tt">Chaos Walking</div><div class="yy">2021</div></div>
+          </div>
+
+          <div style="margin:20px 14px 0;padding:14px;border-radius:12px;background:var(--surface)">
+            <div style="font-family:var(--f-d);font-size:14px;font-weight:700;margin-bottom:5px">Keep track of all this</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:11px">An account gives you a
+              library, episode progress and your taste profile. Private by default.</div>
+            <button class="btn" style="width:100%">Create account</button>
+          </div>
+
+          <div class="sect"><div class="sect-h"><span>Popular series</span><a href="#g">See all</a></div></div>
+          <div class="rail">
+            <div class="rt"><div class="im img i-dv3"><button class="sb">+</button><span class="gb">7.6</span></div><div class="tt">Arrival</div><div class="yy">2016</div></div>
+            <div class="rt"><div class="im img i-dv5"><button class="sb">+</button><span class="gb">6.8</span></div><div class="tt">Enemy</div><div class="yy">2014</div></div>
+            <div class="rt"><div class="im img i-rec3"><button class="sb">+</button><span class="gb">6.3</span></div><div class="tt">Prince of Persia</div><div class="yy">2010</div></div>
+          </div>
+          <div style="height:14px"></div>
+          <div class="bnav"><div class="on"><span>⌂</span>Discover</div><div><span>⌕</span>Search</div><div><span>▤</span>Library</div><div><span>◍</span>Sign in</div></div>
+        </div></div>
+        <div class="rules"><div class="rules-h">Rules</div><ol class="rl" style="--start:51">
+          <li><b>Discovery leads; nothing is hidden.</b> The whole catalogue, every title page, every person page,
+            search and filters all work signed-out. Only <i>saving</i> requires an account.</li>
+          <li><b>The tab is "Discover", not "Home".</b> A guest has no home — naming it Home and then showing someone
+            else's content is a small lie.</li>
+          <li><b>Tiles keep their <code>+</code>.</b> Hiding the quick-add would hide the product's main feature from
+            the exact people who haven't seen it yet. Tapping raises the sign-in sheet — which is how the feature gets
+            discovered in the first place.</li>
+          <li><b>Exactly one sign-up card, placed after the first two rails</b> — below the fold, after some value has
+            been delivered. Not a banner, not a modal, not repeated per rail.</li>
+          <li><b>Library tab stays visible and shows an empty state with a sign-in prompt</b>, rather than disappearing.
+            A nav that changes shape on sign-in is disorienting; a tab that explains itself is not.</li>
+        </ol></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:34px">Settings, About and 404 — spec, not drawing</h3>
+    <p class="lede" style="font-size:13.5px">These are conventional, and drawing them would add nothing a spec doesn't
+      say. What matters is that the contents are decided and nothing contractual gets forgotten.</p>
+    <div class="tw">
+      <table class="spec-t">
+        <thead><tr><th style="width:120px">Screen</th><th>Contents &amp; rules</th></tr></thead>
+        <tbody>
+          <tr><td>Settings</td><td>
+            <b>Account</b> — email (read-only), username, sign out, delete account (confirms, and states that the library
+            goes with it).<br>
+            <b>Preferences</b> — theme (System / Light / Dark, defaulting to System), region (drives watch providers;
+            stated explicitly rather than inferred from IP), spoiler protection for unwatched episode titles (on by
+            default).<br>
+            <b>Data</b> — export library as CSV. Cheap to build, and it's the honest answer to "am I locked in?".<br>
+            <b>About</b> — link out.<br>
+            <em>Rule:</em> destructive actions sit last, visually separated, and confirm.</td></tr>
+          <tr><td>About</td><td>
+            One paragraph on what the app is. Version and build. Links to source and to report a problem.<br>
+            <b>Attribution — contractual, not optional:</b> "This product uses the TMDB API but is not endorsed or
+            certified by TMDB", with their logo, plus JustWatch credit for availability data.<br>
+            <em>Rule:</em> this page is the canonical home for attribution. It also appears on the cover and beside
+            provider chips, but this is where the full notice lives.</td></tr>
+          <tr><td>404</td><td>
+            Plain: what happened, a search field, and a link back to Discover. No illustration, no joke.<br>
+            <em>Rule:</em> a 404 on a <code>/film/:id</code> or <code>/person/:id</code> route says
+            <b>"We couldn't find that title"</b> and offers a search prefilled with the slug — different copy from a
+            genuinely unknown route, because the cause is different and usually recoverable.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>The one decision worth your attention is the cover page's recurrence.</b> I've specified first-visit-only,
+      which respects §1 but means a returning guest never sees the pitch again. The alternative — showing it every
+      signed-out visit — converts better and feels more like a wall. Given that the stated failure condition is
+      "it gets harder for any persona", I'd hold the line on once-only, but it's a growth decision as much as a design
+      one, and it's genuinely arguable.</div>
+  </section>
+
   <!-- ============ DESKTOP ============ -->
   <section>
     <h2>Desktop · the same components, given room</h2>
@@ -1716,6 +1960,108 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
       Get that right while building m-web and desktop is a layout pass. Hardcode 430px and it's a rewrite.</div>
   </section>
 
+  <!-- ============ SMALL SCREENS ============ -->
+  <section>
+    <h2>Small screens · verified, not assumed</h2>
+    <p class="lede">Everything above is drawn at 430px, which proves nothing about narrow phones. So this was
+      <b>tested rather than asserted</b>: the page was served locally, rendered in a real browser at a 320px viewport,
+      and every element inside every phone frame measured for horizontal overflow.</p>
+
+    <h3>What the audit found</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:180px">Result</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td><b>Layout holds at 320px</b></td><td>No content is clipped or cut off. Titles wrap, meta lines reflow, the three-across score strip survives, and the episode row grows in height rather than truncating.</td></tr>
+          <tr><td><b>8 sub-pixel flags</b></td><td>Icon buttons report 3–4px of "overflow" — the glyph's intrinsic width against its box. Invisible in practice; <code>place-items:center</code> already handles it. Not a defect.</td></tr>
+          <tr><td><b>1 false positive</b></td><td>The cover page measured 318px box against 430px content. That's the mosaic's <code>transform: scale(1.35)</code> inflating <code>scrollWidth</code>; <code>overflow:hidden</code> clips it correctly. Confirmed by screenshot.</td></tr>
+          <tr><td><b>1 real bug — found and fixed</b></td><td>Not layout at all: the standalone file had <b>no <code>&lt;meta charset&gt;</code></b>, so all 36 non-ASCII characters (<code>→ ₹ ‖ ↻ ⌄</code>) rendered as mojibake when opened from disk. Invisible inside the published artifact, which supplies its own document head. Now wrapped in a proper HTML skeleton.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>320 against 430</h3>
+    <p class="lede" style="font-size:13.5px">The same two screens at both widths. What changes is wrapping and row
+      height — never what's present.</p>
+    <div class="sscmp">
+      <div class="sscol">
+        <div class="lbl">320 px <em>· iPhone SE, older Android</em></div>
+        <div class="phone w320"><div class="ph-top"><span></span></div><div class="ph-body" style="height:560px">
+          <div class="hero img i-dune_b" style="height:130px">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head"><div class="poster img i-dune_p"></div>
+            <div class="head-t"><h5>Dune: Part Two</h5>
+              <div class="metaline">2024 · Science Fiction, Adventure · 2h 47m</div></div></div>
+          <div class="block"><div class="arow">
+            <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+            <button class="ibtn like on" aria-pressed="true">♥</button></div>
+            <div class="prov"><div class="prov-l">Where to watch · India</div>
+              <div class="provrow"><button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button></div></div></div>
+          <div class="scores">
+            <div class="score gold"><b>8.1</b><span>TMDB</span></div>
+            <div class="score"><b>9.0</b><span>You</span></div>
+            <div class="score dim"><b>1</b><span>Rewatches</span></div></div>
+          <div class="cards2">
+            <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div>
+              <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div></div>
+            <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Denis Villeneuve<br>Director</div></div></div>
+          <div style="height:14px"></div>
+        </div></div>
+      </div>
+      <div class="sscol">
+        <div class="lbl">430 px <em>· iPhone Pro Max</em></div>
+        <div class="phone w430"><div class="ph-top"><span></span></div><div class="ph-body" style="height:560px">
+          <div class="hero img i-dune_b" style="height:130px">
+            <div class="hero-nav"><button class="circ dark">‹</button><button class="circ dark">⋮</button></div></div>
+          <div class="head"><div class="poster img i-dune_p"></div>
+            <div class="head-t"><h5>Dune: Part Two</h5>
+              <div class="metaline">2024 · Science Fiction, Adventure · 2h 47m</div></div></div>
+          <div class="block"><div class="arow">
+            <button class="spill">✓ Watched <span style="opacity:.6;font-size:10px">▾</span></button>
+            <button class="ibtn like on" aria-pressed="true">♥</button></div>
+            <div class="prov"><div class="prov-l">Where to watch · India</div>
+              <div class="provrow"><button class="pchip"><span class="plogo" style="background:#E50914">N</span>Netflix</button></div></div></div>
+          <div class="scores">
+            <div class="score gold"><b>8.1</b><span>TMDB · 8.5k</span></div>
+            <div class="score"><b>9.0</b><span>Your score</span></div>
+            <div class="score dim"><b>1</b><span>Rewatches</span></div></div>
+          <div class="cards2">
+            <div class="pc"><div class="pc-h"><b>Cast</b><i>⌄</i></div>
+              <div class="faces"><span class="face"></span><span class="face"></span><span class="face"></span></div>
+              <div class="ptx" style="margin-top:6px">Chalamet, Zendaya<br>+3 more</div></div>
+            <div class="pc"><div class="pc-h"><b>Crew</b><i>⌄</i></div><div class="ptx">Denis Villeneuve<br>Director</div></div></div>
+          <div style="height:14px"></div>
+        </div></div>
+      </div>
+    </div>
+
+    <h3>Rules</h3>
+    <ol class="rl" style="--start:55;padding:0;gap:11px">
+      <li><b>320px is the supported floor.</b> <code>src/index.css</code> already sets
+        <code>body{min-width:320px}</code>, so the app has effectively declared this. Keep it, and treat anything
+        narrower as out of scope.</li>
+      <li><b><code>white-space:nowrap</code> is permitted only inside a horizontal scroll container.</b> Chips and
+        the season switcher qualify because they scroll. Content text never does — it wraps.</li>
+      <li><b>Wrap, never truncate — except where clamping is deliberate.</b> The only intentional truncation is
+        <code>line-clamp:2</code> on grid tile titles, and it is a design choice with a tooltip and a full title on the
+        detail page behind it.</li>
+      <li><b>Rows grow in height rather than squeezing.</b> A long episode title takes three lines at 320px. That is
+        correct; the alternative is an ellipsis that hides which episode it is.</li>
+      <li><b>Secondary labels may shorten below 360px</b> — <code>TMDB · 8.5k</code> becomes <code>TMDB</code>,
+        <code>Your score</code> becomes <code>You</code>. Shorten the label, never the number.</li>
+      <li><b>Thumbnails are fixed-width and that is fine</b>, because they're small (40–82px) and everything beside
+        them is fluid. Fixed widths are only dangerous on text containers.</li>
+      <li><b>Test matrix: 320 / 360 / 390 / 430.</b> 360 is the most common Android width and 390 the most common
+        iPhone; neither is an edge case. This belongs in the acceptance criteria, not in a QA pass at the end.</li>
+    </ol>
+
+    <div class="warnbox" style="border-left-color:var(--acc);background:var(--acc-bg)">
+      <b>The lesson worth keeping isn't about width.</b> The only genuine defect this pass found was a missing
+      <code>charset</code> — a bug that is invisible in the environment I was designing in and only appears in the
+      environment the file is actually used in. Rendering it somewhere real found in one minute what reading it
+      would never have found at all.</div>
+  </section>
+
   <!-- ============ LIVE DATA ============ -->
   <section>
     <h2>Live data · what production actually returns</h2>
@@ -1831,3 +2177,6 @@ footer{border-top:1px solid var(--bd-sub);margin-top:56px;padding:28px 0 0;font-
   });
 })();
 </script>
+
+</body>
+</html>

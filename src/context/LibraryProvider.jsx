@@ -103,7 +103,7 @@ export function LibraryProvider({ children }) {
         };
         if (!api.validRating(rating)) return false;
         return commit(key, optimistic, async () => {
-            const catalog = await api.catalogFor(item.id, item.mediaType, item.catalog);
+            const catalog = await api.catalogFor(item.id, item.mediaType, item.catalog, { exists: Boolean(before) });
             let row = await api.upsert({
                 id: item.id, mediaType: item.mediaType, catalog,
                 status, rating, favourite, rewatches, recommendedBy,
@@ -155,7 +155,7 @@ export function LibraryProvider({ children }) {
             watched_episodes: watched,
         };
         return commit(key, optimistic, async () => {
-            const catalog = await api.catalogFor(item.id, 'tv', item.catalog);
+            const catalog = await api.catalogFor(item.id, 'tv', item.catalog, { exists: Boolean(before) });
             return api.setEpisodes({ id: item.id, season, episodes, catalog });
         }, 'Couldn’t save that episode.');
     }, [commit]);

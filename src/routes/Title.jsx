@@ -94,7 +94,11 @@ export default function Title() {
     // exactly the people who haven't seen it yet — so they raise the sign-in
     // sheet instead, naming the thing that was being reached for.
     const ask = (action) => setPrompt({ title: t.title, poster: t.poster, action });
-    const gate = (fn) => (isSignedIn ? fn() : ask(isTV ? 'track' : 'want'));
+    // The verb follows the control, not the page. A guest tapping the heart was
+    // being asked "Track this series?" — the same mismatch the sign-in sheet was
+    // built to avoid, reintroduced by a single default.
+    const gate = (verb, fn) => (isSignedIn ? fn() : ask(verb));
+    const primaryVerb = isTV ? 'track' : 'want';
 
     const order = isTV ? runningOrder(t.seasons, t.airedEpisodes) : [];
     const seen = episodesWatched(entry?.watched_episodes);
@@ -152,7 +156,7 @@ export default function Title() {
                 <button
                     type="button"
                     className={`spill${saved ? ' set' : ''}`}
-                    onClick={() => gate(() => (saved ? setEditing(true) : quickSave()))}
+                    onClick={() => gate(saved ? 'edit' : primaryVerb, () => (saved ? setEditing(true) : quickSave()))}
                 >
                     {saved
                         ? <>{state?.icon} {state?.label} <span className="caret" aria-hidden="true">▾</span></>
@@ -163,13 +167,13 @@ export default function Title() {
                     className={`ibtn like${entry?.is_favourite ? ' on' : ''}`}
                     aria-pressed={isSignedIn ? Boolean(entry?.is_favourite) : undefined}
                     aria-label={entry?.is_favourite ? 'Remove from favourites' : 'Mark as favourite'}
-                    onClick={() => gate(() => lib.save(t, { favourite: !entry?.is_favourite }))}
+                    onClick={() => gate('like', () => lib.save(t, { favourite: !entry?.is_favourite }))}
                 >♥</button>
                 <button
                     type="button"
                     className="ibtn"
                     aria-label="Edit"
-                    onClick={() => gate(() => setEditing(true))}
+                    onClick={() => gate('edit', () => setEditing(true))}
                 >✎</button>
             </div>
 
@@ -349,7 +353,6 @@ export default function Title() {
                         <Episodes
                             title={t}
                             entry={entry}
-                            order={order}
                             onTick={tickEpisode}
                             onMarkSeason={markSeason}
                         />
@@ -382,7 +385,7 @@ export default function Title() {
     );
 }
 
-function Episodes({ title, entry, order, onTick, onMarkSeason }) {
+function Episodes({ title, entry, onTick, onMarkSeason }) {
     const { isSignedIn } = useAuth();
     const [prompt, setPrompt] = useState(null);
     const tabs = [...title.seasons, ...(title.specials ? [title.specials] : [])];
@@ -419,10 +422,7 @@ function Episodes({ title, entry, order, onTick, onMarkSeason }) {
 
     return (
         <div className="sect">
-            <div className="sect-h">
-                <span>Episodes</span>
-                {entry && seenHere > 0 && <span className="sect-note">{seenHere} of {order.length} watched</span>}
-            </div>
+            <div className="sect-h"><span>Episodes</span></div>
             <div className="seasonsw" role="tablist" aria-label="Seasons">
                 {tabs.map((s) => (
                     <button
@@ -441,7 +441,15 @@ function Episodes({ title, entry, order, onTick, onMarkSeason }) {
 
             {aired.length > 0 && (
                 <div className="sect-h markrow">
-                    <span>{active === 0 ? 'Specials' : `Season ${active}`} · {aired.length} aired</span>
+                    {/* Per season, counted against that season. The run total is
+                        already on the progress bar above; putting "5 of 62" next
+                        to a seven-episode season measures one thing with the
+                        other thing's ruler. */}
+                    <span>
+                        {active === 0 ? 'Specials' : `Season ${active}`}
+                        {' · '}
+                        {seenHere > 0 ? `${seenHere} of ${aired.length} watched` : `${aired.length} aired`}
+                    </span>
                     {/* Per season, never per series. */}
                     <button type="button" className="markall" onClick={markAll}>
                         {allSeen ? 'Clear season' : 'Mark all'}

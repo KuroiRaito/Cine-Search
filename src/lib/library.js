@@ -62,8 +62,12 @@ export const validRating = (v) => v == null || RATINGS.includes(v);
  * has already moved on optimistically, so this costs the user nothing, and it
  * is the difference between a catalogue with genres in it and one without.
  */
-export async function catalogFor(id, mediaType, known) {
+export async function catalogFor(id, mediaType, known, { exists = false } = {}) {
     if (known) return known;
+    // The catalogue insert is ON CONFLICT DO NOTHING, so fetching a title that
+    // is already saved buys nothing and spends a TMDB request. Every tap of the
+    // "+" on a library row was doing exactly that.
+    if (exists) return null;
     const raw = await titleFull(id, mediaType);
     return toCatalog(raw, mediaType);
 }
@@ -133,10 +137,24 @@ export async function loadEntries() {
         .then(unwrap);
 }
 
-/** How many episodes of a series are ticked, across every season. */
-export function episodesWatched(watched) {
+/**
+ * How many episodes of a series are ticked.
+ *
+ * Specials — season zero — are excluded, because the total they are counted
+ * against excludes them: TMDB's `number_of_episodes` is the numbered run, and
+ * the catalogue's season list is built from seasons above zero. Counting them
+ * on one side of the fraction and not the other reads "63 of 62" and draws a
+ * progress bar past its own end.
+ *
+ * They are still recorded. A special you watched is a thing you watched; it is
+ * just not part of "how far through Breaking Bad are you".
+ */
+export function episodesWatched(watched, { includeSpecials = false } = {}) {
     if (!watched) return 0;
-    return Object.values(watched).reduce((n, list) => n + (Array.isArray(list) ? list.length : 0), 0);
+    return Object.entries(watched).reduce((n, [season, list]) => {
+        if (!includeSpecials && Number(season) === 0) return n;
+        return n + (Array.isArray(list) ? list.length : 0);
+    }, 0);
 }
 
 /**

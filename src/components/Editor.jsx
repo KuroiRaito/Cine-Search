@@ -31,6 +31,9 @@ export default function Editor({ title, onClose }) {
     const [rewatches, setRewatches] = useState(entry?.rewatch_count ?? 0);
     const [by, setBy] = useState(entry?.recommended_by ?? '');
     const [rateNote, setRateNote] = useState(false);
+    // Whether the person actually took their score off, as opposed to the score
+    // merely not being editable under the status they just chose.
+    const [cleared, setCleared] = useState(false);
     const [confirming, setConfirming] = useState(false);
     const [busy, setBusy] = useState(false);
 
@@ -68,6 +71,7 @@ export default function Editor({ title, onClose }) {
         if (!canRate(status)) { setRateNote(true); return; }
         setRateNote(false);
         setRating(value === rating ? null : value);
+        setCleared(value === rating);
     };
 
     const onSave = async () => {
@@ -81,8 +85,11 @@ export default function Editor({ title, onClose }) {
             episodes: isTV ? watched : null,
         });
         // Clearing is a different intention from not passing one, so it is a
-        // different call. Only make it when there really was a rating to clear.
-        if (ok && rating == null && entry?.rating != null) await clearRating(title);
+        // different call — and it is only ever the person's intention. Moving a
+        // title from Watched back to Watching makes the score uneditable; it
+        // does not make the score untrue, and erasing it there is data loss the
+        // person never asked for.
+        if (ok && cleared && entry?.rating != null) await clearRating(title);
         setBusy(false);
         if (ok) onClose();
     };
@@ -178,7 +185,11 @@ export default function Editor({ title, onClose }) {
                         })}
                         <span className="sv">{rating != null ? `${rating} / 10` : '—'}</span>
                         {rating != null && (
-                            <button type="button" className="clear" onClick={() => setRating(null)}>Clear</button>
+                            <button
+                                type="button"
+                                className="clear"
+                                onClick={() => { setRating(null); setCleared(true); }}
+                            >Clear</button>
                         )}
                     </div>
                     {rateNote && (

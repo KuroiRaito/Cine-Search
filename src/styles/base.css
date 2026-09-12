@@ -698,6 +698,9 @@ img { max-width: 100%; display: block; }
   .mosaic { grid-template-columns: repeat(6, 1fr); }
 }
 @media (min-width: 1120px) {
+  /* The tab bar is gone up here, so the gap it was clearing is just a gap. */
+  .toast { bottom: 24px; }
+
   .cover-in h1 { font-size: 40px; }
   .mosaic { grid-template-columns: repeat(8, 1fr); }
 }

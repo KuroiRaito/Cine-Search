@@ -5,6 +5,7 @@ import { fromItem } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { useRegion } from '../hooks/useRegion.js';
 import { Rail, Skeleton, ErrorBox } from '../components/ui.jsx';
+import { useAuth } from '../context/AuthProvider.jsx';
 import SignInPrompt from '../components/SignInPrompt.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 
@@ -33,6 +34,7 @@ function FeedRail({ title, load, deps, onAdd }) {
 
 export default function Discover() {
     const { region } = useRegion();
+    const { isSignedIn, profile } = useAuth();
     const [prompt, setPrompt] = useState(null);
 
     // Tapping + on any tile is how a guest discovers what the product is for.
@@ -45,7 +47,9 @@ export default function Discover() {
                 <div className="head-actions">
                     <Link to="/search" className="circ" aria-label="Search">⌕</Link>
                     <ThemeToggle />
-                    <Link to="/welcome" className="btn quiet">Sign in</Link>
+                    {isSignedIn
+                        ? <Link to="/you" className="btn quiet">{profile?.username || 'You'}</Link>
+                        : <Link to="/welcome/signin" state={{ from: '/' }} className="btn quiet">Sign in</Link>}
                 </div>
             </div>
 
@@ -63,12 +67,15 @@ export default function Discover() {
             />
 
             {/* Exactly one sign-up card, after two rails — below the fold, once
-                some value has been delivered. Not a banner, not a modal. */}
-            <div className="card signup">
-                <h2>Keep track of what you watch</h2>
-                <p>Your watchlist, ratings and episode progress — private by default.</p>
-                <Link className="btn" to="/welcome">Create an account</Link>
-            </div>
+                some value has been delivered. Gone entirely once you're in;
+                selling an account to someone who has one is just noise. */}
+            {!isSignedIn && (
+                <div className="card signup">
+                    <h2>Keep track of what you watch</h2>
+                    <p>Your watchlist, ratings and episode progress — private by default.</p>
+                    <Link className="btn" to="/welcome/signup" state={{ from: '/' }}>Create an account</Link>
+                </div>
+            )}
 
             <FeedRail
                 title="On air now"

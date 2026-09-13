@@ -1,6 +1,6 @@
-import { supabase } from './supabaseClient.js';
-import { titleFull } from './tmdb/endpoints.js';
-import { toCatalog } from './tmdb/view.js';
+import { supabase } from '../shared/auth/supabaseClient.js';
+import { titleFull } from '../shared/tmdb/endpoints.js';
+import { toCatalog } from '../shared/tmdb/view.js';
 
 /**
  * Every write to the library goes through a Postgres function, never straight

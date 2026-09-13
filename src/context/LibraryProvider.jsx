@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { useAuth } from './AuthProvider.jsx';
+import { useAuth } from '../shared/auth/AuthProvider.jsx';
 import * as api from '../lib/library.js';
+import { statusMeta, statusTone } from '../lib/library.js';
 
 const LibraryContext = createContext(null);
 
@@ -211,4 +212,36 @@ const normalise = (r) => ({
 
 export function useLibrary() {
     return useContext(LibraryContext);
+}
+
+/**
+ * What a poster tile should show for a title: its saved state, or nothing.
+ * Returns a function rather than a value so a screen calls the hook once and
+ * asks it per tile — hooks cannot run inside a map.
+ */
+export function useTileStates() {
+    const lib = useLibrary();
+    const entries = lib?.entries;
+    return useCallback((item) => {
+        const e = entries?.[api.keyOf(item.mediaType, item.id)];
+        if (!e) return null;
+        const meta = statusMeta(e.status);
+        return { tone: statusTone(e.status), icon: meta?.icon, label: meta?.label };
+    }, [entries]);
+}
+
+/**
+ * What a tap on a tile's "+" does. A guest gets whatever the screen says —
+ * the sign-in sheet, naming the title; a signed-in person saves it to "want
+ * to watch" in one tap, with no sheet and no confirmation. A title that is
+ * already saved does nothing: the tile reports, it does not toggle.
+ */
+export function useQuickAdd(onGuest) {
+    const { isSignedIn } = useAuth();
+    const lib = useLibrary();
+    return useCallback((item) => {
+        if (!isSignedIn) { onGuest?.(item); return; }
+        if (lib.has(item.mediaType, item.id)) return;
+        lib.save(item, { status: 'want_to_watch' });
+    }, [isSignedIn, lib, onGuest]);
 }

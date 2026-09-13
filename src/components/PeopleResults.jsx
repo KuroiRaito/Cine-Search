@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { PersonRow } from './ui.jsx';
-import { useAuth } from '../context/AuthProvider.jsx';
+import { PersonRow } from '../shared/ui/index.js';
+import { useAuth } from '../shared/auth/AuthProvider.jsx';
 import { useLibrary } from '../context/LibraryProvider.jsx';
-import { searchPerson, person as fetchPerson } from '../lib/tmdb/endpoints.js';
-import { toPersonView, profileUrl, roleForJob } from '../lib/tmdb/view.js';
+import { searchPerson, person as fetchPerson } from '../shared/tmdb/endpoints.js';
+import { toPersonView, profileUrl, roleForJob } from '../shared/tmdb/view.js';
 import {
     collectionProgress, totalsFromView, totalsAreFresh, personTotalsGet, personTotalsSet,
     creditsForPeople, isSeen,
@@ -80,7 +80,7 @@ export default function PeopleResults({ people }) {
     if (!people.length) return null;
 
     return (
-        <div className="sect pad" style={{ marginTop: 'var(--s6)' }}>
+        <div className="sect pad">
             <div className="sect-h"><span>People</span></div>
             {people.map((p) => (
                 <PersonResult

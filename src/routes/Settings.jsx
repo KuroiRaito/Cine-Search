@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthProvider.jsx';
-import { useRegion } from '../hooks/useRegion.js';
-import { activeTheme, applyTheme } from '../lib/theme.js';
+import { useAuth } from '../shared/auth/AuthProvider.jsx';
+import { useRegion } from '../shared/hooks/useRegion.js';
+import { activeTheme, applyTheme } from '../shared/theme/theme.js';
 
 /**
  * Plain and conventional by decision, not by omission — settings has no bespoke

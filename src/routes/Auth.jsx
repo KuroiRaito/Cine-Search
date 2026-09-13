@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link, useParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthProvider.jsx';
+import { useAuth } from '../shared/auth/AuthProvider.jsx';
 import { markSeen } from '../lib/firstVisit.js';
 
 /** Supabase's own wording is for developers. These are for people. */
@@ -126,7 +126,7 @@ export default function Auth() {
 
                     {error && <p className="auth-error" role="alert">{error}</p>}
 
-                    <button type="submit" className="btn" disabled={busy} style={{ width: '100%' }}>
+                    <button type="submit" className="btn block" disabled={busy}>
                         {busy ? 'One moment…' : isSignUp ? 'Create account' : 'Sign in'}
                     </button>
                 </form>

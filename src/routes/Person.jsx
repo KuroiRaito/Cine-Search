@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { person as fetchPerson } from '../lib/tmdb/endpoints.js';
-import { toPersonView } from '../lib/tmdb/view.js';
-import { useAsync } from '../hooks/useAsync.js';
-import { Tile, Skeleton, Empty, initialsOf } from '../components/ui.jsx';
+import { person as fetchPerson } from '../shared/tmdb/endpoints.js';
+import { toPersonView } from '../shared/tmdb/view.js';
+import { useAsync } from '../shared/hooks/useAsync.js';
+import { Tile, Skeleton, Empty, initialsOf } from '../shared/ui/index.js';
 import SignInPrompt from '../components/SignInPrompt.jsx';
-import { useAuth } from '../context/AuthProvider.jsx';
-import { useLibrary } from '../context/LibraryProvider.jsx';
+import { useAuth } from '../shared/auth/AuthProvider.jsx';
+import { useLibrary, useTileStates, useQuickAdd } from '../context/LibraryProvider.jsx';
 import { collectionProgress } from '../lib/library.js';
 
 const year = (d) => (d ? new Date(d).getFullYear() : null);
@@ -24,6 +24,8 @@ export default function Person() {
     const navigate = useNavigate();
     const [role, setRole] = useState(null);
     const [prompt, setPrompt] = useState(null);
+    const onAdd = useQuickAdd((x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' }));
+    const stateFor = useTileStates();
     const { isSignedIn } = useAuth();
     const lib = useLibrary();
 
@@ -36,8 +38,8 @@ export default function Person() {
         return (
             <div className="page">
                 <div className="phead">
-                    <Skeleton h={68} w={68} style={{ borderRadius: 99 }} />
-                    <div style={{ flex: 1, display: 'grid', gap: 8 }}>
+                    <Skeleton h={68} w={68} className="skel-round" />
+                    <div className="skel-lines">
                         <Skeleton h={20} w="60%" /><Skeleton h={12} w="40%" />
                     </div>
                 </div>
@@ -78,7 +80,7 @@ export default function Person() {
                 <div className="avatar">
                     {p.photo ? <img src={p.photo} alt="" fetchPriority="high" /> : initialsOf(p.name)}
                 </div>
-                <div style={{ minWidth: 0 }}>
+                <div className="phead-text">
                     <h1>{p.name}</h1>
                     <div className="sub">
                         {[p.department, lifespan(p)].filter(Boolean).join(' · ')}
@@ -126,12 +128,13 @@ export default function Person() {
                             </button>
                         ))}
                     </div>
-                    <div className="grid" style={{ marginTop: 14 }}>
+                    <div className="grid filmography">
                         {active.items.map((it) => (
                             <Tile
                                 key={`${it.mediaType}-${it.id}`}
                                 item={it}
-                                onAdd={(x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' })}
+                                onAdd={onAdd}
+                                state={stateFor(it)}
                             />
                         ))}
                     </div>

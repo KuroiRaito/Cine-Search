@@ -6,8 +6,8 @@
 //
 // New code should import from lib/tmdb/endpoints.js or lib/search/ directly.
 
-import * as api from './tmdb/endpoints.js';
-import { toItem, attachGenreNames } from './tmdb/normalize.js';
+import * as api from '../shared/tmdb/endpoints.js';
+import { toItem, attachGenreNames } from '../shared/tmdb/normalize.js';
 import { search as runSearch } from './search/index.js';
 
 export { attachGenreNames as mapGenreIdsToNames };

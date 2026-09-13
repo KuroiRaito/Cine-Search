@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Skeleton, Empty, initialsOf } from '../components/ui.jsx';
-import { useAuth } from '../context/AuthProvider.jsx';
+import { Skeleton, Empty, initialsOf } from '../shared/ui/index.js';
+import { useAuth } from '../shared/auth/AuthProvider.jsx';
 import { useLibrary } from '../context/LibraryProvider.jsx';
-import { useAsync } from '../hooks/useAsync.js';
-import { posterUrl, profileUrl, toPersonView, roleForJob } from '../lib/tmdb/view.js';
-import { person as fetchPerson } from '../lib/tmdb/endpoints.js';
+import { useAsync } from '../shared/hooks/useAsync.js';
+import { posterUrl, profileUrl, toPersonView, roleForJob } from '../shared/tmdb/view.js';
+import { person as fetchPerson } from '../shared/tmdb/endpoints.js';
 import {
     tasteSummary, formatDays, formatSpan, SCORE_FLOOR,
     totalsFromView, totalsAreFresh, personTotalsSet,

@@ -47,6 +47,7 @@ const SHAPE_PROPS = new Set([
     'border-radius', 'border-left', 'border-top', 'width', 'height', 'min-height',
     'display', 'flex', 'grid-template-columns', 'grid-column', 'position', 'gap',
     'aspect-ratio', 'object-fit', 'opacity', 'transform', 'inset', 'color', 'font-size',
+    'min-width', 'margin-bottom', 'padding-bottom',
 ]);
 
 const defined = new Set();
@@ -119,6 +120,87 @@ for (const m of css.matchAll(/var\((--[\w-]+)/g)) {
     if (!declared.has(m[1])) fail('undefined-token', `var(${m[1]}) is never declared`);
 }
 
+
+/* ---------------------------------------------------------------
+   5. No inline styles, except the one primitive whose API is dimensional.
+   A `style={{ marginTop: 16 }}` is a number outside the design contract
+   that none of the checks above can see. Values that are genuinely
+   data-driven — a progress bar's width, a poster's background image — are
+   allowed, and only those: the property must be one that carries data, and
+   the value must be an expression rather than a literal.
+   --------------------------------------------------------------- */
+const DYNAMIC_OK = new Set(['width', 'height', 'backgroundImage', 'aspectRatio', 'transform']);
+for (const f of jsx) {
+    if (f.endsWith('Skeleton.jsx')) continue;
+    const text = readFileSync(f, 'utf8');
+    for (const m of text.matchAll(/style=\{\{([\s\S]*?)\}\}/g)) {
+        const line = text.slice(0, m.index).split('\n').length;
+        // Template literals and ${} carry expressions; collapse them so the
+        // property split below does not trip on the commas inside.
+        const body = m[1].replace(/`[^`]*`/g, 'EXPR').replace(/\$\{[^}]*\}/g, 'EXPR');
+        for (const prop of body.split(',')) {
+            const kv = prop.match(/^\s*([A-Za-z]+)\s*:\s*(.+?)\s*$/);
+            if (!kv) continue;
+            const [, key, value] = kv;
+            const literal = /^(\d+|'[^']*'|"[^"]*")$/.test(value);
+            if (!DYNAMIC_OK.has(key) || literal) {
+                fail('inline-style', `${relative(ROOT, f)}:${line} — ${key}: ${value.slice(0, 30)}`);
+            }
+        }
+    }
+}
+
+/* ---------------------------------------------------------------
+   6. A module's classes belong to that module.
+   A class first defined under src/modules/<m>/ may be used only by files
+   under src/modules/<m>/. The class names stay the design system's own —
+   this is what makes per-module stylesheets safe without renaming them.
+   --------------------------------------------------------------- */
+const moduleOf = (f) => relative(ROOT, f).match(/^src\/modules\/([^/]+)\//)?.[1] ?? null;
+const owner = new Map();
+for (const f of cssFiles) {
+    const mod = moduleOf(f);
+    if (!mod) continue;
+    for (const m of readFileSync(f, 'utf8').matchAll(/([^{}]+)\{[^}]*\}/g)) {
+        for (const c of m[1].matchAll(/\.([A-Za-z][\w-]*)/g)) {
+            const prev = owner.get(c[1]);
+            if (prev && prev !== mod) fail('class-ownership', `.${c[1]} is defined by both ${prev} and ${mod}`);
+            owner.set(c[1], mod);
+        }
+    }
+}
+for (const f of jsx) {
+    const mod = moduleOf(f);
+    const text = readFileSync(f, 'utf8');
+    for (const m of text.matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\})/g)) {
+        for (const tok of (m[1] || m[2] || '').split(/[\s${}?:()'"]+/)) {
+            const o = owner.get(tok);
+            if (o && o !== mod) fail('class-ownership', `.${tok} belongs to ${o}, used in ${relative(ROOT, f)}`);
+        }
+    }
+}
+
+/* ---------------------------------------------------------------
+   7. Modules are imported only through their public surface.
+   From outside src/modules/<m>/, the only importable path is the module
+   itself (its index.js). Reaching into a module's internals is what makes
+   it stop being a module.
+   --------------------------------------------------------------- */
+import { dirname, resolve as resolvePath } from 'node:path';
+for (const f of jsx) {
+    const mod = moduleOf(f);
+    const text = readFileSync(f, 'utf8');
+    for (const m of text.matchAll(/(?:from|import)\s*\(?\s*'(\.\.?\/[^']+)'/g)) {
+        const target = relative(ROOT, resolvePath(dirname(f), m[1])).replace(/\\/g, '/');
+        const tm = target.match(/^src\/modules\/([^/]+)(?:\/(.*))?$/);
+        if (!tm || tm[1] === mod) continue;
+        const inside = tm[2] ?? '';
+        if (inside && inside !== 'index.js') {
+            fail('deep-import', `${relative(ROOT, f)} imports ${target} — use modules/${tm[1]}`);
+        }
+    }
+}
+
 /* --------------------------------------------------------------- */
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
@@ -129,6 +211,9 @@ const CHECKS = [
     ['raw-colour', 'No hard-coded colour in components'],
     ['hardcoded-gutter', 'One gutter token, obeyed by everything'],
     ['undefined-token', 'Every custom property used is declared'],
+    ['inline-style', 'No inline styles outside Skeleton; dynamic values only'],
+    ['class-ownership', "A module's classes are used only by that module"],
+    ['deep-import', 'Modules are imported only through their index'],
 ];
 
 let failed = 0;

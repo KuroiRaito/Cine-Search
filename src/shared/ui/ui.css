@@ -1,0 +1,178 @@
+/* ============================================================
+   The shared primitives: tiles and rails, the card, the person row, the
+   skeleton, the empty and error states, the toast. Every screen draws with
+   these. Nothing here knows which screen it is on.
+   ============================================================ */
+
+/* ---------------- rails and tiles ---------------- */
+
+.rail { display: flex; gap: 8px; overflow-x: auto; padding: 0 var(--gutter) 6px; scrollbar-width: none; }
+.rail::-webkit-scrollbar { height: 0; }
+.rail > * { flex: 0 0 auto; }
+
+.tile { width: 108px; }
+
+/* Rails show about two and a half posters. The artwork is the thing being
+   browsed, so it has to be big enough to actually recognise — and the half
+   tile at the edge is what tells you the row scrolls. */
+.rail .tile { width: 128px; }
+.rail .tile .name {
+  /* Reserve both lines so the year sits on the same baseline along the row,
+     whether the title wrapped or not. */
+  min-height: calc(2 * 1.3em);
+}
+@media (min-width: 400px) { .rail .tile { width: 148px; } }
+@media (min-width: 600px) { .rail .tile { width: 168px; } }
+.tile .art {
+  aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; position: relative;
+  background: var(--ink-4); border: 1px solid var(--bd-sub); margin-bottom: 5px;
+}
+.tile .art img { width: 100%; height: 100%; object-fit: cover; }
+.tile .name {
+  font-size: 12px; line-height: 1.3; color: var(--text);
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tile .meta { font-family: var(--f-m); font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* A poster we have no artwork for still has to say which title it is. */
+.noart {
+  width: 100%; height: 100%; display: grid; place-items: center; padding: 8px; text-align: center;
+  background: linear-gradient(150deg, var(--ink-5), var(--ink-3));
+  font-family: var(--f-d); font-size: 11px; font-weight: 700; color: var(--muted); line-height: 1.25;
+}
+
+.quickadd {
+  position: absolute; top: 6px; right: 6px; width: 26px; height: 26px;
+  border-radius: 99px; border: 0; cursor: pointer;
+  display: grid; place-items: center; font-size: 14px; line-height: 1; font-weight: 500;
+  color: #fff; background: rgba(8, 12, 20, .62); backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+  transition: background .13s, color .13s, box-shadow .13s;
+}
+.quickadd:hover { background: var(--acc); color: var(--on-acc); box-shadow: none; }
+.quickadd::after { content: ""; position: absolute; inset: -9px; }
+
+.score-badge {
+  position: absolute; left: 4px; bottom: 4px;
+  font-family: var(--f-m); font-size: 9px; font-weight: 600; color: var(--mar-9);
+  background: rgba(4,6,12,.68); padding: 1px 5px; border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding-inline: var(--gutter);
+}
+@media (min-width: 480px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 760px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.grid .tile { width: auto; }
+/* Inside a block that already carries the gutter, the grid must not add it again. */
+.grid.flush { padding-inline: 0; }
+
+
+.prow {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 11px;
+  background: var(--surface); transition: background .12s; width: 100%; text-align: left;
+}
+.prow + .prow { margin-top: 6px; }
+.prow:hover { background: var(--surface-hv); }
+.prow .pf {
+  width: 38px; height: 38px; flex: 0 0 auto; border-radius: 99px; overflow: hidden;
+  background: var(--ink-5); display: grid; place-items: center;
+  font-family: var(--f-d); font-size: 13px; font-weight: 700; color: var(--ink-11);
+}
+.prow .pf img { width: 100%; height: 100%; object-fit: cover; }
+.prow .pf.noimg { background: var(--ink-5); }
+.prow .pb { flex: 1; min-width: 0; }
+.prow .pb b { display: block; font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--text); }
+.prow .pb span { display: block; font-size: 11px; color: var(--muted); }
+.prow .go { color: var(--ink-9); font-size: 14px; flex: 0 0 auto; }
+
+/* ---------------- card ---------------- */
+
+/* A card must define its own box before any modifier tunes it. This base was
+   missing: .card.signup set only text-align and font sizes, so every .card in
+   the app rendered with no background, no padding and no margin — the sign-up
+   block's text landed at x=0 against the screen edge while the posters beside
+   it sat at the 14px gutter. The desktop rule below already expected .card to
+   exist; only the base was absent. */
+.card {
+  background: var(--ink-3);
+  padding: 14px;
+  border-radius: 12px;
+  margin: var(--s6) var(--gutter);
+  border: 0;
+}
+
+.card-label {
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
+}
+
+
+.skel { border-radius: 6px; }
+/* Skeletons mirror the layout that's coming: the same radii and rhythm as the
+   real thing, so nothing shifts on arrival. Height and width stay props on the
+   component — those are the one inline style the contract allows. */
+.skel-flat { border-radius: 0; }
+.skel-art { border-radius: 8px; }
+.skel-poster { border-radius: 8px; margin-bottom: 5px; }
+.skel-round { border-radius: 99px; }
+.skel-row { border-radius: 10px; margin-top: 7px; }
+.skel-lines { flex: 1; display: grid; gap: 8px; }
+.skel-lines.tight { padding-bottom: 6px; }
+
+.empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 40px var(--gutter); max-width: 34ch;
+  margin: var(--s6) auto 0; min-height: 40vh;
+}
+.empty h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.empty p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+.errbox { margin: var(--s6) var(--gutter); border: 1px solid var(--st-drop-9); background: var(--st-drop-3); border-radius: 11px; padding: 14px; }
+.errbox b { display: block; font-size: 13px; color: var(--st-drop-11); margin-bottom: 4px; }
+.errbox p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+
+/* ---------------- toast ---------------- */
+
+/* Named, not generic: "Breaking Bad · S2 E4 watched" is worth reading, "Saved"
+   is not. Six seconds, because that is how long an undo stays plausible. */
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(78px + env(safe-area-inset-bottom)); z-index: 70;
+  width: calc(100% - (var(--gutter) * 2)); max-width: 420px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--ink-5); border-radius: 10px; padding: 10px 13px;
+  font-size: 12px; color: var(--text); box-shadow: var(--sh);
+}
+.toast button {
+  background: none; border: 0; cursor: pointer; padding: 4px 2px;
+  font-family: var(--f-s); font-size: 11.5px; font-weight: 600; color: var(--acc-t);
+}
+.toast span { min-width: 0; }
+
+/* The season header is a second heading inside one section — same type, but it
+   carries an action, so it needs its own rhythm above the list. */
+.sect-h.markrow { margin-top: 14px; font-family: var(--f-m); font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 400; }
+.sect-note { font-family: var(--f-m); font-size: 10px; color: var(--muted); font-weight: 400; }
+
+/* A saved tile reports its state where the invitation used to be. Same spot,
+   same size — only a poster that is already yours says so. */
+.quickadd.saved {
+  background: var(--stl); color: var(--bg);
+  box-shadow: none; cursor: default; backdrop-filter: none;
+}
+.quickadd.saved:hover { background: var(--stl); color: var(--bg); }
+
+/* A control that navigates within the screen rather than to a URL. It reads as
+   a link because that is what it does; it is a button because there is nothing
+   to link to. */
+.linkish {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--acc-t);
+}
+
+/* Notes are the one field that takes more than a line, so it is the one input
+   that grows. Resizing stays vertical — a sheet has a fixed width. */
+.inp.notes { min-height: 62px; line-height: 1.55; resize: vertical; }
+

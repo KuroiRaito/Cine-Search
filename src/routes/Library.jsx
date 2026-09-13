@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Poster, Tile, Skeleton, Empty, Toast } from '../components/ui.jsx';
-import { useAuth } from '../context/AuthProvider.jsx';
+import { Poster, Tile, Skeleton, Empty, Toast } from '../shared/ui/index.js';
+import { useAuth } from '../shared/auth/AuthProvider.jsx';
 import { useLibrary } from '../context/LibraryProvider.jsx';
-import { posterUrl, yearOf } from '../lib/tmdb/view.js';
+import { posterUrl, yearOf } from '../shared/tmdb/view.js';
 import {
     statusMeta, episodesWatched, runningOrder, nextUnwatched, epLabel, loadEntries, keyOf,
 } from '../lib/library.js';
-import { useAsync } from '../hooks/useAsync.js';
+import { useAsync } from '../shared/hooks/useAsync.js';
 
 /* Which statuses get a chip. "All" is last and has no count of its own — the
    sum is already the sum of the others. */
@@ -92,9 +92,9 @@ export default function Library() {
             <div className="page">
                 <div className="page-head"><h1>Library</h1></div>
                 <div className="chips">
-                    {[0, 1, 2].map((i) => <Skeleton key={i} h={29} w={104} style={{ borderRadius: 99 }} />)}
+                    {[0, 1, 2].map((i) => <Skeleton key={i} h={29} w={104} className="skel-round" />)}
                 </div>
-                <div className="grp">{[0, 1, 2].map((i) => <Skeleton key={i} h={70} style={{ borderRadius: 10, marginTop: 7 }} />)}</div>
+                <div className="grp">{[0, 1, 2].map((i) => <Skeleton key={i} h={70} className="skel-row" />)}</div>
             </div>
         );
     }
@@ -194,7 +194,7 @@ export default function Library() {
                     )
                     : <>Nothing here is marked “{label}”.</>}
             >
-                <div className="grid" style={{ paddingInline: 0 }}>
+                <div className="grid flush">
                     {films.map((r) => <Tile key={r.key} item={r} />)}
                 </div>
             </Group>

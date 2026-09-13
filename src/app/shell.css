@@ -1,0 +1,75 @@
+/* ============================================================
+   The shell: the frame every screen sits in, and the furniture every screen
+   uses. Owns no screen. Breakpoint rules that reshape a screen live with that
+   screen; only the frame's own breakpoints belong here, and until each module
+   carves its own out of base.css the cross-cutting tablet and desktop blocks
+   stay where they are, at the end of the cascade, where they win.
+   ============================================================ */
+
+/* ---------------- shell ---------------- */
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+.app-main { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding-bottom: 78px; }
+
+/* Bottom tabs are a phone idiom. At desktop they become a top bar. */
+.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: flex;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--bd-sub);
+  padding: 7px 0 max(9px, env(safe-area-inset-bottom));
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--muted); font-family: var(--f-m); font-size: 9.5px; letter-spacing: .03em;
+  padding: 2px 4px;
+}
+.tab-item .ico { font-size: 16px; font-family: var(--f-s); line-height: 1; }
+.tab-item.on { color: var(--acc-t); }
+
+.topbar { display: none; }
+
+/* ---------------- page furniture ---------------- */
+
+.page { padding: 0 0 24px; }
+.pad { padding-inline: var(--gutter); }
+
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px var(--gutter) 0; }
+.page-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -.03em; }
+.head-actions { display: flex; align-items: center; gap: 8px; }
+
+.circ {
+  width: 38px; height: 38px; flex: 0 0 auto; border-radius: 99px;
+  background: var(--ink-3); border: 0; color: var(--muted);
+  display: grid; place-items: center; font-size: 15px; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.circ:hover { background: var(--ink-4); color: var(--text); }
+.circ.on-image { background: rgba(4,6,12,.6); backdrop-filter: blur(6px); color: #fff; }
+
+.btn {
+  font-family: var(--f-s); font-size: 13px; font-weight: 600;
+  padding: 11px 18px; min-height: 42px; border-radius: 10px; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--acc); color: var(--on-acc);
+  box-shadow: inset 0 1px 0 var(--hl); transition: filter .12s;
+}
+.btn:hover { filter: brightness(1.06); }
+.btn.quiet { background: var(--ink-4); color: var(--text); box-shadow: none; }
+.btn.quiet:hover { background: var(--ink-5); filter: none; }
+
+.section { margin: var(--s6) var(--gutter) 0; }
+.section-h {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em;
+  margin-bottom: 8px;
+}
+
+
+/* A full-width button, and a padded block that also takes the page rhythm.
+   Both were `style={{ … }}` on the element until the design contract caught
+   them; the number lives here now, where verify can see it. */
+.btn.block { width: 100%; }
+.pad.stack { margin-top: var(--s6); }

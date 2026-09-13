@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Poster } from './ui.jsx';
+import { Poster } from '../shared/ui/index.js';
 import { useLibrary } from '../context/LibraryProvider.jsx';
 import {
     statusesFor, canRate, statusTone,

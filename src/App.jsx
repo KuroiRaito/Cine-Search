@@ -10,11 +10,13 @@ import Settings from './routes/Settings.jsx';
 import NotFound from './routes/NotFound.jsx';
 import About from './routes/About.jsx';
 import Auth from './routes/Auth.jsx';
-import { useAuth } from './context/AuthProvider.jsx';
+import { useAuth } from './shared/auth/AuthProvider.jsx';
 import { hasSeenCover } from './lib/firstVisit.js';
-import ThemeToggle from './components/ThemeToggle.jsx';
-import './styles/tokens.css';
-import './styles/base.css';
+import ThemeToggle from './shared/theme/ThemeToggle.jsx';
+import './shared/theme/tokens.css';
+import './app/shell.css';
+import './shared/ui/ui.css';
+import './base.css';
 
 // Tabs appear only on top-level destinations — never on a title or person page,
 // which are places you arrive at and come back from.

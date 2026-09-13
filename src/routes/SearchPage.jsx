@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { search } from '../lib/search/index.js';
-import { fromItem } from '../lib/tmdb/view.js';
-import { useAsync } from '../hooks/useAsync.js';
-import { Tile, Skeleton, Empty, ErrorBox } from '../components/ui.jsx';
+import { fromItem } from '../shared/tmdb/view.js';
+import { useAsync } from '../shared/hooks/useAsync.js';
+import { Tile, Skeleton, Empty, ErrorBox } from '../shared/ui/index.js';
 import SignInPrompt from '../components/SignInPrompt.jsx';
 import PeopleResults, { usePeopleSearch } from '../components/PeopleResults.jsx';
+import { useTileStates, useQuickAdd } from '../context/LibraryProvider.jsx';
 
 const DEBOUNCE_MS = 250;
 
@@ -16,6 +17,8 @@ export default function SearchPage() {
     const q = params.get('q') || '';
     const [draft, setDraft] = useState(q);
     const [prompt, setPrompt] = useState(null);
+    const onAdd = useQuickAdd((x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' }));
+    const stateFor = useTileStates();
 
     useEffect(() => { setDraft(q); }, [q]);
 
@@ -49,7 +52,7 @@ export default function SearchPage() {
         <div className="page">
             <div className="page-head"><h1>Search</h1></div>
 
-            <div className="pad" style={{ marginTop: 12 }}>
+            <div className="pad searchbox-wrap">
                 <input
                     className="searchbox"
                     type="search"
@@ -69,10 +72,10 @@ export default function SearchPage() {
             )}
 
             {loading && (
-                <div className="grid" style={{ marginTop: 16 }}>
+                <div className="grid results">
                     {[0, 1, 2, 3, 4, 5].map((i) => (
                         <div className="tile" key={i}>
-                            <Skeleton h={150} style={{ borderRadius: 8, marginBottom: 5 }} />
+                            <Skeleton h={150} className="skel-poster" />
                             <Skeleton h={11} w="85%" />
                         </div>
                     ))}
@@ -82,12 +85,13 @@ export default function SearchPage() {
             {error && <ErrorBox what="these results" onRetry={retry} />}
 
             {titles && titles.length > 0 && (
-                <div className="grid" style={{ marginTop: 16 }}>
+                <div className="grid results">
                     {titles.map((it) => (
                         <Tile
                             key={`${it.mediaType}-${it.id}`}
                             item={it}
-                            onAdd={(x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' })}
+                            onAdd={onAdd}
+                            state={stateFor(it)}
                         />
                     ))}
                 </div>

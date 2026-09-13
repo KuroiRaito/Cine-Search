@@ -44,7 +44,7 @@ export default function About() {
                 </p>
             </div>
 
-            <div className="pad" style={{ marginTop: 'var(--s6)' }}>
+            <div className="pad stack">
                 <Link className="btn quiet" to="/">Back to Discover</Link>
             </div>
         </div>

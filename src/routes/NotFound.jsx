@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Empty } from '../components/ui.jsx';
+import { Empty } from '../shared/ui/index.js';
 
 export default function NotFound() {
     return (

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Poster } from './ui.jsx';
+import { Poster } from '../shared/ui/index.js';
 
 // The verb must match the control that was tapped. A pill reading "Want to
 // watch" that raises a sheet asking "Mark watched?" tells the user the app

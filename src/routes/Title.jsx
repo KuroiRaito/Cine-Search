@@ -1,14 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { titleFull, season as fetchSeason } from '../lib/tmdb/endpoints.js';
-import { toTitleView, toSeasonView, compactCount } from '../lib/tmdb/view.js';
-import { useAsync } from '../hooks/useAsync.js';
-import { useRegion } from '../hooks/useRegion.js';
-import { Poster, Tile, PersonRow, TitleSkeleton, ErrorBox, Empty, Toast, initialsOf } from '../components/ui.jsx';
+import { titleFull, season as fetchSeason } from '../shared/tmdb/endpoints.js';
+import { toTitleView, toSeasonView, compactCount } from '../shared/tmdb/view.js';
+import { useAsync } from '../shared/hooks/useAsync.js';
+import { useRegion } from '../shared/hooks/useRegion.js';
+import { Poster, Tile, PersonRow, TitleSkeleton, ErrorBox, Empty, Toast, initialsOf } from '../shared/ui/index.js';
 import SignInPrompt from '../components/SignInPrompt.jsx';
 import Editor from '../components/Editor.jsx';
-import { useAuth } from '../context/AuthProvider.jsx';
-import { useLibrary } from '../context/LibraryProvider.jsx';
+import { useAuth } from '../shared/auth/AuthProvider.jsx';
+import { useLibrary, useTileStates, useQuickAdd } from '../context/LibraryProvider.jsx';
 import {
     statusMeta, statusTone, episodesWatched, isWatched, runningOrder, nextUnwatched,
     rememberSeasonRuntime,
@@ -57,6 +57,8 @@ export default function Title() {
     const dismissToast = useCallback(() => setToast(null), []);
     const { isSignedIn } = useAuth();
     const lib = useLibrary();
+    const stateFor = useTileStates();
+    const quickAdd = useQuickAdd((item) => setPrompt({ title: item.title, poster: item.poster, action: 'save' }));
 
     const valid = mediaType === 'movie' || mediaType === 'tv';
 
@@ -364,7 +366,7 @@ export default function Title() {
                             <div className="sect-h"><span>More like this</span></div>
                             <div className="rail related">
                                 {t.related.map((it) => (
-                                    <Tile key={`${it.mediaType}-${it.id}`} item={it} onAdd={() => ask('save')} />
+                                    <Tile key={`${it.mediaType}-${it.id}`} item={it} onAdd={quickAdd} state={stateFor(it)} />
                                 ))}
                             </div>
                         </div>
@@ -470,7 +472,7 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
             )}
 
             <div className="eplist">
-                {loading && [0, 1, 2].map((i) => <div className="skel" key={i} style={{ height: 52, marginTop: 8 }} />)}
+                {loading && [0, 1, 2].map((i) => <div className="skel skel-ep" key={i} />)}
                 {error && <ErrorBox what="these episodes" onRetry={retry} />}
                 {data?.episodes.map((e) => {
                     const on = isWatched(watched, active, e.number);

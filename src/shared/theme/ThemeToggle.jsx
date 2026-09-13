@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { activeTheme, applyTheme } from '../lib/theme.js';
+import { activeTheme, applyTheme } from './theme.js';
 
 export default function ThemeToggle() {
     const [theme, setTheme] = useState(activeTheme);

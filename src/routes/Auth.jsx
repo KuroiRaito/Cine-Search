@@ -10,6 +10,11 @@ function humanError(message = '') {
         return 'That email already has an account. Try signing in instead.';
     }
     if (m.includes('invalid login')) return 'That email and password don’t match.';
+    // The database gate on auth.users raises before the account exists;
+    // Supabase reports it as a generic database error.
+    if (m.includes('database error saving new user') || m.includes('by invitation')) {
+        return 'Sign-ups are by invitation. Ask Raman to add your email.';
+    }
     // Supabase spells this one out in full, character class by character class.
     if (m.includes('password should contain')) {
         return 'Passwords need an uppercase letter, a lowercase letter, a number and a symbol.';

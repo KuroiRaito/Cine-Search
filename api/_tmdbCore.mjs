@@ -4,10 +4,54 @@
 
 export const PATH_RE = /^[a-zA-Z0-9/_-]+$/;
 
+/**
+ * The TMDB paths this app actually calls, and nothing else.
+ *
+ * The character check above stops injection; it does not stop use. With only
+ * that, anyone holding the app's URL had a free TMDB proxy — every endpoint
+ * under /3/, billed to this key and this Vercel account. The list below is
+ * every path in src/lib/tmdb/endpoints.js; adding an endpoint there means
+ * adding it here, which is the point.
+ */
+const ALLOWED = [
+    /^search\/(movie|tv|multi|person|collection)$/,
+    /^discover\/(movie|tv)$/,
+    /^genre\/(movie|tv)\/list$/,
+    /^trending\/all\/(day|week)$/,
+    /^movie\/(now_playing|upcoming|popular|top_rated)$/,
+    /^tv\/(on_the_air|airing_today|popular|top_rated)$/,
+    /^(movie|tv)\/\d+$/,
+    /^(movie|tv)\/\d+\/(credits|aggregate_credits|keywords|videos|recommendations|similar|release_dates|content_ratings|external_ids)$/,
+    /^(movie|tv)\/\d+\/watch\/providers$/,
+    /^tv\/\d+\/season\/\d+$/,
+    /^person\/\d+(\/combined_credits)?$/,
+    /^collection\/\d+$/,
+    /^configuration$/,
+];
+
 export function validatePath(path) {
     if (!path) return 'Missing path parameter';
     if (!PATH_RE.test(path)) return 'Invalid path';
+    const clean = path.replace(/^\/+/, '').replace(/\/+$/, '');
+    if (!ALLOWED.some((re) => re.test(clean))) return 'Path not allowed';
     return null;
+}
+
+/**
+ * True when a request's Origin (or, for same-origin fetches that omit it, its
+ * Referer) is the host serving the app. A browser on our own page passes; a
+ * script on someone else's page, or curl with no headers, does not.
+ *
+ * Deliberately a same-host check and not a token: a token in a public bundle
+ * is not a secret. This is a fence against casual use of the proxy, not a
+ * wall — that would need rate limiting with state, which this app has no
+ * reason to carry yet.
+ */
+export function isSameOrigin(headers = {}) {
+    const from = headers.origin || headers.referer;
+    if (!from) return false;
+    const host = headers['x-forwarded-host'] || headers.host;
+    try { return new URL(from).host === host; } catch { return false; }
 }
 
 /**

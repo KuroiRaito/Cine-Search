@@ -82,8 +82,10 @@ export default function SearchPage() {
                 </div>
             )}
 
-            {/* After the titles, never above them. */}
-            {data && <PeopleResults people={people} />}
+            {/* After the titles, never above them — and still there when the
+                title search is the half that failed. Errors are scoped to the
+                section that failed, which cuts both ways. */}
+            {(data || error) && <PeopleResults people={people} />}
 
             {/* A search that found a person found something. Saying "nothing
                 for Villeneuve" above his own row would be a strange thing to

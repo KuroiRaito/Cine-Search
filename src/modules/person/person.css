@@ -1,0 +1,85 @@
+/* ============================================================
+   Person — A person's page: who they are, how much of their work you have seen, and
+   their filmography by role.
+
+   Classes introduced here belong to this module; `npm run verify` enforces it.
+   Its breakpoints live here too, so nothing outside decides how it looks.
+   ============================================================ */
+
+
+
+/* ---------------- person page ---------------- */
+
+.phead-text { min-width: 0; }
+.grid.filmography { margin-top: 14px; }
+
+.phead { display: flex; gap: 12px; padding-inline: var(--gutter); margin-top: var(--s6); align-items: center; }
+.phead .avatar {
+  width: 68px; height: 68px; flex: 0 0 auto; border-radius: 99px; overflow: hidden;
+  background: linear-gradient(140deg, var(--ink-7), var(--ink-5));
+  display: grid; place-items: center; font-family: var(--f-d); font-size: 20px; font-weight: 700; color: var(--muted);
+}
+.phead .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.phead h1 { font-size: 20px; font-weight: 700; letter-spacing: -.03em; }
+.phead .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.track-hint {
+  margin: var(--s6) var(--gutter) 0; font-size: 12.5px; color: var(--muted);
+}
+.rolesw { display: flex; gap: 2px; overflow-x: auto; margin: 12px var(--gutter) 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
+.rolesw::-webkit-scrollbar { height: 0; }
+
+.bio { font-size: 13px; line-height: 1.65; color: var(--muted); max-width: var(--measure); }
+
+/* ---------------- collection progress ----------------
+
+   "6 of 10 directed" sits above the filmography rather than in a stats block:
+   it is the differentiator, so it is the first thing on a person page. The
+   fraction is per role — switch to Writer and both halves change, because it
+   is a different body of work.
+   ------------------------------------------------------------------ */
+
+.collectbar,
+.rolesw,
+.track-hint {
+  /* "6 of 10 directed" and "60%" are one sentence in two halves. A full-width
+     desktop bar puts 1200px between them and the pair stops reading as a pair.
+     The role tabs sit directly beneath, so they share the edge. */
+  max-width: 440px;
+}
+.collectbar { margin: 14px var(--gutter) 0; }
+.cb-t { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 10px; }
+.cb-t b { font-family: var(--f-d); font-size: 16px; font-weight: 700; letter-spacing: -.02em; color: var(--text); }
+.cb-t b i { font-style: normal; color: var(--st-done-9); }
+.cb-t span { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cb-track { height: 6px; border-radius: 99px; background: var(--ink-4); overflow: hidden; }
+.cb-track i { display: block; height: 100%; background: var(--st-done-9); border-radius: 99px; transition: width .18s; }
+.cb-sub { margin-top: 7px; font-size: 11.5px; color: var(--muted); }
+
+/* Loading shimmer for the person page; moves with it. */
+.phead .avatar {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
+}
+
+/* ---- Breakpoints. Carved out of base.css's cross-cutting tablet and
+        desktop blocks, into the module that owns the shape. ---- */
+
+
+/* ---------------- tablet ----------------
+
+   700px to the desktop breakpoint: the gutter has already widened but the
+   three-column desktop layout has not arrived, so this band used to get the
+   phone layout stretched across a landscape window. Nothing here is new
+   structure — it is the phone's own components given sizes that suit the
+   width. Controls stop growing once they are big enough to hit; artwork keeps
+   growing, because artwork is what is being browsed.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 700px) and (max-width: 1119.98px) {
+
+  /* The person header carries a face — at this width it can be seen. */
+  .phead .avatar { width: 92px; height: 92px; }
+  .phead h1 { font-size: 25px; }
+  .phead .sub { font-size: 13px; }
+}

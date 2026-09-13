@@ -1,0 +1,165 @@
+/* ============================================================
+   Entry — The cover, sign in, sign up, and the sign-in sheet a guest meets when they
+   reach for something that needs an account.
+
+   Classes introduced here belong to this module; `npm run verify` enforces it.
+   Its breakpoints live here too, so nothing outside decides how it looks.
+   ============================================================ */
+
+
+.grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 14px; }
+/* The poster is what makes this read as the thing you were reaching for,
+   rather than a generic interruption in front of it. */
+.sheet-head { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+.sheet-art {
+  width: 52px; flex: 0 0 auto; aspect-ratio: 2 / 3;
+  border-radius: 8px; overflow: hidden; background: var(--ink-4);
+}
+.sheet-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sheet-art .noart { font-size: 9px; padding: 4px; }
+.sheet-head .sheet-title { margin-bottom: 0; }
+.sheet-title { font-size: 18px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 6px; }
+.sheet-body { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.benefits { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 8px; }
+.benefits li { font-size: 12.5px; color: var(--muted); padding-left: 20px; position: relative; line-height: 1.5; }
+.benefits li::before { content: "✓"; position: absolute; left: 0; color: var(--st-done-9); font-weight: 700; }
+.sheet-actions { display: grid; gap: 8px; }
+.dismiss {
+  display: block; width: 100%; margin-top: 12px; padding: 10px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--muted); font-family: var(--f-s); font-size: 13px; font-weight: 500;
+}
+.dismiss:hover { color: var(--text); }
+
+/* ---------------- cover ---------------- */
+
+/* The artwork is the pitch: a full-bleed mosaic of real posters, turned off
+   square and pushed past the edges so no single title reads as a promotion,
+   then held back to half opacity behind a scrim. */
+.cover { position: relative; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+
+.mosaic {
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 5px;
+  transform: rotate(-8deg) scale(1.35); transform-origin: center;
+  opacity: .5;
+}
+.mosaic-cell { background-size: cover; background-position: center; border-radius: 6px; }
+
+.cover-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to top,
+    var(--bg) 34%,
+    color-mix(in srgb, var(--bg) 72%, transparent) 62%,
+    color-mix(in srgb, var(--bg) 30%, transparent)
+  );
+}
+:root[data-theme="light"] .cover-scrim {
+  background: linear-gradient(
+    to top,
+    var(--bg) 42%,
+    color-mix(in srgb, var(--bg) 58%, transparent) 64%,
+    color-mix(in srgb, var(--bg) 14%, transparent)
+  );
+}
+:root[data-theme="light"] .mosaic { opacity: .82; }
+
+.cover-theme { position: absolute; top: 14px; right: 14px; z-index: 3; }
+.cover-theme .circ { background: rgba(4, 6, 12, .55); backdrop-filter: blur(6px); color: #fff; }
+.cover-theme .circ:hover { background: rgba(4, 6, 12, .72); color: #fff; }
+
+/* Everything sits at the bottom, where the thumb already is. */
+.cover-in { position: relative; z-index: 2; margin-top: auto; padding: 22px 20px 20px; width: 100%; }
+
+.cover-mark {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  font-family: var(--f-d); font-weight: 800; font-size: 17px; letter-spacing: -.03em;
+}
+.cover-mark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
+
+.cover-in h1 { font-size: 27px; font-weight: 800; letter-spacing: -.035em; margin-bottom: 10px; }
+.cover-in > p { font-size: 13.5px; color: var(--muted); max-width: 44ch; margin-bottom: 20px; }
+
+.cover-cta { display: flex; flex-direction: column; gap: 9px; }
+.btn-lg { width: 100%; padding: 13px 20px; font-size: 14.5px; }
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--bd-str); }
+.btn.ghost:hover { background: var(--surface-hv); filter: none; }
+
+.cover-skip { margin-top: 14px; text-align: center; }
+.cover-skip button {
+  background: none; border: 0; cursor: pointer; padding: 6px 10px;
+  color: var(--acc-t); font-family: var(--f-s); font-size: 13px; font-weight: 600;
+}
+
+.cover-fine {
+  margin-top: 14px; font-size: 10.5px; color: var(--ink-9);
+  text-align: center; line-height: 1.5;
+}
+.cover-fine a { color: var(--ink-10); }
+
+/* ---------------- auth ---------------- */
+
+.auth-body { padding-inline: var(--gutter); max-width: 420px; margin: var(--s6) auto 0; }
+.auth-body h1 { font-size: 24px; font-weight: 800; letter-spacing: -.035em; margin-bottom: 8px; }
+.auth-lede { font-size: 13.5px; color: var(--muted); margin-bottom: var(--s6); }
+
+.field { display: block; margin-bottom: 14px; }
+.field > span {
+  display: block; margin-bottom: 6px;
+  font-size: 11.5px; font-weight: 600; color: var(--muted);
+}
+
+.field-hint {
+  display: block; margin-top: 6px; font-size: 11.5px; color: var(--muted); line-height: 1.5;
+  font-weight: 400;
+}
+
+.auth-error {
+  background: var(--st-drop-3); color: var(--st-drop-11);
+  border-radius: 9px; padding: 10px 12px; font-size: 12.5px; margin-bottom: 14px;
+}
+
+.auth-alt { margin-top: 16px; font-size: 12.5px; color: var(--muted); text-align: center; }
+.auth-alt a { color: var(--acc-t); font-weight: 600; }
+
+/* ---- Breakpoints. Carved out of base.css's cross-cutting tablet and
+        desktop blocks, into the module that owns the shape. ---- */
+
+
+@media (min-width: 700px) {
+  .grab { display: none; }
+}
+
+
+/* Light needs its own recipe rather than the dark one with the tokens swapped.
+   Fading artwork into near-white turns it pale instead of moody, so the posters
+   carry more opacity and the veil above the text is thinner - while the band
+   the text actually sits on goes fully opaque, because dark type on light needs
+   more separation than light type on dark. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .cover-scrim {
+    background: linear-gradient(
+      to top,
+      var(--bg) 42%,
+      color-mix(in srgb, var(--bg) 58%, transparent) 64%,
+      color-mix(in srgb, var(--bg) 14%, transparent)
+    );
+  }
+  :root:not([data-theme="dark"]) .mosaic { opacity: .82; }
+}
+
+
+@media (min-width: 760px) {
+  .cover-in { max-width: 560px; margin-inline: auto; text-align: center; padding-bottom: 32px; }
+  .cover-mark { justify-content: center; }
+  .cover-in > p { margin-inline: auto; }
+  .cover-cta { flex-direction: row; }
+  .mosaic { grid-template-columns: repeat(6, 1fr); }
+}
+
+@media (min-width: 1120px) {
+
+  .cover-in h1 { font-size: 40px; }
+  .mosaic { grid-template-columns: repeat(8, 1fr); }
+}

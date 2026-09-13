@@ -1,0 +1,285 @@
+/* ============================================================
+   Title — the detail page for a film or a series.
+
+   Owns the hero, the head, the action row, providers, scores, the overview,
+   the four preview cards, the episode guide and its ticks, progress, and the
+   related rail's tile size. Its breakpoints are here too: a module carries its
+   own shape at every width, so nothing outside it decides how it looks.
+   ============================================================ */
+
+
+
+/* ---------------- title page ---------------- */
+
+.hero { position: relative; height: 190px; }
+/* A 16:9 backdrop cropped into a 4:1 desktop hero loses most of its height, and
+   centring that crop cuts faces in half — subjects sit above the midline far
+   more often than below it. Biasing the crop upward keeps the part of the image
+   that carries the meaning. */
+.hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
+.hero::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, var(--bg), transparent 70%);
+}
+.hero-nav { position: absolute; top: 0; left: 0; right: 0; z-index: 3; display: flex; justify-content: space-between; padding: 10px 12px; }
+
+/* One grid for both layouts. On a phone it's a single column with the poster
+   floated beside the title; on desktop it becomes poster / main / sticky rail. */
+/* The loading skeleton's head. It had no rule at all — only the shimmer
+   selector mentioned `.title-head` — so since the Milestone 1 rebuild the
+   poster and the title stacked vertically and then jumped sideways when the
+   data arrived. Same geometry as .tgrid below, which is what it is standing in
+   for. */
+.title-head {
+  display: flex; gap: 12px; padding-inline: var(--gutter);
+  margin-top: -52px; position: relative; z-index: 2;
+}
+.title-head .skel-art { flex: 0 0 auto; }
+
+.tgrid { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 0 12px; padding-inline: var(--gutter); margin-top: -52px; position: relative; z-index: 2; align-items: start; }
+.tposter { aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; border: 1px solid var(--bd-sub); box-shadow: var(--sh); }
+.tposter img { width: 100%; height: 100%; object-fit: cover; }
+.thead { min-width: 0; padding-top: 56px; }
+.thead h1 { font-size: 21px; font-weight: 800; letter-spacing: -.03em; margin-bottom: 5px; }
+/* Everything below the title runs the full width of the phone, rather than
+   staying trapped in the narrow column beside the poster. */
+.tbody { grid-column: 1 / -1; min-width: 0; }
+.metaline { font-family: var(--f-m); font-size: 10.5px; color: var(--muted); line-height: 1.55; }
+.cert { border: 1px solid var(--bd-str); border-radius: 3px; padding: 0 3px; margin-right: 5px; }
+.tagline { margin-top: 9px; font-size: 12.5px; font-style: italic; color: var(--muted); }
+
+/* The action rail lives inline on a phone and moves into the sidebar on
+   desktop. Only one copy is ever visible. */
+.tside { display: none; }
+.tside-inline { margin-top: 16px; }
+
+.arow { display: flex; gap: 7px; }
+.spill {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: var(--rate); color: var(--on-rate); border: 0; border-radius: 10px;
+  font-family: var(--f-s); font-size: 13.5px; font-weight: 600; letter-spacing: -.01em;
+  padding: 11px 10px; min-height: 44px; cursor: pointer;
+  box-shadow: inset 0 1px 0 var(--hl); transition: filter .12s;
+}
+.spill:hover { filter: brightness(1.06); }
+
+.prov { margin-top: 13px; border-top: 1px solid var(--bd-sub); padding-top: 12px; }
+.prov-l { font-family: var(--f-m); font-size: 9px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.provrow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.pchip {
+  display: inline-flex; align-items: center; gap: 6px; background: var(--ink-3); border: 0;
+  color: var(--text); border-radius: 9px; padding: 5px 10px 5px 6px;
+  font-family: var(--f-s); font-size: 11.5px; font-weight: 500;
+}
+.plogo { width: 18px; height: 18px; border-radius: 4px; }
+.prov-none { font-size: 12.5px; color: var(--muted); }
+.prov-none a { color: var(--acc-t); font-weight: 600; }
+
+
+.scores { display: flex; margin-top: var(--s6); }
+.scores .s { flex: 1; padding: 2px 8px; text-align: center; border-left: 1px solid var(--bd-sub); }
+.scores .s:first-child { border-left: 0; text-align: left; padding-left: 0; }
+.scores .s b { display: block; font-family: var(--f-d); font-size: 21px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.scores .s.gold b { color: var(--rate); }
+.scores .s.dim b { color: var(--ink-9); }
+.scores .s span { display: block; font-size: 10.5px; color: var(--muted); margin-top: 3px; white-space: nowrap; }
+.ov { font-size: 12.5px; line-height: 1.6; color: var(--muted); max-width: var(--measure); }
+.ov.clamped { display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.more {
+  background: none; border: 0; color: var(--acc-t); cursor: pointer;
+  font-family: var(--f-s); font-size: 12.5px; font-weight: 600;
+  padding: 10px 16px 0 0; min-height: 38px; min-width: 48px; text-align: left;
+}
+
+/* Four preview cards, 2x2 on a phone and 1x4 on desktop. */
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: var(--s6); align-items: start; }
+.pc { border: 1px solid var(--bd); border-radius: 10px; background: var(--surface); padding: 10px; }
+.pc.open { grid-column: 1 / -1; }
+.pc-top {
+  display: block; width: 100%; background: none; border: 0; padding: 0; cursor: pointer;
+  text-align: left; font-family: var(--f-s);
+}
+.pc-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; min-height: 24px; }
+.pc-h b { font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--text); }
+.pc-h i { font-style: normal; color: var(--muted); font-size: 10px; }
+.faces { display: flex; margin-bottom: 6px; }
+.ptx { display: block; }
+.face {
+  width: 24px; height: 24px; border-radius: 99px; border: 2px solid var(--surface); margin-right: -7px;
+  overflow: hidden; background: linear-gradient(140deg, var(--ink-8), var(--ink-6));
+  display: grid; place-items: center; font-size: 9px; font-weight: 700; color: var(--ink-11);
+}
+.face img { width: 100%; height: 100%; object-fit: cover; }
+.ptx { font-size: 10.5px; color: var(--muted); line-height: 1.45; }
+.pc-body { margin-top: 10px; border-top: 1px solid var(--bd-sub); padding-top: 10px; }
+
+.facts { margin: 0; display: grid; gap: 7px; }
+.facts > div { display: flex; gap: 10px; font-size: 12px; }
+.facts dt { flex: 0 0 92px; color: var(--muted); font-family: var(--f-m); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+.facts dd { margin: 0; color: var(--text); }
+
+.keywords { display: flex; gap: 6px; flex-wrap: wrap; }
+.kw { font-size: 11.5px; padding: 5px 10px; border-radius: 99px; background: var(--ink-3); color: var(--muted); }
+
+.rail.related { padding-inline: 0; margin-top: 2px; }
+
+/* ---------------- episodes ---------------- */
+
+.skel-ep { height: 52px; margin-top: 8px; }
+
+.seasonsw { display: flex; gap: 2px; overflow-x: auto; margin: 12px 0 0; background: var(--bg-sub); border-radius: 11px; padding: 3px; scrollbar-width: none; }
+.seasonsw::-webkit-scrollbar { height: 0; }
+
+.eplist { margin-top: 10px; }
+.eprow { display: flex; gap: 10px; padding: 10px 0; border-top: 1px solid var(--bd-sub); align-items: flex-start; }
+.eprow:first-child { border-top: 0; }
+.eprow.unaired { opacity: .45; }
+.eprow .still { width: 64px; flex: 0 0 auto; aspect-ratio: 16/9; border-radius: 5px; overflow: hidden; background: var(--ink-4); border: 1px solid var(--bd-sub); }
+.eprow .still img { width: 100%; height: 100%; object-fit: cover; }
+.eprow .body { flex: 1; min-width: 0; }
+/* Rows grow rather than truncate: a long episode title takes three lines at 320px. */
+.eprow .en { font-size: 12.5px; font-weight: 600; line-height: 1.35; }
+.eprow .ed { font-family: var(--f-m); font-size: 10px; color: var(--muted); margin-top: 2px; }
+.eprow .ed .sc { color: var(--rate); }
+
+/* Secondary labels shorten until there's room for them on one line. The number
+   never shortens — only the words around it.
+   Specificity matters here: .scores .s span sets display:block, so a bare
+   .wide-only class was losing and both halves rendered. These match it. */
+.scores .s span { white-space: nowrap; }
+.lbl-long { display: none; }
+.scores .s .lbl-short { display: inline; }
+.scores .s .lbl-long { display: none; }
+
+/* The primary button stops inviting and starts reporting once there is a state
+   to report. Same button, same place, same weight — only its job changes. A
+   primary action rendered as a pale tint reads as disabled. */
+.spill.set { background: var(--stl); color: var(--bg); box-shadow: inset 0 1px 0 var(--hl); }
+.spill.set:hover { filter: brightness(1.06); }
+.spill .caret { opacity: .55; font-size: 10px; margin-left: 2px; }
+
+/* ---------------- progress ---------------- */
+
+/* Episodes, never seasons, and always watched-of-total across the whole run:
+   "3 of 5 seasons" hides that season three is 22 episodes long. */
+.prg { margin-top: 11px; border-top: 1px solid var(--bd-sub); padding-top: 11px; }
+.prg-h { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 6px; }
+.prg-h span { color: var(--muted); }
+.prg-h b { font-family: var(--f-m); font-weight: 400; color: var(--acc-t); }
+.prg-bar { height: 4px; border-radius: 99px; background: var(--ink-5); overflow: hidden; }
+.prg-bar i { display: block; height: 100%; background: var(--acc); transition: width .18s; }
+
+/* ---------------- episode ticks ---------------- */
+
+/* Tapping a ticked episode un-ticks it, so the control is its own undo and no
+   toast is needed. */
+.epchk {
+  width: 28px; height: 28px; flex: 0 0 auto; border-radius: 99px; border: 0;
+  background: var(--ink-4); color: var(--ink-9); cursor: pointer;
+  display: grid; place-items: center; font-size: 13px; align-self: center;
+  transition: background .12s, color .12s;
+}
+.epchk:hover { background: var(--ink-5); color: var(--muted); }
+.epchk.on { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
+.epchk:disabled { opacity: .4; cursor: default; }
+.sect-h .markall {
+  background: none; border: 0; cursor: pointer; padding: 0;
+  font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--acc-t);
+}
+/* Loading shimmer. Stays after the rules it overrides, as it did in base.css. */
+.hero, .eprow .still, .title-head .poster {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
+}
+
+
+/* ---- Breakpoints. These are the rules that used to live in base.css's
+        cross-cutting tablet and desktop blocks; they belong to this screen. ---- */
+
+@media (min-width: 430px) {
+  .scores .s .lbl-short { display: none; }
+  .scores .s .lbl-long { display: inline; }
+}
+
+
+/* ---------------- tablet ----------------
+
+   700px to the desktop breakpoint: the gutter has already widened but the
+   three-column desktop layout has not arrived, so this band used to get the
+   phone layout stretched across a landscape window. Nothing here is new
+   structure — it is the phone's own components given sizes that suit the
+   width. Controls stop growing once they are big enough to hit; artwork keeps
+   growing, because artwork is what is being browsed.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 700px) and (max-width: 1119.98px) {
+  /* A 16:9 backdrop in a 190px-tall band is a letterbox slot at this width.
+     Give it back enough height to read as an image. */
+  .hero { height: 260px; }
+
+  /* An 82px poster beside 700px of page reads as a thumbnail that failed to
+     load. It is the second most important image on the screen; size it so. */
+  .tgrid { grid-template-columns: 132px minmax(0, 1fr); gap: 0 20px; margin-top: -72px; }
+  .thead { padding-top: 82px; }
+  .thead h1 { font-size: 26px; letter-spacing: -.032em; margin-bottom: 6px; }
+  .metaline { font-size: 11px; }
+  .tagline { font-size: 13.5px; }
+
+  /* A 700px-wide primary button is not more tappable than a 440px one, only
+     louder. Controls cap; artwork does not.
+
+     One width for all of them, so the block under the title has a single right
+     edge instead of four ragged ones. Prose keeps its own measure — a reading
+     column and a control column are allowed to differ, so long as each is
+     deliberate. */
+  .arow, .scores, .prov, .cards,
+  .tside-inline .prow,
+  .seasonsw, .eplist { max-width: 440px; }
+  /* The episode still earns a little more of that width than it gets on a
+     phone — it is the only thing in the row that identifies the episode
+     before you have read its name. */
+  .eprow .still { width: 84px; }
+  .scores .s b { font-size: 23px; }
+
+  /* At the top of this band the page is already full; at the bottom of it
+     there is slack, and an 1100px window should not leave 600px of void on
+     one side. Centre the column rather than letting it drift left. */
+  .tgrid { max-width: 860px; margin-inline: auto; }
+}
+
+
+/* ---------------- desktop ---------------- */
+
+@media (min-width: 1120px) {
+
+  /* Title page: poster, the reading column, and a sticky action rail. Same
+     components as the phone — desktop changes how many fit and where they sit,
+     not what they are. */
+  .hero { height: 300px; }
+  .tgrid {
+    grid-template-columns: 210px minmax(0, 1fr) 260px;
+    gap: 0 28px; margin-top: -78px;
+  }
+  /* The poster spans both rows so the first row is sized by the title block,
+     not by the poster — otherwise everything below it starts at the poster's
+     foot and leaves a hole. */
+  .tposter { grid-column: 1; grid-row: 1 / span 2; }
+  .thead { grid-column: 2; grid-row: 1; padding-top: 48px; }
+  .thead h1 { font-size: 30px; letter-spacing: -.035em; margin-bottom: 7px; }
+  .tbody { grid-column: 2; grid-row: 2; }
+  .tside { grid-column: 3; grid-row: 1 / span 2; }
+  .metaline { font-size: 11.5px; }
+  .tside-inline { display: none; }
+  .tside {
+    display: block; position: sticky; top: 78px;
+    background: var(--surface); border-radius: 12px; padding: 14px;
+  }
+  .tside .prow { background: var(--bg-sub); }
+  .tside .pchip { background: var(--ink-4); }
+
+  /* The four cards go one across rather than two by two. */
+  .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .pc.open { grid-column: 1 / -1; }
+
+  .rail.related .tile { width: 132px; }
+}

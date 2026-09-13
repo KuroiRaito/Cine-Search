@@ -1,14 +1,15 @@
 // Compatibility facade.
 //
 // The TMDB layer now lives in lib/tmdb/ (transport, endpoints, normalize) and
-// search lives in lib/search/. This file keeps the old import paths working so
+// search lives in modules/search/lib/. This file keeps the old import paths working so
 // the restructure did not have to touch every consumer at once.
 //
-// New code should import from lib/tmdb/endpoints.js or lib/search/ directly.
+// New code imports from shared/tmdb/endpoints.js, or calls search() through
+// the search module's index. Only the eval harness still uses this file.
 
-import * as api from './tmdb/endpoints.js';
-import { toItem, attachGenreNames } from './tmdb/normalize.js';
-import { search as runSearch } from './search/index.js';
+import * as api from '../shared/tmdb/endpoints.js';
+import { toItem, attachGenreNames } from '../shared/tmdb/normalize.js';
+import { search as runSearch } from '../modules/search/index.js';
 
 export { attachGenreNames as mapGenreIdsToNames };
 

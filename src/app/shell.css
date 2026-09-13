@@ -1,0 +1,196 @@
+/* ============================================================
+   Projector — base, shell and shared components.
+   Every value comes from a token in tokens.css. No raw hex here.
+   Mobile first; 320px is the supported floor.
+   ============================================================ */
+
+/* One gutter, obeyed by everything. No block gets its own number. */
+:root {
+  --gutter: 14px;
+  --s6: 24px;
+  /* The longest a line of body text may run. Prose past ~65 characters costs
+     the reader the return sweep, so no column exceeds it at any width. */
+  --measure: 65ch;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Full-bleed is opt-in and explicit: only backdrops, heroes and horizontally
+   scrolling rails may touch the viewport edge, and they must say so. Their
+   text and controls stay gutter-inset regardless. */
+.bleed { margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--f-s);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5 { font-family: var(--f-d); margin: 0; letter-spacing: -.022em; line-height: 1.14; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+img { max-width: 100%; display: block; }
+
+:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; border-radius: 5px; }
+
+
+.about-h { font-family: var(--f-d); font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.about-p { font-size: 13px; line-height: 1.65; color: var(--muted); }
+.about-p + .about-p { margin-top: 10px; }
+.about-p a { color: var(--acc-t); }
+.attribution a { color: var(--acc-t); }
+
+/* ============================================================
+   The shell: the frame every screen sits in, and the furniture every screen
+   uses. Owns no screen. Breakpoint rules that reshape a screen live with that
+   screen; only the frame's own breakpoints belong here, and until each module
+   carves its own out of base.css the cross-cutting tablet and desktop blocks
+   stay where they are, at the end of the cascade, where they win.
+   ============================================================ */
+
+/* ---------------- shell ---------------- */
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+.app-main { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding-bottom: 78px; }
+
+/* Bottom tabs are a phone idiom. At desktop they become a top bar. */
+.tabs {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: flex;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--bd-sub);
+  padding: 7px 0 max(9px, env(safe-area-inset-bottom));
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--muted); font-family: var(--f-m); font-size: 9.5px; letter-spacing: .03em;
+  padding: 2px 4px;
+}
+.tab-item .ico { font-size: 16px; font-family: var(--f-s); line-height: 1; }
+.tab-item.on { color: var(--acc-t); }
+
+.topbar { display: none; }
+
+/* ---------------- page furniture ---------------- */
+
+.page { padding: 0 0 24px; }
+.pad { padding-inline: var(--gutter); }
+
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 18px var(--gutter) 0; }
+.page-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -.03em; }
+.head-actions { display: flex; align-items: center; gap: 8px; }
+
+.circ {
+  width: 38px; height: 38px; flex: 0 0 auto; border-radius: 99px;
+  background: var(--ink-3); border: 0; color: var(--muted);
+  display: grid; place-items: center; font-size: 15px; cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.circ:hover { background: var(--ink-4); color: var(--text); }
+.circ.on-image { background: rgba(4,6,12,.6); backdrop-filter: blur(6px); color: #fff; }
+
+.btn {
+  font-family: var(--f-s); font-size: 13px; font-weight: 600;
+  padding: 11px 18px; min-height: 42px; border-radius: 10px; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--acc); color: var(--on-acc);
+  box-shadow: inset 0 1px 0 var(--hl); transition: filter .12s;
+}
+.btn:hover { filter: brightness(1.06); }
+.btn.quiet { background: var(--ink-4); color: var(--text); box-shadow: none; }
+.btn.quiet:hover { background: var(--ink-5); filter: none; }
+
+.section { margin: var(--s6) var(--gutter) 0; }
+.section-h {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em;
+  margin-bottom: 8px;
+}
+
+
+/* A full-width button, and a padded block that also takes the page rhythm.
+   Both were `style={{ … }}` on the element until the design contract caught
+   them; the number lives here now, where verify can see it. */
+.btn.block { width: 100%; }
+.pad.stack { margin-top: var(--s6); }
+
+/* A titled block, on any page. */
+
+
+.sect { margin-top: var(--s6); }
+.sect-h { font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em; color: var(--text); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+
+/* ============================================================
+   Breakpoints, last.
+
+   They must come after the rules they override: `.topbar { display: none }`
+   above and `.topbar { display: block }` at 1120 have the same specificity,
+   so whichever is written second wins. Carving the media blocks out of
+   base.css put them first for one build, and at 1280 the phone's tab bar
+   showed while the desktop top bar stayed hidden.
+   ============================================================ */
+
+
+@media (min-width: 700px)  { :root { --gutter: 24px; }
+}
+
+@media (min-width: 1100px) { :root { --gutter: 40px; }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+
+/* ---------------- tablet ----------------
+
+   700px to the desktop breakpoint: the gutter has already widened but the
+   three-column desktop layout has not arrived, so this band used to get the
+   phone layout stretched across a landscape window. Nothing here is new
+   structure — it is the phone's own components given sizes that suit the
+   width. Controls stop growing once they are big enough to hit; artwork keeps
+   growing, because artwork is what is being browsed.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 700px) and (max-width: 1119.98px) {
+
+  /* Four tab targets spread over a landscape window leaves each icon stranded
+     in its own quarter. Hold them together in the middle, thumb-width apart. */
+  .tabs { justify-content: center; }
+  .tab-item { flex: 0 1 132px; }
+}
+
+
+/* ---------------- desktop ---------------- */
+
+@media (min-width: 1120px) {
+  .tabs { display: none; }
+  .topbar {
+    display: block; position: sticky; top: 0; z-index: 40;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--bd-sub);
+  }
+  .topbar-in {
+    max-width: 1280px; margin: 0 auto; padding: 12px 24px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .wordmark { display: flex; align-items: center; gap: 8px; font-family: var(--f-d); font-weight: 800; font-size: 16px; letter-spacing: -.03em; }
+  .wordmark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
+  .topnav { display: flex; gap: 4px; }
+  .topnav a { padding: 6px 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: var(--muted); }
+  .topnav a.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+  .topbar-spacer { flex: 1; }
+  .topbar-in .circ { margin-right: 4px; }
+  .page-head h1 { font-size: 30px; }
+
+  .app-main { padding-bottom: 40px; }
+}

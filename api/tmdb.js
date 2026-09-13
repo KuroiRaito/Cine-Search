@@ -1,4 +1,4 @@
-import { validatePath, fetchTmdb } from './_tmdbCore.mjs';
+import { validatePath, fetchTmdb, isSameOrigin } from './_tmdbCore.mjs';
 
 const CACHE = new Map();
 const TTL = 60 * 1000;
@@ -26,6 +26,12 @@ function getCached(key) {
 export default async function handler(request, response) {
   if (request.method !== 'GET') {
     return response.status(400).json({ error: 'Method not allowed' });
+  }
+
+  // Only our own pages may use this. The dev middleware in vite.config.js
+  // skips this check because everything there is localhost.
+  if (!isSameOrigin(request.headers)) {
+    return response.status(403).json({ error: 'Forbidden' });
   }
 
   // eslint-disable-next-line no-unused-vars

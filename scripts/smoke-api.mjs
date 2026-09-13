@@ -7,6 +7,10 @@
 import assert from 'node:assert/strict';
 
 const results = [];
+
+// What a browser on our own page sends. The proxy refuses anything else.
+const HOST = 'v0-cine-search.vercel.app';
+const OURS = { host: HOST, origin: `https://${HOST}` };
 const check = async (name, fn) => {
     try { await fn(); results.push(['pass', name]); }
     catch (err) { results.push(['FAIL', `${name} — ${err.message}`]); }
@@ -29,8 +33,27 @@ await check('_tmdbCore exports validatePath and fetchTmdb', async () => {
 await check('handler rejects a missing path with 400', async () => {
     const { default: handler } = await import('../api/tmdb.js');
     const res = mockRes();
-    await handler({ method: 'GET', query: {} }, res);
+    await handler({ method: 'GET', headers: OURS, query: {} }, res);
     assert.equal(res.statusCode, 400);
+});
+
+await check('handler refuses a path outside the allowlist with 400', async () => {
+    const { default: handler } = await import('../api/tmdb.js');
+    const res = mockRes();
+    await handler({ method: 'GET', headers: OURS, query: { path: '/authentication/guest_session/new' } }, res);
+    assert.equal(res.statusCode, 400);
+    assert.equal(res.body.error, 'Path not allowed');
+});
+
+await check('handler refuses a foreign origin with 403, and no origin at all', async () => {
+    const { default: handler } = await import('../api/tmdb.js');
+    let res = mockRes();
+    await handler({ method: 'GET', headers: { host: HOST, origin: 'https://someone-else.example' },
+        query: { path: '/search/movie', query: 'x' } }, res);
+    assert.equal(res.statusCode, 403);
+    res = mockRes();
+    await handler({ method: 'GET', headers: { host: HOST }, query: { path: '/search/movie', query: 'x' } }, res);
+    assert.equal(res.statusCode, 403, 'curl with no headers must not get a free proxy');
 });
 
 await check('handler returns TMDB payload with a stubbed fetch', async () => {
@@ -41,7 +64,7 @@ await check('handler returns TMDB payload with a stubbed fetch', async () => {
     try {
         const { default: handler } = await import('../api/tmdb.js');
         const res = mockRes();
-        await handler({ method: 'GET', query: { path: '/search/movie', query: 'inception' } }, res);
+        await handler({ method: 'GET', headers: OURS, query: { path: '/search/movie', query: 'inception' } }, res);
         assert.equal(res.statusCode, 200);
         assert.equal(res.body.results[0].title, 'Inception');
     } finally { globalThis.fetch = real; }

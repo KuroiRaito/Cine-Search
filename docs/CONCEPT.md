@@ -2,7 +2,7 @@
 
 **Owner:** Raman Malani
 **Status:** v0.2, 2026-09-12 — concept, architecture and MVP scope finalised. Design stage open.
-**Relationship to other docs:** This is the product vision. [`BRIEF.md`](BRIEF.md) is no longer the master plan — it becomes the *search quality workstream* inside this concept. Nothing in it is discarded; its framing as "a portfolio project that happens to have an app attached" is inverted. [`TMDB_CAPABILITIES.md`](TMDB_CAPABILITIES.md) is the verified data inventory behind §13.
+**Relationship to other docs:** This is the product vision. [`BRIEF.md`](archive/BRIEF.md) is no longer the master plan — it becomes the *search quality workstream* inside this concept. Nothing in it is discarded; its framing as "a portfolio project that happens to have an app attached" is inverted. [`TMDB_CAPABILITIES.md`](TMDB_CAPABILITIES.md) is the verified data inventory behind §13.
 
 > **Reading this as design context?** Start at §14 (what to design), §15 (the decisions to make), §11 (the reference product), and §13 (what data each screen can hold). §1–10 is the product reasoning behind all of it; §12 is the engineering state. This document is self-contained — it assumes no prior conversation.
 
@@ -253,7 +253,7 @@ Notably, that gold/cyan split is the same two-accent rule Projector already defi
 
 ## 12. Build state — architecture, as audited 2026-09-12
 
-**The data layer is in good shape.** Better than [`Architecture audit.md`](Architecture%20audit.md) suggests — that document is stale on two points: Supabase Auth is now real (`getSession` + `onAuthStateChange`, not localStorage), and the API proxy's in-memory cache now LRU-evicts at 500 entries, so the memory leak it flags is fixed.
+**The data layer is in good shape.** Better than [`Architecture audit.md`](archive/Architecture%20audit.md) suggests — that document is stale on two points: Supabase Auth is now real (`getSession` + `onAuthStateChange`, not localStorage), and the API proxy's in-memory cache now LRU-evicts at 500 entries, so the memory leak it flags is fixed.
 
 What's solid:
 - `src/lib/tmdb/` cleanly split into transport / endpoints / normalize. The TMDB key never reaches the browser — every call proxies through `/api/tmdb`.

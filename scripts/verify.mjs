@@ -53,7 +53,12 @@ const defined = new Set();
 const shaped = new Set();
 for (const m of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
     const props = new Set([...m[2].matchAll(/([a-z-]+)\s*:/g)].map((p) => p[1]));
-    const setsShape = [...props].some((p) => SHAPE_PROPS.has(p));
+    // A class that only sets custom properties is still doing something: the
+    // watch-state tones (.st-want, .st-ing, …) carry a hue into whatever they
+    // are applied to, and the rules that consume it live on the component. That
+    // is the intended pattern, not a class that forgot to do anything.
+    const carriesTokens = [...props].some((p) => p.startsWith('--'));
+    const setsShape = carriesTokens || [...props].some((p) => SHAPE_PROPS.has(p));
     for (const c of m[1].matchAll(/\.([A-Za-z][\w-]*)/g)) {
         defined.add(c[1]);
         if (setsShape) shaped.add(c[1]);

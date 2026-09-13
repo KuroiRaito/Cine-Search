@@ -5,6 +5,7 @@ import { fromItem } from '../lib/tmdb/view.js';
 import { useAsync } from '../hooks/useAsync.js';
 import { Tile, Skeleton, Empty, ErrorBox } from '../components/ui.jsx';
 import SignInPrompt from '../components/SignInPrompt.jsx';
+import PeopleResults, { usePeopleSearch } from '../components/PeopleResults.jsx';
 
 const DEBOUNCE_MS = 250;
 
@@ -15,6 +16,7 @@ export default function SearchPage() {
     const q = params.get('q') || '';
     const [draft, setDraft] = useState(q);
     const [prompt, setPrompt] = useState(null);
+    const people = usePeopleSearch(q);
 
     useEffect(() => { setDraft(q); }, [q]);
 
@@ -80,7 +82,15 @@ export default function SearchPage() {
                 </div>
             )}
 
-            {data && data.length === 0 && (
+            {/* After the titles, never above them — and still there when the
+                title search is the half that failed. Errors are scoped to the
+                section that failed, which cuts both ways. */}
+            {(data || error) && <PeopleResults people={people} />}
+
+            {/* A search that found a person found something. Saying "nothing
+                for Villeneuve" above his own row would be a strange thing to
+                read. */}
+            {data && data.length === 0 && people.length === 0 && (
                 <Empty
                     title={`Nothing for “${q}”`}
                     body="Check the spelling, or try fewer words."

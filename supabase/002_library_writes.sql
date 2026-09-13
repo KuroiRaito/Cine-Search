@@ -66,6 +66,7 @@ language plpgsql
 security definer
 set search_path = ''
 as $$
+declare v_credits jsonb;
 begin
   if auth.uid() is null then
     raise exception 'sign in required' using errcode = '42501';
@@ -106,6 +107,54 @@ begin
          then p_catalog->'seasons' else '[]'::jsonb end
   )
   on conflict (tmdb_id, media_type) do nothing;
+
+  -- Who made it. The credits ride on the catalogue payload rather than as
+  -- another argument, so a save stays one call and one transaction. They are
+  -- capped before they leave the browser: top 15 cast plus five key crew jobs
+  -- for a film, and for a series the creators only — Breaking Bad lists 25
+  -- Directors in aggregate_credits because those are per-episode credits, and
+  -- storing them would make "your most-watched director" a list of people who
+  -- did one episode each. Inception goes from 788 raw credits to 19 stored.
+  v_credits := case when jsonb_typeof(p_catalog->'credits') = 'array'
+                    then p_catalog->'credits' else '[]'::jsonb end;
+
+  if jsonb_array_length(v_credits) = 0 then
+    return;
+  end if;
+
+  -- The whole credit write sits in its own block. An exception here rolls back
+  -- only this much: a malformed credit must never cost someone the library
+  -- entry they were actually trying to save.
+  begin
+    -- People first: catalog_credits has a foreign key to them.
+    insert into public.catalog_people (tmdb_id, name, department, profile_path)
+    select distinct on ((c->>'id')::integer)
+           (c->>'id')::integer,
+           c->>'name',
+           nullif(c->>'department', ''),
+           nullif(c->>'profile_path', '')
+      from jsonb_array_elements(v_credits) as c
+     where (c->>'id') ~ '^[0-9]+$' and nullif(c->>'name', '') is not null
+    on conflict (tmdb_id) do nothing;
+
+    insert into public.catalog_credits (
+      tmdb_id, media_type, person_id, role, job, character, credit_order
+    )
+    select distinct on ((c->>'id')::integer, c->>'role', coalesce(c->>'job', ''))
+           p_tmdb_id,
+           p_media_type,
+           (c->>'id')::integer,
+           c->>'role',
+           coalesce(c->>'job', ''),
+           nullif(c->>'character', ''),
+           nullif(c->>'credit_order', '')::integer
+      from jsonb_array_elements(v_credits) as c
+     where (c->>'id') ~ '^[0-9]+$'
+       and c->>'role' in ('cast', 'crew')
+    on conflict (tmdb_id, media_type, person_id, role, job) do nothing;
+  exception when others then
+    null;
+  end;
 end $$;
 
 -- An earlier signature of this function would survive as a separate overload,

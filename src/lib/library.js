@@ -48,6 +48,29 @@ export const statusTone = (key) => statusMeta(key)?.tone || 'st-want';
  */
 export const canRate = (status) => status === 'watched' || status === 'rewatching';
 
+/**
+ * Whether a library entry counts as seen.
+ *
+ * Collection progress measures what you have actually watched, so a title on
+ * the watchlist is not progress — "6 of 11" would otherwise mean "six I have
+ * heard of". Rewatching counts: you saw it the first time.
+ */
+export const isSeen = (entry) => canRate(entry?.status);
+
+/**
+ * How much of one body of work has been watched.
+ *
+ * Shared by the person page, the search results and the taste cards so that all
+ * three answer the same question the same way. Three places quoting different
+ * fractions for the same person would be worse than none of them quoting any.
+ */
+export function collectionProgress(role, entryFor) {
+    const total = role?.items.length ?? 0;
+    const seen = (role?.items ?? [])
+        .filter((it) => isSeen(entryFor(it.mediaType, it.id))).length;
+    return { seen, total, pct: total ? Math.round((seen / total) * 100) : 0 };
+}
+
 export const keyOf = (mediaType, id) => `${mediaType}-${id}`;
 
 /** Half points, 0.5 to 10 — the range the database's own check constraint allows. */
@@ -197,3 +220,57 @@ export function lastWatched(order, watched) {
 }
 
 export const epLabel = ({ season, episode }) => `S${season} E${episode}`;
+
+/**
+ * Record how long an episode of this season runs.
+ *
+ * TMDB has retired `episode_run_time`, so the only place these numbers exist is
+ * the season endpoint — which the app fetches anyway when someone opens a
+ * season. The data arrives as a side effect of the thing that makes it matter:
+ * you cannot tick an episode without opening its season.
+ *
+ * Fire and forget. A season whose runtime is missing costs a number on a screen
+ * nobody is currently looking at, and is never worth interrupting anyone for.
+ */
+export function rememberSeasonRuntime(tmdbId, season, episodes) {
+    const mins = (episodes || []).map((e) => e.minutes).filter((m) => m > 0);
+    if (mins.length < 1) return;
+    const average = Math.round(mins.reduce((a, b) => a + b, 0) / mins.length);
+    supabase.rpc('season_runtime_set', {
+        p_tmdb_id: tmdbId,
+        p_season: season,
+        p_minutes: average,
+    }).then(({ error }) => {
+        if (error && import.meta.env.DEV) console.warn('season runtime not saved', error);
+    });
+}
+
+/** Everything the You screen draws, in one round trip. */
+export async function tasteSummary() {
+    return supabase.rpc('taste_summary').then(unwrap);
+}
+
+/**
+ * Minutes are stored as minutes and formatted where they are drawn — the same
+ * integer becomes "18.4 days" on a stat tile and "3d 4h" on a card.
+ */
+export function formatDays(minutes) {
+    if (!minutes) return '0';
+    return (minutes / 1440).toFixed(1);
+}
+
+export function formatSpan(minutes) {
+    if (!minutes) return '—';
+    const d = Math.floor(minutes / 1440);
+    const h = Math.floor((minutes % 1440) / 60);
+    if (d > 0) return h > 0 ? `${d}d ${h}h` : `${d}d`;
+    if (h > 0) return `${h}h`;
+    return `${minutes}m`;
+}
+
+/**
+ * "Score" needs a floor or it is meaningless: one film you gave a 10 would
+ * outrank a genre you have watched for twenty years. Three is enough to be an
+ * opinion rather than an accident.
+ */
+export const SCORE_FLOOR = 3;

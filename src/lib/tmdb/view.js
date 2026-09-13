@@ -142,6 +142,71 @@ const toCard = (r) => ({
  * this from the full payload rather than from a poster tile is what keeps the
  * genres and keywords in it, which is the whole basis of the taste work later.
  */
+/**
+ * The crew jobs worth storing, for a film.
+ *
+ * A title's full crew is not a list anyone reads: Inception alone credits 736
+ * people, almost all of them gaffers, assistant editors and drivers. These six
+ * are the ones a person actually tracks — the ones they would say made it.
+ */
+const KEY_JOBS = [
+    'Director', 'Writer', 'Screenplay',
+    'Original Music Composer', 'Director of Photography',
+];
+
+/** Billing order is the only ranking TMDB gives, and it is the right one. */
+const CAST_DEPTH = 15;
+
+/**
+ * The people behind a title, flattened for storage.
+ *
+ * Film and television need different rules, because the same job name means
+ * different things in each. Breaking Bad lists 25 Directors and 10 Writers in
+ * `aggregate_credits` — those are per-episode credits, and storing them would
+ * make "your most-watched director" a list of people who did one episode each.
+ * A series has one author and TMDB names them in `created_by`.
+ *
+ * So: a film keeps its key crew; a series keeps its creators, and nothing else
+ * from crew. Cast is billing order in both, capped.
+ */
+export function toCredits(raw, mediaType) {
+    const out = [];
+    const push = (p, role, job, character, order) => {
+        if (!p?.id || !p?.name) return;
+        out.push({
+            id: p.id,
+            name: p.name,
+            profile_path: p.profile_path || null,
+            department: p.known_for_department || null,
+            role,
+            job: job || '',
+            character: character || null,
+            credit_order: order ?? null,
+        });
+    };
+
+    if (mediaType === 'tv') {
+        (raw.aggregate_credits?.cast || [])
+            .slice(0, CAST_DEPTH)
+            .forEach((p, i) => push(p, 'cast', '', p.roles?.[0]?.character, p.order ?? i));
+        (raw.created_by || []).forEach((p) => push(p, 'crew', 'Creator', null, null));
+        return out;
+    }
+
+    (raw.credits?.cast || [])
+        .slice(0, CAST_DEPTH)
+        .forEach((p, i) => push(p, 'cast', '', p.character, p.order ?? i));
+
+    // One person can hold two of these jobs on the same film — Nolan writes and
+    // directs — and that is two credits, not a duplicate. The table's key is
+    // (title, person, role, job), so both are kept and neither collides.
+    (raw.credits?.crew || [])
+        .filter((c) => KEY_JOBS.includes(c.job))
+        .forEach((c) => push(c, 'crew', c.job, null, null));
+
+    return out;
+}
+
 export function toCatalog(raw, mediaType) {
     const isTV = mediaType === 'tv';
     return {
@@ -171,6 +236,9 @@ export function toCatalog(raw, mediaType) {
                 .filter((s) => s.season_number > 0)
                 .map((s) => ({ n: s.season_number, c: s.episode_count || 0 }))
             : [],
+        // Carried on the catalogue payload rather than as another argument, so
+        // saving a title stays one call and one transaction.
+        credits: toCredits(raw, mediaType),
     };
 }
 
@@ -229,6 +297,8 @@ export function toSeasonView(raw) {
             // Unaired episodes render dimmed and can't be ticked (design edge case).
             aired: Boolean(e.air_date && e.air_date <= today),
             runtime: formatRuntime(e.runtime),
+            // The formatted string is for reading; the number is for adding up.
+            minutes: e.runtime || null,
             voteAverage: e.vote_average ? Number(e.vote_average).toFixed(1) : null,
             still: stillUrl(e.still_path),
             overview: e.overview?.trim() || null,
@@ -237,23 +307,109 @@ export function toSeasonView(raw) {
 }
 
 /**
+ * How many votes a credit needs to count as part of someone's body of work.
+ *
+ * This is a policy, not a fact, and it is the number the design was drawn
+ * against: at 200, Villeneuve has exactly the 10 directed features the mock
+ * shows. It is a proxy for "is this a real release" and it is an imperfect one
+ * — it filters a 1990s Québécois short and a straight-to-video obscurity the
+ * same way. The screen says how many it removed, which is what makes an
+ * opinionated number honest.
+ *
+ * Known cost: Emilia Clarke reads 12 rather than the ~20 a viewer would name.
+ */
+const RELEVANCE_VOTES = 200;
+
+/**
+ * TMDB records talk-show appearances and archive footage as cast credits, with
+ * the character as "Self". Tom Cruise has 135 cast credits and 57 of them are
+ * films; the rest are him being interviewed. Appearing as yourself is not a
+ * part you played, so this is a correctness filter rather than a taste one —
+ * it runs before the vote threshold and does most of the work.
+ */
+const isSelf = (c) => /^(self|himself|herself|themselves)\b/i.test(c.character || '');
+
+const dateOf = (c) => c.release_date || c.first_air_date || '';
+
+/** Credits that count toward a body of work, newest first. */
+function notableCredits(list) {
+    const today = new Date().toISOString().slice(0, 10);
+    const seen = new Set();
+    return (list || [])
+        .filter((c) => {
+            const d = dateOf(c);
+            // An unreleased film is not something you have failed to watch.
+            if (!d || d > today) return false;
+            if (isSelf(c)) return false;
+            if ((c.vote_count || 0) < RELEVANCE_VOTES) return false;
+            // A film credited as both Writer and Screenplay is one film.
+            const key = `${c.media_type}-${c.id}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        })
+        .sort((a, b) => String(dateOf(b)).localeCompare(String(dateOf(a))));
+}
+
+/**
+ * The bodies of work a person page can show, and the verb each one takes.
+ *
+ * These are the same six jobs stored as credits when a title is saved, so the
+ * fraction on a person page and the fraction on a taste card are answering the
+ * same question about the same set. A composer had no page at all before this:
+ * Hans Zimmer has no Director or Writer credits and his cast credits are all
+ * "Self", so his filmography came out empty behind a biography.
+ */
+const ROLES = [
+    { key: 'director', label: 'Director', verb: 'directed', jobs: ['Director'] },
+    { key: 'creator', label: 'Creator', verb: 'created', jobs: ['Creator'] },
+    { key: 'writer', label: 'Writer', verb: 'written', jobs: ['Writer', 'Screenplay'] },
+    { key: 'composer', label: 'Composer', verb: 'scored', jobs: ['Original Music Composer'] },
+    { key: 'camera', label: 'Cinematographer', verb: 'shot', jobs: ['Director of Photography'] },
+    { key: 'cast', label: 'Cast', verb: 'acted in', jobs: null },
+];
+
+/** Which role a stored credit belongs to, so a card can find its denominator. */
+export function roleForJob(role, job) {
+    if (role === 'cast') return ROLES.find((r) => r.key === 'cast');
+    return ROLES.find((r) => r.jobs?.includes(job)) || null;
+}
+
+/**
  * A person, with their filmography split by role.
  *
- * Credits with no release date are dropped - verified, 2 of Villeneuve's 26
- * raw director credits are unreleased projects with no date at all.
+ * Each role carries its own denominator. "6 of 11" means eleven films they
+ * directed, six of which you have seen; switching to Writer changes both halves
+ * because it is a different body of work.
+ *
+ * Roles are ordered by size, so the largest body of work leads — which is
+ * Director for a director, Cast for an actor, and Composer for a composer,
+ * without needing a rule for each.
  */
 export function toPersonView(raw) {
     const credits = raw.combined_credits || {};
-    const dated = (list) => (list || []).filter((c) => c.release_date || c.first_air_date);
-    const byNewest = (a, b) =>
-        String(b.release_date || b.first_air_date || '').localeCompare(String(a.release_date || a.first_air_date || ''));
 
-    const crewFor = (job) => dated(credits.crew).filter((c) => c.job === job).sort(byNewest).map(toCard);
-    const roles = [
-        { key: 'director', label: 'Director', items: crewFor('Director') },
-        { key: 'writer', label: 'Writer', items: [...crewFor('Writer'), ...crewFor('Screenplay')].sort(byNewest) },
-        { key: 'cast', label: 'Cast', items: dated(credits.cast).sort(byNewest).map(toCard) },
-    ].filter((r) => r.items.length);
+    const build = (role) => {
+        const all = role.jobs
+            ? (credits.crew || []).filter((c) => role.jobs.includes(c.job))
+            : (credits.cast || []);
+        const items = notableCredits(all).map(toCard);
+        return {
+            key: role.key,
+            label: role.label,
+            verb: role.verb,
+            items,
+            // Everything the filter removed, counted so the screen can admit to
+            // it rather than quietly present an opinion as a total.
+            filteredOut: all.length - items.length,
+        };
+    };
+
+    const roles = ROLES.map(build)
+        // A role with nothing left after filtering shows no tab. An empty grid
+        // behind a tab that promised a count is worse than no tab.
+        .filter((r) => r.items.length)
+        .sort((a, b) => b.items.length - a.items.length);
 
     return {
         id: raw.id,
@@ -268,11 +424,6 @@ export function toPersonView(raw) {
     };
 }
 
-/**
- * The app's normalised item shape (lib/tmdb/normalize.js) -> the shape tiles
- * render. Search results and the browse feeds both arrive that way, so this is
- * the one place the two vocabularies meet.
- */
 export const fromItem = (it) => ({
     id: it.id,
     mediaType: it.media_type || 'movie',

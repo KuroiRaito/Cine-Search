@@ -78,8 +78,12 @@ function PersonResult({ person }) {
     const lib = useLibrary();
     const [role, setRole] = useState(null);
 
+    // Fetched for guests too. The role is worth naming to anyone — it is the
+    // count that needs an account, not the word. Reading "Sound" here and
+    // "Composer" everywhere else was TMDB's department taxonomy leaking through
+    // one branch, and mapping one to the other would have been a guess: "Sound"
+    // is also where TMDB files boom operators.
     useEffect(() => {
-        if (!isSignedIn) return undefined;
         const controller = new AbortController();
         let live = true;
 
@@ -90,9 +94,17 @@ function PersonResult({ person }) {
             .catch(() => {});
 
         return () => { live = false; controller.abort(); };
-    }, [person.id, isSignedIn]);
+    }, [person.id]);
 
-    const progress = role && collectionProgress(role, lib.entryFor);
+    // A guest has no library, so there is nothing to be "0 of 131" of.
+    const progress = isSignedIn && role ? collectionProgress(role, lib.entryFor) : null;
+
+    // The department is the fallback while the credits are in flight, or if
+    // they never arrive — not the guest's answer.
+    const sub = role
+        ? [role.label, progress && `${progress.seen} of ${progress.total} seen`]
+            .filter(Boolean).join(' · ')
+        : person.known_for_department;
 
     return (
         <PersonRow
@@ -101,9 +113,7 @@ function PersonResult({ person }) {
                 name: person.name,
                 photo: profileUrl(person.profile_path),
             }}
-            sub={progress
-                ? `${role.label} · ${progress.seen} of ${progress.total} seen`
-                : person.known_for_department}
+            sub={sub}
         />
     );
 }

@@ -151,22 +151,40 @@ for (const f of jsx) {
 }
 
 /* ---------------------------------------------------------------
-   6. A module's classes belong to that module.
-   A class first defined under src/modules/<m>/ may be used only by files
-   under src/modules/<m>/. The class names stay the design system's own —
-   this is what makes per-module stylesheets safe without renaming them.
+   6. A module's own classes belong to that module.
+
+   A class a module INTRODUCES may be used only by that module. A class the
+   shared layer already defines is not introduced — a module is free to scope
+   one inside its own element (`.tside .prow`), which is styling its own
+   composition, not claiming someone else's primitive.
+
+   The class names stay the design system's own. That is what makes per-module
+   stylesheets safe without renaming anything, and it is why this check exists
+   rather than CSS Modules.
    --------------------------------------------------------------- */
 const moduleOf = (f) => relative(ROOT, f).match(/^src\/modules\/([^/]+)\//)?.[1] ?? null;
+const classesIn = (file) => {
+    const found = new Set();
+    for (const m of readFileSync(file, 'utf8').matchAll(/([^{}]+)\{[^}]*\}/g)) {
+        // Strip at-rule preludes: @media's condition is not a selector.
+        if (m[1].trim().startsWith('@')) continue;
+        for (const c of m[1].matchAll(/\.([A-Za-z][\w-]*)/g)) found.add(c[1]);
+    }
+    return found;
+};
+
+const sharedClasses = new Set();
+for (const f of cssFiles) if (!moduleOf(f)) for (const c of classesIn(f)) sharedClasses.add(c);
+
 const owner = new Map();
 for (const f of cssFiles) {
     const mod = moduleOf(f);
     if (!mod) continue;
-    for (const m of readFileSync(f, 'utf8').matchAll(/([^{}]+)\{[^}]*\}/g)) {
-        for (const c of m[1].matchAll(/\.([A-Za-z][\w-]*)/g)) {
-            const prev = owner.get(c[1]);
-            if (prev && prev !== mod) fail('class-ownership', `.${c[1]} is defined by both ${prev} and ${mod}`);
-            owner.set(c[1], mod);
-        }
+    for (const c of classesIn(f)) {
+        if (sharedClasses.has(c)) continue;          // scoping a shared class: fine
+        const prev = owner.get(c);
+        if (prev && prev !== mod) fail('class-ownership', `.${c} is introduced by both ${prev} and ${mod}`);
+        owner.set(c, mod);
     }
 }
 for (const f of jsx) {
@@ -212,7 +230,7 @@ const CHECKS = [
     ['hardcoded-gutter', 'One gutter token, obeyed by everything'],
     ['undefined-token', 'Every custom property used is declared'],
     ['inline-style', 'No inline styles outside Skeleton; dynamic values only'],
-    ['class-ownership', "A module's classes are used only by that module"],
+    ['class-ownership', "A module's own classes are used only by that module"],
     ['deep-import', 'Modules are imported only through their index'],
 ];
 

@@ -176,3 +176,52 @@
    that grows. Resizing stays vertical — a sheet has a fixed width. */
 .inp.notes { min-height: 62px; line-height: 1.55; resize: vertical; }
 
+/* ---- Controls and state tones used on more than one screen. The six
+        watch-state hues carry a tone into whatever they are applied to:
+        a pill, a segment, a chip, a library row. ---- */
+
+.ibtn {
+  width: 44px; min-height: 44px; border: 0; background: var(--ink-4); color: var(--muted);
+  border-radius: 10px; cursor: pointer; display: grid; place-items: center; font-size: 15px;
+  transition: background .12s, color .12s;
+}
+.ibtn:hover { background: var(--ink-5); color: var(--text); }
+.ibtn.like:hover { color: var(--like-9); }
+.sw {
+  flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
+  font-family: var(--f-s); font-size: 12.5px; font-weight: 500; padding: 0 13px;
+  min-height: 38px; display: inline-flex; align-items: center;
+  border-radius: 8px; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.sw em { font-style: normal; opacity: .55; margin-left: 4px; font-size: 11px; }
+.sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 1px var(--acc-bd); }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ---------------- status colour ----------------
+
+   Six hues, one per watch state, straight from the design system's swatches.
+   Each state is carried by a class rather than an inline style so that a state
+   looks the same everywhere it appears — pill, segment, chip, library row.
+
+   The design system fills the title-page pill with the -9 hue and puts a
+   hardcoded near-black on top of it. That literal is right in dark mode and
+   unreadable in light, because -9 is a mid-tone in both. `var(--bg)` is the
+   fix: it is near-black in dark and near-white in light, so it is always the
+   pole furthest from a mid-tone. The fill stays as designed, and the label
+   stays legible in both themes without a single hardcoded value.
+   ------------------------------------------------------------------ */
+
+.st-want    { --stc: var(--st-want-11); --stb: var(--st-want-3); --stl: var(--st-want-9); }
+.st-ing     { --stc: var(--st-ing-11);  --stb: var(--st-ing-3);  --stl: var(--st-ing-9); }
+.st-hold    { --stc: var(--st-hold-11); --stb: var(--st-hold-3); --stl: var(--st-hold-9); }
+.st-done    { --stc: var(--st-done-11); --stb: var(--st-done-3); --stl: var(--st-done-9); }
+.st-re      { --stc: var(--st-re-11);   --stb: var(--st-re-3);   --stl: var(--st-re-9); }
+.st-drop    { --stc: var(--st-drop-11); --stb: var(--st-drop-3); --stl: var(--st-drop-9); }
+
+.ibtn.on { background: var(--stb); color: var(--stc); box-shadow: inset 0 0 0 1px var(--stl); }
+.ibtn.like.on { --stb: var(--like-3); --stc: var(--like-11); --stl: var(--like-9); }
+/* Loading shimmer, after the rules it overrides. */
+.skel, .tile .art {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
+}

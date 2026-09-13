@@ -73,3 +73,9 @@
    them; the number lives here now, where verify can see it. */
 .btn.block { width: 100%; }
 .pad.stack { margin-top: var(--s6); }
+
+/* A titled block, on any page. */
+
+
+.sect { margin-top: var(--s6); }
+.sect-h { font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em; color: var(--text); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }

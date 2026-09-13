@@ -1,7 +1,10 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, NavLink, useLocation } from 'react-router-dom';
 import Discover from './routes/Discover.jsx';
 import SearchPage from './routes/SearchPage.jsx';
-import Title from './routes/Title.jsx';
+// A module loads on demand, as its own chunk with its own stylesheet. The
+// route table is the only place that names one.
+const Title = lazy(() => import('./modules/title'));
 import Person from './routes/Person.jsx';
 import Cover from './routes/Cover.jsx';
 import Library from './routes/Library.jsx';
@@ -88,6 +91,9 @@ export default function App() {
                 path="*"
                 element={
                     <Shell>
+                        {/* A module arrives with its own CSS; until it does the
+                            shell holds the space rather than flashing a spinner. */}
+                        <Suspense fallback={null}>
                         <Routes>
                             <Route path="/" element={<HomeOrCover />} />
                             <Route path="/search" element={<SearchPage />} />
@@ -99,6 +105,7 @@ export default function App() {
                             <Route path="/about" element={<About />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
+                        </Suspense>
                     </Shell>
                 }
             />

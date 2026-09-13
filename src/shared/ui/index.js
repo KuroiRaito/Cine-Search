@@ -4,7 +4,7 @@ export { Poster, TILE_SIZES } from './Poster.jsx';
 export { Tile } from './Tile.jsx';
 export { Rail } from './Rail.jsx';
 export { PersonRow, initialsOf } from './PersonRow.jsx';
-export { Skeleton, TitleSkeleton } from './Skeleton.jsx';
+export { Skeleton } from './Skeleton.jsx';
 export { Empty } from './Empty.jsx';
 export { ErrorBox } from './ErrorBox.jsx';
 export { Toast } from './Toast.jsx';

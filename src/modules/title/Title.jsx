@@ -1,18 +1,20 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import './title.css';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { titleFull, season as fetchSeason } from '../shared/tmdb/endpoints.js';
-import { toTitleView, toSeasonView, compactCount } from '../shared/tmdb/view.js';
-import { useAsync } from '../shared/hooks/useAsync.js';
-import { useRegion } from '../shared/hooks/useRegion.js';
-import { Poster, Tile, PersonRow, TitleSkeleton, ErrorBox, Empty, Toast, initialsOf } from '../shared/ui/index.js';
-import SignInPrompt from '../components/SignInPrompt.jsx';
-import Editor from '../components/Editor.jsx';
-import { useAuth } from '../shared/auth/AuthProvider.jsx';
-import { useLibrary, useTileStates, useQuickAdd } from '../context/LibraryProvider.jsx';
+import { titleFull, season as fetchSeason } from '../../shared/tmdb/endpoints.js';
+import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.js';
+import { useAsync } from '../../shared/hooks/useAsync.js';
+import { useRegion } from '../../shared/hooks/useRegion.js';
+import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, initialsOf } from '../../shared/ui/index.js';
+import { TitleSkeleton } from './TitleSkeleton.jsx';
+import SignInPrompt from '../../components/SignInPrompt.jsx';
+import Editor from '../../components/Editor.jsx';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { useLibrary, useTileStates, useQuickAdd } from '../../context/LibraryProvider.jsx';
 import {
     statusMeta, statusTone, episodesWatched, isWatched, runningOrder, nextUnwatched,
     rememberSeasonRuntime,
-} from '../lib/library.js';
+} from '../../lib/library.js';
 
 const displayName = (type, code) => {
     if (!code) return null;

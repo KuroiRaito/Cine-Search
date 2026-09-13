@@ -274,3 +274,61 @@ export function formatSpan(minutes) {
  * opinion rather than an accident.
  */
 export const SCORE_FLOOR = 3;
+
+/* ---------------------------------------------------------------
+   Person filmography totals — the "11" in "6 of 11".
+
+   The denominator lives at TMDB and changes a few times a year. It is kept on
+   catalog_people, per role, in the app's own vocabulary, so a person whose
+   filmography has been counted once is never counted again from the browser.
+   --------------------------------------------------------------- */
+
+/** Every role a person has, as the cache stores it. */
+export function totalsFromView(view) {
+    const out = {};
+    for (const r of view.roles) out[r.key] = { count: r.items.length, label: r.label, verb: r.verb };
+    return out;
+}
+
+const STALE_DAYS = 30;
+export const totalsAreFresh = (row) => Boolean(row?.credit_totals)
+    && (!row.totals_synced_at
+        || (Date.now() - new Date(row.totals_synced_at).getTime()) < STALE_DAYS * 86_400_000);
+
+/** One read for up to a handful of ids; returns a map id → row. */
+export async function personTotalsGet(ids) {
+    if (!ids?.length) return {};
+    const rows = await supabase
+        .from('catalog_people')
+        .select('tmdb_id, credit_totals, totals_synced_at')
+        .in('tmdb_id', ids)
+        .then(unwrap);
+    return Object.fromEntries((rows || []).map((r) => [r.tmdb_id, r]));
+}
+
+/** Fire and forget: the number is on screen already; storing it is for next time. */
+export function personTotalsSet({ id, name, profilePath, totals }) {
+    supabase.rpc('person_totals_set', {
+        p_person_id: id,
+        p_name: name ?? null,
+        p_profile_path: profilePath ?? null,
+        p_totals: totals,
+    }).then(({ error }) => {
+        if (error && import.meta.env.DEV) console.warn('person totals not saved', error);
+    });
+}
+
+/**
+ * The stored credits for a handful of people, so a search row can count what
+ * has been seen without the person's full filmography. This is the same
+ * numerator the You screen computes in SQL — the taste cards and the search
+ * rows agree with each other by construction.
+ */
+export async function creditsForPeople(ids) {
+    if (!ids?.length) return [];
+    return supabase
+        .from('catalog_credits')
+        .select('person_id, tmdb_id, media_type, role, job')
+        .in('person_id', ids)
+        .then(unwrap);
+}

@@ -16,11 +16,13 @@ export const searchMovies = (query, params = {}, opts) =>
 export const searchTV = (query, params = {}, opts) =>
     get('/search/tv', { query, ...params }, opts).then((d) => withPage(d, 'tv'));
 
-/** Movies + TV + people in one call. Unused by v1; v2's person route needs it. */
+/** Movies + TV + people in one call, in TMDB's own relevance order. */
 export const searchMulti = (query, params = {}, opts) =>
     get('/search/multi', { query, ...params }, opts).then((d) => ({
         people: (d.results || []).filter((r) => r.media_type === 'person'),
         titles: toItems((d.results || []).filter((r) => r.media_type !== 'person')),
+        totalPages: d.total_pages || 1,
+        totalResults: d.total_results || 0,
     }));
 
 export const searchPerson = (query, opts) =>

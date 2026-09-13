@@ -1,21 +1,17 @@
 // Public search API. The UI and the eval harness both call this and nothing else.
 //
-// The app always runs v1 — the plain TMDB search that shipped. No flags, no env
-// var, no URL override: one path, so search behaves the same everywhere until we
-// deliberately come back to it.
-//
-// The eval harness is the one caller that may ask for another variant, by
-// passing { variant } explicitly. Nothing in the app does.
+// The app runs v2. v1 — the search that shipped, measured at 52% null-and-low
+// and MRR 0.47 — is preserved exactly as the baseline, and v2 falls through to
+// it for every case it does not handle. The eval harness names a variant
+// explicitly so the two can be scored side by side.
 
 import { search as searchV1 } from './v1.js';
+import { search as searchV2 } from './v2/index.js';
 import { DEFAULT_SEARCH_OPTS } from './types.js';
 
 export { DEFAULT_SEARCH_OPTS };
 
 export async function search(query, opts = {}, { variant, signal } = {}) {
-    if (variant === 'v2') {
-        const { search: searchV2 } = await import('./v2/index.js');
-        return searchV2(query, opts, { signal });
-    }
-    return searchV1(query, opts, { signal });
+    if (variant === 'v1' || variant === 'v1-baseline') return searchV1(query, opts, { signal });
+    return searchV2(query, opts, { signal });
 }

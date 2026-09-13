@@ -16,7 +16,6 @@ export default function SearchPage() {
     const q = params.get('q') || '';
     const [draft, setDraft] = useState(q);
     const [prompt, setPrompt] = useState(null);
-    const people = usePeopleSearch(q);
 
     useEffect(() => { setDraft(q); }, [q]);
 
@@ -28,11 +27,23 @@ export default function SearchPage() {
         return () => clearTimeout(t);
     }, [draft, q, setParams]);
 
+    // One request now carries both the titles and the people for a plain
+    // query. `people` is null when the search fell back to v1 and carried none.
     const { data, error, loading, retry } = useAsync(
-        ({ signal }) => search(q, {}, { signal }).then((r) => (r.results || []).map(fromItem)),
+        ({ signal }) => search(q, {}, { signal }).then((r) => ({
+            titles: (r.results || []).map(fromItem),
+            people: r.people ?? null,
+        })),
         [q],
         { skip: !q.trim() },
     );
+    const titles = data?.titles;
+    // After the fetch it reads from — hooks do not get to be conditional, and
+    // `data` does not exist above this line.
+    // Three states, kept apart on purpose: undefined = the search has not
+    // answered yet, so wait; an array = it brought the people, use them;
+    // null = it was a v1 fallback with none, so ask /search/person.
+    const people = usePeopleSearch(q, data ? data.people : undefined);
 
     return (
         <div className="page">
@@ -70,9 +81,9 @@ export default function SearchPage() {
 
             {error && <ErrorBox what="these results" onRetry={retry} />}
 
-            {data && data.length > 0 && (
+            {titles && titles.length > 0 && (
                 <div className="grid" style={{ marginTop: 16 }}>
-                    {data.map((it) => (
+                    {titles.map((it) => (
                         <Tile
                             key={`${it.mediaType}-${it.id}`}
                             item={it}
@@ -90,7 +101,7 @@ export default function SearchPage() {
             {/* A search that found a person found something. Saying "nothing
                 for Villeneuve" above his own row would be a strange thing to
                 read. */}
-            {data && data.length === 0 && people.length === 0 && (
+            {titles && titles.length === 0 && people.length === 0 && (
                 <Empty
                     title={`Nothing for “${q}”`}
                     body="Check the spelling, or try fewer words."

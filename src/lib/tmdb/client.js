@@ -14,7 +14,10 @@ let fetchImpl = (...args) => globalThis.fetch(...args);
 export function setFetchImpl(fn) {
     const prev = fetchImpl;
     fetchImpl = fn;
-    return () => { fetchImpl = prev; };
+    // A different transport means different answers; nothing cached under the
+    // old one may be served under the new one.
+    clearCache();
+    return () => { fetchImpl = prev; clearCache(); };
 }
 
 export class TmdbError extends Error {
@@ -36,19 +39,93 @@ export function buildUrl(path, params = {}) {
     return `/api/tmdb?path=${path}${q ? '&' + q : ''}`;
 }
 
-/**
- * GET a TMDB path. Rejects with TmdbError rather than returning a half-empty
- * object, so callers cannot mistake a transport failure for an empty result set
- * — that confusion silently corrupted eval scores once already.
- */
-export async function get(path, params = {}, { signal } = {}) {
+/* ---------------------------------------------------------------
+   Session cache.
+
+   Measured before this existed: navigating Discover → a title → back fetched
+   all four rails again; the You screen fetched twelve people on every visit;
+   React's dev double-mount fetched everything twice. A five-minute session was
+   ~30 requests, nearly all for data that had not changed.
+
+   One Map, keyed by the exact URL, holding the PROMISE rather than the data:
+   two callers asking for the same URL at the same moment share one request.
+   The underlying fetch never takes a caller's abort signal — if it did, the
+   first caller unmounting would poison the shared result for the second,
+   which is precisely what the dev double-mount does. Each caller's signal is
+   honoured on its own wrapper instead (withSignal), so useAsync's semantics
+   are unchanged: an aborted caller sees AbortError, and the fetch completes
+   for whoever is still listening.
+
+   Failures are never cached. Entities that do not change while you look at
+   them keep for half an hour; feeds and searches for five minutes.
+   --------------------------------------------------------------- */
+
+const CACHE = new Map();      // url -> { expires, promise }
+const MAX_ENTRIES = 200;
+
+function ttlFor(path) {
+    const p = String(path).replace(/^\/+/, '');
+    if (/^(movie|tv|person|collection)\/\d+/.test(p)) return 30 * 60_000;
+    if (/^(genre|configuration)/.test(p)) return 24 * 3_600_000;
+    return 5 * 60_000;
+}
+
+const abortError = () => {
+    const e = new Error('The operation was aborted');
+    e.name = 'AbortError';
+    return e;
+};
+
+/** Reject when `signal` fires, without touching the shared promise. */
+function withSignal(promise, signal) {
+    if (!signal) return promise;
+    if (signal.aborted) return Promise.reject(abortError());
+    return new Promise((resolve, reject) => {
+        const onAbort = () => reject(abortError());
+        signal.addEventListener('abort', onAbort, { once: true });
+        promise.then(
+            (v) => { signal.removeEventListener('abort', onAbort); resolve(v); },
+            (e) => { signal.removeEventListener('abort', onAbort); reject(e); },
+        );
+    });
+}
+
+/** Drop everything. Called when the transport is swapped (tests, eval). */
+export function clearCache() {
+    CACHE.clear();
+}
+
+async function fetchJson(url, path) {
     let res;
     try {
-        res = await fetchImpl(buildUrl(path, params), { signal });
+        res = await fetchImpl(url);
     } catch (err) {
-        if (err?.name === 'AbortError') throw err;
         throw new TmdbError(err?.message || 'network error', { path });
     }
     if (!res.ok) throw new TmdbError(`TMDB responded ${res.status}`, { status: res.status, path });
     return res.json();
+}
+
+/**
+ * GET a TMDB path. Rejects with TmdbError rather than returning a half-empty
+ * object, so callers cannot mistake a transport failure for an empty result set
+ * — that confusion silently corrupted eval scores once already.
+ *
+ * `fresh: true` bypasses the session cache for one call.
+ */
+export async function get(path, params = {}, { signal, fresh = false } = {}) {
+    const url = buildUrl(path, params);
+    const now = Date.now();
+    const hit = CACHE.get(url);
+    if (!fresh && hit && hit.expires > now) return withSignal(hit.promise, signal);
+
+    const promise = fetchJson(url, path);
+    CACHE.set(url, { expires: now + ttlFor(path), promise });
+    while (CACHE.size > MAX_ENTRIES) CACHE.delete(CACHE.keys().next().value);
+    // A failed request must not be served from the cache — and a rejection
+    // nobody is listening to (every caller aborted) must not surface as an
+    // unhandled rejection either.
+    promise.catch(() => { if (CACHE.get(url)?.promise === promise) CACHE.delete(url); });
+
+    return withSignal(promise, signal);
 }

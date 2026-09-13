@@ -6,7 +6,10 @@ import { useLibrary } from '../context/LibraryProvider.jsx';
 import { useAsync } from '../hooks/useAsync.js';
 import { posterUrl, profileUrl, toPersonView, roleForJob } from '../lib/tmdb/view.js';
 import { person as fetchPerson } from '../lib/tmdb/endpoints.js';
-import { tasteSummary, formatDays, formatSpan, SCORE_FLOOR } from '../lib/library.js';
+import {
+    tasteSummary, formatDays, formatSpan, SCORE_FLOOR,
+    totalsFromView, totalsAreFresh, personTotalsSet,
+} from '../lib/library.js';
 
 /**
  * Your taste, worked out from your own records and nobody else's.
@@ -226,9 +229,11 @@ function TasteCard({ card, rank, total }) {
  * How much of each person's work exists, so "6" can become "6 of 11".
  *
  * The denominator is not ours: it is the whole filmography, which lives at
- * TMDB. Fetched after the cards have painted, for only the people actually
- * shown, and using the same filter the person page uses — otherwise a card and
- * the page it links to would disagree about the same number.
+ * TMDB. It used to be fetched for every person card on every visit — twelve
+ * requests to redraw numbers that change a few times a year. The taste query
+ * now brings each person's cached totals along; only a person whose totals
+ * are missing or a month old is asked for, and the answer is stored for next
+ * time, so the second visit asks for nobody.
  */
 function usePersonTotals(people) {
     const [totals, setTotals] = useState({});
@@ -238,9 +243,18 @@ function usePersonTotals(people) {
         if (!people?.length) return undefined;
         let live = true;
 
+        // What the query already carried, applied at once.
+        const known = {};
+        for (const p of people) {
+            const role = roleForJob(p.role, p.job);
+            const t = role && totalsAreFresh(p) && p.credit_totals?.[role.key];
+            if (t) known[p.person_id] = { count: t.count, verb: t.verb };
+        }
+        if (Object.keys(known).length) setTotals((prev) => ({ ...prev, ...known }));
+
         (async () => {
             for (const p of people) {
-                if (!live || asked.current.has(p.person_id)) continue;
+                if (!live || known[p.person_id] || asked.current.has(p.person_id)) continue;
                 // TMDB returns the occasional 502. Marking a person as asked
                 // before the attempt meant one transient failure left that card
                 // reading "6 titles" for the rest of the session, with no way
@@ -256,6 +270,12 @@ function usePersonTotals(people) {
                                 ...t,
                                 [p.person_id]: { count: found.items.length, verb: found.verb },
                             }));
+                        }
+                        if (view.roles.length) {
+                            personTotalsSet({
+                                id: p.person_id, name: p.name,
+                                profilePath: p.profile_path, totals: totalsFromView(view),
+                            });
                         }
                         break;
                     } catch {

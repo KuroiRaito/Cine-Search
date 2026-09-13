@@ -9,8 +9,8 @@
 //     pagination: measured 84 TMDB calls / 9.6s for filtered page 5
 //   - no typo tolerance: TMDB returns 0 results for "intersteller"
 
-import { searchMovies, searchTV, discoverMovies, discoverTV } from '../../shared/tmdb/endpoints.js';
-import { dedupe } from '../../shared/tmdb/normalize.js';
+import { searchMovies, searchTV, discoverMovies, discoverTV } from '../../../shared/tmdb/endpoints.js';
+import { dedupe } from '../../../shared/tmdb/normalize.js';
 import { DEFAULT_SEARCH_OPTS } from './types.js';
 
 function sortParam(type, sortBy) {

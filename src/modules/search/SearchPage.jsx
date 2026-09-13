@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { search } from '../lib/search/index.js';
-import { fromItem } from '../shared/tmdb/view.js';
-import { useAsync } from '../shared/hooks/useAsync.js';
-import { Tile, Skeleton, Empty, ErrorBox } from '../shared/ui/index.js';
-import SignInPrompt from '../components/SignInPrompt.jsx';
-import PeopleResults, { usePeopleSearch } from '../components/PeopleResults.jsx';
-import { useTileStates, useQuickAdd } from '../context/LibraryProvider.jsx';
+import { search } from './lib/index.js';
+import { fromItem } from '../../shared/tmdb/view.js';
+import { useAsync } from '../../shared/hooks/useAsync.js';
+import { Tile, Skeleton, Empty, ErrorBox } from '../../shared/ui/index.js';
+import { SignInPrompt } from '../entry';
+import PeopleResults, { usePeopleSearch } from './PeopleResults.jsx';
+import { useTileStates, useQuickAdd } from '../library';
+import './search.css';
 
 const DEBOUNCE_MS = 250;
 

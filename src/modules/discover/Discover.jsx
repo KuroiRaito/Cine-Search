@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { trending, nowPlaying, upcoming, onTheAir } from '../shared/tmdb/endpoints.js';
-import { fromItem } from '../shared/tmdb/view.js';
-import { useAsync } from '../shared/hooks/useAsync.js';
-import { useRegion } from '../shared/hooks/useRegion.js';
-import { Rail, Skeleton, ErrorBox } from '../shared/ui/index.js';
-import { useAuth } from '../shared/auth/AuthProvider.jsx';
-import { useTileStates, useQuickAdd } from '../context/LibraryProvider.jsx';
-import SignInPrompt from '../components/SignInPrompt.jsx';
-import ThemeToggle from '../shared/theme/ThemeToggle.jsx';
+import { trending, nowPlaying, upcoming, onTheAir } from '../../shared/tmdb/endpoints.js';
+import { fromItem } from '../../shared/tmdb/view.js';
+import { useAsync } from '../../shared/hooks/useAsync.js';
+import { useRegion } from '../../shared/hooks/useRegion.js';
+import { Rail, Skeleton, ErrorBox } from '../../shared/ui/index.js';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { useTileStates, useQuickAdd } from '../library';
+import { SignInPrompt } from '../entry';
+import ThemeToggle from '../../shared/theme/ThemeToggle.jsx';
+import './discover.css';
 
 function FeedRail({ title, load, deps, onAdd, stateFor }) {
     const { data, error, loading, retry } = useAsync(load, deps);

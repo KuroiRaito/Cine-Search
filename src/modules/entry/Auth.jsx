@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link, useParams } from 'react-router-dom';
-import { useAuth } from '../shared/auth/AuthProvider.jsx';
-import { markSeen } from '../lib/firstVisit.js';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { markSeen } from '../../app/firstVisit.js';
+import './entry.css';
 
 /** Supabase's own wording is for developers. These are for people. */
 function humanError(message = '') {

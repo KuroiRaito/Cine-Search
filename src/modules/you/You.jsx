@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Skeleton, Empty, initialsOf } from '../shared/ui/index.js';
-import { useAuth } from '../shared/auth/AuthProvider.jsx';
-import { useLibrary } from '../context/LibraryProvider.jsx';
-import { useAsync } from '../shared/hooks/useAsync.js';
-import { posterUrl, profileUrl, toPersonView, roleForJob } from '../shared/tmdb/view.js';
-import { person as fetchPerson } from '../shared/tmdb/endpoints.js';
-import {
-    tasteSummary, formatDays, formatSpan, SCORE_FLOOR,
-    totalsFromView, totalsAreFresh, personTotalsSet,
-} from '../lib/library.js';
+import { Skeleton, Empty, initialsOf } from '../../shared/ui/index.js';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { useLibrary } from '../library';
+import { useAsync } from '../../shared/hooks/useAsync.js';
+import { posterUrl, profileUrl, toPersonView, roleForJob } from '../../shared/tmdb/view.js';
+import { person as fetchPerson } from '../../shared/tmdb/endpoints.js';
+import { totalsFromView, totalsAreFresh, personTotalsSet } from '../library';
+import { tasteSummary, formatDays, formatSpan, SCORE_FLOOR } from './taste.js';
+import './you.css';
 
 /**
  * Your taste, worked out from your own records and nobody else's.

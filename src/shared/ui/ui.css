@@ -225,3 +225,158 @@
   background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
   background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
 }
+
+/* ---- Primitives and form controls used by more than one module: the sheet,
+        the segmented control, the stepper, the stars, the input, the
+        destructive button. Two modules use each; none owns it. ---- */
+
+
+.searchbox {
+  width: 100%; font-family: var(--f-s); font-size: 15px; color: var(--text);
+  background: var(--bg-sub); border: 0; box-shadow: inset 0 0 0 1px var(--bd-sub);
+  border-radius: 11px; padding: 12px 14px; transition: box-shadow .12s;
+}
+.searchbox::placeholder { color: var(--muted); }
+.searchbox:focus { outline: none; box-shadow: inset 0 0 0 1px var(--acc); }
+
+/* ---------------- sign-in sheet ---------------- */
+
+.scrim {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(4, 6, 12, .62);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.sheet {
+  /* A sheet is a fixed-width surface, not the page, so --gutter is the wrong
+     number for its insets: at desktop the page gutter is 40px and this box is
+     460px wide. It still gets exactly one number, declared here. */
+  --sheet-pad: 18px;
+  width: 100%; max-width: 460px;
+  background: var(--bg-sub); border-top: 1px solid var(--bd);
+  border-radius: 16px 16px 0 0;
+  padding: 0 var(--sheet-pad) max(var(--sheet-pad), env(safe-area-inset-bottom));
+  box-shadow: var(--sh);
+}
+
+/* All six visible at once: one tap, rather than open, scan, tap. Films render
+   three of the six — "watching" is meaningless for a two-hour film. */
+.segs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.seg {
+  background: var(--ink-3); border: 0; border-radius: 9px; padding: 8px 3px; cursor: pointer;
+  color: var(--muted); font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-family: var(--f-s); transition: background .12s, color .12s, box-shadow .12s;
+}
+.seg:hover { background: var(--ink-4); color: var(--text); }
+.seg i { font-style: normal; font-size: 9.5px; font-family: var(--f-s); }
+.seg.on { background: var(--stb); color: var(--stc); font-weight: 600; box-shadow: inset 0 0 0 1px var(--stc); }
+
+.prog {
+  display: flex; align-items: center; gap: 9px; background: var(--bg-sub);
+  box-shadow: inset 0 0 0 1px var(--bd-sub); border-radius: 10px; padding: 7px 9px;
+}
+.prog.compact { width: 150px; }
+.stp {
+  width: 32px; height: 32px; flex: 0 0 auto; border-radius: 8px; border: 0; background: var(--ink-4);
+  color: var(--text); font-size: 17px; cursor: pointer; display: grid; place-items: center; transition: background .12s;
+}
+.stp:hover { background: var(--ink-5); }
+.stp:disabled { opacity: .35; cursor: default; }
+.prog-v { flex: 1; text-align: center; }
+.prog-v b { display: block; font-family: var(--f-d); font-size: 18px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.prog-v span { display: block; font-family: var(--f-m); font-size: 9px; color: var(--muted); margin-top: 2px; }
+.jump { margin-top: 7px; font-size: 11px; color: var(--muted); }
+.jump b { color: var(--text); font-family: var(--f-m); font-weight: 400; }
+
+/* Half stars, 1–10, matching TMDB's scale so the two scores are comparable. */
+.stars {
+  display: flex; align-items: center; gap: 4px; background: var(--bg-sub);
+  box-shadow: inset 0 0 0 1px var(--bd-sub); border-radius: 10px; padding: 9px 11px;
+}
+.stars button {
+  background: none; border: 0; padding: 0; cursor: pointer; position: relative;
+  font-size: 19px; color: var(--ink-7); line-height: 1; width: 19px; height: 22px;
+}
+.stars button.on { color: var(--rate); }
+/* A half star is the full glyph clipped down the middle, over a dim one. */
+.stars button.half::after {
+  content: "★"; position: absolute; inset: 0; color: var(--rate);
+  clip-path: inset(0 50% 0 0);
+}
+.stars .sv { margin-left: auto; font-family: var(--f-m); font-size: 11.5px; color: var(--rate-t); font-weight: 600; }
+.stars .clear {
+  margin-left: 8px; width: auto; height: auto; font-family: var(--f-s); font-size: 11px;
+  font-weight: 600; color: var(--muted);
+}
+.stars .clear:hover { color: var(--text); }
+
+.inp {
+  width: 100%; background: var(--bg-sub); border: 0; box-shadow: inset 0 0 0 1px var(--bd-sub);
+  border-radius: 9px; padding: 10px 11px; font-size: 12.5px; color: var(--text);
+  font-family: var(--f-s); transition: box-shadow .12s;
+}
+.inp:hover { box-shadow: inset 0 0 0 1px var(--bd); }
+.inp:focus { outline: none; box-shadow: inset 0 0 0 1px var(--acc); }
+.inp.dim { color: var(--muted); }
+.hint { font-size: 10.5px; color: var(--muted); margin-top: 5px; }
+.del {
+  width: 100%; background: var(--st-drop-3); border: 0; color: var(--st-drop-11);
+  border-radius: 9px; padding: 10px; font-family: var(--f-s); font-size: 12.5px;
+  font-weight: 600; cursor: pointer; transition: filter .12s;
+}
+.del:hover { filter: brightness(1.1); }
+.del-confirm { font-size: 12px; color: var(--muted); margin-bottom: 9px; line-height: 1.5; }
+.del-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* An empty filter explains itself. "Films don't have a watching state" is a
+   real answer; an empty grid is not. */
+.whynot {
+  padding: 16px 12px; border: 1px dashed var(--bd); border-radius: 10px;
+  text-align: center; font-size: 12px; color: var(--muted); line-height: 1.6;
+  /* It is a sentence, not a container. A dashed box running the width of a
+     desktop window to hold eight words looks like a failure, not an answer. */
+  max-width: var(--measure);
+}
+.whynot a { color: var(--acc-t); font-weight: 600; }
+
+
+/* ---------------- tablet ----------------
+
+   700px to the desktop breakpoint: the gutter has already widened but the
+   three-column desktop layout has not arrived, so this band used to get the
+   phone layout stretched across a landscape window. Nothing here is new
+   structure — it is the phone's own components given sizes that suit the
+   width. Controls stop growing once they are big enough to hit; artwork keeps
+   growing, because artwork is what is being browsed.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 700px) and (max-width: 1119.98px) {
+
+  /* A card whose text stops at the measure but whose box runs to the window
+     is a half-empty box. The container follows the content. */
+  .card { max-width: calc(var(--measure) + 28px); }
+
+  /* Artwork keeps growing with the window; the rail still shows a half tile at
+     the edge, which is the only thing telling anyone the row scrolls. */
+  .rail .tile { width: 182px; }
+}
+
+
+/* ---------------- desktop ---------------- */
+
+@media (min-width: 1120px) {
+  /* Reading columns never go full width, however wide the screen. */
+
+  .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .rail .tile { width: 190px; }
+}
+
+
+@media (min-width: 700px) {
+  .scrim { align-items: center; }
+  .sheet { border-radius: 16px; border: 1px solid var(--bd); padding-bottom: 18px; }
+}
+
+@media (min-width: 1120px) {
+  /* The tab bar is gone up here, so the gap it was clearing is just a gap. */
+  .toast { bottom: 24px; }
+}

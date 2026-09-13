@@ -1,25 +1,25 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, NavLink, useLocation } from 'react-router-dom';
-import Discover from './routes/Discover.jsx';
-import SearchPage from './routes/SearchPage.jsx';
-// A module loads on demand, as its own chunk with its own stylesheet. The
-// route table is the only place that names one.
+// Every screen is a module, loaded on demand through its own index, as its own
+// chunk with its own stylesheet. This table is the only place a module is named.
+const Discover = lazy(() => import('./modules/discover'));
+const SearchPage = lazy(() => import('./modules/search'));
 const Title = lazy(() => import('./modules/title'));
-import Person from './routes/Person.jsx';
-import Cover from './routes/Cover.jsx';
-import Library from './routes/Library.jsx';
-import You from './routes/You.jsx';
-import Settings from './routes/Settings.jsx';
-import NotFound from './routes/NotFound.jsx';
-import About from './routes/About.jsx';
-import Auth from './routes/Auth.jsx';
+const Person = lazy(() => import('./modules/person'));
+const Library = lazy(() => import('./modules/library').then((m) => ({ default: m.Library })));
+const You = lazy(() => import('./modules/you').then((m) => ({ default: m.You })));
+const Settings = lazy(() => import('./modules/you').then((m) => ({ default: m.Settings })));
+const Cover = lazy(() => import('./modules/entry').then((m) => ({ default: m.Cover })));
+const Auth = lazy(() => import('./modules/entry').then((m) => ({ default: m.Auth })));
+// Small, static, and always present: no reason to split these out.
+import About from './app/About.jsx';
+import NotFound from './app/NotFound.jsx';
 import { useAuth } from './shared/auth/AuthProvider.jsx';
-import { hasSeenCover } from './lib/firstVisit.js';
+import { hasSeenCover } from './app/firstVisit.js';
 import ThemeToggle from './shared/theme/ThemeToggle.jsx';
 import './shared/theme/tokens.css';
 import './app/shell.css';
 import './shared/ui/ui.css';
-import './base.css';
 
 // Tabs appear only on top-level destinations — never on a title or person page,
 // which are places you arrive at and come back from.
@@ -84,6 +84,7 @@ function HomeOrCover() {
 
 export default function App() {
     return (
+        <Suspense fallback={null}>
         <Routes>
             <Route path="/welcome" element={<Cover />} />
             <Route path="/welcome/:mode" element={<Auth />} />
@@ -110,5 +111,6 @@ export default function App() {
                 }
             />
         </Routes>
+        </Suspense>
     );
 }

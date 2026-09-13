@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { person as fetchPerson } from '../shared/tmdb/endpoints.js';
-import { toPersonView } from '../shared/tmdb/view.js';
-import { useAsync } from '../shared/hooks/useAsync.js';
-import { Tile, Skeleton, Empty, initialsOf } from '../shared/ui/index.js';
-import SignInPrompt from '../components/SignInPrompt.jsx';
-import { useAuth } from '../shared/auth/AuthProvider.jsx';
-import { useLibrary, useTileStates, useQuickAdd } from '../context/LibraryProvider.jsx';
-import { collectionProgress } from '../lib/library.js';
+import { person as fetchPerson } from '../../shared/tmdb/endpoints.js';
+import { toPersonView } from '../../shared/tmdb/view.js';
+import { useAsync } from '../../shared/hooks/useAsync.js';
+import { Tile, Skeleton, Empty, initialsOf } from '../../shared/ui/index.js';
+import { SignInPrompt } from '../entry';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { useLibrary, useTileStates, useQuickAdd } from '../library';
+import { collectionProgress } from '../library';
+import './person.css';
 
 const year = (d) => (d ? new Date(d).getFullYear() : null);
 

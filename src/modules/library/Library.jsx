@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Poster, Tile, Skeleton, Empty, Toast } from '../shared/ui/index.js';
-import { useAuth } from '../shared/auth/AuthProvider.jsx';
-import { useLibrary } from '../context/LibraryProvider.jsx';
-import { posterUrl, yearOf } from '../shared/tmdb/view.js';
+import { Poster, Tile, Skeleton, Empty, Toast } from '../../shared/ui/index.js';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { useLibrary } from './LibraryProvider.jsx';
+import { posterUrl, yearOf } from '../../shared/tmdb/view.js';
 import {
     statusMeta, episodesWatched, runningOrder, nextUnwatched, epLabel, loadEntries, keyOf,
-} from '../lib/library.js';
-import { useAsync } from '../shared/hooks/useAsync.js';
+} from './library.js';
+import { useAsync } from '../../shared/hooks/useAsync.js';
+import './library.css';
 
 /* Which statuses get a chip. "All" is last and has no count of its own — the
    sum is already the sum of the others. */

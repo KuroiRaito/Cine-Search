@@ -7,14 +7,14 @@ import { useAsync } from '../../shared/hooks/useAsync.js';
 import { useRegion } from '../../shared/hooks/useRegion.js';
 import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, initialsOf } from '../../shared/ui/index.js';
 import { TitleSkeleton } from './TitleSkeleton.jsx';
-import SignInPrompt from '../../components/SignInPrompt.jsx';
-import Editor from '../../components/Editor.jsx';
+import { SignInPrompt } from '../entry';
+import { Editor } from '../library';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
-import { useLibrary, useTileStates, useQuickAdd } from '../../context/LibraryProvider.jsx';
+import { useLibrary, useTileStates, useQuickAdd } from '../library';
 import {
     statusMeta, statusTone, episodesWatched, isWatched, runningOrder, nextUnwatched,
     rememberSeasonRuntime,
-} from '../../lib/library.js';
+} from '../library';
 
 const displayName = (type, code) => {
     if (!code) return null;

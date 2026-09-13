@@ -1,0 +1,46 @@
+/* ============================================================
+   Discover — The home rails. Its own sign-up nudge, and the page-head actions the shell
+   takes over at desktop.
+
+   Classes introduced here belong to this module; `npm run verify` enforces it.
+   Its breakpoints live here too, so nothing outside decides how it looks.
+   ============================================================ */
+
+
+
+/* ---------------- sign-up card ---------------- */
+
+.card.signup { text-align: center; }
+.card.signup h2 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.card.signup p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+.card.signup .btn { width: 100%; }
+
+/* ---- Breakpoints. Carved out of base.css's cross-cutting tablet and
+        desktop blocks, into the module that owns the shape. ---- */
+
+
+/* ---------------- tablet ----------------
+
+   700px to the desktop breakpoint: the gutter has already widened but the
+   three-column desktop layout has not arrived, so this band used to get the
+   phone layout stretched across a landscape window. Nothing here is new
+   structure — it is the phone's own components given sizes that suit the
+   width. Controls stop growing once they are big enough to hit; artwork keeps
+   growing, because artwork is what is being browsed.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 700px) and (max-width: 1119.98px) {
+
+  /* The sign-in nudge is an aside, not a billboard. */
+  .card.signup { max-width: 480px; margin-inline: auto; }
+  .card.signup .btn { width: auto; min-width: 220px; }
+}
+
+
+/* ---------------- desktop ---------------- */
+
+@media (min-width: 1120px) {
+  /* The top bar already carries search, theme and sign-in. Repeating them in
+     the page heading is noise. */
+  .head-actions { display: none; }
+}

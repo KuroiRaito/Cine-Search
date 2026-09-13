@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Poster } from '../shared/ui/index.js';
-import { useLibrary } from '../context/LibraryProvider.jsx';
+import { Poster } from '../../shared/ui/index.js';
+import { useLibrary } from './LibraryProvider.jsx';
 import {
-    statusesFor, canRate, statusTone,
-    runningOrder, nextUnwatched, lastWatched, epLabel, episodesWatched,
-} from '../lib/library.js';
+    statusesFor, canRate, statusTone, runningOrder, nextUnwatched, lastWatched, epLabel, episodesWatched,
+} from './library.js';
+import './library.css';
 
 const dateText = (iso) => (iso
     ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })

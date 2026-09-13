@@ -1,0 +1,77 @@
+/* ============================================================
+   Library — The record: the library screen, the editor sheet, and every write.
+
+   Classes introduced here belong to this module; `npm run verify` enforces it.
+   Its breakpoints live here too, so nothing outside decides how it looks.
+   ============================================================ */
+
+
+
+/* ---------------- editor sheet ----------------
+   Arrived at from a title and returned to it. Never takes a URL of its own. */
+
+/* The sign-in sheet pads its own sides; this one lets each field do it, so the
+   segmented control can run edge to edge. */
+.sheet.editor { --sheet-pad: 14px; padding-inline: 0; max-height: 88vh; overflow-y: auto; }
+.sh-grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 0; }
+.sh-head { display: flex; align-items: center; gap: 9px; padding: 11px var(--sheet-pad); border-bottom: 1px solid var(--bd-sub); }
+.sh-po { width: 34px; flex: 0 0 auto; aspect-ratio: 2/3; border-radius: 5px; border: 1px solid var(--bd-sub); overflow: hidden; }
+.sh-po img { width: 100%; height: 100%; object-fit: cover; }
+.sh-po .noart { font-size: 7px; padding: 2px; }
+.sh-t { flex: 1; min-width: 0; }
+.sh-t b { display: block; font-size: 13px; font-weight: 700; line-height: 1.25; }
+.sh-t span { display: block; font-family: var(--f-m); font-size: 9.5px; color: var(--muted); }
+
+.fld { padding: 12px var(--sheet-pad) 0; }
+.fld2 { padding: 12px var(--sheet-pad) 0; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.fld label, .fld2 label { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 7px; }
+
+/* Remove is isolated in the footer and confirms. Everything above it is one
+   tap from undoable; this is not. */
+.sh-foot { padding: var(--sheet-pad) var(--sheet-pad) 4px; margin-top: 6px; border-top: 1px solid var(--bd-sub); }
+
+/* ---------------- library ---------------- */
+
+/* Counts, not stacked sections: sections work at 40 titles and collapse at 400.
+   The count is what makes the shape of a library readable without scrolling. */
+.chips { display: flex; gap: 6px; overflow-x: auto; padding: 12px var(--gutter) 0; scrollbar-width: none; }
+.chips::-webkit-scrollbar { height: 0; }
+.chip {
+  flex: 0 0 auto; font-family: var(--f-s); font-size: 12.5px; font-weight: 500;
+  padding: 6px 13px; border-radius: 99px; border: 0; cursor: pointer;
+  background: var(--ink-3); color: var(--muted); white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.chip em { font-style: normal; opacity: .5; margin-left: 4px; font-variant-numeric: tabular-nums; }
+.chip:hover { background: var(--ink-4); color: var(--text); }
+.chip[aria-pressed="true"] { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
+.chip[aria-pressed="true"] em { opacity: .65; }
+
+.grp { margin: 15px var(--gutter) 0; }
+.grp-h { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; gap: 10px; }
+.grp-h b { font-family: var(--f-d); font-size: 14px; font-weight: 700; letter-spacing: -.02em; color: var(--text); }
+.grp-h span { font-size: 11.5px; color: var(--muted); }
+
+/* Series are rows and films are a grid, inside one filter. A series carries
+   progress, which a poster cannot show and a row can. */
+.srow {
+  display: flex; gap: 10px; padding: 10px; border: 1px solid var(--bd); border-radius: 10px;
+  background: var(--surface); position: relative; overflow: hidden; align-items: stretch;
+}
+.srow + .srow { margin-top: 7px; }
+.srow:hover { background: var(--surface-hv); }
+.srow .th { width: 40px; flex: 0 0 auto; aspect-ratio: 2/3; border-radius: 5px; border: 1px solid var(--bd-sub); overflow: hidden; background: var(--ink-4); }
+.srow .th img { width: 100%; height: 100%; object-fit: cover; }
+.srow .th .noart { font-size: 7px; padding: 2px; }
+.srow .bd { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; justify-content: center; }
+.srow .nm { font-size: 12.5px; font-weight: 600; line-height: 1.25; }
+.srow .ep { font-family: var(--f-m); font-size: 10px; color: var(--muted); }
+.plus {
+  width: 32px; height: 32px; flex: 0 0 auto; align-self: center; border-radius: 99px; border: 0;
+  background: var(--acc); color: var(--on-acc); font-size: 16px; cursor: pointer;
+  display: grid; place-items: center; transition: filter .12s;
+}
+.plus:hover { filter: brightness(1.08); }
+.plus:disabled { opacity: .4; cursor: default; }
+.track { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--ink-5); }
+.track i { display: block; height: 100%; background: var(--acc); transition: width .18s; }

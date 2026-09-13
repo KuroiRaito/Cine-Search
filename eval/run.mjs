@@ -79,7 +79,7 @@ async function main() {
     const { setFetchImpl } = await import('../src/lib/client-shim.mjs');
     setFetchImpl(await makeCachingFetch({ refresh: REFRESH }));
 
-    const { search } = await import('../src/lib/search/index.js');
+    const { search } = await import('../src/modules/search/lib/index.js');
     const searchOrDiscover = (q, mediaType, o) => search(q, { ...o, mediaType }, { variant: VARIANT_PATH });
 
     console.log(`\n  ${queries.length} queries · variant "${VARIANT}" · cache ${REFRESH ? 'REFRESH' : 'on'} · tmdb: ${getMode()}`);

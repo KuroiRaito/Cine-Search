@@ -10,7 +10,7 @@
 // year, page two — falls through to v1 unchanged, so no path gets worse than
 // the measured baseline. Measured, not assumed: the eval harness scores both.
 import { search as searchV1 } from '../v1.js';
-import { searchMulti } from '../../../shared/tmdb/endpoints.js';
+import { searchMulti } from '../../../../shared/tmdb/endpoints.js';
 import { DEFAULT_SEARCH_OPTS } from '../types.js';
 
 export async function search(query, opts = {}, { signal } = {}) {

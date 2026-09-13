@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { useAuth } from '../shared/auth/AuthProvider.jsx';
-import * as api from '../lib/library.js';
-import { statusMeta, statusTone } from '../lib/library.js';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import * as api from './library.js';
+import { statusMeta, statusTone } from './library.js';
 
 const LibraryContext = createContext(null);
 

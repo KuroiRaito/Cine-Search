@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import { AuthProvider } from './shared/auth/AuthProvider.jsx';
-import { LibraryProvider } from './context/LibraryProvider.jsx';
+import { LibraryProvider } from './modules/library';
 import { restoreTheme } from './shared/theme/theme.js';
 
 // Before first paint, so a stored choice never flashes the other theme.

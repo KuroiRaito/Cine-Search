@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { trending } from '../shared/tmdb/endpoints.js';
-import { posterUrl } from '../shared/tmdb/view.js';
-import { useAsync } from '../shared/hooks/useAsync.js';
-import { markSeen } from '../lib/firstVisit.js';
-import ThemeToggle from '../shared/theme/ThemeToggle.jsx';
+import { trending } from '../../shared/tmdb/endpoints.js';
+import { posterUrl } from '../../shared/tmdb/view.js';
+import { useAsync } from '../../shared/hooks/useAsync.js';
+import { markSeen } from '../../app/firstVisit.js';
+import ThemeToggle from '../../shared/theme/ThemeToggle.jsx';
+import './entry.css';
 
 /**
  * First visit only. Skippable, and it never comes back.

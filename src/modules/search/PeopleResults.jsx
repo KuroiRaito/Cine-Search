@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { PersonRow } from '../shared/ui/index.js';
-import { useAuth } from '../shared/auth/AuthProvider.jsx';
-import { useLibrary } from '../context/LibraryProvider.jsx';
-import { searchPerson, person as fetchPerson } from '../shared/tmdb/endpoints.js';
-import { toPersonView, profileUrl, roleForJob } from '../shared/tmdb/view.js';
+import { PersonRow } from '../../shared/ui/index.js';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { useLibrary } from '../library';
+import { searchPerson, person as fetchPerson } from '../../shared/tmdb/endpoints.js';
+import { toPersonView, profileUrl, roleForJob } from '../../shared/tmdb/view.js';
 import {
     collectionProgress, totalsFromView, totalsAreFresh, personTotalsGet, personTotalsSet,
     creditsForPeople, isSeen,
-} from '../lib/library.js';
+} from '../library';
 
 /**
  * Whether a search result plausibly names someone.

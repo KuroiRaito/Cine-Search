@@ -1,0 +1,13 @@
+/* ============================================================
+   Search — Query, results, and the people who match.
+
+   Classes introduced here belong to this module; `npm run verify` enforces it.
+   Its breakpoints live here too, so nothing outside decides how it looks.
+   ============================================================ */
+
+
+
+/* ---------------- search box ---------------- */
+
+.searchbox-wrap { margin-top: 12px; }
+.grid.results { margin-top: 16px; }

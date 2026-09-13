@@ -36,3 +36,10 @@ returned as integers; the shape they take is decided where they are drawn.
 - Rewatch semantics remain open from M2 grooming: do episode ticks clear per
   pass or persist? The hours multiply by `rewatch_count`, so the question now
   has a visible consequence.
+
+## Seeing it
+
+```bash
+npm run snap -- you            # screenshots at 390 / 900 / 1280, both themes
+npm run snap -- you --check    # did anything move that shouldn't have?
+```

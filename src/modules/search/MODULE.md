@@ -37,3 +37,10 @@ labels, and committed runs.
   tolerance; the golden set already contains "intersteller", and the measured
   typo score is 95% null-and-low.
 - The eval harness scores titles only; the people results are unmeasured.
+
+## Seeing it
+
+```bash
+npm run snap -- search            # screenshots at 390 / 900 / 1280, both themes
+npm run snap -- search --check    # did anything move that shouldn't have?
+```

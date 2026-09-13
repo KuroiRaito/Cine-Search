@@ -31,3 +31,10 @@ import Person from '../modules/person';
   filter are the obvious next controls.
 - Known cost of the 200-vote threshold: Emilia Clarke reads 12 rather than the
   ~20 a viewer would name. Nowhere explains why.
+
+## Seeing it
+
+```bash
+npm run snap -- person            # screenshots at 390 / 900 / 1280, both themes
+npm run snap -- person --check    # did anything move that shouldn't have?
+```

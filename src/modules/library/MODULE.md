@@ -45,3 +45,10 @@ anything about libraries.
 `library.js` is still one file doing four jobs — vocabulary, transport,
 arithmetic, cache. Splitting it into `statuses.js` / `api.js` / `progress.js`
 is mechanical and was deliberately deferred so the module move stayed a move.
+
+## Seeing it
+
+```bash
+npm run snap -- library            # screenshots at 390 / 900 / 1280, both themes
+npm run snap -- library --check    # did anything move that shouldn't have?
+```

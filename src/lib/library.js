@@ -57,6 +57,20 @@ export const canRate = (status) => status === 'watched' || status === 'rewatchin
  */
 export const isSeen = (entry) => canRate(entry?.status);
 
+/**
+ * How much of one body of work has been watched.
+ *
+ * Shared by the person page, the search results and the taste cards so that all
+ * three answer the same question the same way. Three places quoting different
+ * fractions for the same person would be worse than none of them quoting any.
+ */
+export function collectionProgress(role, entryFor) {
+    const total = role?.items.length ?? 0;
+    const seen = (role?.items ?? [])
+        .filter((it) => isSeen(entryFor(it.mediaType, it.id))).length;
+    return { seen, total, pct: total ? Math.round((seen / total) * 100) : 0 };
+}
+
 export const keyOf = (mediaType, id) => `${mediaType}-${id}`;
 
 /** Half points, 0.5 to 10 — the range the database's own check constraint allows. */

@@ -7,7 +7,7 @@ import { Tile, Skeleton, Empty, initialsOf } from '../components/ui.jsx';
 import SignInPrompt from '../components/SignInPrompt.jsx';
 import { useAuth } from '../context/AuthProvider.jsx';
 import { useLibrary } from '../context/LibraryProvider.jsx';
-import { isSeen } from '../lib/library.js';
+import { collectionProgress } from '../lib/library.js';
 
 const year = (d) => (d ? new Date(d).getFullYear() : null);
 
@@ -66,11 +66,7 @@ export default function Person() {
 
     // Free: the credits were fetched to draw this page, and the library is
     // already in memory. No request is made to work this out.
-    const seen = active
-        ? active.items.filter((it) => isSeen(lib.entryFor(it.mediaType, it.id))).length
-        : 0;
-    const total = active?.items.length ?? 0;
-    const pct = total ? Math.round((seen / total) * 100) : 0;
+    const { seen, total, pct } = collectionProgress(active, lib.entryFor);
 
     return (
         <div className="page">

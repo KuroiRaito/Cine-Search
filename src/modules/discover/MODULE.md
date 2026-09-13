@@ -23,3 +23,10 @@ import Discover from '../modules/discover';   // the route component
   "because you watched" rail — the second is buildable from `taste_summary`.
 - `.head-actions` duplicates controls the shell's top bar owns at desktop. One
   of the two should go.
+
+## Seeing it
+
+```bash
+npm run snap -- discover            # screenshots at 390 / 900 / 1280, both themes
+npm run snap -- discover --check    # did anything move that shouldn't have?
+```

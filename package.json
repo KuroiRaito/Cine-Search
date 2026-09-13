@@ -17,7 +17,8 @@
     "eval:label": "node --env-file=.env eval/label-server.mjs",
     "eval:bench": "vite-node eval/bench.mjs --",
     "test:api": "node scripts/smoke-api.mjs",
-    "verify": "node scripts/verify.mjs"
+    "verify": "node scripts/verify.mjs",
+    "snap": "node scripts/snap.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",
@@ -34,6 +35,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "playwright": "^1.63.0",
     "vite": "^7.3.1",
     "vite-node": "^6.0.0"
   }

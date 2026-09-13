@@ -14,3 +14,8 @@ eval/.cache/
 
 # supabase cli scratch
 supabase/.temp/
+
+# snapshots
+# The images are for looking at locally — regenerate with `npm run snap`.
+# A full sweep is >100 full-page PNGs; only the fingerprints are committed.
+snapshots/**/*.png

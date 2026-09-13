@@ -54,3 +54,10 @@ design decision, not a refactor.
 - "Jump to episode" was deferred at grooming.
 - There is no card for *your* history with the title (started, finished,
   rewatches, notes), which is the one thing no other film app can show.
+
+## Seeing it
+
+```bash
+npm run snap -- title            # screenshots at 390 / 900 / 1280, both themes
+npm run snap -- title --check    # did anything move that shouldn't have?
+```

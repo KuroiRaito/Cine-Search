@@ -26,3 +26,10 @@ raises it, naming the title and the verb of the control that was tapped.
 
 Complete as designed. The one open item is the owner's: leaked-password
 protection in Supabase Auth.
+
+## Seeing it
+
+```bash
+npm run snap -- entry            # screenshots at 390 / 900 / 1280, both themes
+npm run snap -- entry --check    # did anything move that shouldn't have?
+```

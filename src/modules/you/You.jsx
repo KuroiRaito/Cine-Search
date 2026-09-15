@@ -18,7 +18,7 @@ import './you.css';
  * watched and not a game you can be losing.
  */
 export default function You() {
-    const { isSignedIn, profile } = useAuth();
+    const { isSignedIn, authReady, profile } = useAuth();
     const lib = useLibrary();
     const [order, setOrder] = useState('count');
 
@@ -32,7 +32,9 @@ export default function You() {
     // hooks do not get to be conditional.
     const filmographies = usePersonTotals(data?.people);
 
-    if (!isSignedIn) {
+    // Same order, same reason as Library: "we don't know yet" is not "you are
+    // a guest", and only one of the two is worth showing someone.
+    if (authReady && !isSignedIn) {
         return (
             <div className="page">
                 <div className="page-head"><h1>You</h1></div>
@@ -49,7 +51,7 @@ export default function You() {
     // after the first render, so there is a frame where nothing is loading and
     // nothing has loaded. Treating that as loaded shows an empty library to
     // someone who has one.
-    if (loading || (!data && !error)) {
+    if (!authReady || loading || (!data && !error)) {
         return (
             <div className="page">
                 <div className="page-head"><h1>{profile?.username || 'You'}</h1></div>

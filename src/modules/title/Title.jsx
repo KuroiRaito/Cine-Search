@@ -57,7 +57,7 @@ export default function Title() {
     const [editing, setEditing] = useState(false);
     const [toast, setToast] = useState(null);
     const dismissToast = useCallback(() => setToast(null), []);
-    const { isSignedIn } = useAuth();
+    const { isSignedIn, authReady } = useAuth();
     const lib = useLibrary();
     const stateFor = useTileStates();
     const quickAdd = useQuickAdd((item) => setPrompt({ title: item.title, poster: item.poster, action: 'save' }));
@@ -102,7 +102,13 @@ export default function Title() {
     // The verb follows the control, not the page. A guest tapping the heart was
     // being asked "Track this series?" — the same mismatch the sign-in sheet was
     // built to avoid, reintroduced by a single default.
-    const gate = (verb, fn) => (isSignedIn ? fn() : ask(verb));
+    // A tap in the second before the session answer arrives does nothing
+    // rather than raising a sign-in sheet at someone who is already signed in.
+    const gate = (verb, fn) => {
+        if (isSignedIn) return fn();
+        if (authReady) return ask(verb);
+        return undefined;
+    };
     const primaryVerb = isTV ? 'track' : 'want';
 
     const order = isTV ? runningOrder(t.seasons, t.airedEpisodes) : [];
@@ -391,7 +397,7 @@ export default function Title() {
 }
 
 function Episodes({ title, entry, onTick, onMarkSeason }) {
-    const { isSignedIn } = useAuth();
+    const { isSignedIn, authReady } = useAuth();
     const [prompt, setPrompt] = useState(null);
     const tabs = [...title.seasons, ...(title.specials ? [title.specials] : [])];
     const [active, setActive] = useState(tabs[0]?.season_number ?? 1);
@@ -422,7 +428,7 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
 
     const tick = (e, on) => {
         if (!isSignedIn) {
-            setPrompt({ title: title.title, poster: title.poster, action: 'watched' });
+            if (authReady) setPrompt({ title: title.title, poster: title.poster, action: 'watched' });
             return;
         }
         onTick(active, e.number, on);
@@ -430,7 +436,7 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
 
     const markAll = () => {
         if (!isSignedIn) {
-            setPrompt({ title: title.title, poster: title.poster, action: 'watched' });
+            if (authReady) setPrompt({ title: title.title, poster: title.poster, action: 'watched' });
             return;
         }
         onMarkSeason(active, aired.map((e) => e.number), !allSeen);

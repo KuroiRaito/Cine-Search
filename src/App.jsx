@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, NavLink, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, NavLink, Link, useLocation } from 'react-router-dom';
 // Every screen is a module, loaded on demand through its own index, as its own
 // chunk with its own stylesheet. This table is the only place a module is named.
 const Discover = lazy(() => import('./modules/discover'));
@@ -34,7 +34,7 @@ const isTopLevel = (pathname) => TABS.some((t) => t.to === pathname);
 
 function Shell({ children }) {
     const { pathname } = useLocation();
-    const { isSignedIn, profile } = useAuth();
+    const { isSignedIn, authReady, profile, sessionEnded, dismissSessionEnded } = useAuth();
     const showTabs = isTopLevel(pathname);
 
     return (
@@ -52,11 +52,28 @@ function Shell({ children }) {
                     </nav>
                     <span className="topbar-spacer" />
                     <ThemeToggle />
-                    {isSignedIn
-                        ? <NavLink to="/you" className="btn quiet">{profile?.username || 'You'}</NavLink>
-                        : <NavLink to="/welcome/signin" state={{ from: pathname }} className="btn quiet">Sign in</NavLink>}
+                    {/* Neither "Sign in" nor a username until the session
+                        question has an answer. Offering a signed-in person a
+                        sign-in button for a second is the app telling them it
+                        has forgotten who they are. */}
+                    {!authReady ? <span className="btn quiet is-waiting" aria-hidden="true" />
+                        : isSignedIn
+                            ? <NavLink to="/you" className="btn quiet">{profile?.username || 'You'}</NavLink>
+                            : <NavLink to="/welcome/signin" state={{ from: pathname }} className="btn quiet">Sign in</NavLink>}
                 </div>
             </header>
+
+            {/* A session that ended on its own — a refresh token revoked,
+                expired or used twice. The person did not sign out, so dropping
+                them onto a guest screen without a word reads as the app losing
+                their library rather than their session. */}
+            {sessionEnded && (
+                <p className="session-note" role="status">
+                    Your session ended.{' '}
+                    <Link to="/welcome/signin" state={{ from: pathname }}>Sign in again</Link> to see your library.
+                    <button type="button" onClick={dismissSessionEnded} aria-label="Dismiss">×</button>
+                </p>
+            )}
 
             <main className="app-main">{children}</main>
 
@@ -82,15 +99,34 @@ function HomeOrCover() {
     return hasSeenCover() ? <Discover /> : <Navigate to="/welcome" replace />;
 }
 
+/**
+ * An account with no profile row is a real state, not a corrupt one: Supabase
+ * makes the account and we make the profile, so anything that interrupts the
+ * gap between them lands here. It used to be a dead end — the person was signed
+ * in, nameless, and the only screen that could fix it was the one that told
+ * them their email was already registered. Now there is one thing left to do
+ * and the app asks for it, wherever they are.
+ */
+function RequireProfile({ children }) {
+    const { needsUsername } = useAuth();
+    const { pathname } = useLocation();
+    if (needsUsername && !pathname.startsWith('/welcome')) {
+        return <Navigate to="/welcome/username" replace state={{ from: pathname }} />;
+    }
+    return children;
+}
+
 export default function App() {
     return (
         <Suspense fallback={null}>
         <Routes>
             <Route path="/welcome" element={<Cover />} />
             <Route path="/welcome/:mode" element={<Auth />} />
+            <Route path="/welcome/*" element={<Navigate to="/welcome/signin" replace />} />
             <Route
                 path="*"
                 element={
+                    <RequireProfile>
                     <Shell>
                         {/* A module arrives with its own CSS; until it does the
                             shell holds the space rather than flashing a spinner. */}
@@ -108,6 +144,7 @@ export default function App() {
                         </Routes>
                         </Suspense>
                     </Shell>
+                    </RequireProfile>
                 }
             />
         </Routes>

@@ -1,8 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { trending } from '../../shared/tmdb/endpoints.js';
 import { posterUrl } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { markSeen } from '../../app/firstVisit.js';
+import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import ThemeToggle from '../../shared/theme/ThemeToggle.jsx';
 import './entry.css';
 
@@ -18,10 +19,19 @@ import './entry.css';
  */
 export default function Cover() {
     const navigate = useNavigate();
+    const { authReady, isSignedIn } = useAuth();
     const { data } = useAsync(
         ({ signal }) => trending('week', { signal }).then((r) => r.filter((x) => x.poster_path).slice(0, 12)),
         [],
     );
+
+    // A signed-in person has no business being pitched the product. This is
+    // reachable: clearing site data leaves the cover flag gone and the session
+    // intact, and so does anyone typing the URL.
+    if (authReady && isSignedIn) {
+        markSeen();
+        return <Navigate to="/" replace />;
+    }
 
     const go = (to) => { markSeen(); navigate(to, { replace: true }); };
 

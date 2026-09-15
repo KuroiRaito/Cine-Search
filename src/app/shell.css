@@ -194,3 +194,26 @@ img { max-width: 100%; display: block; }
 
   .app-main { padding-bottom: 40px; }
 }
+
+/* Said by the app about the app, not about anything the person typed:
+   a session that ended on its own. */
+.session-note {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--st-hold-3); color: var(--st-hold-11);
+  border-radius: 9px; padding: 9px 12px; font-size: 12.5px;
+  margin: 10px var(--gutter) 0;
+}
+.session-note a { color: inherit; font-weight: 700; text-decoration: underline; }
+.session-note button {
+  margin-left: auto; background: none; border: 0; color: inherit;
+  font-size: 15px; line-height: 1; padding: 2px 4px; cursor: pointer; opacity: .7;
+}
+.session-note button:hover { opacity: 1; }
+
+/* The gap where the sign-in button or the username will go, once the session
+   question has an answer. Holding the space is the difference between a bar
+   that is thinking and a bar that jumps. */
+.btn.quiet.is-waiting {
+  display: inline-block; min-width: 68px; height: 30px;
+  background: var(--surface); box-shadow: none; pointer-events: none;
+}

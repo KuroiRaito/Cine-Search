@@ -47,29 +47,77 @@
     "elements": 30,
     "hash": "2cebb5f9"
   },
+  "entry/forgot@1280-dark": {
+    "elements": 15,
+    "hash": "12bb623"
+  },
+  "entry/forgot@1280-light": {
+    "elements": 15,
+    "hash": "12bb623"
+  },
+  "entry/forgot@390-dark": {
+    "elements": 15,
+    "hash": "169f484"
+  },
+  "entry/forgot@390-light": {
+    "elements": 15,
+    "hash": "169f484"
+  },
+  "entry/forgot@900-dark": {
+    "elements": 15,
+    "hash": "a10cb5b"
+  },
+  "entry/forgot@900-light": {
+    "elements": 15,
+    "hash": "a10cb5b"
+  },
   "entry/signin@1280-dark": {
-    "elements": 18,
-    "hash": "321a4a95"
+    "elements": 22,
+    "hash": "a0b223ac"
   },
   "entry/signin@1280-light": {
-    "elements": 18,
-    "hash": "321a4a95"
+    "elements": 22,
+    "hash": "a0b223ac"
   },
   "entry/signin@390-dark": {
-    "elements": 18,
-    "hash": "9a8821d5"
+    "elements": 22,
+    "hash": "e58cfad7"
   },
   "entry/signin@390-light": {
-    "elements": 18,
-    "hash": "9a8821d5"
+    "elements": 22,
+    "hash": "e58cfad7"
   },
   "entry/signin@900-dark": {
-    "elements": 18,
-    "hash": "7503fc20"
+    "elements": 22,
+    "hash": "3845a8c9"
   },
   "entry/signin@900-light": {
-    "elements": 18,
-    "hash": "7503fc20"
+    "elements": 22,
+    "hash": "3845a8c9"
+  },
+  "entry/signup@1280-dark": {
+    "elements": 34,
+    "hash": "4ce7e69e"
+  },
+  "entry/signup@1280-light": {
+    "elements": 34,
+    "hash": "4ce7e69e"
+  },
+  "entry/signup@390-dark": {
+    "elements": 34,
+    "hash": "ea5aafc"
+  },
+  "entry/signup@390-light": {
+    "elements": 34,
+    "hash": "ea5aafc"
+  },
+  "entry/signup@900-dark": {
+    "elements": 34,
+    "hash": "954d394e"
+  },
+  "entry/signup@900-light": {
+    "elements": 34,
+    "hash": "954d394e"
   },
   "library/library@1280-dark": {
     "elements": 53,

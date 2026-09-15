@@ -120,6 +120,36 @@
   border-radius: 9px; padding: 10px 12px; font-size: 12.5px; margin-bottom: 14px;
 }
 
+/* A problem with one field belongs under that field, not in a single line at
+   the bottom that makes you work out which of three inputs it meant. */
+.field-error {
+  display: block; margin-top: 6px; font-size: 11.5px; font-weight: 500;
+  color: var(--st-drop-11); line-height: 1.5;
+}
+.field-error + .searchbox, .field:has(.field-error) .searchbox {
+  box-shadow: inset 0 0 0 1px var(--st-drop-9);
+}
+
+/* The password field and the control that reveals it are one object. */
+.pw-wrap { position: relative; display: block; }
+.pw-wrap .searchbox { padding-right: 58px; }
+.pw-peek {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: none; border: 0; padding: 4px 8px; border-radius: 6px;
+  font-size: 11.5px; font-weight: 600; color: var(--muted); cursor: pointer;
+}
+.pw-peek:hover { color: var(--text); background: var(--surface-hv); }
+
+/* Requirements you watch yourself meet, rather than a rule read out after
+   you have already failed it. */
+.pw-rules { list-style: none; margin: -4px 0 16px; padding: 0; display: grid; gap: 5px; }
+.pw-rules li {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11.5px; color: var(--muted); transition: color .12s ease;
+}
+.pw-rules li span { width: 12px; text-align: center; font-size: 10px; }
+.pw-rules li.met { color: var(--st-done-11); }
+
 .auth-alt { margin-top: 16px; font-size: 12.5px; color: var(--muted); text-align: center; }
 .auth-alt a { color: var(--acc-t); font-weight: 600; }
 

@@ -63,13 +63,40 @@ already have.
   them: eight characters and four character classes, ticked off as you type.
 - An account with no username is asked for one, wherever in the app it is.
 
+## Every state, and how to look at one
+
+`docs/foundations.html` §12 numbers 38 states across four screens. 35 of them
+are driven by `npm run auth`, which runs the real app against Supabase
+responses recorded off this project — no credentials, no network, no test
+accounts left behind.
+
+```bash
+npm run auth              # 35 cases
+npm run auth -- --shots   # and a screenshot of each, to snapshots/auth/
+npm run auth -- 26 29     # just those
+```
+
+`--shots` is the only way to look at an error state without causing one. The
+states that are hard to reach by hand — a revoked refresh token, a 429, a
+username collision mid-sign-up, a profile write that failed after the account
+was made — each have a numbered case and a photograph.
+
+Three of the 38 are not machine-checked, and each has a reason:
+
+| # | State | Why not |
+| --- | --- | --- |
+| I10 | Autofilled | Needs a real password manager. The CSS that keeps the ring visible through Chrome's yellow wash is in `entry.css`. |
+| I14 | Keyboard open at 320×568 | Needs a device keyboard, not a viewport. |
+| C4/C5 | Light theme, reduced motion | Covered by `npm run snap -- entry`, which shoots both themes. |
+
 ## Known headroom
 
 - **The action that started it is not replayed.** A guest taps ♥, signs up, and
   lands back on the title with the heart still empty. They return to the right
   page; the thing they were doing does not complete. This is the oldest promise
   in the module — `SignInPrompt` has carried a comment about it since M1 — and
-  it is a product decision, not a bug, so it is left for the design pass.
+  it is the last thing in entry that is a decision rather than a defect: what
+  the title page should *do* on the way back is a design answer.
 - **`006_username.sql` is not applied yet.** Until it is, `Raman` and `raman`
   are two different usernames, and a collision is caught after the account is
   created rather than before. The flow handles both; applying it makes the
@@ -80,8 +107,9 @@ already have.
 ## Seeing it
 
 ```bash
-npm run auth                     # 25 cases: every way this can go wrong
+npm run auth                     # 35 cases: every way this can go wrong
+npm run auth -- --shots          # and a photograph of each state
 npm run auth -- --show 15        # what case 15 actually rendered
-npm run snap -- entry            # screenshots at 390 / 900 / 1280, both themes
+npm run snap -- entry            # cover / signin / signup / forgot, both themes
 npm run snap -- entry --check    # did anything move that shouldn't have?
 ```

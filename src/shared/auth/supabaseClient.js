@@ -28,6 +28,7 @@ function createUnconfiguredClient() {
             signUp: async () => notConfigured(),
             signInWithPassword: async () => notConfigured(),
             signOut: async () => ({ error: null }),
+            resend: async () => notConfigured(),
             resetPasswordForEmail: async () => notConfigured(),
             updateUser: async () => notConfigured(),
         },

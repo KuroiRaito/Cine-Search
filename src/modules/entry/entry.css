@@ -84,7 +84,15 @@
   transform: rotate(-8deg) scale(1.35); transform-origin: center;
   opacity: .5;
 }
-.mosaic-cell { background-size: cover; background-position: center; border-radius: var(--radius-8); }
+/* C2 — artwork loading. The cells are laid out and coloured before any image
+   arrives, so the mosaic fades in behind copy that is already final. Nothing
+   reflows: the person may already be reaching for "Create account". */
+.mosaic-cell {
+  background-color: var(--surface-hv);
+  background-size: cover; background-position: center; border-radius: var(--radius-8);
+  opacity: 0; transition: opacity var(--dur-slow) var(--ease-out);
+}
+.mosaic-cell.on { opacity: 1; }
 
 /* The fallback when artwork never arrives. The cover is not broken without
    it, only plainer, so nothing announces an error. */
@@ -172,6 +180,9 @@
   font-size: var(--text-label); line-height: var(--lh-label);
   font-weight: 600; color: var(--muted);
 }
+/* The label and anything that belongs to this field share one row. */
+.field-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-12); }
+.field-aside { font-weight: 600; color: var(--acc-t); }
 
 /* Hint and error share one slot, and the slot is reserved at render rather
    than inserted on failure — otherwise every field below jumps down the
@@ -200,17 +211,53 @@
   display: grid; place-items: center;
   font-size: var(--text-caption); font-weight: 700;
 }
+/* It takes focus when it appears, and a focus ring is how anyone can tell.
+   Removing the outline here without a replacement is the one thing §05 forbids. */
+.auth-error:focus-visible { outline: var(--border-focus) solid var(--acc); outline-offset: var(--space-2); }
+.auth-error a { color: inherit; font-weight: 700; text-decoration: underline; }
 
-/* A problem with one field belongs under that field, not in a single line at
-   the bottom that makes you work out which of three inputs it meant.
-   No margin: .field is a flex column and its gap owns the spacing. */
-.field-error {
-  font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 500;
-  color: var(--st-drop-11);
+/* U4 — the flow succeeded and cannot finish here. One icon, one sentence,
+   one action; centred, because there is nothing to compare it against. */
+.auth-done { text-align: center; }
+.auth-done .auth-lede { margin-bottom: var(--space-24); }
+.done-mark {
+  width: var(--space-48); height: var(--space-48); margin: 0 auto var(--space-16);
+  border-radius: var(--radius-full); background: var(--st-done-3); color: var(--st-done-11);
+  display: grid; place-items: center; font-size: var(--text-title-sm); font-weight: 700;
 }
-/* The error span follows the input, so `.field-error + .searchbox` could never
-   match — :has is the one that does the work. */
-.field:has(.field-error) .searchbox { box-shadow: inset 0 0 0 var(--border-focus) var(--st-drop-9); }
+.auth-done .auth-error { text-align: left; margin-top: var(--space-12); }
+
+/* Caps Lock, and anything else that is worth saying but is not a fault.
+   Deliberately not in the hint slot: the hint slot is where problems go, and
+   colouring this one like a problem would say something is wrong when nothing
+   is. Foundations §12, I9. */
+.field-note {
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  color: var(--muted); font-weight: 500;
+}
+
+/* A password manager paints its own background over the field, and Chrome's
+   is an opaque wash that hides an inset ring entirely — the one state where
+   the person most needs to see the field is autofill. A large inset shadow in
+   the field's own colour repaints the ground, and the ring rides on top. */
+.searchbox:-webkit-autofill,
+.searchbox:-webkit-autofill:hover,
+.searchbox:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  box-shadow: inset 0 0 0 var(--space-40) var(--bg-sub), inset 0 0 0 var(--border-hair) var(--bd-sub);
+}
+.searchbox:-webkit-autofill:focus {
+  box-shadow: inset 0 0 0 var(--space-40) var(--bg-sub), inset 0 0 0 var(--border-focus) var(--acc);
+}
+.searchbox[aria-invalid="true"]:-webkit-autofill {
+  box-shadow: inset 0 0 0 var(--space-40) var(--bg-sub), inset 0 0 0 var(--border-focus) var(--st-drop-9);
+}
+
+/* I3 / U9 — submitting. Dimmed and frozen, never `disabled`: a disabled field
+   leaves the tab order, so the keyboard jumps somewhere unrelated for the
+   second the request takes and the person loses their place. */
+.auth-form.busy .field,
+.auth-form.busy .pw-rules { opacity: .6; pointer-events: none; }
 
 /* The password field and the control that reveals it are one object. The
    input reserves room on the right so the two never overlap. */
@@ -242,6 +289,11 @@
   color: var(--muted); text-align: center;
 }
 .auth-alt a { color: var(--acc-t); font-weight: 600; }
+/* Leaving without an account is a way out, not a third thing being offered.
+   Three accent links in a stack under the button read as three equal choices,
+   and one of them is the one we are not asking anyone to take. */
+.auth-alt.quiet a { color: var(--muted); font-weight: 500; }
+.auth-alt.quiet a:hover { color: var(--text); }
 
 /* ============================================================
    Breakpoints. Two queries, matching the system's two — the cover used
@@ -250,6 +302,9 @@
    ============================================================ */
 
 @media (min-width: 600px) {
+  /* S5 — a sheet is a fixed surface. With a pointer there is nothing to drag,
+     and nothing anchoring it to the bottom edge, so it becomes a dialog in the
+     middle of the screen with all four corners rounded. */
   .grab { display: none; }
 
   .cover-in {

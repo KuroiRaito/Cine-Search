@@ -83,14 +83,45 @@ export function humanError(error) {
  * different problems wearing the same response.
  */
 export function signUpOutcome({ data, error }) {
-    if (error) return { kind: 'error', message: humanError(error) };
+    if (error) return { kind: 'error', message: humanError(error), reason: failureKind(error) };
     // Supabase's anti-enumeration answer when email confirmation is on: a user
     // object that looks real, with no identities behind it. This project has
     // confirmation off and gets a proper error instead — but the toggle is one
     // click away, and this is what the day after that click looks like.
     if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-        return { kind: 'error', message: 'That email already has an account. Sign in instead.' };
+        return { kind: 'error', message: 'That email already has an account. Sign in instead.', reason: 'email-taken' };
     }
     if (!data?.session) return { kind: 'confirm-email' };
     return { kind: 'signed-in', user: data.user };
 }
+
+/**
+ * What the form has to *do* about a failure, as distinct from what it says.
+ *
+ * Three of the twelve messages change the submit button rather than only
+ * sitting above it: offline relabels it "Try again", a rate limit disables it
+ * until the wait elapses, and bad credentials clear the password and ring the
+ * field. Deriving that from the message text would put the behaviour back on
+ * prose, which is the thing keying on codes was meant to stop.
+ */
+export function failureKind(error) {
+    if (!error) return null;
+    const code = error.code || '';
+    const m = String(error.message || '').toLowerCase();
+
+    if (code === 'over_request_rate_limit' || code === 'over_email_send_rate_limit'
+        || error.status === 429) return 'rate-limit';
+    if (m.includes('database error saving new user') || m.includes('by invitation')) return 'not-invited';
+    if ((error.name === 'AuthRetryableFetchError' && !error.status)
+        || m.includes('failed to fetch') || m.includes('networkerror')
+        || m.includes('load failed')) return 'offline';
+    if (code === 'invalid_credentials') return 'credentials';
+    if (code === 'user_already_exists' || code === 'email_exists') return 'email-taken';
+    if (code === '23505' || m.includes('duplicate key') || m.includes('profiles_username')) {
+        return 'username-taken';
+    }
+    return 'other';
+}
+
+/** How long a rate limit holds the submit button, in seconds. */
+export const RATE_LIMIT_WAIT = 60;

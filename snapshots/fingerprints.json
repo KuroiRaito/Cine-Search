@@ -24,100 +24,100 @@
     "hash": "3958658a"
   },
   "entry/cover@1280-dark": {
-    "elements": 30,
-    "hash": "159a68bc"
+    "elements": 42,
+    "hash": "e5e06a0c"
   },
   "entry/cover@1280-light": {
-    "elements": 30,
-    "hash": "159a68bc"
+    "elements": 42,
+    "hash": "e5e06a0c"
   },
   "entry/cover@390-dark": {
-    "elements": 30,
-    "hash": "8897446f"
+    "elements": 42,
+    "hash": "a1518d3d"
   },
   "entry/cover@390-light": {
-    "elements": 30,
-    "hash": "8897446f"
+    "elements": 42,
+    "hash": "a1518d3d"
   },
   "entry/cover@900-dark": {
-    "elements": 30,
-    "hash": "2cebb5f9"
+    "elements": 42,
+    "hash": "71a2df5f"
   },
   "entry/cover@900-light": {
-    "elements": 30,
-    "hash": "2cebb5f9"
+    "elements": 42,
+    "hash": "71a2df5f"
   },
   "entry/forgot@1280-dark": {
-    "elements": 15,
-    "hash": "12bb623"
+    "elements": 16,
+    "hash": "b44373e3"
   },
   "entry/forgot@1280-light": {
-    "elements": 15,
-    "hash": "12bb623"
+    "elements": 16,
+    "hash": "b44373e3"
   },
   "entry/forgot@390-dark": {
-    "elements": 15,
-    "hash": "169f484"
+    "elements": 16,
+    "hash": "86421f8b"
   },
   "entry/forgot@390-light": {
-    "elements": 15,
-    "hash": "169f484"
+    "elements": 16,
+    "hash": "86421f8b"
   },
   "entry/forgot@900-dark": {
-    "elements": 15,
-    "hash": "a10cb5b"
+    "elements": 16,
+    "hash": "7b0a0c55"
   },
   "entry/forgot@900-light": {
-    "elements": 15,
-    "hash": "a10cb5b"
+    "elements": 16,
+    "hash": "7b0a0c55"
   },
   "entry/signin@1280-dark": {
-    "elements": 22,
-    "hash": "a0b223ac"
+    "elements": 23,
+    "hash": "5013ab17"
   },
   "entry/signin@1280-light": {
-    "elements": 22,
-    "hash": "a0b223ac"
+    "elements": 23,
+    "hash": "5013ab17"
   },
   "entry/signin@390-dark": {
-    "elements": 22,
-    "hash": "e58cfad7"
+    "elements": 23,
+    "hash": "a7993688"
   },
   "entry/signin@390-light": {
-    "elements": 22,
-    "hash": "e58cfad7"
+    "elements": 23,
+    "hash": "a7993688"
   },
   "entry/signin@900-dark": {
-    "elements": 22,
-    "hash": "3845a8c9"
+    "elements": 23,
+    "hash": "5c0d18d1"
   },
   "entry/signin@900-light": {
-    "elements": 22,
-    "hash": "3845a8c9"
+    "elements": 23,
+    "hash": "5c0d18d1"
   },
   "entry/signup@1280-dark": {
-    "elements": 34,
-    "hash": "4ce7e69e"
+    "elements": 37,
+    "hash": "471a6761"
   },
   "entry/signup@1280-light": {
-    "elements": 34,
-    "hash": "4ce7e69e"
+    "elements": 37,
+    "hash": "471a6761"
   },
   "entry/signup@390-dark": {
-    "elements": 34,
-    "hash": "ea5aafc"
+    "elements": 37,
+    "hash": "26def738"
   },
   "entry/signup@390-light": {
-    "elements": 34,
-    "hash": "ea5aafc"
+    "elements": 37,
+    "hash": "26def738"
   },
   "entry/signup@900-dark": {
-    "elements": 34,
-    "hash": "954d394e"
+    "elements": 37,
+    "hash": "eb501443"
   },
   "entry/signup@900-light": {
-    "elements": 34,
-    "hash": "954d394e"
+    "elements": 37,
+    "hash": "eb501443"
   },
   "library/library@1280-dark": {
     "elements": 53,

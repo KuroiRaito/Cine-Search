@@ -34,10 +34,22 @@ export function emailProblem(value) {
     return null;
 }
 
+/**
+ * Names only what is missing.
+ *
+ * The five requirements are already on screen and ticking green as you type,
+ * so repeating the whole rule underneath them is the form reading its own
+ * notes back. Length is called out by itself because it is the one people hit
+ * without noticing — every other requirement is a character you either typed
+ * or did not. Foundations §13, U7 and U8.
+ */
 export function passwordProblem(value, { checkStrength = false } = {}) {
     if (!value) return 'Enter your password.';
     if (!checkStrength) return null;
-    return passwordFailures(value).length ? 'Your password doesn’t meet the requirements yet.' : null;
+    const missing = passwordFailures(value);
+    if (!missing.length) return null;
+    if (missing.length === 1 && missing[0].id === 'length') return 'At least 8 characters';
+    return 'That password doesn’t meet the requirements below.';
 }
 
 // A username is a name, not a sentence. Letters, digits and the three

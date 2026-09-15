@@ -169,6 +169,12 @@ export function AuthProvider({ children }) {
         signUp: (email, password) =>
             supabase.auth.signUp({ email: email.trim(), password }),
 
+        // U4: the account is made and the link is sent, but nothing on this
+        // screen can advance it. Offering to send it again is the only honest
+        // action left there.
+        resendConfirmation: (email) =>
+            supabase.auth.resend({ type: 'signup', email: email.trim() }),
+
         requestPasswordReset: (email) =>
             supabase.auth.resetPasswordForEmail(email.trim(), {
                 redirectTo: `${window.location.origin}/welcome/reset`,

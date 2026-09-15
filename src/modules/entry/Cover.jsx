@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { trending } from '../../shared/tmdb/endpoints.js';
 import { posterUrl } from '../../shared/tmdb/view.js';
@@ -17,6 +18,33 @@ import './entry.css';
  * Attribution lives here too. It's contractual, and this is the first screen —
  * the cheapest possible place to satisfy it.
  */
+/* C2 — the grid exists before the artwork does. Twelve cells at --surface-hv
+   hold the pattern, so the mosaic fades in rather than assembling itself, and
+   the copy above it never moves. */
+const PLACEHOLDERS = Array.from({ length: 12 }, () => ({ placeholder: true }));
+
+/**
+ * One cell, which turns itself on only once its own image has decoded.
+ *
+ * Setting the background and the opacity in the same frame fades in an empty
+ * box and pops the poster in halfway through. Waiting for the load means the
+ * fade is of the artwork, which is the only thing worth fading.
+ */
+function MosaicCell({ path }) {
+    const [loaded, setLoaded] = useState(false);
+    const src = posterUrl(path, 'w342');
+    return (
+        <div
+            className={`mosaic-cell${loaded ? ' on' : ''}`}
+            style={{ backgroundImage: `url(${src})` }}
+        >
+            {/* Never painted — it is here to tell us when the background it
+                shares a URL with has arrived. */}
+            <img src={src} alt="" hidden onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} />
+        </div>
+    );
+}
+
 export default function Cover() {
     const navigate = useNavigate();
     const { authReady, isSignedIn } = useAuth();
@@ -41,12 +69,10 @@ export default function Cover() {
                 failed fetch says nothing — it just falls back to a gradient. */}
             {(error || (data && data.length === 0)) && <div className="cover-fallback" aria-hidden="true" />}
             <div className="mosaic" aria-hidden="true">
-                {(data || []).map((it) => (
-                    <div
-                        key={`${it.media_type}-${it.id}`}
-                        className="mosaic-cell"
-                        style={{ backgroundImage: `url(${posterUrl(it.poster_path, 'w342')})` }}
-                    />
+                {(data || PLACEHOLDERS).map((it, i) => (
+                    it.placeholder
+                        ? <div key={`ph-${i}`} className="mosaic-cell" />
+                        : <MosaicCell key={`${it.media_type}-${it.id}`} path={it.poster_path} />
                 ))}
             </div>
             <div className="cover-scrim" aria-hidden="true" />

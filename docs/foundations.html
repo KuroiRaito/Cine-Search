@@ -1151,11 +1151,11 @@ pre u{color:var(--st-done-11);text-decoration:none}
         <tr><td class="tok">C6</td><td class="num">Cover</td><td class="use">medium / expanded</td><td class="use">Content centred, capped 560px, CTAs side by side, mosaic 6 / 8 columns, h1 → --text-display.</td></tr>
         <tr><td class="tok">C7</td><td class="num">Cover</td><td class="use">Already seen</td><td class="use">Never rendered. <code>/welcome</code> redirects to <code>/</code>.</td></tr>
         <tr><td class="tok">C8</td><td class="num">Cover</td><td class="use">Signed in, visits <code>/welcome</code></td><td class="use">Redirect to <code>/</code>. A signed-in person is never pitched.</td></tr>
-        <tr><td class="tok">I1</td><td class="num">Sign in</td><td class="use">At rest</td><td class="use">Two empty fields, submit enabled.</td></tr>
-        <tr><td class="tok">I2</td><td class="num">Sign in</td><td class="use">Wrong credentials</td><td class="use">Banner above submit, password ring --st-drop-9, password cleared, focus to banner.</td></tr>
+        <tr><td class="tok">I1</td><td class="num">Sign in</td><td class="use">At rest</td><td class="use">Two empty fields, submit enabled. &ldquo;Forgotten?&rdquo; sits in the password label row &mdash; see <i>What the build settled</i>.</td></tr>
+        <tr><td class="tok">I2</td><td class="num">Sign in</td><td class="use">Wrong credentials</td><td class="use">Banner above submit, password ring --st-drop-9, password cleared <i>and untouched</i>, focus to banner.</td></tr>
         <tr><td class="tok">I3</td><td class="num">Sign in</td><td class="use">Submitting</td><td class="use">Fields at .6 and readonly, button disabled reading &ldquo;One moment…&rdquo;.</td></tr>
         <tr><td class="tok">I4</td><td class="num">Sign in</td><td class="use">Offline</td><td class="use">Banner; submit relabelled &ldquo;Try again&rdquo;. Typed values preserved.</td></tr>
-        <tr><td class="tok">I5</td><td class="num">Sign in</td><td class="use">Rate limited (429)</td><td class="use">Banner naming the wait; submit disabled until it elapses.</td></tr>
+        <tr><td class="tok">I5</td><td class="num">Sign in</td><td class="use">Rate limited (429)</td><td class="use">Banner naming the wait; submit disabled and counting down &mdash; &ldquo;Try again in 47s&rdquo;.</td></tr>
         <tr><td class="tok">I6</td><td class="num">Sign in</td><td class="use">Malformed email</td><td class="use">Inline, on blur — not on submit. Field ring + message in the hint slot.</td></tr>
         <tr><td class="tok">I7</td><td class="num">Sign in</td><td class="use">Server / unknown error</td><td class="use">Banner: &ldquo;Something went wrong. Try again.&rdquo; Values preserved.</td></tr>
         <tr><td class="tok">I8</td><td class="num">Sign in</td><td class="use">Password revealed</td><td class="use">Trailing --icon-20 toggle inside the field; <code>aria-pressed</code>. Off by default.</td></tr>
@@ -1171,7 +1171,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
         <tr><td class="tok">U4</td><td class="num">Sign up</td><td class="use">Confirmation pending</td><td class="use">Replaces the form. Names the address, offers resend, offers browsing.</td></tr>
         <tr><td class="tok">U5</td><td class="num">Sign up</td><td class="use">Email already registered</td><td class="use">Banner: &ldquo;That email already has an account. Try signing in instead.&rdquo;</td></tr>
         <tr><td class="tok">U6</td><td class="num">Sign up</td><td class="use">Username too short</td><td class="use">Inline on blur at &lt;3 characters.</td></tr>
-        <tr><td class="tok">U7</td><td class="num">Sign up</td><td class="use">Password too short</td><td class="use">Inline. The hint is already visible, so the message names only what is missing.</td></tr>
+        <tr><td class="tok">U7</td><td class="num">Sign up</td><td class="use">Password too short</td><td class="use">Inline, and literally &ldquo;At least 8 characters&rdquo; when length is the only thing missing. The checklist is already on screen.</td></tr>
         <tr><td class="tok">U8</td><td class="num">Sign up</td><td class="use">Password missing a class</td><td class="use">Inline, naming which class — never the full rule again.</td></tr>
         <tr><td class="tok">U9</td><td class="num">Sign up</td><td class="use">Submitting</td><td class="use">As I3.</td></tr>
         <tr><td class="tok">U10</td><td class="num">Sign up</td><td class="use">Offline</td><td class="use">As I4.</td></tr>
@@ -1202,6 +1202,21 @@ pre u{color:var(--st-done-11);text-decoration:none}
 <!-- ============================== 12b DESKTOP ============================== -->
 <section id="desktop">
   <div class="wrap">
+    <h3>What the build settled</h3>
+    <p>Five places where building the states changed them. Each one is in the
+    product now, and this document has been brought to match &mdash; the drawings
+    above still show the earlier version of the first two.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Drawn</th><th>Built</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">I1</td><td class="use">&ldquo;Forgotten your password?&rdquo; under the submit button.</td><td class="use">&ldquo;Forgotten?&rdquo; in the password label row, right-aligned.</td><td class="use">Three accent links stacked under one button read as three equal offers. Beside the password it is one answer next to the question it answers.</td></tr>
+        <tr><td class="tok">I1</td><td class="use">&ldquo;Keep browsing without an account&rdquo; in --acc-t, like its neighbours.</td><td class="use">--muted, weight 500.</td><td class="use">It is the way out, not a third thing being offered. On the cover it stays prominent: that screen is the one asking.</td></tr>
+        <tr><td class="tok">I2</td><td class="use">Password cleared.</td><td class="use">Cleared <i>and untouched</i>.</td><td class="use">Clearing it alone made the field immediately report &ldquo;Enter your password&rdquo; &mdash; the form accusing somebody of leaving blank a box it had just emptied.</td></tr>
+        <tr><td class="tok">I5</td><td class="use">Submit disabled for the wait.</td><td class="use">Disabled, and saying how long is left.</td><td class="use">A dead button with no clock is indistinguishable from a broken one.</td></tr>
+        <tr><td class="tok">I3</td><td class="use">Fields at .6, readonly.</td><td class="use">Unchanged &mdash; and <code>readonly</code> specifically, never <code>disabled</code>.</td><td class="use">A disabled field leaves the tab order, so the keyboard jumps somewhere unrelated for the second the request takes.</td></tr>
+      </tbody>
+    </table></div>
+
     <div class="shead"><span class="snum">12b</span><h2>Desktop and wide</h2></div>
     <p>The first version of this document stopped at &ldquo;expanded, 1120 and up&rdquo;, which is not an answer for a 1920px monitor — it is the absence of one. Drawn to scale: <span style="color:var(--faint)">margin</span>, <span style="color:var(--rate-t)">gutter</span>, <span style="color:var(--acc-t)">content</span>.</p>
 

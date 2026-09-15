@@ -267,6 +267,20 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   box-shadow: var(--shadow-sheet);
 }
 
+/* S5 — with a pointer the sheet stops being a sheet. Centred, all four corners
+   rounded, and no longer glued to an edge the thumb was reaching for. The width
+   does not change: it is a fixed surface, so it takes neither the page's gutter
+   nor the container's width. */
+@media (min-width: 600px) {
+  .scrim { align-items: center; }
+  .sheet {
+    border-radius: var(--radius-16);
+    border-top: 0;
+    padding: var(--sheet-pad);
+    margin: var(--space-16);
+  }
+}
+
 /* All six visible at once: one tap, rather than open, scan, tap. Films render
    three of the six — "watching" is meaningless for a two-hour film. */
 .segs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }

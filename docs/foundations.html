@@ -263,7 +263,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
     <dl class="counts">
       <div class="count"><dt>Font sizes</dt><dd><span class="was">30</span><span class="arrow">→</span><span class="now">9</span></dd></div>
       <div class="count"><dt>Corner radii</dt><dd><span class="was">11</span><span class="arrow">→</span><span class="now">5</span></dd></div>
-      <div class="count"><dt>Breakpoints</dt><dd><span class="was">11</span><span class="arrow">→</span><span class="now">3</span></dd></div>
+      <div class="count"><dt>Breakpoints</dt><dd><span class="was">11</span><span class="arrow">→</span><span class="now">4</span></dd></div>
       <div class="count"><dt>Space tokens</dt><dd><span class="was">1</span><span class="arrow">→</span><span class="now">13</span></dd></div>
     </dl>
   </div>
@@ -283,6 +283,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
     <a href="#roles">10 Component tokens</a>
     <a href="#components">11 Components</a>
     <a href="#screens">12 Screens</a>
+    <a href="#desktop">12b Desktop</a>
     <a href="#errors">13 Errors</a>
     <a href="#emit">14 tokens.css</a>
     <a href="#enforce">15 Enforcement</a>
@@ -502,28 +503,60 @@ pre u{color:var(--st-done-11);text-decoration:none}
 <section id="break">
   <div class="wrap">
     <div class="shead"><span class="snum">08</span><h2>Breakpoints</h2></div>
-    <p>The codebase has <b>eleven</b>: 48, 220, 320, 400, 430, 480, 600, 700, 760, 1100, 1120. Three of those are real layout boundaries and the rest are one component each, guessed at in isolation. Worse, two pairs nearly collide — and that near-collision is a live bug.</p>
+    <p>The codebase has <b>eleven</b>: 48, 220, 320, 400, 430, 480, 600, 700, 760, 1100, 1120. Four of those are real layout boundaries and the rest are one component each, guessed at in isolation. Worse, two pairs nearly collide — and that near-collision is a live bug.</p>
 
     <div class="note law"><b>The stretching you can see on a wide window.</b> <code>--gutter</code> steps at <b>1100px</b> in <code>shell.css</code>, but every component reflows at <b>1120px</b> in its own module. Between 1100 and 1120 the page uses the 40px desktop gutter while the layout inside it is still tablet. The same fault exists at 700 / 760. Two files disagreeing about where desktop begins is exactly what &ldquo;things stretch, things go short&rdquo; looks like.</div>
 
     <div class="tbl-wrap"><table>
-      <thead><tr><th>Band</th><th>Range</th><th>Gutter</th><th>Shape</th></tr></thead>
+      <thead><tr><th>Band</th><th>Range</th><th>Gutter</th><th>Container</th><th>Content</th><th>Shape</th></tr></thead>
       <tbody>
-        <tr><td class="num">compact</td><td class="num">320 – 599</td><td class="num">16px</td><td class="use">One column. Bottom tab bar. Sheets rise from the bottom edge, full width.</td></tr>
-        <tr><td class="num">medium</td><td class="num">600 – 1119</td><td class="num">24px</td><td class="use">One column, centred, capped by <code>--measure</code>. Tabs hold together in the middle. Artwork grows; controls stop growing.</td></tr>
-        <tr><td class="num">expanded</td><td class="num">1120 +</td><td class="num">40px</td><td class="use">Top bar replaces tabs. Multi-column. Sheets become centred dialogs.</td></tr>
+        <tr><td class="num">compact</td><td class="num">320 – 599</td><td class="num">16px</td><td class="num">viewport</td><td class="num">288 – 567</td><td class="use">One column. Bottom tab bar. Sheets rise from the bottom edge, full width.</td></tr>
+        <tr><td class="num">medium</td><td class="num">600 – 1119</td><td class="num">24px</td><td class="num">viewport</td><td class="num">552 – 1071</td><td class="use">One column, centred, capped by <code>--measure</code>. Tabs hold together in the middle. Artwork grows; controls stop growing.</td></tr>
+        <tr><td class="num">expanded</td><td class="num">1120 – 1439</td><td class="num">40px</td><td class="num">1200</td><td class="num">1120</td><td class="use">Top bar replaces tabs. Multi-column. Sheets become centred dialogs.</td></tr>
+        <tr><td class="num">wide</td><td class="num">1440 +</td><td class="num">40px</td><td class="num">1600</td><td class="num">1520</td><td class="use">Container caps; the margin takes the rest. Grid steps to six columns. Nothing else changes.</td></tr>
       </tbody>
     </table></div>
 
-    <pre><i>/* Two queries. Three bands. Nothing else. */</i>
+    <pre><i>/* Three queries. Four bands. The gutter steps twice, the container three times. */</i>
 @media (min-width: <b>600px</b>)  { :root { --gutter: <b>var(--space-24)</b>; } }
-@media (min-width: <b>1120px</b>) { :root { --gutter: <b>var(--space-40)</b>; } }</pre>
+@media (min-width: <b>1120px</b>) { :root { --gutter: <b>var(--space-40)</b>; --shell-max: <b>1200px</b>; } }
+@media (min-width: <b>1440px</b>) { :root { --shell-max: <b>1600px</b>; } }</pre>
+
+    <h4>Above 1440 the gutter stops being what positions anything</h4>
+    <p>This is the part the first version of this document got wrong: <b>expanded had no upper bound</b>, so a 1920px monitor was simply an unstated case. It is stated now. The container caps at 1600 and the margin absorbs everything past it — the 40px gutter is still there, but it is a minimum inset inside the container, not the thing holding content off the screen edge.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Monitor</th><th>Container</th><th>Content</th><th>Margin each side</th><th>Grid</th><th>Rail peek</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1280</td><td class="num">1200</td><td class="num">1120</td><td class="num">40</td><td class="num">5 × 213</td><td class="num">5.66 tiles</td></tr>
+        <tr><td class="num">1440</td><td class="num">1440</td><td class="num">1360</td><td class="num">0</td><td class="num">6 × 215</td><td class="num">6.87 tiles</td></tr>
+        <tr><td class="num">1600</td><td class="num">1600</td><td class="num">1520</td><td class="num">0</td><td class="num">6 × 242</td><td class="num">7.68 tiles</td></tr>
+        <tr><td class="num">1920</td><td class="num">1600</td><td class="num">1520</td><td class="num">160</td><td class="num">6 × 242</td><td class="num">7.68 tiles</td></tr>
+        <tr><td class="num">2560</td><td class="num">1600</td><td class="num">1520</td><td class="num">480</td><td class="num">6 × 242</td><td class="num">7.68 tiles</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note law"><b>The container steps; it does not flow.</b> The obvious design is to let content grow continuously from 1120 to the cap, using every pixel. It was built that way first, and it was wrong. <code>.rail</code> hides its scrollbar — <code>scrollbar-width: none</code>, <code>::-webkit-scrollbar { height: 0 }</code> — and has no arrows, so <b>the partial tile at the edge is the only thing that says a row scrolls</b>, on a mouse exactly as much as on a thumb. A container that flows sweeps the visible tile count through whole numbers: at a 1280px window it landed on <b>6.06</b> — six tiles and a twelve-pixel sliver, which reads as a complete set. Two fixed content widths can be checked. A continuum cannot.</div>
+
+    <div class="note warn"><b>Why the grid steps at 1440 and the gutter does not.</b> Six columns is a <i>content</i> ladder, not a band: five columns held to the 1600 cap would put poster tiles at 293px, where a row reads as a gallery wall rather than a set you can compare. A tile stays roughly 180–260px. The gutter, meanwhile, is done growing at 40 — an inset wider than that stops reading as breathing room and starts reading as a missing sidebar.</div>
 
     <div class="note warn"><b>Breakpoints cannot be custom properties.</b> CSS does not permit <code>var()</code> inside a media query, so 600 and 1120 are written literally. This is the one place raw numbers are legal — and the one place <code>verify</code> checks hardest, because nothing in the language can stop a fourth breakpoint appearing.</div>
 
     <h4>320 is the floor, and it is a real device</h4>
     <p>The iPhone SE first generation and Android Go devices report 320px. At that width the compact gutter leaves <b>288px</b> of content. Every screen is designed against that number, not against 390. A layout that only works at 390 will clip on hardware people actually own.</p>
-    <div class="note"><b>Content decides a breakpoint, never a device.</b> If a line of copy wraps badly at 720px, the fix is <code>--measure</code> or a shorter line — not a new breakpoint at 720. Three bands is the budget.</div>
+    <div class="note"><b>Content decides a breakpoint, never a device.</b> If a line of copy wraps badly at 720px, the fix is <code>--measure</code> or a shorter line — not a new breakpoint at 720. <b>Four bands is the budget</b>, and the fourth earns its place by answering a question the other three could not: what happens when the screen keeps growing and the content should not.</div>
+
+    <h4>Three containers, by what they hold</h4>
+    <p>A single max-width cannot serve a catalogue. <b>Browse surfaces grow; reading surfaces do not.</b></p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Token</th><th>Caps at</th><th>Holds</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">--shell-max</td><td class="num">1200 / 1600</td><td class="use">The page and the top bar. Rails, grids, artwork — everything being browsed.</td></tr>
+        <tr><td class="tok">--measure</td><td class="num">65ch</td><td class="use">Prose. Past about 65 characters a reader loses the return sweep, at any screen size.</td></tr>
+        <tr><td class="tok">--form-max</td><td class="num">420px</td><td class="use">Forms. A 1520px-wide email field is not a generous email field.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note law"><b>The top bar and the page share <code>--shell-max</code>, and that is not cosmetic.</b> They used to cap at 1280 and 1200 with different padding, which put the wordmark <b>56px to the left of the page heading at every desktop width</b> — measured, not guessed. Nobody could name it; everybody could see it. One container, one edge.</div>
   </div>
 </section>
 
@@ -588,9 +621,10 @@ pre u{color:var(--st-done-11);text-decoration:none}
         <tr><td class="tok">--sheet-pad</td><td class="num" colspan="3" style="text-align:left">20px</td><td class="use">Inside the sheet. Deliberately <b>not</b> <code>--gutter</code> — a 460px sheet at a 40px desktop gutter would be absurd.</td></tr>
         <tr><td class="tok">--form-max</td><td class="num" colspan="3" style="text-align:left">420px</td><td class="use">Widest a form column may run. A 900px-wide email field is unusable.</td></tr>
         <tr><td class="tok">--measure</td><td class="num" colspan="3" style="text-align:left">65ch</td><td class="use">Widest a line of prose may run, at any breakpoint.</td></tr>
+        <tr><td class="tok">--shell-max</td><td class="num">viewport</td><td class="num">viewport</td><td class="num">1200 → 1600</td><td class="use">The browse container, shared by the page and the top bar. Steps again at the wide band (1440), where it caps and the margin takes the rest.</td></tr>
       </tbody>
     </table></div>
-    <div class="note"><b>Read the <code>--control-h</code> row again.</b> It is constant across all three bands, and that is the point of having a role layer. Without it, somebody looks at a desktop mockup, decides the buttons look chunky, and shrinks them — breaking touch targets on the tablet that shares the breakpoint.</div>
+    <div class="note"><b>Read the <code>--control-h</code> row again.</b> It is constant across all four bands, and that is the point of having a role layer. Without it, somebody looks at a desktop mockup, decides the buttons look chunky, and shrinks them — breaking touch targets on the tablet that shares the breakpoint.</div>
   </div>
 </section>
 
@@ -1153,6 +1187,86 @@ pre u{color:var(--st-done-11);text-decoration:none}
   </div>
 </section>
 
+<style>
+.strip-wrap{margin-top:var(--space-16);display:flex;flex-direction:column;gap:var(--space-16)}
+.strip-row{display:flex;flex-direction:column;gap:var(--space-8)}
+.strip-lbl{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase;display:flex;gap:var(--space-8);align-items:baseline}
+.strip-lbl b{color:var(--acc-t);font-weight:600}
+.strip{display:flex;height:var(--space-48);border-radius:var(--radius-8);overflow:hidden;border:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub)}
+.strip div{display:grid;place-items:center;font-family:var(--f-m);font-size:var(--text-micro);font-variant-numeric:tabular-nums;min-width:0;overflow:hidden;white-space:nowrap}
+.strip .m{background:repeating-linear-gradient(45deg,var(--ink-3) 0 5px,transparent 5px 10px);color:var(--faint)}
+.strip .g{background:var(--rate-bg);color:var(--rate-t)}
+.strip .c{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+</style>
+
+<!-- ============================== 12b DESKTOP ============================== -->
+<section id="desktop">
+  <div class="wrap">
+    <div class="shead"><span class="snum">12b</span><h2>Desktop and wide</h2></div>
+    <p>The first version of this document stopped at &ldquo;expanded, 1120 and up&rdquo;, which is not an answer for a 1920px monitor — it is the absence of one. Drawn to scale: <span style="color:var(--faint)">margin</span>, <span style="color:var(--rate-t)">gutter</span>, <span style="color:var(--acc-t)">content</span>.</p>
+
+    <div class="strip-wrap">
+      <div class="strip-row">
+        <div class="strip-lbl"><b>1280</b> laptop &middot; expanded &middot; container 1200</div>
+        <div class="strip">
+          <div class="m" style="width:3.125%"></div>
+          <div class="g" style="width:3.125%">40</div>
+          <div class="c" style="width:87.5%">1120 content</div>
+          <div class="g" style="width:3.125%">40</div>
+          <div class="m" style="width:3.125%"></div>
+        </div>
+      </div>
+      <div class="strip-row">
+        <div class="strip-lbl"><b>1600</b> &middot; wide &middot; container fills the viewport</div>
+        <div class="strip">
+          <div class="g" style="width:2.5%">40</div>
+          <div class="c" style="width:95%">1520 content</div>
+          <div class="g" style="width:2.5%">40</div>
+        </div>
+      </div>
+      <div class="strip-row">
+        <div class="strip-lbl"><b>1920</b> the usual monitor &middot; wide &middot; container capped at 1600</div>
+        <div class="strip">
+          <div class="m" style="width:8.33%">160</div>
+          <div class="g" style="width:2.08%"></div>
+          <div class="c" style="width:79.17%">1520 content</div>
+          <div class="g" style="width:2.08%"></div>
+          <div class="m" style="width:8.33%">160</div>
+        </div>
+      </div>
+      <div class="strip-row">
+        <div class="strip-lbl"><b>2560</b> ultrawide &middot; wide &middot; same content, more margin</div>
+        <div class="strip">
+          <div class="m" style="width:18.75%">480</div>
+          <div class="g" style="width:1.56%"></div>
+          <div class="c" style="width:59.38%">1520 content</div>
+          <div class="g" style="width:1.56%"></div>
+          <div class="m" style="width:18.75%">480</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note"><b>Past 1600 the gutter stops being what holds content off the edge.</b> It is still 40px, but it is now a minimum inset <i>inside</i> a capped container — the margin is doing the work. That is the answer to &ldquo;I don't want a gutter when the screen gets very big&rdquo;: the gutter does not grow, the margin does.</div>
+
+    <h3>What changes, and what deliberately does not</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Element</th><th>compact</th><th>expanded</th><th>wide</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Navigation</td><td class="use">bottom tabs</td><td class="use">top bar</td><td class="use">top bar</td><td class="use">Tabs are a thumb idiom. A mouse has no thumb reach to respect.</td></tr>
+        <tr><td class="num">Container</td><td class="use">viewport</td><td class="num">1200</td><td class="num">1600</td><td class="use">Shared by the page and the top bar, so they hold one edge.</td></tr>
+        <tr><td class="num">Grid</td><td class="num">2 cols</td><td class="num">5 cols</td><td class="num">6 cols</td><td class="use">A poster tile stays 180&ndash;260px. Five columns at the cap would be 293.</td></tr>
+        <tr><td class="num">Rail tile</td><td class="num">128px</td><td class="num">190px</td><td class="num">190px</td><td class="use">Artwork is what is being browsed, but a rail tile has a legible ceiling too.</td></tr>
+        <tr><td class="num">Control height</td><td class="num">44px</td><td class="num">44px</td><td class="num">44px</td><td class="use"><b>Unchanged.</b> A pointer is more precise than a finger, but the same person uses a touchscreen laptop at this width.</td></tr>
+        <tr><td class="num">Body type</td><td class="num">15/24</td><td class="num">15/24</td><td class="num">15/24</td><td class="use"><b>Unchanged.</b> Reading distance grows with the screen, so apparent size is already roughly constant. Scaling type by viewport is a fourth set of values buying nothing.</td></tr>
+        <tr><td class="num">Gutter</td><td class="num">16px</td><td class="num">40px</td><td class="num">40px</td><td class="use"><b>Stops at 40.</b> A wider inset stops reading as breathing room and starts reading as a missing sidebar.</td></tr>
+        <tr><td class="num">Sheet</td><td class="use">bottom, full width</td><td class="use">centred dialog, 460px</td><td class="use">centred dialog, 460px</td><td class="use">A sheet is a fixed surface. It never takes the page's gutter or the container's width.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note warn"><b>Two things stay put on purpose, and both will look wrong to somebody.</b> Controls at 44px look chunky in a 1920px mockup, and body text at 15px looks small. Change either and you break the case the mockup does not show: the touchscreen laptop, and the person sitting further from a bigger screen. If these are revisited, revisit them with a device in hand, not a mockup.</div>
+  </div>
+</section>
+
 <!-- ============================== 13 ERRORS ============================== -->
 <section id="errors">
   <div class="wrap">
@@ -1261,7 +1375,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
       <thead><tr><th>Check</th><th>Rule</th><th>Detects</th></tr></thead>
       <tbody>
         <tr><td class="tok">token-scale</td><td class="use">In a <b>converted</b> module, no raw <code>px</code> on a spacing or sizing property. Container caps and blur radii are exempt — they have no scale.</td><td class="use">The whole class of drift. The one rule that makes the rest hold. <code>CONVERTED = ['entry']</code> is also the migration board.</td></tr>
-        <tr><td class="tok">gutter-bands</td><td class="use"><code>--gutter</code> steps at 600 and 1120, and at no other width — and must step at both.</td><td class="use">Exactly the 1100/1120 fault. A component may still carry its own content-driven ladder; the page gutter may not.</td></tr>
+        <tr><td class="tok">gutter-bands</td><td class="use"><code>--gutter</code> steps only at 600 and 1120, and <code>--shell-max</code> only at 1120 and 1440 — each must step at both of its own.</td><td class="use">Exactly the 1100/1120 fault. A component may still carry its own content-driven ladder; the page gutter may not.</td></tr>
         <tr><td class="tok">control-colour</td><td class="use">A rule setting <code>background</code> on a <code>button</code>, <code>input</code>, <code>select</code> or <code>textarea</code> also sets <code>color</code>.</td><td class="use">The invisible-in-dark-mode failure that shipped once on <code>.n-pchip</code>.</td></tr>
         <tr><td class="tok">focus-ring</td><td class="use">A block with <code>outline:none</code> must draw a replacement in the same block — a <code>box-shadow</code> ring or a border.</td><td class="use">Silent keyboard inaccessibility. Judged per rule, not per file, so an inset ring counts and a bare removal does not.</td></tr>
         <tr><td class="tok">layer-token</td><td class="use"><code>z-index</code> is a layer token, or a single digit. Nothing between.</td><td class="use">Stacking wars. 0&ndash;9 is local stacking inside one component's own context; the app's shared layers start at 10 and must be named.</td></tr>

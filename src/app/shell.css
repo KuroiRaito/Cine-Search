@@ -59,8 +59,13 @@ img { max-width: 100%; display: block; }
    ============================================================ */
 
 .app { min-height: 100vh; display: flex; flex-direction: column; }
+/* One container, and the top bar uses the same one. They used to cap at 1200
+   and 1280 with different padding, which put the wordmark 56px left of the
+   page heading at every desktop width — a drift nobody could name but
+   everybody could see. */
 .app-main {
-  flex: 1; width: 100%; max-width: 1200px; margin: 0 auto;
+  flex: 1; width: 100%;
+  max-width: var(--shell-max); margin-inline: auto;
   padding-bottom: calc(var(--tabbar-h) + var(--space-16));
 }
 
@@ -159,7 +164,9 @@ img { max-width: 100%; display: block; }
    `.topbar { display: none }` above and `.topbar { display: block }`
    below have the same specificity, so whichever is written second wins.
 
-   TWO queries. THREE bands. Nothing else in the system.
+   THREE queries. FOUR bands. Nothing else in the system.
+   The gutter steps twice (600, 1120); the container steps at 1120 and again
+   at 1440, where it caps and the margin takes the rest.
 
    They used to be four: the gutter stepped at 700 and 1100 while every
    component reflowed at 760 and 1120, so 700-759 and 1100-1119 wore a
@@ -185,7 +192,7 @@ img { max-width: 100%; display: block; }
 /* ---------------- expanded: 1120+ ---------------- */
 
 @media (min-width: 1120px) {
-  :root { --gutter: var(--space-40); }
+  :root { --gutter: var(--space-40); --shell-max: 1200px; }
 
   .tabs { display: none; }
   .topbar {
@@ -194,7 +201,8 @@ img { max-width: 100%; display: block; }
     backdrop-filter: blur(10px); border-bottom: var(--border-hair) solid var(--bd-sub);
   }
   .topbar-in {
-    max-width: 1280px; margin: 0 auto; padding: var(--space-12) var(--space-24);
+    max-width: var(--shell-max); margin-inline: auto;
+    padding: var(--space-12) var(--gutter);
     display: flex; align-items: center; gap: var(--space-24);
   }
   .wordmark {
@@ -237,4 +245,28 @@ img { max-width: 100%; display: block; }
 .btn.quiet.is-waiting {
   display: inline-block; min-width: 68px; height: 30px;
   background: var(--surface); box-shadow: none; pointer-events: none;
+}
+
+/* ---------------- wide: 1440+ ----------------
+
+   The container steps rather than flowing, and the margin takes the rest.
+   A 1920px monitor gets 1600px of content with 160px either side, and the
+   gutter stops being what positions anything.
+
+   Stepped, not fluid, for one reason: .rail hides its scrollbar
+   (scrollbar-width: none) and has no arrows, so the partial tile at the edge
+   is the ONLY thing that says a row scrolls. A container that flows
+   continuously sweeps the visible tile count through whole numbers — at a
+   1280px window it lands on 6.06, a 12px sliver that reads as a complete
+   set. Two fixed content widths can be checked; a continuum cannot.
+
+       1120 band -> 1120px of content -> 1120/198 = 5.66 tiles
+       1440 band -> 1520px of content -> 1520/198 = 7.68 tiles
+
+   Neither is whole, and both are provable. --gutter does not step here:
+   40px is already as far as an inset should go.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 1440px) {
+  :root { --shell-max: 1600px; }
 }

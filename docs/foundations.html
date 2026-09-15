@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Projector Foundations</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* ============================================================
+   Projector Foundations.
+   This document is built from the tokens it publishes. Every value
+   below is a var() from the block in §14 — there are no loose
+   numbers in this stylesheet, which is the whole argument.
+   ============================================================ */
+
+:root{
+  color-scheme:dark;
+  /* ---- ink: the neutral, biased blue so it never reads as default grey ---- */
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-3:#0A2530;--beam-7:#155A72;--beam-9:#25BADF;--beam-11:#6FDCF5;--beam-12:#C5F2FD;
+  --mar-3:#2B210B;--mar-7:#6B5316;--mar-9:#F5C45C;--mar-11:#F0C468;
+  --st-done-3:#07241F;--st-done-9:#2ABFA0;--st-done-11:#6FE0C8;
+  --st-drop-3:#26100C;--st-drop-9:#B5594A;--st-drop-11:#DC8E7F;
+  --on-beam-9:#06333F;
+
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);
+  --grid-line:rgba(111,220,245,.13);
+
+  /* ---- THE ATOMS. Space: 4px grid, 2px the one sub-grid step. ---- */
+  --space-0:0px;--space-2:2px;--space-4:4px;--space-8:8px;--space-12:12px;
+  --space-16:16px;--space-20:20px;--space-24:24px;--space-32:32px;--space-40:40px;
+  --space-48:48px;--space-64:64px;--space-80:80px;
+
+  /* ---- Radius ---- */
+  --radius-4:4px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-full:999px;
+
+  /* ---- Border ---- */
+  --border-hair:1px;--border-focus:2px;
+
+  /* ---- Control heights ---- */
+  --control-sm:36px;--control-md:44px;--control-lg:52px;
+
+  /* ---- Icon ---- */
+  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+
+  /* ---- Faces ---- */
+  --f-d:'Archivo',system-ui,sans-serif;
+  --f-s:'IBM Plex Sans',system-ui,sans-serif;
+  --f-m:'IBM Plex Mono',ui-monospace,monospace;
+
+  /* ---- Motion ---- */
+  --dur-fast:120ms;--dur-base:200ms;--dur-slow:320ms;
+  --ease-out:cubic-bezier(.2,0,0,1);--ease-in-out:cubic-bezier(.4,0,.2,1);
+
+  /* ---- Elevation ---- */
+  --shadow-raised:0 6px 16px -4px rgba(0,0,0,.6);
+  --shadow-sheet:0 -8px 32px -8px rgba(0,0,0,.7);
+  --scrim-wash:rgba(4,6,12,.62);
+
+  /* ---- Layers ---- */
+  --z-sticky:10;--z-nav:40;--z-scrim:60;--z-toast:70;--z-top:80;
+
+  /* ---- COMPONENT TOKENS: roles that alias atoms ---- */
+  --gutter:var(--space-16);
+  --control-h:var(--control-md);
+  --radius-control:var(--radius-12);
+  --field-gap:var(--space-8);
+  --field-stack:var(--space-16);
+  --section-gap:var(--space-24);
+  --sheet-pad:var(--space-20);
+  --form-max:420px;
+  --measure:65ch;
+
+  /* ---- Type roles ---- */
+  --text-micro:11px;      --lh-micro:16px;
+  --text-caption:12px;    --lh-caption:16px;
+  --text-body-sm:13px;    --lh-body-sm:20px;
+  --text-body:15px;       --lh-body:24px;
+  --text-label:13px;      --lh-label:16px;
+  --text-title-sm:17px;   --lh-title-sm:24px;
+  --text-title:21px;      --lh-title:28px;
+  --text-display-sm:27px; --lh-display-sm:32px;
+  --text-display:40px;    --lh-display:44px;
+}
+
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;--beam-12:#06333F;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --grid-line:rgba(37,186,223,.16);
+  --shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+  --shadow-sheet:0 -8px 32px -8px rgba(23,27,38,.16);
+}}
+
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;--beam-12:#06333F;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --grid-line:rgba(37,186,223,.16);
+  --shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+  --shadow-sheet:0 -8px 32px -8px rgba(23,27,38,.16);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--f-s);font-size:var(--text-body);line-height:var(--lh-body);
+  -webkit-font-smoothing:antialiased;
+}
+:focus-visible{outline:var(--border-focus) solid var(--acc);outline-offset:3px;border-radius:var(--radius-4)}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 var(--space-24)}
+
+/* ---- masthead ---- */
+.mast{border-bottom:var(--border-hair) solid var(--bd-sub);padding:var(--space-64) 0 var(--space-40);position:relative;overflow:hidden}
+.mast::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(to right,var(--grid-line) 0 1px,transparent 1px var(--space-4)),
+    repeating-linear-gradient(to bottom,var(--grid-line) 0 1px,transparent 1px var(--space-4));
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%);
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%);
+}
+.mast .wrap{position:relative}
+.eyebrow{
+  font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);
+  font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t);
+  display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-16)
+}
+.eyebrow i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal;flex:0 0 auto}
+h1{
+  font-family:var(--f-d);font-size:var(--text-display);line-height:var(--lh-display);
+  font-weight:800;letter-spacing:-.04em;margin:0 0 var(--space-16);text-wrap:balance;max-width:16ch
+}
+.lede{font-size:var(--text-body);line-height:var(--lh-body);color:var(--muted);max-width:60ch;margin:0}
+.lede b{color:var(--text);font-weight:600}
+
+/* ---- the count strip: the argument in four numbers ---- */
+.counts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-2);margin-top:var(--space-32);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden;background:var(--bd-sub)}
+.count{background:var(--bg-sub);padding:var(--space-16)}
+.count dt{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:var(--space-8)}
+.count dd{margin:0;font-family:var(--f-m);font-size:var(--text-title);line-height:var(--lh-title);font-weight:600;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:var(--space-8)}
+.count .was{color:var(--st-drop-11)}
+.count .arrow{color:var(--faint);font-size:var(--text-body-sm)}
+.count .now{color:var(--st-done-11)}
+
+/* ---- nav ---- */
+nav.toc{border-bottom:var(--border-hair) solid var(--bd-sub);position:sticky;top:0;z-index:var(--z-nav);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px)}
+nav.toc .wrap{display:flex;gap:var(--space-4);overflow-x:auto;padding-top:var(--space-8);padding-bottom:var(--space-8);scrollbar-width:thin}
+nav.toc a{
+  flex:0 0 auto;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);
+  letter-spacing:.04em;color:var(--muted);text-decoration:none;
+  padding:var(--space-8) var(--space-12);border-radius:var(--radius-8)
+}
+nav.toc a:hover{background:var(--surface);color:var(--text)}
+
+/* ---- sections ---- */
+section{padding:var(--space-64) 0;border-bottom:var(--border-hair) solid var(--bd-sub)}
+.shead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
+.snum{font-family:var(--f-m);font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--acc);font-variant-numeric:tabular-nums;flex:0 0 auto}
+h2{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0;text-wrap:balance}
+h3{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;margin:var(--space-40) 0 var(--space-12)}
+h4{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:var(--space-24) 0 var(--space-12)}
+section > .wrap > p,.prose{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0 0 var(--space-12)}
+.prose b,section > .wrap > p b{color:var(--text);font-weight:600}
+code{font-family:var(--f-m);font-size:.92em;background:var(--surface);padding:var(--space-2) var(--space-4);border-radius:var(--radius-4);color:var(--acc-t)}
+
+/* ---- the ruler: specimens sit on a true 4px grid ---- */
+.ruler{
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);
+  padding:var(--space-20);margin-top:var(--space-16);
+  background-image:
+    repeating-linear-gradient(to bottom,var(--grid-line) 0 1px,transparent 1px var(--space-4));
+  background-position:0 var(--space-20);
+}
+
+/* ---- spec table ---- */
+.tbl-wrap{overflow-x:auto;margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12)}
+table{width:100%;border-collapse:collapse;font-size:var(--text-body-sm);line-height:var(--lh-body-sm)}
+th{
+  text-align:left;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);
+  font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
+  padding:var(--space-12) var(--space-16);border-bottom:var(--border-hair) solid var(--bd);
+  background:var(--bg-sub);white-space:nowrap
+}
+td{padding:var(--space-12) var(--space-16);border-bottom:var(--border-hair) solid var(--bd-sub);vertical-align:top;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.tok,td.num{font-family:var(--f-m);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.tok{color:var(--acc-t)}
+td.num{color:var(--text)}
+td.use{color:var(--muted)}
+tbody tr:hover td{background:color-mix(in srgb,var(--surface) 55%,transparent)}
+
+/* ---- space specimens ---- */
+.spaces{display:flex;flex-direction:column;gap:var(--space-8)}
+.sp{display:flex;align-items:center;gap:var(--space-16)}
+.sp-tok{font-family:var(--f-m);font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--acc-t);width:104px;flex:0 0 auto;font-variant-numeric:tabular-nums}
+.sp-bar{height:var(--space-8);background:var(--acc);border-radius:var(--radius-full);flex:0 0 auto;min-width:1px}
+.sp-use{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);min-width:0}
+
+/* ---- type specimens ---- */
+.type-row{display:grid;grid-template-columns:132px 1fr;gap:var(--space-16);padding:var(--space-16) 0;border-bottom:var(--border-hair) solid var(--bd-sub);align-items:baseline}
+.type-row:last-child{border-bottom:0}
+.type-meta{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);font-variant-numeric:tabular-nums}
+.type-meta b{display:block;color:var(--acc-t);font-weight:600;margin-bottom:var(--space-2)}
+.type-spec{min-width:0;color:var(--text)}
+
+/* ---- swatch grid for radius / control ---- */
+.demo-grid{display:flex;flex-wrap:wrap;gap:var(--space-16);align-items:flex-end;margin-top:var(--space-16)}
+.demo{display:flex;flex-direction:column;gap:var(--space-8);align-items:center}
+.demo-box{background:var(--surface);border:var(--border-hair) solid var(--bd);width:72px;height:72px}
+.demo-cap{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--acc-t);font-variant-numeric:tabular-nums;text-align:center}
+.demo-cap span{display:block;color:var(--faint)}
+
+/* ---- callout ---- */
+.note{
+  border-left:var(--border-focus) solid var(--acc-bd);background:var(--acc-bg);
+  padding:var(--space-12) var(--space-16);border-radius:0 var(--radius-8) var(--radius-8) 0;
+  margin:var(--space-16) 0;font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure)
+}
+.note b{color:var(--acc-t);font-weight:600}
+.note.warn{border-left-color:var(--rate-bd);background:var(--rate-bg)}
+.note.warn b{color:var(--rate-t)}
+.note.law{border-left-color:var(--st-drop-9);background:var(--st-drop-3)}
+.note.law b{color:var(--st-drop-11)}
+
+/* ---- code block ---- */
+pre{
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);
+  padding:var(--space-16);overflow-x:auto;margin:var(--space-16) 0;
+  font-family:var(--f-m);font-size:var(--text-caption);line-height:var(--lh-body-sm);color:var(--muted)
+}
+pre b{color:var(--acc-t);font-weight:500}
+pre i{color:var(--faint);font-style:normal}
+pre u{color:var(--st-done-11);text-decoration:none}
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="eyebrow"><i></i>Projector · the layer underneath</div>
+    <h1>Foundations</h1>
+    <p class="lede">The previous design system specified <b>colour</b> as tokens and everything else as pictures. A developer implementing from it had no number to reference, so they invented one per component. This is the atom layer that was missing — every dimension in the product, named, measured and enforced.</p>
+
+    <dl class="counts">
+      <div class="count"><dt>Font sizes</dt><dd><span class="was">30</span><span class="arrow">→</span><span class="now">9</span></dd></div>
+      <div class="count"><dt>Corner radii</dt><dd><span class="was">11</span><span class="arrow">→</span><span class="now">5</span></dd></div>
+      <div class="count"><dt>Breakpoints</dt><dd><span class="was">11</span><span class="arrow">→</span><span class="now">3</span></dd></div>
+      <div class="count"><dt>Space tokens</dt><dd><span class="was">1</span><span class="arrow">→</span><span class="now">13</span></dd></div>
+    </dl>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#grid">01 Grid</a>
+    <a href="#space">02 Space</a>
+    <a href="#type">03 Type</a>
+    <a href="#radius">04 Radius</a>
+    <a href="#border">05 Border</a>
+    <a href="#control">06 Control size</a>
+    <a href="#icon">07 Icons</a>
+    <a href="#break">08 Breakpoints</a>
+    <a href="#layers">09 Layers &amp; motion</a>
+    <a href="#roles">10 Component tokens</a>
+    <a href="#components">11 Components</a>
+    <a href="#screens">12 Screens</a>
+    <a href="#errors">13 Errors</a>
+    <a href="#emit">14 tokens.css</a>
+    <a href="#enforce">15 Enforcement</a>
+  </div>
+</nav>
+
+<!-- ============================== 01 GRID ============================== -->
+<section id="grid">
+  <div class="wrap">
+    <div class="shead"><span class="snum">01</span><h2>The grid</h2></div>
+    <p><b>Four pixels.</b> Every dimension in Projector — padding, margin, gap, line-height, control height, icon box — is a multiple of 4. One exception is permitted and only one: <b>2px</b>, for optical nudges where 4 is visibly too much (an icon sitting a hair low against its label).</p>
+    <p>Four is the right base for this product rather than eight, because a phone at 320px cannot afford 8px as its smallest real step: a field label 8px above its input and a hint 8px below reads as one undifferentiated block. Four gives the tight rungs the compact layout needs while still halving cleanly into the 16 / 24 / 40 gutters.</p>
+    <div class="note law"><b>The law.</b> A raw pixel value in a module stylesheet is a defect, not a preference. <code>npm run verify</code> rejects any length that is not a token (§15). If a value you need is not on the scale, the scale is wrong — change it here, not locally.</div>
+    <p>The grid is visible behind every specimen in this document. Where a specimen's edges land on a line, it is on the scale. That is the only proof that matters.</p>
+  </div>
+</section>
+
+<!-- ============================== 02 SPACE ============================== -->
+<section id="space">
+  <div class="wrap">
+    <div class="shead"><span class="snum">02</span><h2>Space</h2></div>
+    <p>Thirteen rungs, rendered below at true size. Tokens are named for their value: <code>--space-16</code> is 16 pixels. There is no arithmetic to do and nothing to misremember, which matters more than the theoretical ability to re-theme a grid that will never change.</p>
+
+    <div class="ruler">
+      <div class="spaces">
+        <div class="sp"><span class="sp-tok">--space-0</span><span class="sp-bar" style="width:1px;background:var(--bd-str)"></span><span class="sp-use">Collapse a gap deliberately. Never omit the token.</span></div>
+        <div class="sp"><span class="sp-tok">--space-2</span><span class="sp-bar" style="width:2px"></span><span class="sp-use">Optical nudge only. The single sub-grid step.</span></div>
+        <div class="sp"><span class="sp-tok">--space-4</span><span class="sp-bar" style="width:4px"></span><span class="sp-use">Icon to its own label. Tightest real gap.</span></div>
+        <div class="sp"><span class="sp-tok">--space-8</span><span class="sp-bar" style="width:8px"></span><span class="sp-use">Field label to input. Items inside one control.</span></div>
+        <div class="sp"><span class="sp-tok">--space-12</span><span class="sp-bar" style="width:12px"></span><span class="sp-use">Related items in a group. Sheet poster to title.</span></div>
+        <div class="sp"><span class="sp-tok">--space-16</span><span class="sp-bar" style="width:16px"></span><span class="sp-use">Gutter at compact. Field to field. Default.</span></div>
+        <div class="sp"><span class="sp-tok">--space-20</span><span class="sp-bar" style="width:20px"></span><span class="sp-use">Sheet padding. Cover block inset.</span></div>
+        <div class="sp"><span class="sp-tok">--space-24</span><span class="sp-bar" style="width:24px"></span><span class="sp-use">Section to section. Gutter at medium.</span></div>
+        <div class="sp"><span class="sp-tok">--space-32</span><span class="sp-bar" style="width:32px"></span><span class="sp-use">Form block to the next block of a different kind.</span></div>
+        <div class="sp"><span class="sp-tok">--space-40</span><span class="sp-bar" style="width:40px"></span><span class="sp-use">Gutter at expanded. Page top padding, desktop.</span></div>
+        <div class="sp"><span class="sp-tok">--space-48</span><span class="sp-bar" style="width:48px"></span><span class="sp-use">Major break inside a long page.</span></div>
+        <div class="sp"><span class="sp-tok">--space-64</span><span class="sp-bar" style="width:64px"></span><span class="sp-use">Page-level rhythm at expanded.</span></div>
+        <div class="sp"><span class="sp-tok">--space-80</span><span class="sp-bar" style="width:80px"></span><span class="sp-use">Largest. Above the fold on the cover only.</span></div>
+      </div>
+    </div>
+
+    <div class="note"><b>Why 10 and 14 are gone.</b> They were the two most-used values in the codebase after 8 — 31 and 16 uses. Both sit off the 4px grid, and both were arrived at by nudging rather than choosing. Every one snaps to 8, 12 or 16. The gutter moves 14 → 16, which shifts every screen's content edge by two pixels and brings the page into alignment with everything inside it.</div>
+  </div>
+</section>
+
+<!-- ============================== 03 TYPE ============================== -->
+<section id="type">
+  <div class="wrap">
+    <div class="shead"><span class="snum">03</span><h2>Type</h2></div>
+    <p>Nine roles, replacing thirty ad-hoc sizes. The half-pixel values in the codebase — 8.5, 9.5, 10.5, 11.5, 12.5, 13.5, 14.5 — are the clearest evidence that no scale existed: nobody chooses 12.5px, they arrive at it by nudging 13 down.</p>
+    <p><b>Every line-height sits on the 4px grid.</b> That is what makes two columns of different type align at the baseline instead of drifting apart down the page. Roles are named for their job, not their size, because the size changes at expanded and the job does not.</p>
+
+    <div class="ruler">
+      <div class="type-row">
+        <div class="type-meta"><b>--text-micro</b>11 / 16 · 600<br>mono · .04em</div>
+        <div class="type-spec" style="font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)">Season 2 · 8 episodes · Watching</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>--text-caption</b>12 / 16 · 500<br>sans</div>
+        <div class="type-spec" style="font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:500;color:var(--muted)">At least 6 characters, with an uppercase letter, a number and a symbol.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>--text-body-sm</b>13 / 20 · 400<br>sans</div>
+        <div class="type-spec" style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted)">Track films and series, see where to watch them, and keep the whole lot in one place.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>--text-label</b>13 / 16 · 600<br>sans</div>
+        <div class="type-spec" style="font-size:var(--text-label);line-height:var(--lh-label);font-weight:600">Create account</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>--text-body</b>15 / 24 · 400<br>sans</div>
+        <div class="type-spec" style="font-size:var(--text-body);line-height:var(--lh-body)">ramanmalani15@gmail.com</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>--text-title-sm</b>17 / 24 · 700<br>display · -.02em</div>
+        <div class="type-spec" style="font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em">Save Dune: Part Two?</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>--text-title</b>21 / 28 · 800<br>display · -.03em</div>
+        <div class="type-spec" style="font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em">Welcome back</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>--text-display-sm</b>27 / 32 · 800<br>display · -.035em</div>
+        <div class="type-spec" style="font-family:var(--f-d);font-size:var(--text-display-sm);line-height:var(--lh-display-sm);font-weight:800;letter-spacing:-.035em">Everything you&rsquo;ve watched.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>--text-display</b>40 / 44 · 800<br>display · -.04em<br><i>expanded only</i></div>
+        <div class="type-spec" style="font-family:var(--f-d);font-size:var(--text-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.04em">Everything you will.</div>
+      </div>
+    </div>
+
+    <h4>Which face</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Face</th><th>Token</th><th>Carries</th><th>Never</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Archivo</td><td class="tok">--f-d</td><td class="use">Titles and display. Anything at <code>--text-title-sm</code> or above.</td><td class="use">Body copy, form labels, buttons.</td></tr>
+        <tr><td class="num">IBM Plex Sans</td><td class="tok">--f-s</td><td class="use">Body, labels, buttons, inputs, errors — everything a person reads as a sentence.</td><td class="use">Headings. Counts and measurements.</td></tr>
+        <tr><td class="num">IBM Plex Mono</td><td class="tok">--f-m</td><td class="use">Counts, runtimes, episode numbers, dates, eyebrows. Anything that lines up in a column.</td><td class="use">Sentences. Buttons.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><b>Digits that line up take <code>font-variant-numeric: tabular-nums</code>.</b> Episode counts in a list, runtimes in a table, the year on a row of tiles. Proportional digits make a column of numbers ripple; nobody can say why it looks wrong, only that it does.</div>
+  </div>
+</section>
+
+<!-- ============================== 04 RADIUS ============================== -->
+<section id="radius">
+  <div class="wrap">
+    <div class="shead"><span class="snum">04</span><h2>Radius</h2></div>
+    <p>Five rungs replacing eleven. The eleven included 3, 4, 5, 6, 8, 9, 10, 11 and 12 — nine values inside a nine-pixel span, none of which a person could tell apart, all of which a developer had to choose between.</p>
+    <div class="demo-grid">
+      <div class="demo"><div class="demo-box" style="border-radius:var(--radius-4)"></div><div class="demo-cap">--radius-4<span>chips, hints</span></div></div>
+      <div class="demo"><div class="demo-box" style="border-radius:var(--radius-8)"></div><div class="demo-cap">--radius-8<span>artwork, tiles</span></div></div>
+      <div class="demo"><div class="demo-box" style="border-radius:var(--radius-12)"></div><div class="demo-cap">--radius-12<span>controls, cards</span></div></div>
+      <div class="demo"><div class="demo-box" style="border-radius:var(--radius-16)"></div><div class="demo-cap">--radius-16<span>sheets</span></div></div>
+      <div class="demo"><div class="demo-box" style="border-radius:var(--radius-full)"></div><div class="demo-cap">--radius-full<span>pills, avatars</span></div></div>
+    </div>
+    <div class="note"><b>Radius encodes scale, not decoration.</b> A bigger surface takes a bigger radius, so the curve reads as constant relative to the box. A 44px button at <code>--radius-16</code> looks like a lozenge; a 460px sheet at <code>--radius-8</code> looks square. Pick by the size of the thing, and never by taste.</div>
+    <div class="note warn"><b>Nested radius.</b> When one rounded box sits inside another with padding <i>p</i>, the inner radius is the outer minus <i>p</i>. A poster at <code>--radius-8</code> inside a sheet at <code>--radius-16</code> with 20px padding is correct because 16 − 20 is already below zero — the inner curve is independent. Where padding is small, the rule bites: never give a child the same radius as its parent.</div>
+  </div>
+</section>
+
+<!-- ============================== 05 BORDER ============================== -->
+<section id="border">
+  <div class="wrap">
+    <div class="shead"><span class="snum">05</span><h2>Border, focus and separation</h2></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Token</th><th>Value</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">--border-hair</td><td class="num">1px</td><td class="use">Every border in the product. There is one border weight.</td></tr>
+        <tr><td class="tok">--border-focus</td><td class="num">2px</td><td class="use">Focus ring only. Nothing else is 2px, so a focus ring can never be mistaken for a border.</td></tr>
+      </tbody>
+    </table></div>
+    <h4>The focus ring is not optional</h4>
+    <p>Every interactive element shows <code>:focus-visible</code> as a 2px <code>--acc</code> outline at 3px offset. The offset matters: an outline flush to the edge of a filled button disappears into it.</p>
+    <pre>:focus-visible {
+  outline: <b>var(--border-focus)</b> solid <b>var(--acc)</b>;
+  outline-offset: 3px;
+  border-radius: <b>var(--radius-4)</b>;
+}</pre>
+    <div class="note law"><b>Never <code>outline: none</code> without a replacement.</b> A keyboard user who cannot see where they are cannot use the form at all. If a design calls for a different focus treatment, it must still be 2px, still <code>--acc</code>, and still visible against both themes.</div>
+
+    <h4>Three ways to separate, used by role</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Device</th><th>Says</th><th>Use for</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Space</td><td class="use">These are different things.</td><td class="use">The default. Reach for this first, always.</td></tr>
+        <tr><td class="num">Hairline</td><td class="use">These are a list of the same thing.</td><td class="use">Table rows, settings rows, a form's sections.</td></tr>
+        <tr><td class="num">Surface</td><td class="use">This is a separate object you can act on.</td><td class="use">Cards, sheets, the tab bar.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><b>Not everything is a card.</b> Border, fill, radius and shadow each independently say &ldquo;separate object&rdquo;. Spending all four on every block flattens the hierarchy — if everything is lifted, nothing is. A card earns its surface by being independently actionable.</div>
+  </div>
+</section>
+
+<!-- ============================== 06 CONTROL ============================== -->
+<section id="control">
+  <div class="wrap">
+    <div class="shead"><span class="snum">06</span><h2>Control size</h2></div>
+    <p>This is the section that fixes the alignment problems. In the current build a button is <b>42px</b> tall and a text input computes to roughly <b>43px</b>. Stacked in the sign-up form they are one pixel apart — not enough to read as deliberate, more than enough to look wrong.</p>
+
+    <div class="ruler">
+      <div class="demo-grid" style="margin-top:0">
+        <div class="demo">
+          <div style="height:var(--control-sm);min-width:132px;border-radius:var(--radius-control);background:var(--surface);border:var(--border-hair) solid var(--bd);display:grid;place-items:center;font-size:var(--text-label);font-weight:600;color:var(--text)">Small</div>
+          <div class="demo-cap">--control-sm<span>36px</span></div>
+        </div>
+        <div class="demo">
+          <div style="height:var(--control-md);min-width:132px;border-radius:var(--radius-control);background:var(--acc);color:var(--on-beam-9);display:grid;place-items:center;font-size:var(--text-label);font-weight:600">Create account</div>
+          <div class="demo-cap">--control-md<span>44px · default</span></div>
+        </div>
+        <div class="demo">
+          <div style="height:var(--control-lg);min-width:132px;border-radius:var(--radius-control);background:var(--acc);color:var(--on-beam-9);display:grid;place-items:center;font-size:var(--text-body);font-weight:600">Create account</div>
+          <div class="demo-cap">--control-lg<span>52px</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Token</th><th>Height</th><th>Padding</th><th>Type</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">--control-sm</td><td class="num">36px</td><td class="num">0 12px</td><td class="num">--text-label</td><td class="use">Dense rows, inline actions, expanded-width toolbars. <b>Needs an expanded hit area.</b></td></tr>
+        <tr><td class="tok">--control-md</td><td class="num">44px</td><td class="num">0 16px</td><td class="num">--text-label</td><td class="use">The default. Every button, input, select and tappable row unless stated otherwise.</td></tr>
+        <tr><td class="tok">--control-lg</td><td class="num">52px</td><td class="num">0 20px</td><td class="num">--text-body</td><td class="use">The primary call to action on the cover, and nowhere else.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note law"><b>The 44-pixel law.</b> Every interactive target is at least 44&times;44 CSS pixels, including its hit area. A control drawn smaller than 44 — a 36px chip, a 24px close icon — must expand its hit area with a pseudo-element, not by growing the visible box.
+    <pre style="margin-bottom:0">.chip::after {
+  content: ""; position: absolute; inset: 50% auto auto 50%;
+  width: <b>var(--control-md)</b>; height: <b>var(--control-md)</b>;
+  transform: translate(-50%, -50%);
+}</pre></div>
+
+    <p><b>Why 44 and not 48.</b> Apple's guidance is 44, Google's is 48. Projector's densest real screen is the episode list, where 48px rows push a season of 24 episodes past three full phone screens. 44 clears the accessibility floor, matches the platform the product ships on first, and buys back a full screen of scrolling on the screen that needs it most.</p>
+    <div class="note warn"><b>Inputs and buttons share a height, always.</b> When a form stacks a field above a submit button, they are the same object to the eye. Both take <code>--control-h</code>. This single rule removes the 1px drift that is currently visible on the sign-up screen.</div>
+  </div>
+</section>
+
+<!-- ============================== 07 ICONS ============================== -->
+<section id="icon">
+  <div class="wrap">
+    <div class="shead"><span class="snum">07</span><h2>Icons</h2></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Token</th><th>Box</th><th>Paired with</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">--icon-16</td><td class="num">16px</td><td class="num">--text-caption, --text-body-sm</td><td class="use">Inline with a label. Tab bar. Field affixes.</td></tr>
+        <tr><td class="tok">--icon-20</td><td class="num">20px</td><td class="num">--text-body, --text-label</td><td class="use">Button leading icons. List row leading icons.</td></tr>
+        <tr><td class="tok">--icon-24</td><td class="num">24px</td><td class="num">--text-title-sm and above</td><td class="use">Page-head actions. Standalone icon buttons.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><b>The icon box is square and fixed; the glyph inside it is not.</b> Optical sizing differs by shape — a circle at 20px reads smaller than a square at 20px. Size the <i>box</i> from the token so layout stays predictable, then let the glyph fill 75–100% of it by eye.</div>
+    <div class="note warn"><b>An icon alone is never a control.</b> Every icon-only button carries <code>aria-label</code>, and the label is the sentence a person would say — <code>aria-label="Back"</code>, not <code>aria-label="chevron-left"</code>.</div>
+  </div>
+</section>
+
+<!-- ============================== 08 BREAKPOINTS ============================== -->
+<section id="break">
+  <div class="wrap">
+    <div class="shead"><span class="snum">08</span><h2>Breakpoints</h2></div>
+    <p>The codebase has <b>eleven</b>: 48, 220, 320, 400, 430, 480, 600, 700, 760, 1100, 1120. Three of those are real layout boundaries and the rest are one component each, guessed at in isolation. Worse, two pairs nearly collide — and that near-collision is a live bug.</p>
+
+    <div class="note law"><b>The stretching you can see on a wide window.</b> <code>--gutter</code> steps at <b>1100px</b> in <code>shell.css</code>, but every component reflows at <b>1120px</b> in its own module. Between 1100 and 1120 the page uses the 40px desktop gutter while the layout inside it is still tablet. The same fault exists at 700 / 760. Two files disagreeing about where desktop begins is exactly what &ldquo;things stretch, things go short&rdquo; looks like.</div>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Band</th><th>Range</th><th>Gutter</th><th>Shape</th></tr></thead>
+      <tbody>
+        <tr><td class="num">compact</td><td class="num">320 – 599</td><td class="num">16px</td><td class="use">One column. Bottom tab bar. Sheets rise from the bottom edge, full width.</td></tr>
+        <tr><td class="num">medium</td><td class="num">600 – 1119</td><td class="num">24px</td><td class="use">One column, centred, capped by <code>--measure</code>. Tabs hold together in the middle. Artwork grows; controls stop growing.</td></tr>
+        <tr><td class="num">expanded</td><td class="num">1120 +</td><td class="num">40px</td><td class="use">Top bar replaces tabs. Multi-column. Sheets become centred dialogs.</td></tr>
+      </tbody>
+    </table></div>
+
+    <pre><i>/* Two queries. Three bands. Nothing else. */</i>
+@media (min-width: <b>600px</b>)  { :root { --gutter: <b>var(--space-24)</b>; } }
+@media (min-width: <b>1120px</b>) { :root { --gutter: <b>var(--space-40)</b>; } }</pre>
+
+    <div class="note warn"><b>Breakpoints cannot be custom properties.</b> CSS does not permit <code>var()</code> inside a media query, so 600 and 1120 are written literally. This is the one place raw numbers are legal — and the one place <code>verify</code> checks hardest, because nothing in the language can stop a fourth breakpoint appearing.</div>
+
+    <h4>320 is the floor, and it is a real device</h4>
+    <p>The iPhone SE first generation and Android Go devices report 320px. At that width the compact gutter leaves <b>288px</b> of content. Every screen is designed against that number, not against 390. A layout that only works at 390 will clip on hardware people actually own.</p>
+    <div class="note"><b>Content decides a breakpoint, never a device.</b> If a line of copy wraps badly at 720px, the fix is <code>--measure</code> or a shorter line — not a new breakpoint at 720. Three bands is the budget.</div>
+  </div>
+</section>
+
+<!-- ============================== 09 LAYERS ============================== -->
+<section id="layers">
+  <div class="wrap">
+    <div class="shead"><span class="snum">09</span><h2>Layers, motion and elevation</h2></div>
+    <h4>Stacking order</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Token</th><th>z-index</th><th>Occupied by</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">--z-sticky</td><td class="num">10</td><td class="use">Sticky section headers inside a scrolling page.</td></tr>
+        <tr><td class="tok">--z-nav</td><td class="num">40</td><td class="use">Tab bar, top bar. Persistent navigation.</td></tr>
+        <tr><td class="tok">--z-scrim</td><td class="num">60</td><td class="use">Sheet and dialog backdrop. Covers navigation.</td></tr>
+        <tr><td class="tok">--z-toast</td><td class="num">70</td><td class="use">Toasts. Above a sheet, because a sheet can raise one.</td></tr>
+        <tr><td class="tok">--z-top</td><td class="num">80</td><td class="use">Reserved. Nothing currently occupies it.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><b>No raw z-index.</b> Five layers, four in use. A component that needs to sit between two of them is telling you the component is wrong, not the scale.</div>
+
+    <h4>Motion</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Token</th><th>Value</th><th>For</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">--dur-fast</td><td class="num">120ms</td><td class="use">Hover, focus, colour change. Anything that must feel instant.</td></tr>
+        <tr><td class="tok">--dur-base</td><td class="num">200ms</td><td class="use">A sheet rising, a panel opening. Movement across distance.</td></tr>
+        <tr><td class="tok">--dur-slow</td><td class="num">320ms</td><td class="use">Full-screen transitions only.</td></tr>
+        <tr><td class="tok">--ease-out</td><td class="num">cubic-bezier(.2,0,0,1)</td><td class="use">Things entering. Fast start, soft landing.</td></tr>
+        <tr><td class="tok">--ease-in-out</td><td class="num">cubic-bezier(.4,0,.2,1)</td><td class="use">Things moving between two on-screen positions.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note law"><b><code>prefers-reduced-motion</code> is honoured globally</b> and already is in <code>shell.css</code>. Motion carries no information in Projector — nothing is only communicated by movement — so reducing it to 0.01ms loses nothing.</div>
+
+    <h4>Elevation</h4>
+    <p>Two shadows, because there are two things that lift: a sheet, and everything else.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Token</th><th>For</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">--shadow-raised</td><td class="use">Toasts, menus, a card lifted on hover at expanded.</td></tr>
+        <tr><td class="tok">--shadow-sheet</td><td class="use">The sign-in sheet. Cast upward, because the sheet comes from below.</td></tr>
+        <tr><td class="tok">--scrim-wash</td><td class="use">The backdrop behind a sheet. <code>rgba(4,6,12,.62)</code> in <b>both</b> themes.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><b>The scrim does not have a light variant.</b> A scrim's job is to push a layer back, and a pale wash over a pale page does not. This is the same principle as <i>artwork has no theme</i> — the scrim is closer to artwork than to surface.</div>
+  </div>
+</section>
+
+<!-- ============================== 10 ROLES ============================== -->
+<section id="roles">
+  <div class="wrap">
+    <div class="shead"><span class="snum">10</span><h2>Component tokens</h2></div>
+    <p>The layer between atoms and components. A component never reaches for an atom directly when a role exists — it asks for <code>--gutter</code>, and the role decides which atom that is at this width. This is what makes the system adapt to a platform instead of being redrawn for one.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Role</th><th>compact</th><th>medium</th><th>expanded</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">--gutter</td><td class="num">16px</td><td class="num">24px</td><td class="num">40px</td><td class="use">Distance from the viewport edge to any content. One number, obeyed by everything.</td></tr>
+        <tr><td class="tok">--control-h</td><td class="num">44px</td><td class="num">44px</td><td class="num">44px</td><td class="use">Height of every button, input and select. Does not change — a finger does not get smaller on a tablet.</td></tr>
+        <tr><td class="tok">--radius-control</td><td class="num" colspan="3" style="text-align:left">12px</td><td class="use">Shared by buttons and inputs so a stacked form reads as one object.</td></tr>
+        <tr><td class="tok">--field-gap</td><td class="num" colspan="3" style="text-align:left">8px</td><td class="use">Label to its input. Input to its hint or error.</td></tr>
+        <tr><td class="tok">--field-stack</td><td class="num" colspan="3" style="text-align:left">16px</td><td class="use">One complete field to the next.</td></tr>
+        <tr><td class="tok">--section-gap</td><td class="num" colspan="3" style="text-align:left">24px</td><td class="use">Section to section within a page.</td></tr>
+        <tr><td class="tok">--sheet-pad</td><td class="num" colspan="3" style="text-align:left">20px</td><td class="use">Inside the sheet. Deliberately <b>not</b> <code>--gutter</code> — a 460px sheet at a 40px desktop gutter would be absurd.</td></tr>
+        <tr><td class="tok">--form-max</td><td class="num" colspan="3" style="text-align:left">420px</td><td class="use">Widest a form column may run. A 900px-wide email field is unusable.</td></tr>
+        <tr><td class="tok">--measure</td><td class="num" colspan="3" style="text-align:left">65ch</td><td class="use">Widest a line of prose may run, at any breakpoint.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note"><b>Read the <code>--control-h</code> row again.</b> It is constant across all three bands, and that is the point of having a role layer. Without it, somebody looks at a desktop mockup, decides the buttons look chunky, and shrinks them — breaking touch targets on the tablet that shares the breakpoint.</div>
+  </div>
+</section>
+
+<style>
+/* ---- component and screen specimens ---- */
+.spec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-24);margin-top:var(--space-16);align-items:start}
+@media (max-width:760px){.spec{grid-template-columns:minmax(0,1fr)}}
+.stage{
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);
+  padding:var(--space-20);display:flex;flex-direction:column;gap:var(--space-12);align-items:stretch;
+  background-image:repeating-linear-gradient(to bottom,var(--grid-line) 0 1px,transparent 1px var(--space-4));
+  background-position:0 var(--space-20)
+}
+.stage.center{align-items:center}
+
+/* real components, built from the tokens */
+.p-btn{
+  font-family:var(--f-s);font-size:var(--text-label);line-height:var(--lh-label);font-weight:600;
+  height:var(--control-h);padding:0 var(--space-16);border-radius:var(--radius-control);border:0;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);
+  background:var(--acc);color:var(--on-beam-9);transition:filter var(--dur-fast) var(--ease-out);width:100%
+}
+.p-btn:hover{filter:brightness(1.06)}
+.p-btn.ghost{background:transparent;color:var(--text);box-shadow:inset 0 0 0 var(--border-hair) var(--bd-str)}
+.p-btn.quiet{background:var(--surface-hv);color:var(--text)}
+.p-btn.lg{height:var(--control-lg);font-size:var(--text-body);padding:0 var(--space-20)}
+.p-btn[disabled]{opacity:.55;cursor:not-allowed;filter:none}
+.p-field{display:flex;flex-direction:column;gap:var(--field-gap)}
+.p-field > span{font-size:var(--text-label);line-height:var(--lh-label);font-weight:600;color:var(--muted)}
+.p-inp{
+  width:100%;height:var(--control-h);font-family:var(--f-s);font-size:var(--text-body);color:var(--text);
+  background:var(--bg);border:0;box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);
+  border-radius:var(--radius-control);padding:0 var(--space-16);transition:box-shadow var(--dur-fast) var(--ease-out)
+}
+.p-inp::placeholder{color:var(--faint)}
+.p-inp.focus{box-shadow:inset 0 0 0 var(--border-focus) var(--acc)}
+.p-inp.bad{box-shadow:inset 0 0 0 var(--border-focus) var(--st-drop-9)}
+.p-hint{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted)}
+.p-err-txt{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--st-drop-11);font-weight:500}
+.p-banner{
+  display:flex;gap:var(--space-12);align-items:flex-start;
+  background:var(--st-drop-3);border-radius:var(--radius-8);padding:var(--space-12) var(--space-16);
+  font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--st-drop-11)
+}
+.p-banner i{font-style:normal;flex:0 0 auto;width:var(--icon-20);height:var(--icon-20);border-radius:var(--radius-full);
+  background:var(--st-drop-9);color:#fff;display:grid;place-items:center;font-size:var(--text-caption);font-weight:700}
+.p-circ{
+  width:var(--control-h);height:var(--control-h);flex:0 0 auto;border-radius:var(--radius-full);
+  background:var(--surface);border:0;color:var(--muted);display:grid;place-items:center;
+  font-size:var(--text-title-sm);cursor:pointer;transition:background var(--dur-fast) var(--ease-out)
+}
+.p-circ:hover{background:var(--surface-hv);color:var(--text)}
+.p-link{background:none;border:0;cursor:pointer;padding:var(--space-8) var(--space-12);
+  font-family:var(--f-s);font-size:var(--text-body-sm);font-weight:600;color:var(--acc-t)}
+.p-bens{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-8);width:100%}
+.p-bens li{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);padding-left:var(--space-24);position:relative}
+.p-bens li::before{content:"✓";position:absolute;left:0;top:0;color:var(--st-done-9);font-weight:700}
+.p-grab{width:34px;height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto}
+.p-art{width:52px;flex:0 0 auto;aspect-ratio:2/3;border-radius:var(--radius-8);overflow:hidden;background:var(--surface-hv);
+  display:grid;place-items:center;font-family:var(--f-m);font-size:9px;color:var(--faint);text-align:center}
+.p-art img{width:100%;height:100%;object-fit:cover;display:block}
+
+.anat{display:flex;flex-direction:column;gap:var(--space-4);margin-top:var(--space-12)}
+.anat li{display:flex;gap:var(--space-12);font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);list-style:none}
+.anat b{font-family:var(--f-m);color:var(--acc-t);font-weight:500;flex:0 0 auto;min-width:120px;font-variant-numeric:tabular-nums}
+</style>
+
+<!-- ============================== 11 COMPONENTS ============================== -->
+<section id="components">
+  <div class="wrap">
+    <div class="shead"><span class="snum">11</span><h2>Components — the entry module</h2></div>
+    <p>Seven components. Every one is assembled from §2–§9 and nothing else; each specimen below is live HTML using the real tokens, so what you see is what the numbers produce.</p>
+
+    <h3>Button</h3>
+    <div class="spec">
+      <div class="stage">
+        <button class="p-btn">Create account</button>
+        <button class="p-btn ghost">Sign in</button>
+        <button class="p-btn quiet">Not now</button>
+        <button class="p-btn lg">Create account</button>
+        <button class="p-btn" disabled>One moment…</button>
+      </div>
+      <div>
+        <ul class="anat">
+          <li><b>height</b><span>--control-h · 44px. The <code>lg</code> variant is 52px and appears on the cover only.</span></li>
+          <li><b>padding</b><span>0 --space-16. Vertical padding is never set; height owns it.</span></li>
+          <li><b>radius</b><span>--radius-control · 12px. Same as an input, deliberately.</span></li>
+          <li><b>type</b><span>--text-label · 13/16 · 600. Sans, never display, never mono.</span></li>
+          <li><b>gap</b><span>--space-8 to a leading --icon-20.</span></li>
+          <li><b>colour</b><span>Primary: --acc on --on-beam-9. Ghost: transparent with a 1px --bd-str inset. Quiet: --surface-hv on --text.</span></li>
+          <li><b>disabled</b><span>opacity .55. The label changes to say what is happening — never just greys out.</span></li>
+        </ul>
+        <div class="note law" style="margin-bottom:0"><b>Every button declares <code>color</code>.</b> A <code>&lt;button&gt;</code> with a background and no colour falls back to the user agent's <code>buttontext</code>, which is black — invisible on a dark surface. This shipped once already.</div>
+      </div>
+    </div>
+
+    <h3>Field</h3>
+    <div class="spec">
+      <div class="stage">
+        <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="raman@example.com" readonly></label>
+        <label class="p-field"><span>Password</span><input class="p-inp focus" type="password" value="••••••••" readonly>
+          <span class="p-hint">At least 6 characters, with an uppercase letter, a lowercase letter, a number and a symbol.</span></label>
+        <label class="p-field"><span>Username</span><input class="p-inp bad" type="text" value="ra" readonly>
+          <span class="p-err-txt">Usernames are at least 3 characters.</span></label>
+      </div>
+      <div>
+        <ul class="anat">
+          <li><b>height</b><span>--control-h · 44px. Identical to a button, so a stacked form has one edge.</span></li>
+          <li><b>label gap</b><span>--field-gap · 8px above the input.</span></li>
+          <li><b>hint gap</b><span>--field-gap · 8px below. Hint and error occupy the same slot.</span></li>
+          <li><b>field to field</b><span>--field-stack · 16px.</span></li>
+          <li><b>type</b><span>Label --text-label. Value --text-body 15px — <b>never below 16px on iOS unless you accept zoom-on-focus</b>; 15px is chosen knowing this, because the field is inside a capped 420px column where the zoom is not disruptive.</span></li>
+          <li><b>rest</b><span>inset 1px --bd-sub on --bg.</span></li>
+          <li><b>focus</b><span>inset 2px --acc. The inset ring replaces the border rather than adding to it, so the control does not change size.</span></li>
+          <li><b>invalid</b><span>inset 2px --st-drop-9, plus the message in --st-drop-11 in the hint slot.</span></li>
+        </ul>
+        <div class="note warn" style="margin-bottom:0"><b>The hint slot is reserved at render, not inserted on error.</b> If the message appears only when validation fails, every field below it jumps down the screen at exactly the moment the person is reading. Reserve the line height from the start.</div>
+      </div>
+    </div>
+
+    <h3>Error banner</h3>
+    <div class="spec">
+      <div class="stage">
+        <div class="p-banner" role="alert"><i>!</i><span>That email and password don&rsquo;t match.</span></div>
+        <div class="p-banner" role="alert"><i>!</i><span>Sign-ups are by invitation. Ask Raman to add your email.</span></div>
+      </div>
+      <div>
+        <ul class="anat">
+          <li><b>padding</b><span>--space-12 --space-16.</span></li>
+          <li><b>radius</b><span>--radius-8. Smaller than a control — it is a message, not a thing you press.</span></li>
+          <li><b>colour</b><span>--st-drop-3 ground, --st-drop-11 text. Both themes carry their own pair.</span></li>
+          <li><b>icon</b><span>--icon-20 disc in --st-drop-9. Colour is never the only signal.</span></li>
+          <li><b>position</b><span>Directly above the submit button, inside the form. Never at the top of the page, where a person who has scrolled to the button will not see it.</span></li>
+          <li><b>a11y</b><span><code>role="alert"</code> so it is announced. Focus moves to it on submit failure.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Icon button</h3>
+    <div class="spec">
+      <div class="stage center" style="flex-direction:row;justify-content:flex-start;gap:var(--space-12)">
+        <button class="p-circ" aria-label="Back">‹</button>
+        <button class="p-circ" aria-label="Close">×</button>
+        <button class="p-circ" aria-label="Switch to light theme">☾</button>
+      </div>
+      <div>
+        <ul class="anat">
+          <li><b>box</b><span>--control-h square · 44&times;44. Was 38px; that failed the 44-pixel law.</span></li>
+          <li><b>radius</b><span>--radius-full.</span></li>
+          <li><b>glyph</b><span>--icon-24 box, --text-title-sm optical size.</span></li>
+          <li><b>on artwork</b><span>Ground becomes <code>rgba(4,6,12,.6)</code> with a 6px blur and <code>#fff</code> glyph — in <b>both</b> themes. Artwork has no theme.</span></li>
+          <li><b>a11y</b><span><code>aria-label</code> is mandatory and reads as speech.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Sheet</h3>
+    <div class="spec">
+      <div class="stage" style="gap:var(--space-16)">
+        <div class="p-grab"></div>
+        <div style="display:flex;gap:var(--space-12);align-items:center">
+          <div class="p-art">no art</div>
+          <div style="font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;color:var(--text)">Save Dune: Part Two?</div>
+        </div>
+        <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:0">You&rsquo;ll need an account to keep track of what you watch.</p>
+        <ul class="p-bens">
+          <li>Your watchlist, ratings and progress in one place</li>
+          <li>Pick up any series exactly where you left off</li>
+          <li>Private by default — nobody sees your library but you</li>
+        </ul>
+        <button class="p-btn">Create account</button>
+        <button class="p-btn quiet">Sign in</button>
+        <button class="p-link" style="align-self:center">Not now</button>
+      </div>
+      <div>
+        <ul class="anat">
+          <li><b>width</b><span>100% to a max of 460px.</span></li>
+          <li><b>padding</b><span>--sheet-pad · 20px, with <code>max(20px, env(safe-area-inset-bottom))</code> at the foot.</span></li>
+          <li><b>radius</b><span>--radius-16 top corners at compact; all four at expanded, where it becomes a centred dialog.</span></li>
+          <li><b>grab</b><span>34&times;4px, --radius-full, --bd-str. Hidden at medium and above — there is nothing to drag with a mouse.</span></li>
+          <li><b>poster</b><span>52px wide, 2:3, --radius-8. This is what makes the sheet read as the thing you reached for rather than a generic interruption.</span></li>
+          <li><b>head gap</b><span>--space-12 poster to title.</span></li>
+          <li><b>stack</b><span>--space-16 between blocks; --space-8 between the two action buttons.</span></li>
+          <li><b>scrim</b><span>--scrim-wash at --z-scrim. Click dismisses. <kbd>Esc</kbd> dismisses.</span></li>
+          <li><b>motion</b><span>Rises --dur-base with --ease-out. Scrim fades --dur-fast.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Benefit list &amp; text link</h3>
+    <div class="spec">
+      <div class="stage">
+        <ul class="p-bens">
+          <li>Your watchlist, ratings and progress in one place</li>
+          <li>Pick up any series exactly where you left off</li>
+        </ul>
+        <button class="p-link" style="align-self:flex-start">Browse without an account →</button>
+      </div>
+      <div>
+        <ul class="anat">
+          <li><b>tick</b><span>--st-done-9, the same green that means <i>Completed</i> everywhere else in the product. Reusing the state hue here is deliberate: it is the only green.</span></li>
+          <li><b>indent</b><span>--space-24 left padding, tick absolutely positioned at 0.</span></li>
+          <li><b>row gap</b><span>--space-8.</span></li>
+          <li><b>text link</b><span>--text-body-sm · 600 · --acc-t. Padding --space-8 --space-12 gives it a 44px hit area without a visible box.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Poster mosaic</h3>
+    <div class="spec">
+      <div class="stage">
+        <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:0">Twelve trending posters, rotated &minus;8&deg;, scaled 1.35, held at .5 opacity behind a gradient scrim. Never stock illustration — the catalogue <i>is</i> the product, so showing it is the most honest pitch available.</p>
+      </div>
+      <div>
+        <ul class="anat">
+          <li><b>columns</b><span>3 at compact · 6 at medium · 8 at expanded.</span></li>
+          <li><b>gap</b><span>--space-4.</span></li>
+          <li><b>cell radius</b><span>--radius-8.</span></li>
+          <li><b>opacity</b><span>.5 dark · .82 light. Light needs its own recipe: fading artwork into near-white turns it pale rather than moody.</span></li>
+          <li><b>scrim</b><span>Gradient to --bg, opaque by 34% up the screen (42% in light, because dark type on light needs more separation than light type on dark).</span></li>
+          <li><b>a11y</b><span><code>aria-hidden="true"</code>. It is decoration, and a screen reader announcing twelve poster URLs is noise.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.phones{display:flex;flex-wrap:wrap;gap:var(--space-24);margin-top:var(--space-16)}
+.phone{flex:0 0 auto;width:320px;max-width:100%}
+.phone-cap{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:var(--space-8);display:flex;gap:var(--space-8);align-items:center}
+.phone-cap b{color:var(--acc-t);font-weight:600}
+.screen{
+  width:320px;max-width:100%;height:568px;overflow:hidden;position:relative;
+  background:var(--bg);border:var(--border-hair) solid var(--bd);border-radius:var(--radius-16);
+  display:flex;flex-direction:column;
+  --gutter:var(--space-16)
+}
+.screen *{box-sizing:border-box}
+.s-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);padding:var(--space-16) var(--gutter) 0}
+.s-body{padding:var(--space-24) var(--gutter) var(--space-16);display:flex;flex-direction:column;gap:var(--field-stack);overflow:hidden}
+.s-h1{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0;color:var(--text)}
+.s-lede{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:0}
+.s-alt{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);text-align:center;margin:0}
+.s-alt a{color:var(--acc-t);font-weight:600;text-decoration:none}
+.s-cover{position:relative;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.s-mosaic{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:var(--space-4);
+  transform:rotate(-8deg) scale(1.35);transform-origin:center;opacity:.5}
+.s-mosaic div{background:var(--surface-hv);border-radius:var(--radius-8);background-size:cover;background-position:center}
+.s-scrim{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 34%,color-mix(in srgb,var(--bg) 72%,transparent) 62%,color-mix(in srgb,var(--bg) 30%,transparent))}
+.s-cover-in{position:relative;z-index:2;margin-top:auto;padding:var(--space-20) var(--gutter) var(--space-20);display:flex;flex-direction:column;gap:var(--space-12)}
+.s-mark{display:flex;align-items:center;gap:var(--space-8);font-family:var(--f-d);font-weight:800;font-size:var(--text-title-sm);letter-spacing:-.03em;color:var(--text)}
+.s-mark i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal}
+.s-cover-h1{font-family:var(--f-d);font-size:var(--text-display-sm);line-height:var(--lh-display-sm);font-weight:800;letter-spacing:-.035em;margin:0;color:var(--text)}
+.s-fine{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);text-align:center;margin:0}
+.s-fine a{color:var(--muted);text-decoration:none}
+.s-sheet-wrap{position:relative;height:100%;background:var(--surface);display:flex;flex-direction:column;justify-content:flex-end}
+.s-sheet-scrim{position:absolute;inset:0;background:var(--scrim-wash)}
+.s-sheet{position:relative;z-index:2;background:var(--bg-sub);border-top:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16) var(--radius-16) 0 0;padding:var(--space-12) var(--sheet-pad) var(--sheet-pad);
+  display:flex;flex-direction:column;gap:var(--space-16);box-shadow:var(--shadow-sheet)}
+.s-skel{background:var(--surface-hv);border-radius:var(--radius-4)}
+</style>
+
+<!-- ============================== 12 SCREENS ============================== -->
+<section id="screens">
+  <div class="wrap">
+    <div class="shead"><span class="snum">12</span><h2>Screens and every state</h2></div>
+    <p>Four screens. <b>Thirty-eight states.</b> Every frame below is 320&times;568 — the supported floor, on a real iPhone SE — because a layout proven at 320 works everywhere above it, and one drawn at 390 clips on hardware people own.</p>
+
+    <h3>Cover</h3>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>C1</b> first visit · loaded</div>
+        <div class="screen"><div class="s-cover">
+          <div class="s-mosaic" aria-hidden="true"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+          <div class="s-scrim"></div>
+          <div class="s-cover-in">
+            <div class="s-mark"><i></i>Cine Search</div>
+            <h1 class="s-cover-h1">Everything you&rsquo;ve watched.<br>Everything you will.</h1>
+            <p class="s-lede">Track films and series, see where to watch them, and keep the whole lot in one place.</p>
+            <button class="p-btn lg">Create account</button>
+            <button class="p-btn lg ghost">Sign in</button>
+            <button class="p-link" style="align-self:center">Browse without an account →</button>
+            <p class="s-fine">Data from <a href="#screens">TMDB and JustWatch</a></p>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>C2</b> artwork loading</div>
+        <div class="screen"><div class="s-cover">
+          <div class="s-mosaic" aria-hidden="true" style="opacity:.28"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+          <div class="s-scrim"></div>
+          <div class="s-cover-in">
+            <div class="s-mark"><i></i>Cine Search</div>
+            <h1 class="s-cover-h1">Everything you&rsquo;ve watched.<br>Everything you will.</h1>
+            <p class="s-lede">Track films and series, see where to watch them, and keep the whole lot in one place.</p>
+            <button class="p-btn lg">Create account</button>
+            <button class="p-btn lg ghost">Sign in</button>
+            <button class="p-link" style="align-self:center">Browse without an account →</button>
+            <p class="s-fine">Data from <a href="#screens">TMDB and JustWatch</a></p>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>C3</b> artwork failed · offline</div>
+        <div class="screen"><div class="s-cover">
+          <div class="s-scrim" style="background:linear-gradient(160deg,var(--ink-3),var(--bg) 62%)"></div>
+          <div class="s-cover-in">
+            <div class="s-mark"><i></i>Cine Search</div>
+            <h1 class="s-cover-h1">Everything you&rsquo;ve watched.<br>Everything you will.</h1>
+            <p class="s-lede">Track films and series, see where to watch them, and keep the whole lot in one place.</p>
+            <button class="p-btn lg">Create account</button>
+            <button class="p-btn lg ghost">Sign in</button>
+            <button class="p-link" style="align-self:center">Browse without an account →</button>
+            <p class="s-fine">Data from <a href="#screens">TMDB and JustWatch</a></p>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="note"><b>The cover never blocks on artwork.</b> C2 and C3 keep the copy and both buttons exactly where C1 has them — the mosaic fades in behind if it arrives and is replaced by a flat gradient if it does not. Nothing reflows, because the person may already be reaching for &ldquo;Create account&rdquo; when the images land.</div>
+
+    <h3>Sign in</h3>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>I1</b> at rest</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body">
+            <div><h1 class="s-h1">Welcome back</h1><p class="s-lede" style="margin-top:var(--space-8)">Sign in to pick up where you left off.</p></div>
+            <label class="p-field"><span>Email</span><input class="p-inp" type="email" placeholder="you@example.com" readonly></label>
+            <label class="p-field"><span>Password</span><input class="p-inp" type="password" readonly></label>
+            <button class="p-btn">Sign in</button>
+            <p class="s-alt">New here? <a href="#screens">Create one</a></p>
+            <p class="s-alt"><a href="#screens">Keep browsing without an account</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>I2</b> wrong credentials</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body">
+            <div><h1 class="s-h1">Welcome back</h1><p class="s-lede" style="margin-top:var(--space-8)">Sign in to pick up where you left off.</p></div>
+            <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="raman@example.com" readonly></label>
+            <label class="p-field"><span>Password</span><input class="p-inp bad" type="password" value="••••••" readonly></label>
+            <div class="p-banner" role="alert"><i>!</i><span>That email and password don&rsquo;t match.</span></div>
+            <button class="p-btn">Sign in</button>
+            <p class="s-alt">New here? <a href="#screens">Create one</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>I3</b> submitting</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body">
+            <div><h1 class="s-h1">Welcome back</h1><p class="s-lede" style="margin-top:var(--space-8)">Sign in to pick up where you left off.</p></div>
+            <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="raman@example.com" readonly style="opacity:.6"></label>
+            <label class="p-field"><span>Password</span><input class="p-inp" type="password" value="••••••••" readonly style="opacity:.6"></label>
+            <button class="p-btn" disabled>One moment…</button>
+            <p class="s-alt">New here? <a href="#screens">Create one</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>I4</b> offline</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body">
+            <div><h1 class="s-h1">Welcome back</h1><p class="s-lede" style="margin-top:var(--space-8)">Sign in to pick up where you left off.</p></div>
+            <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="raman@example.com" readonly></label>
+            <label class="p-field"><span>Password</span><input class="p-inp" type="password" value="••••••••" readonly></label>
+            <div class="p-banner" role="alert"><i>!</i><span>You&rsquo;re offline. Check your connection and try again.</span></div>
+            <button class="p-btn">Try again</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>I5</b> rate limited</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body">
+            <div><h1 class="s-h1">Welcome back</h1><p class="s-lede" style="margin-top:var(--space-8)">Sign in to pick up where you left off.</p></div>
+            <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="raman@example.com" readonly></label>
+            <label class="p-field"><span>Password</span><input class="p-inp" type="password" value="••••••••" readonly></label>
+            <div class="p-banner" role="alert"><i>!</i><span>Too many attempts. Try again in about a minute.</span></div>
+            <button class="p-btn" disabled>Sign in</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Sign up</h3>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>U1</b> at rest · hint visible</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body" style="gap:var(--space-12)">
+            <div><h1 class="s-h1">Create your account</h1><p class="s-lede" style="margin-top:var(--space-8)">Your library is private by default.</p></div>
+            <label class="p-field"><span>Username</span><input class="p-inp" type="text" readonly></label>
+            <label class="p-field"><span>Email</span><input class="p-inp" type="email" readonly></label>
+            <label class="p-field"><span>Password</span><input class="p-inp" type="password" readonly>
+              <span class="p-hint">At least 6 characters, with an uppercase letter, a lowercase letter, a number and a symbol.</span></label>
+            <button class="p-btn">Create account</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>U2</b> not invited</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body" style="gap:var(--space-12)">
+            <div><h1 class="s-h1">Create your account</h1><p class="s-lede" style="margin-top:var(--space-8)">Your library is private by default.</p></div>
+            <label class="p-field"><span>Username</span><input class="p-inp" type="text" value="raman" readonly></label>
+            <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="new@example.com" readonly></label>
+            <label class="p-field"><span>Password</span><input class="p-inp" type="password" value="••••••••" readonly></label>
+            <div class="p-banner" role="alert"><i>!</i><span>Sign-ups are by invitation. Ask Raman to add your email.</span></div>
+            <button class="p-btn">Create account</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>U3</b> username taken</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body" style="gap:var(--space-12)">
+            <div><h1 class="s-h1">Create your account</h1><p class="s-lede" style="margin-top:var(--space-8)">Your library is private by default.</p></div>
+            <label class="p-field"><span>Username</span><input class="p-inp bad" type="text" value="raman" readonly>
+              <span class="p-err-txt">That username is taken. Try another.</span></label>
+            <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="new@example.com" readonly></label>
+            <label class="p-field"><span>Password</span><input class="p-inp" type="password" value="••••••••" readonly></label>
+            <button class="p-btn">Create account</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>U4</b> confirm your email</div>
+        <div class="screen">
+          <div class="s-head"><button class="p-circ" aria-label="Back">‹</button></div>
+          <div class="s-body" style="justify-content:center;flex:1;text-align:center;align-items:center;gap:var(--space-16)">
+            <div class="p-art" style="width:48px;height:48px;aspect-ratio:1;border-radius:var(--radius-full);background:var(--st-done-3);color:var(--st-done-11);font-size:var(--text-title);font-family:var(--f-s)">✓</div>
+            <h1 class="s-h1">Check your email</h1>
+            <p class="s-lede">We sent a confirmation link to <b style="color:var(--text)">new@example.com</b>. Open it to finish setting up your account.</p>
+            <button class="p-btn quiet">Resend the link</button>
+            <p class="s-alt"><a href="#screens">Keep browsing without an account</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Sign-in sheet</h3>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>S1</b> with artwork</div>
+        <div class="screen"><div class="s-sheet-wrap">
+          <div class="s-sheet-scrim"></div>
+          <div class="s-sheet">
+            <div class="p-grab"></div>
+            <div style="display:flex;gap:var(--space-12);align-items:center">
+              <div class="p-art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-5))"></div>
+              <div style="font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;color:var(--text)">Save Dune: Part Two?</div>
+            </div>
+            <p class="s-lede" style="margin:0">You&rsquo;ll need an account to keep track of what you watch.</p>
+            <ul class="p-bens">
+              <li>Your watchlist, ratings and progress in one place</li>
+              <li>Pick up any series where you left off</li>
+              <li>Private by default</li>
+            </ul>
+            <button class="p-btn">Create account</button>
+            <button class="p-btn quiet">Sign in</button>
+            <button class="p-link" style="align-self:center">Not now</button>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>S2</b> no artwork · long title</div>
+        <div class="screen"><div class="s-sheet-wrap">
+          <div class="s-sheet-scrim"></div>
+          <div class="s-sheet">
+            <div class="p-grab"></div>
+            <div style="display:flex;gap:var(--space-12);align-items:center">
+              <div class="p-art">no art</div>
+              <div style="font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;color:var(--text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">Mark watched The Lord of the Rings: The Fellowship of the Ring?</div>
+            </div>
+            <p class="s-lede" style="margin:0">You&rsquo;ll need an account to keep track of what you watch.</p>
+            <ul class="p-bens">
+              <li>Your watchlist, ratings and progress in one place</li>
+              <li>Pick up any series where you left off</li>
+              <li>Private by default</li>
+            </ul>
+            <button class="p-btn">Create account</button>
+            <button class="p-btn quiet">Sign in</button>
+            <button class="p-link" style="align-self:center">Not now</button>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="note warn"><b>Title clamps at three lines.</b> <code>Mark watched</code> plus a Tolkien title is 62 characters and would otherwise push the buttons off a 568px screen. Three lines at <code>--text-title-sm</code> is 72px — the longest the head may grow. The sheet's actions must never leave the viewport, because the sheet is a decision and a decision you cannot reach is a trap.</div>
+
+    <h3>The full state inventory</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Screen</th><th>State</th><th>What is on screen</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">C1</td><td class="num">Cover</td><td class="use">First visit, artwork loaded</td><td class="use">Mosaic at .5, both CTAs, skip link, attribution.</td></tr>
+        <tr><td class="tok">C2</td><td class="num">Cover</td><td class="use">Artwork loading</td><td class="use">Mosaic cells at --surface-hv, fading in. Copy and CTAs already final.</td></tr>
+        <tr><td class="tok">C3</td><td class="num">Cover</td><td class="use">Artwork failed / offline</td><td class="use">Flat --ink-3 → --bg gradient. No error shown: the cover is not broken, it is just plainer.</td></tr>
+        <tr><td class="tok">C4</td><td class="num">Cover</td><td class="use">Light theme</td><td class="use">Mosaic .82, scrim opaque from 42%.</td></tr>
+        <tr><td class="tok">C5</td><td class="num">Cover</td><td class="use">Reduced motion</td><td class="use">Mosaic present, no fade-in. Identical resting state.</td></tr>
+        <tr><td class="tok">C6</td><td class="num">Cover</td><td class="use">medium / expanded</td><td class="use">Content centred, capped 560px, CTAs side by side, mosaic 6 / 8 columns, h1 → --text-display.</td></tr>
+        <tr><td class="tok">C7</td><td class="num">Cover</td><td class="use">Already seen</td><td class="use">Never rendered. <code>/welcome</code> redirects to <code>/</code>.</td></tr>
+        <tr><td class="tok">C8</td><td class="num">Cover</td><td class="use">Signed in, visits <code>/welcome</code></td><td class="use">Redirect to <code>/</code>. A signed-in person is never pitched.</td></tr>
+        <tr><td class="tok">I1</td><td class="num">Sign in</td><td class="use">At rest</td><td class="use">Two empty fields, submit enabled.</td></tr>
+        <tr><td class="tok">I2</td><td class="num">Sign in</td><td class="use">Wrong credentials</td><td class="use">Banner above submit, password ring --st-drop-9, password cleared, focus to banner.</td></tr>
+        <tr><td class="tok">I3</td><td class="num">Sign in</td><td class="use">Submitting</td><td class="use">Fields at .6 and readonly, button disabled reading &ldquo;One moment…&rdquo;.</td></tr>
+        <tr><td class="tok">I4</td><td class="num">Sign in</td><td class="use">Offline</td><td class="use">Banner; submit relabelled &ldquo;Try again&rdquo;. Typed values preserved.</td></tr>
+        <tr><td class="tok">I5</td><td class="num">Sign in</td><td class="use">Rate limited (429)</td><td class="use">Banner naming the wait; submit disabled until it elapses.</td></tr>
+        <tr><td class="tok">I6</td><td class="num">Sign in</td><td class="use">Malformed email</td><td class="use">Inline, on blur — not on submit. Field ring + message in the hint slot.</td></tr>
+        <tr><td class="tok">I7</td><td class="num">Sign in</td><td class="use">Server / unknown error</td><td class="use">Banner: &ldquo;Something went wrong. Try again.&rdquo; Values preserved.</td></tr>
+        <tr><td class="tok">I8</td><td class="num">Sign in</td><td class="use">Password revealed</td><td class="use">Trailing --icon-20 toggle inside the field; <code>aria-pressed</code>. Off by default.</td></tr>
+        <tr><td class="tok">I9</td><td class="num">Sign in</td><td class="use">Caps lock on</td><td class="use">Caption under the password field. Not an error — nothing is wrong yet.</td></tr>
+        <tr><td class="tok">I10</td><td class="num">Sign in</td><td class="use">Autofilled</td><td class="use">Both fields populated by the manager; the ring must survive the UA's yellow wash.</td></tr>
+        <tr><td class="tok">I11</td><td class="num">Sign in</td><td class="use">Success</td><td class="use">Navigate to <code>location.state.from</code>, replace. Never a generic home.</td></tr>
+        <tr><td class="tok">I12</td><td class="num">Sign in</td><td class="use">Already signed in</td><td class="use">Redirect to <code>from</code> on mount. No flash of the form.</td></tr>
+        <tr><td class="tok">I13</td><td class="num">Sign in</td><td class="use">Back pressed mid-submit</td><td class="use">Request aborted; no state written. Returning shows I1, not I3.</td></tr>
+        <tr><td class="tok">I14</td><td class="num">Sign in</td><td class="use">Keyboard open, 320&times;568</td><td class="use">Form scrolls; submit stays reachable. Head may scroll away.</td></tr>
+        <tr><td class="tok">U1</td><td class="num">Sign up</td><td class="use">At rest</td><td class="use">Three fields, password rule stated up front.</td></tr>
+        <tr><td class="tok">U2</td><td class="num">Sign up</td><td class="use">Not invited</td><td class="use">Banner naming the route to access. The one error a person cannot fix alone.</td></tr>
+        <tr><td class="tok">U3</td><td class="num">Sign up</td><td class="use">Username taken</td><td class="use">Inline on the username field. The other two keep their values.</td></tr>
+        <tr><td class="tok">U4</td><td class="num">Sign up</td><td class="use">Confirmation pending</td><td class="use">Replaces the form. Names the address, offers resend, offers browsing.</td></tr>
+        <tr><td class="tok">U5</td><td class="num">Sign up</td><td class="use">Email already registered</td><td class="use">Banner: &ldquo;That email already has an account. Try signing in instead.&rdquo;</td></tr>
+        <tr><td class="tok">U6</td><td class="num">Sign up</td><td class="use">Username too short</td><td class="use">Inline on blur at &lt;3 characters.</td></tr>
+        <tr><td class="tok">U7</td><td class="num">Sign up</td><td class="use">Password too short</td><td class="use">Inline. The hint is already visible, so the message names only what is missing.</td></tr>
+        <tr><td class="tok">U8</td><td class="num">Sign up</td><td class="use">Password missing a class</td><td class="use">Inline, naming which class — never the full rule again.</td></tr>
+        <tr><td class="tok">U9</td><td class="num">Sign up</td><td class="use">Submitting</td><td class="use">As I3.</td></tr>
+        <tr><td class="tok">U10</td><td class="num">Sign up</td><td class="use">Offline</td><td class="use">As I4.</td></tr>
+        <tr><td class="tok">U11</td><td class="num">Sign up</td><td class="use">Profile write failed after auth</td><td class="use">Account exists, profile does not. Banner offers &ldquo;Pick a username&rdquo;, not a re-signup.</td></tr>
+        <tr><td class="tok">S1</td><td class="num">Sheet</td><td class="use">With artwork</td><td class="use">52px poster, verb matched to the control tapped.</td></tr>
+        <tr><td class="tok">S2</td><td class="num">Sheet</td><td class="use">No artwork</td><td class="use">52px placeholder holds the slot. The head never collapses.</td></tr>
+        <tr><td class="tok">S3</td><td class="num">Sheet</td><td class="use">Long title</td><td class="use">Clamped to 3 lines.</td></tr>
+        <tr><td class="tok">S4</td><td class="num">Sheet</td><td class="use">Dismissed</td><td class="use">Closes; nothing remembered. The next reach raises it again — it is not a nag counter.</td></tr>
+        <tr><td class="tok">S5</td><td class="num">Sheet</td><td class="use">expanded</td><td class="use">Centred dialog, --radius-16 all round, grab hidden.</td></tr>
+        <tr><td class="tok">S6</td><td class="num">Sheet</td><td class="use">Keyboard / screen reader</td><td class="use">Focus trapped, <kbd>Esc</kbd> closes, focus returns to the control that raised it.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============================== 13 ERRORS ============================== -->
+<section id="errors">
+  <div class="wrap">
+    <div class="shead"><span class="snum">13</span><h2>Errors</h2></div>
+    <p>Three placements, chosen by <b>who can fix it and when</b> — not by severity.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Placement</th><th>When</th><th>Timing</th><th>Looks like</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Inline, in the hint slot</td><td class="use">One field is wrong and the person can see which.</td><td class="use">On blur. Never while typing — correcting someone mid-word is hostile.</td><td class="use">2px --st-drop-9 ring, --text-caption in --st-drop-11.</td></tr>
+        <tr><td class="num">Banner, above submit</td><td class="use">The submission failed, or the cause spans fields.</td><td class="use">On response. Focus moves to it.</td><td class="use">--st-drop-3 ground, --icon-20 disc, <code>role="alert"</code>.</td></tr>
+        <tr><td class="num">Replaces the screen</td><td class="use">The flow succeeded but is not finished, or cannot continue here.</td><td class="use">On response.</td><td class="use">Centred, one icon, one sentence, one action. See U4.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>Every message, verbatim</h3>
+    <p>Supabase's own wording is written for developers. These are the strings a person sees. <b>Each one names what happened and what to do</b> — no apology, no &ldquo;unexpected error&rdquo;, no error code.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Cause</th><th>Message</th><th>Placement</th></tr></thead>
+      <tbody>
+        <tr><td class="use">Credentials don't match</td><td class="num">That email and password don&rsquo;t match.</td><td class="use">Banner</td></tr>
+        <tr><td class="use">Email already registered</td><td class="num">That email already has an account. Try signing in instead.</td><td class="use">Banner + link</td></tr>
+        <tr><td class="use">Invitation gate</td><td class="num">Sign-ups are by invitation. Ask Raman to add your email.</td><td class="use">Banner</td></tr>
+        <tr><td class="use">Password too short</td><td class="num">Passwords need at least 6 characters.</td><td class="use">Inline</td></tr>
+        <tr><td class="use">Password missing a class</td><td class="num">Add an uppercase letter, a number and a symbol.</td><td class="use">Inline</td></tr>
+        <tr><td class="use">Username taken</td><td class="num">That username is taken. Try another.</td><td class="use">Inline</td></tr>
+        <tr><td class="use">Username too short</td><td class="num">Usernames are at least 3 characters.</td><td class="use">Inline</td></tr>
+        <tr><td class="use">Malformed email</td><td class="num">That doesn&rsquo;t look like an email address.</td><td class="use">Inline</td></tr>
+        <tr><td class="use">Offline</td><td class="num">You&rsquo;re offline. Check your connection and try again.</td><td class="use">Banner, submit → &ldquo;Try again&rdquo;</td></tr>
+        <tr><td class="use">Rate limited (429)</td><td class="num">Too many attempts. Try again in about a minute.</td><td class="use">Banner, submit disabled</td></tr>
+        <tr><td class="use">Profile write failed</td><td class="num">Your account is ready, but the username didn&rsquo;t save. Pick one to finish.</td><td class="use">Banner + action</td></tr>
+        <tr><td class="use">Anything else</td><td class="num">Something went wrong. Try again.</td><td class="use">Banner</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note law"><b>Typed values survive every error.</b> Except the password after a failed sign-in, which is cleared — that one is a security convention people expect. Everything else stays: making somebody retype an email because the network dropped is the app blaming them for its own problem.</div>
+    <div class="note warn"><b>Never leak the taxonomy.</b> On sign-in, a wrong password and an unknown email produce the <i>same</i> message. Distinguishing them tells an attacker which addresses have accounts.</div>
+  </div>
+</section>
+
+<!-- ============================== 14 EMIT ============================== -->
+<section id="emit">
+  <div class="wrap">
+    <div class="shead"><span class="snum">14</span><h2>tokens.css</h2></div>
+    <p>This block appends to <code>src/shared/theme/tokens.css</code>, below the existing colour scales. The colour half of that file already carries the rule that matters — <i>do not hand-edit values here; change them in the design system and re-extract</i> — and this half now falls under it too.</p>
+<pre><i>/* ---------------- atoms: space ---------------- */</i>
+<b>--space-0</b>:0px;   <b>--space-2</b>:2px;   <b>--space-4</b>:4px;   <b>--space-8</b>:8px;
+<b>--space-12</b>:12px;  <b>--space-16</b>:16px; <b>--space-20</b>:20px; <b>--space-24</b>:24px;
+<b>--space-32</b>:32px;  <b>--space-40</b>:40px; <b>--space-48</b>:48px; <b>--space-64</b>:64px;
+<b>--space-80</b>:80px;
+
+<i>/* ---------------- atoms: radius, border, size ---------------- */</i>
+<b>--radius-4</b>:4px; <b>--radius-8</b>:8px; <b>--radius-12</b>:12px; <b>--radius-16</b>:16px; <b>--radius-full</b>:999px;
+<b>--border-hair</b>:1px; <b>--border-focus</b>:2px;
+<b>--control-sm</b>:36px; <b>--control-md</b>:44px; <b>--control-lg</b>:52px;
+<b>--icon-16</b>:16px; <b>--icon-20</b>:20px; <b>--icon-24</b>:24px;
+
+<i>/* ---------------- atoms: type ---------------- */</i>
+<b>--text-micro</b>:11px;      <b>--lh-micro</b>:16px;
+<b>--text-caption</b>:12px;    <b>--lh-caption</b>:16px;
+<b>--text-body-sm</b>:13px;    <b>--lh-body-sm</b>:20px;
+<b>--text-label</b>:13px;      <b>--lh-label</b>:16px;
+<b>--text-body</b>:15px;       <b>--lh-body</b>:24px;
+<b>--text-title-sm</b>:17px;   <b>--lh-title-sm</b>:24px;
+<b>--text-title</b>:21px;      <b>--lh-title</b>:28px;
+<b>--text-display-sm</b>:27px; <b>--lh-display-sm</b>:32px;
+<b>--text-display</b>:40px;    <b>--lh-display</b>:44px;
+
+<i>/* ---------------- atoms: motion, elevation, layers ---------------- */</i>
+<b>--dur-fast</b>:120ms; <b>--dur-base</b>:200ms; <b>--dur-slow</b>:320ms;
+<b>--ease-out</b>:cubic-bezier(.2,0,0,1); <b>--ease-in-out</b>:cubic-bezier(.4,0,.2,1);
+<b>--shadow-raised</b>:0 6px 16px -4px rgba(0,0,0,.6);
+<b>--shadow-sheet</b>:0 -8px 32px -8px rgba(0,0,0,.7);
+<b>--scrim-wash</b>:rgba(4,6,12,.62);
+<b>--z-sticky</b>:10; <b>--z-nav</b>:40; <b>--z-scrim</b>:60; <b>--z-toast</b>:70; <b>--z-top</b>:80;
+
+<i>/* ---------------- component tokens: roles that alias atoms ---------------- */</i>
+<b>--gutter</b>:var(--space-16);
+<b>--control-h</b>:var(--control-md);
+<b>--radius-control</b>:var(--radius-12);
+<b>--field-gap</b>:var(--space-8);
+<b>--field-stack</b>:var(--space-16);
+<b>--section-gap</b>:var(--space-24);
+<b>--sheet-pad</b>:var(--space-20);
+<b>--form-max</b>:420px;
+<b>--measure</b>:65ch;
+
+<i>/* ---------------- the only two media queries in the system ---------------- */</i>
+@media (min-width:600px)  { :root { <b>--gutter</b>:var(--space-24); } }
+@media (min-width:1120px) { :root { <b>--gutter</b>:var(--space-40); } }</pre>
+
+    <div class="note warn"><b>Three removals ship with this.</b> <code>--s6</code> is deleted — its five call sites become <code>--space-24</code>. <code>--sheet-pad</code> moves out of <code>.sheet</code>'s local block into the root. The light-theme <code>:root</code> block currently repeats <code>--like-9</code>, <code>--like-11</code>, <code>--like-3</code> and <code>--hl</code> twice; the duplicates go.</div>
+    <div class="note law"><b>Dark stays the shipped default.</b> Spacing, type and radius are theme-independent — only the shadows change, because a shadow is light behaving differently, not a measurement.</div>
+  </div>
+</section>
+
+<!-- ============================== 15 ENFORCE ============================== -->
+<section id="enforce">
+  <div class="wrap">
+    <div class="shead"><span class="snum">15</span><h2>Enforcement</h2></div>
+    <p>A design system that is only a document decays at the first deadline. The thirty font sizes did not arrive through carelessness — they arrived because nothing rejected them. <code>scripts/verify.mjs</code> already exists and already enforces module ownership of class names; these six rules extend it.</p>
+
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Rule</th><th>Detects</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">V1</td><td class="use">No raw <code>px</code> length in <code>src/modules/**/*.css</code> except inside <code>@media</code>.</td><td class="use">The whole class of drift. The one rule that makes the rest hold.</td></tr>
+        <tr><td class="tok">V2</td><td class="use">Only two <code>min-width</code> values exist across all CSS: 600 and 1120.</td><td class="use">A fourth breakpoint. The 1100/1120 fault could not have shipped with this in place.</td></tr>
+        <tr><td class="tok">V3</td><td class="use">Every rule setting <code>background</code> on a <code>button</code>, <code>input</code>, <code>select</code> or <code>textarea</code> also sets <code>color</code>.</td><td class="use">The invisible-in-dark-mode failure that shipped once.</td></tr>
+        <tr><td class="tok">V4</td><td class="use">No <code>outline:none</code> / <code>outline:0</code> without a sibling <code>:focus-visible</code> rule.</td><td class="use">Silent keyboard inaccessibility.</td></tr>
+        <tr><td class="tok">V5</td><td class="use">No numeric <code>z-index</code> outside the five layer tokens.</td><td class="use">Stacking wars.</td></tr>
+        <tr><td class="tok">V6</td><td class="use">No <code>style={{…}}</code> carrying a length in <code>src/modules/**/*.jsx</code>.</td><td class="use">Values that escape CSS entirely, where no stylesheet audit can see them. Two were caught by hand last time.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note"><b>The snapshot check is the second half.</b> <code>npm run snap -- entry --check</code> already renders the module at three widths in both themes and compares fingerprints. V1–V6 stop a wrong <i>number</i>; the snapshot stops a wrong <i>result</i>. Migrating the gutter from 14 to 16 will fail that check on every screen — which is correct, and is the proof the token reaches what it claims to.</div>
+
+    <h3>What a contract looks like</h3>
+    <p>From the rail-tile correction, and it generalises: <b>a contract records the ladder and the principle, never a lone number.</b> &ldquo;Rail tiles are 104px&rdquo; invited the next developer to change it to 128 and be right. The full form is:</p>
+    <pre>Rail tile width: <b>128 / 148 / 168 / 190</b> at 320 / 400 / 600 / 1120.
+Principle: <u>never a whole number of tiles</u>. A rail has no scrollbar and
+no arrow on touch, so the partial tile is the only scroll affordance.
+At 375px: 104px shows 3.17 tiles and reads as a complete set;
+          128px shows 2.61 and reads as a row that continues.</pre>
+    <div class="note law" style="margin-bottom:0"><b>If a rule cannot say what breaks when it is violated, it is not finished.</b> Every number in this document carries its reason for exactly that purpose — so the next person changes it deliberately, or not at all.</div>
+  </div>
+</section>
+
+<footer style="padding:var(--space-48) 0 var(--space-64)">
+  <div class="wrap">
+    <p style="font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 var(--space-8)">Projector · Foundations · entry module first</p>
+    <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0">
+      Atoms in §2–§9 are global and apply to all seven modules. Components in §11 and screens in §12 cover <b style="color:var(--text)">entry</b> only — discover, search, title, person, library and you convert as each is picked up. The screens in <code>docs/design-system.html</code> remain the product-rule reference; this document is the measurement layer underneath them.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

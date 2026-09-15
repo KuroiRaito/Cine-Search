@@ -338,7 +338,7 @@ export default function Auth() {
                     </>
                 ) : (
                 <>
-                <form onSubmit={submit} noValidate>
+                <form className="auth-form" onSubmit={submit} noValidate>
                     {config.fields.includes('username') && (
                         <Field
                             id="auth-username" label="Username"

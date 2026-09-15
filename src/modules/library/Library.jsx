@@ -26,7 +26,7 @@ const FILM_LESS = new Set(['watching', 'on_hold', 'rewatching']);
  * carries nothing a poster doesn't already say, so it stays a poster.
  */
 export default function Library() {
-    const { isSignedIn } = useAuth();
+    const { isSignedIn, authReady } = useAuth();
     const lib = useLibrary();
     const [filter, setFilter] = useState(null);
     const [toast, setToast] = useState(null);
@@ -71,7 +71,11 @@ export default function Library() {
         || 'all';
     const active = filter ?? fallback;
 
-    if (!isSignedIn) {
+    // `authReady` before `isSignedIn`, and that order is the whole fix: a
+    // returning session takes a network round trip to renew, and asking
+    // "are they signed in?" during it answers no. This screen used to offer a
+    // signed-in person a "Create an account" button for a second and a half.
+    if (authReady && !isSignedIn) {
         return (
             <div className="page">
                 <div className="page-head"><h1>Library</h1></div>
@@ -88,7 +92,7 @@ export default function Library() {
     // after the first render, so there is a frame where nothing is loading and
     // nothing has loaded. Treating that as loaded shows an empty library to
     // someone who has one.
-    if (loading || (!data && !error)) {
+    if (!authReady || loading || (!data && !error)) {
         return (
             <div className="page">
                 <div className="page-head"><h1>Library</h1></div>

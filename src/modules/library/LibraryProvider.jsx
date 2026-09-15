@@ -237,11 +237,14 @@ export function useTileStates() {
  * already saved does nothing: the tile reports, it does not toggle.
  */
 export function useQuickAdd(onGuest) {
-    const { isSignedIn } = useAuth();
+    const { isSignedIn, authReady } = useAuth();
     const lib = useLibrary();
     return useCallback((item) => {
-        if (!isSignedIn) { onGuest?.(item); return; }
+        // Until the session question has an answer, a tap waits. Raising the
+        // sign-in sheet at someone whose session is still being restored is the
+        // same lie the Library screen used to tell, in a sheet.
+        if (!isSignedIn) { if (authReady) onGuest?.(item); return; }
         if (lib.has(item.mediaType, item.id)) return;
         lib.save(item, { status: 'want_to_watch' });
-    }, [isSignedIn, lib, onGuest]);
+    }, [isSignedIn, authReady, lib, onGuest]);
 }

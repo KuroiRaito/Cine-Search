@@ -36,7 +36,7 @@ function FeedRail({ title, load, deps, onAdd, stateFor }) {
 
 export default function Discover() {
     const { region } = useRegion();
-    const { isSignedIn, profile } = useAuth();
+    const { isSignedIn, authReady, profile } = useAuth();
     const [prompt, setPrompt] = useState(null);
 
     // Tapping + on any tile is how a guest discovers what the product is for.
@@ -50,9 +50,10 @@ export default function Discover() {
                 <div className="head-actions">
                     <Link to="/search" className="circ" aria-label="Search">⌕</Link>
                     <ThemeToggle />
-                    {isSignedIn
-                        ? <Link to="/you" className="btn quiet">{profile?.username || 'You'}</Link>
-                        : <Link to="/welcome/signin" state={{ from: '/' }} className="btn quiet">Sign in</Link>}
+                    {!authReady ? <span className="btn quiet is-waiting" aria-hidden="true" />
+                        : isSignedIn
+                            ? <Link to="/you" className="btn quiet">{profile?.username || 'You'}</Link>
+                            : <Link to="/welcome/signin" state={{ from: '/' }} className="btn quiet">Sign in</Link>}
                 </div>
             </div>
 
@@ -74,7 +75,7 @@ export default function Discover() {
             {/* Exactly one sign-up card, after two rails — below the fold, once
                 some value has been delivered. Gone entirely once you're in;
                 selling an account to someone who has one is just noise. */}
-            {!isSignedIn && (
+            {authReady && !isSignedIn && (
                 <div className="card signup">
                     <h2>Keep track of what you watch</h2>
                     <p>Your watchlist, ratings and episode progress — private by default.</p>

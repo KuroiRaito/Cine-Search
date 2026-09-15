@@ -11,7 +11,7 @@ import './you.css';
  */
 export default function Settings() {
     const navigate = useNavigate();
-    const { user, profile, signOut, isSignedIn } = useAuth();
+    const { user, profile, signOut, isSignedIn, authReady } = useAuth();
     const { region, setRegion } = useRegion();
     const [theme, setTheme] = useState(activeTheme);
     const [confirming, setConfirming] = useState(false);
@@ -72,7 +72,7 @@ export default function Settings() {
 
             {/* Theme and region are as useful to a guest as to anyone — they are
                 about this browser, not this account. Everything below is not. */}
-            {!isSignedIn && (
+            {authReady && !isSignedIn && (
                 <div className="setblock">
                     <div className="setlabel">Account</div>
                     <p className="hint">
@@ -83,7 +83,7 @@ export default function Settings() {
                 </div>
             )}
 
-            {isSignedIn && (
+            {authReady && isSignedIn && (
             <div className="setblock">
                 <div className="setlabel">Account</div>
                 <div className="setrow"><span>Username</span><b>{profile?.username || '—'}</b></div>
@@ -91,7 +91,7 @@ export default function Settings() {
             </div>
             )}
 
-            {isSignedIn && (
+            {authReady && isSignedIn && (
             <div className="setblock">
                 {confirming ? (
                     <>

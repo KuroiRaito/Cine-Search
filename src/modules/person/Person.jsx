@@ -27,7 +27,7 @@ export default function Person() {
     const [prompt, setPrompt] = useState(null);
     const onAdd = useQuickAdd((x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' }));
     const stateFor = useTileStates();
-    const { isSignedIn } = useAuth();
+    const { isSignedIn, authReady } = useAuth();
     const lib = useLibrary();
 
     const { data, error, loading, retry } = useAsync(
@@ -109,7 +109,7 @@ export default function Person() {
                     </div>
                 </div>
             ) : (
-                !isSignedIn && <p className="track-hint">Sign in to track what you&apos;ve seen</p>
+                authReady && !isSignedIn && <p className="track-hint">Sign in to track what you&apos;ve seen</p>
             )}
 
             {/* Films before biography: this is a collection product, the work is the point. */}

@@ -31,11 +31,75 @@
 
   --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
   --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
-  --text:var(--ink-12);--muted:var(--ink-11);
+  --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
   --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
   --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);--on-rate:var(--on-mar-9);
   --f-d:'Archivo',sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',monospace;
-  --sh:0 6px 16px -4px rgba(0,0,0,.6);
+
+  /* ============================================================
+     ATOMS — the measurement layer. Published in docs/foundations.html.
+     Theme-independent: a millimetre is a millimetre in the dark.
+     Only the shadows below are redefined per theme, because a shadow
+     is light behaving differently, not a measurement.
+     ============================================================ */
+
+  /* Space. 4px grid; 2px is the one permitted sub-grid step. */
+  --space-0:0px;--space-2:2px;--space-4:4px;--space-8:8px;
+  --space-12:12px;--space-16:16px;--space-20:20px;--space-24:24px;
+  --space-32:32px;--space-40:40px;--space-48:48px;--space-64:64px;--space-80:80px;
+
+  /* Radius. Encodes the size of the thing, never taste. */
+  --radius-4:4px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-full:999px;
+
+  /* Border. One border weight; the focus ring is the only 2px in the system. */
+  --border-hair:1px;--border-focus:2px;
+
+  /* Control height. 44 clears the touch floor and keeps the episode list short. */
+  --control-sm:36px;--control-md:44px;--control-lg:52px;
+
+  /* Icon box. Square and fixed; the glyph inside is sized by eye. */
+  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+
+  /* Type. Every line-height sits on the 4px grid, which is what keeps
+     two columns of different type aligned down the page. */
+  --text-micro:11px;      --lh-micro:16px;
+  --text-caption:12px;    --lh-caption:16px;
+  --text-body-sm:13px;    --lh-body-sm:20px;
+  --text-label:13px;      --lh-label:16px;
+  --text-body:15px;       --lh-body:24px;
+  --text-title-sm:17px;   --lh-title-sm:24px;
+  --text-title:21px;      --lh-title:28px;
+  --text-display-sm:27px; --lh-display-sm:32px;
+  --text-display:40px;    --lh-display:44px;
+
+  /* Motion. Nothing in Projector is communicated only by movement. */
+  --dur-fast:120ms;--dur-base:200ms;--dur-slow:320ms;
+  --ease-out:cubic-bezier(.2,0,0,1);--ease-in-out:cubic-bezier(.4,0,.2,1);
+
+  /* Layers. Five, four in use. */
+  --z-sticky:10;--z-nav:40;--z-scrim:60;--z-toast:70;--z-top:80;
+
+  /* Elevation. The scrim has no light variant on purpose: a pale wash
+     over a pale page does not push anything back. */
+  --shadow-raised:0 6px 16px -4px rgba(0,0,0,.6);
+  --shadow-sheet:0 -8px 32px -8px rgba(0,0,0,.7);
+  --scrim-wash:rgba(4,6,12,.62);
+
+  /* ============================================================
+     COMPONENT TOKENS — roles that alias atoms. A component asks for
+     the role; the role decides which atom applies at this width.
+     ============================================================ */
+  --gutter:var(--space-16);
+  --control-h:var(--control-md);
+  --radius-control:var(--radius-12);
+  --field-gap:var(--space-8);
+  --field-stack:var(--space-16);
+  --section-gap:var(--space-24);
+  --sheet-pad:var(--space-20);
+  --form-max:420px;
+  --measure:65ch;
+
+  --sh:var(--shadow-raised);
 }
 
 @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
@@ -57,9 +121,9 @@
   --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
   --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
   --hl:rgba(255,255,255,.7);
-  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
-  --hl:rgba(255,255,255,.7);
-  --sh:0 6px 16px -4px rgba(23,27,38,.13);
+  --shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+  --shadow-sheet:0 -8px 32px -8px rgba(23,27,38,.16);
+  --sh:var(--shadow-raised);
 }}
 
 :root[data-theme="light"]{
@@ -79,5 +143,7 @@
   --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
   --st-hold-9:#B0642A;--st-hold-11:#7A4415;--st-hold-3:#FBEDE0;
   --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
-  --sh:0 6px 16px -4px rgba(23,27,38,.13);
+  --shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+  --shadow-sheet:0 -8px 32px -8px rgba(23,27,38,.16);
+  --sh:var(--shadow-raised);
 }

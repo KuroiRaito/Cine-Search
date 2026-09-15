@@ -45,12 +45,12 @@
 /* The heading belongs to the cards beneath it, so it takes their geometry. On a
    phone that is invisible; at 1280 it is what stops "Score ▾" from sitting 800px
    away from the heading it modifies. */
-.sect.taste-head { margin: var(--s6) var(--gutter) 0; max-width: 440px; }
+.sect.taste-head { margin: var(--section-gap) var(--gutter) 0; max-width: 440px; }
 
 /* ---------------- settings ----------------
    Plain and conventional by decision, not omission. Standard rows and toggles. */
 
-.setblock { margin: var(--s6) var(--gutter) 0; max-width: 440px; }
+.setblock { margin: var(--section-gap) var(--gutter) 0; max-width: 440px; }
 .setlabel { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
 .segs.two { grid-template-columns: repeat(2, 1fr); }
 .setrow {

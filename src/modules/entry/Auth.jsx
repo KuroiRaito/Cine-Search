@@ -87,13 +87,14 @@ export default function Auth() {
                         : 'Sign in to pick up where you left off.'}
                 </p>
 
-                <form onSubmit={submit} noValidate>
+                <form className="auth-form" onSubmit={submit} noValidate>
                     {isSignUp && (
                         <label className="field">
                             <span>Username</span>
                             <input
                                 className="searchbox" type="text" value={username} required
                                 autoComplete="username" minLength={3} maxLength={24}
+                                aria-invalid={/username/i.test(error || '') || undefined}
                                 onChange={(e) => setUsername(e.target.value)}
                             />
                         </label>
@@ -103,6 +104,7 @@ export default function Auth() {
                         <input
                             className="searchbox" type="email" value={email} required
                             autoComplete="email" inputMode="email"
+                            aria-invalid={/email address/i.test(error || '') || undefined}
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     </label>
@@ -112,6 +114,7 @@ export default function Auth() {
                             className="searchbox" type="password" value={password} required
                             autoComplete={isSignUp ? 'new-password' : 'current-password'} minLength={6}
                             aria-describedby={isSignUp ? 'pw-rule' : undefined}
+                            aria-invalid={/password/i.test(error || '') || undefined}
                             onChange={(e) => setPassword(e.target.value)}
                         />
                         {/* Stated up front. Letting someone type a password,

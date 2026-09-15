@@ -99,7 +99,7 @@
   background: var(--ink-3);
   padding: 14px;
   border-radius: 12px;
-  margin: var(--s6) var(--gutter);
+  margin: var(--section-gap) var(--gutter);
   border: 0;
 }
 
@@ -124,12 +124,12 @@
 .empty {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; padding: 40px var(--gutter); max-width: 34ch;
-  margin: var(--s6) auto 0; min-height: 40vh;
+  margin: var(--section-gap) auto 0; min-height: 40vh;
 }
 .empty h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
 .empty p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 
-.errbox { margin: var(--s6) var(--gutter); border: 1px solid var(--st-drop-9); background: var(--st-drop-3); border-radius: 11px; padding: 14px; }
+.errbox { margin: var(--section-gap) var(--gutter); border: 1px solid var(--st-drop-9); background: var(--st-drop-3); border-radius: 11px; padding: 14px; }
 .errbox b { display: block; font-size: 13px; color: var(--st-drop-11); margin-bottom: 4px; }
 .errbox p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
 
@@ -139,7 +139,7 @@
    is not. Six seconds, because that is how long an undo stays plausible. */
 .toast {
   position: fixed; left: 50%; transform: translateX(-50%);
-  bottom: calc(78px + env(safe-area-inset-bottom)); z-index: 70;
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); z-index: var(--z-toast);
   width: calc(100% - (var(--gutter) * 2)); max-width: 420px;
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   background: var(--ink-5); border-radius: 10px; padding: 10px 13px;
@@ -232,30 +232,39 @@
 
 
 .searchbox {
-  width: 100%; font-family: var(--f-s); font-size: 15px; color: var(--text);
-  background: var(--bg-sub); border: 0; box-shadow: inset 0 0 0 1px var(--bd-sub);
-  border-radius: 11px; padding: 12px 14px; transition: box-shadow .12s;
+  /* Height and radius are shared with .btn: stacked in a form they are one
+     object to the eye, and 42 against 43 reads as a mistake. The focus ring
+     is inset so the control does not change size when it gains focus. */
+  width: 100%; height: var(--control-h);
+  font-family: var(--f-s); font-size: var(--text-body); color: var(--text);
+  background: var(--bg-sub); border: 0;
+  box-shadow: inset 0 0 0 var(--border-hair) var(--bd-sub);
+  border-radius: var(--radius-control); padding: 0 var(--space-16);
+  transition: box-shadow var(--dur-fast) var(--ease-out);
 }
-.searchbox::placeholder { color: var(--muted); }
-.searchbox:focus { outline: none; box-shadow: inset 0 0 0 1px var(--acc); }
+.searchbox::placeholder { color: var(--faint); }
+.searchbox:focus { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
+.searchbox[aria-invalid="true"] { box-shadow: inset 0 0 0 var(--border-focus) var(--st-drop-9); }
+/* Notes are the one multi-line field, so it is the one that may grow. */
+textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--space-12) var(--space-16); line-height: var(--lh-body); }
 
 /* ---------------- sign-in sheet ---------------- */
 
 .scrim {
-  position: fixed; inset: 0; z-index: 60;
-  background: rgba(4, 6, 12, .62);
+  position: fixed; inset: 0; z-index: var(--z-scrim);
+  background: var(--scrim-wash);
   display: flex; align-items: flex-end; justify-content: center;
 }
 .sheet {
   /* A sheet is a fixed-width surface, not the page, so --gutter is the wrong
-     number for its insets: at desktop the page gutter is 40px and this box is
-     460px wide. It still gets exactly one number, declared here. */
-  --sheet-pad: 18px;
+     number for its insets: at expanded the page gutter is 40px and this box
+     is 460px wide. --sheet-pad is its one number, and it lives in tokens.css
+     with the rest of the role layer. */
   width: 100%; max-width: 460px;
-  background: var(--bg-sub); border-top: 1px solid var(--bd);
-  border-radius: 16px 16px 0 0;
-  padding: 0 var(--sheet-pad) max(var(--sheet-pad), env(safe-area-inset-bottom));
-  box-shadow: var(--sh);
+  background: var(--bg-sub); border-top: var(--border-hair) solid var(--bd);
+  border-radius: var(--radius-16) var(--radius-16) 0 0;
+  padding: var(--space-12) var(--sheet-pad) max(var(--sheet-pad), env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-sheet);
 }
 
 /* All six visible at once: one tap, rather than open, scan, tap. Films render
@@ -371,12 +380,15 @@
 }
 
 
-@media (min-width: 700px) {
+@media (min-width: 600px) {
   .scrim { align-items: center; }
-  .sheet { border-radius: 16px; border: 1px solid var(--bd); padding-bottom: 18px; }
+  .sheet {
+    border-radius: var(--radius-16); border: var(--border-hair) solid var(--bd);
+    padding-bottom: var(--sheet-pad);
+  }
 }
 
 @media (min-width: 1120px) {
   /* The tab bar is gone up here, so the gap it was clearing is just a gap. */
-  .toast { bottom: 24px; }
+  .toast { bottom: var(--space-24); }
 }

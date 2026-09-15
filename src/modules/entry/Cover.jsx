@@ -18,7 +18,7 @@ import './entry.css';
  */
 export default function Cover() {
     const navigate = useNavigate();
-    const { data } = useAsync(
+    const { data, error } = useAsync(
         ({ signal }) => trending('week', { signal }).then((r) => r.filter((x) => x.poster_path).slice(0, 12)),
         [],
     );
@@ -27,6 +27,9 @@ export default function Cover() {
 
     return (
         <div className="cover">
+            {/* The cover is not broken without artwork, only plainer, so a
+                failed fetch says nothing — it just falls back to a gradient. */}
+            {(error || (data && data.length === 0)) && <div className="cover-fallback" aria-hidden="true" />}
             <div className="mosaic" aria-hidden="true">
                 {(data || []).map((it) => (
                     <div

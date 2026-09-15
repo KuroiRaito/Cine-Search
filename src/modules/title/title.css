@@ -76,7 +76,7 @@
 .prov-none a { color: var(--acc-t); font-weight: 600; }
 
 
-.scores { display: flex; margin-top: var(--s6); }
+.scores { display: flex; margin-top: var(--section-gap); }
 .scores .s { flex: 1; padding: 2px 8px; text-align: center; border-left: 1px solid var(--bd-sub); }
 .scores .s:first-child { border-left: 0; text-align: left; padding-left: 0; }
 .scores .s b { display: block; font-family: var(--f-d); font-size: 21px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
@@ -92,7 +92,7 @@
 }
 
 /* Four preview cards, 2x2 on a phone and 1x4 on desktop. */
-.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: var(--s6); align-items: start; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: var(--section-gap); align-items: start; }
 .pc { border: 1px solid var(--bd); border-radius: 10px; background: var(--surface); padding: 10px; }
 .pc.open { grid-column: 1 / -1; }
 .pc-top {

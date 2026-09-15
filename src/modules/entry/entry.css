@@ -1,33 +1,69 @@
 /* ============================================================
-   Entry — The cover, sign in, sign up, and the sign-in sheet a guest meets when they
-   reach for something that needs an account.
+   Entry — the cover, sign in, sign up, and the sheet a guest meets when
+   they reach for something that needs an account.
 
-   Classes introduced here belong to this module; `npm run verify` enforces it.
-   Its breakpoints live here too, so nothing outside decides how it looks.
+   Every length is a token. See docs/foundations.html §11 for the
+   component specs and §12 for all 38 states.
+
+   Classes introduced here belong to this module; `npm run verify`
+   enforces it. Its breakpoints live here too, so nothing outside
+   decides how it looks.
    ============================================================ */
 
+/* ---------------- the sheet ---------------- */
 
-.grab { width: 34px; height: 4px; border-radius: 99px; background: var(--bd-str); margin: 9px auto 14px; }
+/* Hidden from medium up: there is nothing to drag with a mouse. */
+.grab {
+  width: var(--space-32); height: var(--space-4);
+  border-radius: var(--radius-full); background: var(--bd-str);
+  margin: 0 auto var(--space-16);
+}
+
 /* The poster is what makes this read as the thing you were reaching for,
-   rather than a generic interruption in front of it. */
-.sheet-head { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+   rather than a generic interruption in front of it. The slot is never
+   collapsed — a missing poster shows a placeholder at the same size, so
+   the head cannot change height between titles. */
+.sheet-head { display: flex; align-items: center; gap: var(--space-12); margin-bottom: var(--space-12); }
 .sheet-art {
-  width: 52px; flex: 0 0 auto; aspect-ratio: 2 / 3;
-  border-radius: 8px; overflow: hidden; background: var(--ink-4);
+  width: var(--space-48); flex: 0 0 auto; aspect-ratio: 2 / 3;
+  border-radius: var(--radius-8); overflow: hidden; background: var(--surface-hv);
 }
 .sheet-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.sheet-art .noart { font-size: 9px; padding: 4px; }
+.sheet-art .noart { font-size: var(--text-micro); line-height: var(--lh-micro); padding: var(--space-4); }
 .sheet-head .sheet-title { margin-bottom: 0; }
-.sheet-title { font-size: 18px; font-weight: 700; letter-spacing: -.03em; margin-bottom: 6px; }
-.sheet-body { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
-.benefits { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 8px; }
-.benefits li { font-size: 12.5px; color: var(--muted); padding-left: 20px; position: relative; line-height: 1.5; }
-.benefits li::before { content: "✓"; position: absolute; left: 0; color: var(--st-done-9); font-weight: 700; }
-.sheet-actions { display: grid; gap: 8px; }
+
+/* "Mark watched" plus a Tolkien title is 62 characters. Three lines is the
+   longest the head may grow: the actions must never leave the viewport,
+   because a decision you cannot reach is a trap. */
+.sheet-title {
+  font-family: var(--f-d);
+  font-size: var(--text-title-sm); line-height: var(--lh-title-sm);
+  font-weight: 700; letter-spacing: -.02em;
+  margin-bottom: var(--space-4);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.sheet-body {
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  color: var(--muted); margin-bottom: var(--space-16);
+}
+
+.benefits { list-style: none; margin: 0 0 var(--space-20); padding: 0; display: grid; gap: var(--space-8); }
+.benefits li {
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  color: var(--muted); padding-left: var(--space-24); position: relative;
+}
+/* The same green that means Completed everywhere else. It is the only green. */
+.benefits li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--st-done-9); font-weight: 700; }
+
+.sheet-actions { display: grid; gap: var(--space-8); }
+
+/* Padding, not height, gives this its 44px hit area — it has no visible box. */
 .dismiss {
-  display: block; width: 100%; margin-top: 12px; padding: 10px;
+  display: block; width: 100%; margin-top: var(--space-12);
+  min-height: var(--control-h); padding: var(--space-8) var(--space-12);
   background: none; border: 0; cursor: pointer;
-  color: var(--muted); font-family: var(--f-s); font-size: 13px; font-weight: 500;
+  color: var(--muted); font-family: var(--f-s);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 500;
 }
 .dismiss:hover { color: var(--text); }
 
@@ -35,16 +71,24 @@
 
 /* The artwork is the pitch: a full-bleed mosaic of real posters, turned off
    square and pushed past the edges so no single title reads as a promotion,
-   then held back to half opacity behind a scrim. */
-.cover { position: relative; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+   then held back behind a scrim. Never stock illustration — the catalogue is
+   the product, so showing it is the most honest pitch there is. */
+.cover {
+  position: relative; min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column; overflow: hidden;
+}
 
 .mosaic {
   position: absolute; inset: 0;
-  display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 5px;
+  display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: var(--space-4);
   transform: rotate(-8deg) scale(1.35); transform-origin: center;
   opacity: .5;
 }
-.mosaic-cell { background-size: cover; background-position: center; border-radius: 6px; }
+.mosaic-cell { background-size: cover; background-position: center; border-radius: var(--radius-8); }
+
+/* The fallback when artwork never arrives. The cover is not broken without
+   it, only plainer, so nothing announces an error. */
+.cover-fallback { position: absolute; inset: 0; background: linear-gradient(160deg, var(--ink-3), var(--bg) 62%); }
 
 .cover-scrim {
   position: absolute; inset: 0;
@@ -55,88 +99,145 @@
     color-mix(in srgb, var(--bg) 30%, transparent)
   );
 }
-:root[data-theme="light"] .cover-scrim {
-  background: linear-gradient(
-    to top,
-    var(--bg) 42%,
-    color-mix(in srgb, var(--bg) 58%, transparent) 64%,
-    color-mix(in srgb, var(--bg) 14%, transparent)
-  );
-}
-:root[data-theme="light"] .mosaic { opacity: .82; }
 
-.cover-theme { position: absolute; top: 14px; right: 14px; z-index: 3; }
-.cover-theme .circ { background: rgba(4, 6, 12, .55); backdrop-filter: blur(6px); color: #fff; }
-.cover-theme .circ:hover { background: rgba(4, 6, 12, .72); color: #fff; }
+.cover-theme { position: absolute; top: var(--space-16); right: var(--gutter); z-index: 3; }
 
 /* Everything sits at the bottom, where the thumb already is. */
-.cover-in { position: relative; z-index: 2; margin-top: auto; padding: 22px 20px 20px; width: 100%; }
+.cover-in {
+  position: relative; z-index: 2; margin-top: auto;
+  padding: var(--space-20) var(--gutter) var(--space-20);
+  width: 100%;
+}
 
 .cover-mark {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
-  font-family: var(--f-d); font-weight: 800; font-size: 17px; letter-spacing: -.03em;
+  display: flex; align-items: center; gap: var(--space-8); margin-bottom: var(--space-12);
+  font-family: var(--f-d); font-weight: 800;
+  font-size: var(--text-title-sm); line-height: var(--lh-title-sm); letter-spacing: -.03em;
 }
-.cover-mark i { width: 6px; height: 6px; border-radius: 99px; background: var(--acc); font-style: normal; }
+.cover-mark i { width: var(--space-8); height: var(--space-8); border-radius: var(--radius-full); background: var(--acc); font-style: normal; }
 
-.cover-in h1 { font-size: 27px; font-weight: 800; letter-spacing: -.035em; margin-bottom: 10px; }
-.cover-in > p { font-size: 13.5px; color: var(--muted); max-width: 44ch; margin-bottom: 20px; }
+.cover-in h1 {
+  font-size: var(--text-display-sm); line-height: var(--lh-display-sm);
+  font-weight: 800; letter-spacing: -.035em; margin-bottom: var(--space-8);
+  text-wrap: balance;
+}
+.cover-in > p {
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  color: var(--muted); max-width: 44ch; margin-bottom: var(--space-20);
+}
 
-.cover-cta { display: flex; flex-direction: column; gap: 9px; }
-.btn-lg { width: 100%; padding: 13px 20px; font-size: 14.5px; }
-.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--bd-str); }
+.cover-cta { display: flex; flex-direction: column; gap: var(--space-8); }
+
+/* The only place --control-lg appears in the product. */
+.btn-lg { width: 100%; height: var(--control-lg); padding: 0 var(--space-20); font-size: var(--text-body); }
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 var(--border-hair) var(--bd-str); }
 .btn.ghost:hover { background: var(--surface-hv); filter: none; }
 
-.cover-skip { margin-top: 14px; text-align: center; }
+/* A real, visible action — the whole point of this persona is browsing before
+   committing, and burying the skip loses them at the door. */
+.cover-skip { margin-top: var(--space-12); text-align: center; }
 .cover-skip button {
-  background: none; border: 0; cursor: pointer; padding: 6px 10px;
-  color: var(--acc-t); font-family: var(--f-s); font-size: 13px; font-weight: 600;
+  min-height: var(--control-h); padding: var(--space-8) var(--space-12);
+  background: none; border: 0; cursor: pointer;
+  color: var(--acc-t); font-family: var(--f-s);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 600;
 }
 
 .cover-fine {
-  margin-top: 14px; font-size: 10.5px; color: var(--ink-9);
-  text-align: center; line-height: 1.5;
+  margin-top: var(--space-12);
+  font-size: var(--text-micro); line-height: var(--lh-micro);
+  color: var(--faint); text-align: center;
 }
-.cover-fine a { color: var(--ink-10); }
+.cover-fine a { color: var(--muted); }
 
 /* ---------------- auth ---------------- */
 
-.auth-body { padding-inline: var(--gutter); max-width: 420px; margin: var(--s6) auto 0; }
-.auth-body h1 { font-size: 24px; font-weight: 800; letter-spacing: -.035em; margin-bottom: 8px; }
-.auth-lede { font-size: 13.5px; color: var(--muted); margin-bottom: var(--s6); }
+.auth-body {
+  padding-inline: var(--gutter);
+  max-width: var(--form-max); margin: var(--space-24) auto 0;
+}
+.auth-body h1 {
+  font-size: var(--text-title); line-height: var(--lh-title);
+  font-weight: 800; letter-spacing: -.035em; margin-bottom: var(--space-8);
+}
+.auth-lede {
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  color: var(--muted); margin-bottom: var(--space-24);
+}
 
-.field { display: block; margin-bottom: 14px; }
+.auth-form { display: flex; flex-direction: column; gap: var(--field-stack); }
+
+.field { display: flex; flex-direction: column; gap: var(--field-gap); }
 .field > span {
-  display: block; margin-bottom: 6px;
-  font-size: 11.5px; font-weight: 600; color: var(--muted);
+  font-size: var(--text-label); line-height: var(--lh-label);
+  font-weight: 600; color: var(--muted);
 }
 
+/* Hint and error share one slot, and the slot is reserved at render rather
+   than inserted on failure — otherwise every field below jumps down the
+   screen at exactly the moment the person is reading. */
 .field-hint {
-  display: block; margin-top: 6px; font-size: 11.5px; color: var(--muted); line-height: 1.5;
-  font-weight: 400;
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  color: var(--muted); font-weight: 400; min-height: var(--lh-caption);
 }
+.field-hint.bad { color: var(--st-drop-11); font-weight: 500; }
 
+/* Above the submit button, inside the form — never at the top of the page,
+   where somebody who has scrolled to the button will not see it. */
 .auth-error {
-  background: var(--st-drop-3); color: var(--st-drop-11);
-  border-radius: 9px; padding: 10px 12px; font-size: 12.5px; margin-bottom: 14px;
+  display: flex; align-items: flex-start; gap: var(--space-12);
+  background: var(--st-drop-3);
+  border-radius: var(--radius-8);
+  padding: var(--space-12) var(--space-16);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  color: var(--st-drop-11);
+}
+/* Colour is never the only signal. */
+.auth-error::before {
+  content: "!"; flex: 0 0 auto;
+  width: var(--icon-20); height: var(--icon-20); border-radius: var(--radius-full);
+  background: var(--st-drop-9); color: #fff;
+  display: grid; place-items: center;
+  font-size: var(--text-caption); font-weight: 700;
 }
 
-.auth-alt { margin-top: 16px; font-size: 12.5px; color: var(--muted); text-align: center; }
+.auth-alt {
+  margin-top: var(--space-16);
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  color: var(--muted); text-align: center;
+}
 .auth-alt a { color: var(--acc-t); font-weight: 600; }
 
-/* ---- Breakpoints. Carved out of base.css's cross-cutting tablet and
-        desktop blocks, into the module that owns the shape. ---- */
+/* ============================================================
+   Breakpoints. Two queries, matching the system's two — the cover used
+   to reflow at 760 while the gutter stepped at 700, which left a 60px
+   band wearing one band's gutter around the other band's layout.
+   ============================================================ */
 
-
-@media (min-width: 700px) {
+@media (min-width: 600px) {
   .grab { display: none; }
+
+  .cover-in {
+    max-width: 560px; margin-inline: auto; text-align: center;
+    padding-bottom: var(--space-32);
+  }
+  .cover-mark { justify-content: center; }
+  .cover-in > p { margin-inline: auto; }
+  .cover-cta { flex-direction: row; }
+  .mosaic { grid-template-columns: repeat(6, 1fr); }
 }
 
+@media (min-width: 1120px) {
+  .cover-in h1 { font-size: var(--text-display); line-height: var(--lh-display); }
+  .mosaic { grid-template-columns: repeat(8, 1fr); }
+}
 
-/* Light needs its own recipe rather than the dark one with the tokens swapped.
-   Fading artwork into near-white turns it pale instead of moody, so the posters
-   carry more opacity and the veil above the text is thinner - while the band
-   the text actually sits on goes fully opaque, because dark type on light needs
-   more separation than light type on dark. */
+/* Light needs its own recipe rather than the dark one with the tokens
+   swapped. Fading artwork into near-white turns it pale instead of moody,
+   so the posters carry more opacity and the veil above the text is thinner
+   — while the band the text sits on goes fully opaque, because dark type on
+   light needs more separation than light type on dark. */
+
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) .cover-scrim {
     background: linear-gradient(
@@ -149,17 +250,17 @@
   :root:not([data-theme="dark"]) .mosaic { opacity: .82; }
 }
 
-
-@media (min-width: 760px) {
-  .cover-in { max-width: 560px; margin-inline: auto; text-align: center; padding-bottom: 32px; }
-  .cover-mark { justify-content: center; }
-  .cover-in > p { margin-inline: auto; }
-  .cover-cta { flex-direction: row; }
-  .mosaic { grid-template-columns: repeat(6, 1fr); }
+:root[data-theme="light"] .cover-scrim {
+  background: linear-gradient(
+    to top,
+    var(--bg) 42%,
+    color-mix(in srgb, var(--bg) 58%, transparent) 64%,
+    color-mix(in srgb, var(--bg) 14%, transparent)
+  );
 }
+:root[data-theme="light"] .mosaic { opacity: .82; }
 
-@media (min-width: 1120px) {
-
-  .cover-in h1 { font-size: 40px; }
-  .mosaic { grid-template-columns: repeat(8, 1fr); }
-}
+/* Artwork has no theme: the control over the poster keeps its own dark
+   ground and white glyph in both. */
+.cover-theme .circ { background: rgba(4, 6, 12, .55); backdrop-filter: blur(6px); color: #fff; }
+.cover-theme .circ:hover { background: rgba(4, 6, 12, .72); color: #fff; }

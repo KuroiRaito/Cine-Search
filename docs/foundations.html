@@ -648,8 +648,8 @@ pre u{color:var(--st-done-11);text-decoration:none}
 .p-bens{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-8);width:100%}
 .p-bens li{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);padding-left:var(--space-24);position:relative}
 .p-bens li::before{content:"✓";position:absolute;left:0;top:0;color:var(--st-done-9);font-weight:700}
-.p-grab{width:34px;height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto}
-.p-art{width:52px;flex:0 0 auto;aspect-ratio:2/3;border-radius:var(--radius-8);overflow:hidden;background:var(--surface-hv);
+.p-grab{width:32px;height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto}
+.p-art{width:48px;flex:0 0 auto;aspect-ratio:2/3;border-radius:var(--radius-8);overflow:hidden;background:var(--surface-hv);
   display:grid;place-items:center;font-family:var(--f-m);font-size:9px;color:var(--faint);text-align:center}
 .p-art img{width:100%;height:100%;object-fit:cover;display:block}
 
@@ -770,8 +770,8 @@ pre u{color:var(--st-done-11);text-decoration:none}
           <li><b>width</b><span>100% to a max of 460px.</span></li>
           <li><b>padding</b><span>--sheet-pad · 20px, with <code>max(20px, env(safe-area-inset-bottom))</code> at the foot.</span></li>
           <li><b>radius</b><span>--radius-16 top corners at compact; all four at expanded, where it becomes a centred dialog.</span></li>
-          <li><b>grab</b><span>34&times;4px, --radius-full, --bd-str. Hidden at medium and above — there is nothing to drag with a mouse.</span></li>
-          <li><b>poster</b><span>52px wide, 2:3, --radius-8. This is what makes the sheet read as the thing you reached for rather than a generic interruption.</span></li>
+          <li><b>grab</b><span>--space-32 &times; --space-4, --radius-full, --bd-str. Hidden at medium and above — there is nothing to drag with a mouse.</span></li>
+          <li><b>poster</b><span>--space-48 wide, 2:3, --radius-8. This is what makes the sheet read as the thing you reached for rather than a generic interruption.</span></li>
           <li><b>head gap</b><span>--space-12 poster to title.</span></li>
           <li><b>stack</b><span>--space-16 between blocks; --space-8 between the two action buttons.</span></li>
           <li><b>scrim</b><span>--scrim-wash at --z-scrim. Click dismisses. <kbd>Esc</kbd> dismisses.</span></li>
@@ -1142,8 +1142,8 @@ pre u{color:var(--st-done-11);text-decoration:none}
         <tr><td class="tok">U9</td><td class="num">Sign up</td><td class="use">Submitting</td><td class="use">As I3.</td></tr>
         <tr><td class="tok">U10</td><td class="num">Sign up</td><td class="use">Offline</td><td class="use">As I4.</td></tr>
         <tr><td class="tok">U11</td><td class="num">Sign up</td><td class="use">Profile write failed after auth</td><td class="use">Account exists, profile does not. Banner offers &ldquo;Pick a username&rdquo;, not a re-signup.</td></tr>
-        <tr><td class="tok">S1</td><td class="num">Sheet</td><td class="use">With artwork</td><td class="use">52px poster, verb matched to the control tapped.</td></tr>
-        <tr><td class="tok">S2</td><td class="num">Sheet</td><td class="use">No artwork</td><td class="use">52px placeholder holds the slot. The head never collapses.</td></tr>
+        <tr><td class="tok">S1</td><td class="num">Sheet</td><td class="use">With artwork</td><td class="use">48px poster, verb matched to the control tapped.</td></tr>
+        <tr><td class="tok">S2</td><td class="num">Sheet</td><td class="use">No artwork</td><td class="use">48px placeholder holds the slot. The head never collapses.</td></tr>
         <tr><td class="tok">S3</td><td class="num">Sheet</td><td class="use">Long title</td><td class="use">Clamped to 3 lines.</td></tr>
         <tr><td class="tok">S4</td><td class="num">Sheet</td><td class="use">Dismissed</td><td class="use">Closes; nothing remembered. The next reach raises it again — it is not a nag counter.</td></tr>
         <tr><td class="tok">S5</td><td class="num">Sheet</td><td class="use">expanded</td><td class="use">Centred dialog, --radius-16 all round, grab hidden.</td></tr>
@@ -1252,22 +1252,25 @@ pre u{color:var(--st-done-11);text-decoration:none}
 <section id="enforce">
   <div class="wrap">
     <div class="shead"><span class="snum">15</span><h2>Enforcement</h2></div>
-    <p>A design system that is only a document decays at the first deadline. The thirty font sizes did not arrive through carelessness — they arrived because nothing rejected them. <code>scripts/verify.mjs</code> already exists and already enforces module ownership of class names; these six rules extend it.</p>
+    <p>A design system that is only a document decays at the first deadline. The thirty font sizes did not arrive through carelessness — they arrived because nothing rejected them. <code>scripts/verify.mjs</code> already exists and already enforces module ownership of class names; these five rules extend it — and <code>npm run verify</code> now runs thirteen.</p>
 
     <div class="tbl-wrap"><table>
-      <thead><tr><th>#</th><th>Rule</th><th>Detects</th></tr></thead>
+      <thead><tr><th>Check</th><th>Rule</th><th>Detects</th></tr></thead>
       <tbody>
-        <tr><td class="tok">V1</td><td class="use">No raw <code>px</code> length in <code>src/modules/**/*.css</code> except inside <code>@media</code>.</td><td class="use">The whole class of drift. The one rule that makes the rest hold.</td></tr>
-        <tr><td class="tok">V2</td><td class="use">Only two <code>min-width</code> values exist across all CSS: 600 and 1120.</td><td class="use">A fourth breakpoint. The 1100/1120 fault could not have shipped with this in place.</td></tr>
-        <tr><td class="tok">V3</td><td class="use">Every rule setting <code>background</code> on a <code>button</code>, <code>input</code>, <code>select</code> or <code>textarea</code> also sets <code>color</code>.</td><td class="use">The invisible-in-dark-mode failure that shipped once.</td></tr>
-        <tr><td class="tok">V4</td><td class="use">No <code>outline:none</code> / <code>outline:0</code> without a sibling <code>:focus-visible</code> rule.</td><td class="use">Silent keyboard inaccessibility.</td></tr>
-        <tr><td class="tok">V5</td><td class="use">No numeric <code>z-index</code> outside the five layer tokens.</td><td class="use">Stacking wars.</td></tr>
-        <tr><td class="tok">V6</td><td class="use">No <code>style={{…}}</code> carrying a length in <code>src/modules/**/*.jsx</code>.</td><td class="use">Values that escape CSS entirely, where no stylesheet audit can see them. Two were caught by hand last time.</td></tr>
+        <tr><td class="tok">token-scale</td><td class="use">In a <b>converted</b> module, no raw <code>px</code> on a spacing or sizing property. Container caps and blur radii are exempt — they have no scale.</td><td class="use">The whole class of drift. The one rule that makes the rest hold. <code>CONVERTED = ['entry']</code> is also the migration board.</td></tr>
+        <tr><td class="tok">gutter-bands</td><td class="use"><code>--gutter</code> steps at 600 and 1120, and at no other width — and must step at both.</td><td class="use">Exactly the 1100/1120 fault. A component may still carry its own content-driven ladder; the page gutter may not.</td></tr>
+        <tr><td class="tok">control-colour</td><td class="use">A rule setting <code>background</code> on a <code>button</code>, <code>input</code>, <code>select</code> or <code>textarea</code> also sets <code>color</code>.</td><td class="use">The invisible-in-dark-mode failure that shipped once on <code>.n-pchip</code>.</td></tr>
+        <tr><td class="tok">focus-ring</td><td class="use">A block with <code>outline:none</code> must draw a replacement in the same block — a <code>box-shadow</code> ring or a border.</td><td class="use">Silent keyboard inaccessibility. Judged per rule, not per file, so an inset ring counts and a bare removal does not.</td></tr>
+        <tr><td class="tok">layer-token</td><td class="use"><code>z-index</code> is a layer token, or a single digit. Nothing between.</td><td class="use">Stacking wars. 0&ndash;9 is local stacking inside one component's own context; the app's shared layers start at 10 and must be named.</td></tr>
       </tbody>
     </table></div>
 
     <div class="note"><b>The snapshot check is the second half.</b> <code>npm run snap -- entry --check</code> already renders the module at three widths in both themes and compares fingerprints. V1–V6 stop a wrong <i>number</i>; the snapshot stops a wrong <i>result</i>. Migrating the gutter from 14 to 16 will fail that check on every screen — which is correct, and is the proof the token reaches what it claims to.</div>
 
+
+    <div class="note warn"><b>The inline-style rule already existed.</b> <code>verify</code>'s <i>No inline styles outside Skeleton</i> check covers <code>style={{&hellip;}}</code> carrying a length, so it is not repeated here. Five new rules, not six.</div>
+
+    <div class="note law"><b>A check that cannot fail is worse than no check.</b> All five of these passed on their first run — because <code>verify.mjs</code> aggregates failures into a map <i>before</i> reporting, and the new checks had been appended after that aggregation. They ran, they recorded failures, and the reporter never looked. Every one of them was proven by injecting a real violation and watching it fail. Do that for the next rule too.</div>
     <h3>What a contract looks like</h3>
     <p>From the rail-tile correction, and it generalises: <b>a contract records the ladder and the principle, never a lone number.</b> &ldquo;Rail tiles are 104px&rdquo; invited the next developer to change it to 128 and be right. The full form is:</p>
     <pre>Rail tile width: <b>128 / 148 / 168 / 190</b> at 320 / 400 / 600 / 1120.

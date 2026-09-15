@@ -18,12 +18,18 @@ function createUnconfiguredClient() {
     return {
         auth: {
             getSession: async () => ({ data: { session: null }, error: null }),
-            onAuthStateChange: () => ({
-                data: { subscription: { unsubscribe: () => {} } },
-            }),
+            // The subscriber is told "guest" rather than left waiting. An app
+            // that never resolves who you are is worse than one that knows you
+            // are nobody.
+            onAuthStateChange: (cb) => {
+                queueMicrotask(() => cb('INITIAL_SESSION', null));
+                return { data: { subscription: { unsubscribe: () => {} } } };
+            },
             signUp: async () => notConfigured(),
             signInWithPassword: async () => notConfigured(),
             signOut: async () => ({ error: null }),
+            resetPasswordForEmail: async () => notConfigured(),
+            updateUser: async () => notConfigured(),
         },
         from() {
             throw new Error('Supabase is not configured');
@@ -39,5 +45,17 @@ if (!isSupabaseConfigured) {
 }
 
 export const supabase = isSupabaseConfigured
-    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+            // Spelled out rather than left to defaults. These four decide every
+            // session case in the app, and a default that changes under us is a
+            // bug nobody will think to look for.
+            persistSession: true,      // survive a reload and a closed tab
+            autoRefreshToken: true,    // the access token lasts an hour; renew it
+            detectSessionInUrl: true,  // the password-reset link lands here
+            // PKCE keeps the tokens out of the URL, so a reset link cannot leak
+            // a session through browser history or a referrer header.
+            flowType: 'pkce',
+        },
+    })
     : createUnconfiguredClient();

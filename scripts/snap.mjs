@@ -43,7 +43,12 @@ const FINGERPRINTS = join(OUT, 'fingerprints.json');
    desktop three-column layout. */
 const MODULES = {
     entry:    [{ name: 'cover', path: '/welcome', guest: true },
-               { name: 'signin', path: '/welcome/signin', guest: true }],
+               { name: 'signin', path: '/welcome/signin', guest: true },
+               // The steps a person actually gets stuck on. `username` and
+               // `reset` are not here: both need a session behind them, and a
+               // guest visiting either is sent away by design.
+               { name: 'signup', path: '/welcome/signup', guest: true },
+               { name: 'forgot', path: '/welcome/forgot', guest: true }],
     discover: [{ name: 'home', path: '/' }],
     search:   [{ name: 'results', path: '/search?q=zimmer' }],
     title:    [{ name: 'series', path: '/title/tv/1396' },

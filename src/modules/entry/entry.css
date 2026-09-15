@@ -201,6 +201,41 @@
   font-size: var(--text-caption); font-weight: 700;
 }
 
+/* A problem with one field belongs under that field, not in a single line at
+   the bottom that makes you work out which of three inputs it meant.
+   No margin: .field is a flex column and its gap owns the spacing. */
+.field-error {
+  font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 500;
+  color: var(--st-drop-11);
+}
+/* The error span follows the input, so `.field-error + .searchbox` could never
+   match — :has is the one that does the work. */
+.field:has(.field-error) .searchbox { box-shadow: inset 0 0 0 var(--border-focus) var(--st-drop-9); }
+
+/* The password field and the control that reveals it are one object. The
+   input reserves room on the right so the two never overlap. */
+.pw-wrap { position: relative; display: block; }
+.pw-wrap .searchbox { padding-right: var(--space-64); }
+.pw-peek {
+  position: absolute; right: var(--space-4); top: 50%; transform: translateY(-50%);
+  min-height: var(--control-h); display: grid; place-items: center;
+  background: none; border: 0; padding: 0 var(--space-8); border-radius: var(--radius-8);
+  font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
+  font-weight: 600; color: var(--muted); cursor: pointer;
+}
+.pw-peek:hover { color: var(--text); background: var(--surface-hv); }
+
+/* Requirements you watch yourself meet, rather than a rule read out after you
+   have already failed it. */
+.pw-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
+.pw-rules li {
+  display: flex; align-items: center; gap: var(--space-8);
+  font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.pw-rules li span { width: var(--space-12); text-align: center; font-size: var(--text-micro); }
+.pw-rules li.met { color: var(--st-done-11); }
+
 .auth-alt {
   margin-top: var(--space-16);
   font-size: var(--text-caption); line-height: var(--lh-caption);

@@ -342,7 +342,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
       </div>
       <div class="type-row">
         <div class="type-meta"><b>--text-caption</b>12 / 16 · 500<br>sans</div>
-        <div class="type-spec" style="font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:500;color:var(--muted)">At least 6 characters, with an uppercase letter, a number and a symbol.</div>
+        <div class="type-spec" style="font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:500;color:var(--muted)">At least 8 characters, with an uppercase letter, a number and a symbol.</div>
       </div>
       <div class="type-row">
         <div class="type-meta"><b>--text-body-sm</b>13 / 20 · 400<br>sans</div>
@@ -692,7 +692,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
       <div class="stage">
         <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="raman@example.com" readonly></label>
         <label class="p-field"><span>Password</span><input class="p-inp focus" type="password" value="••••••••" readonly>
-          <span class="p-hint">At least 6 characters, with an uppercase letter, a lowercase letter, a number and a symbol.</span></label>
+          <span class="p-hint">At least 8 characters, with an uppercase letter, a lowercase letter, a number and a symbol.</span></label>
         <label class="p-field"><span>Username</span><input class="p-inp bad" type="text" value="ra" readonly>
           <span class="p-err-txt">Usernames are at least 3 characters.</span></label>
       </div>
@@ -971,7 +971,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
             <div><h1 class="s-h1">Welcome back</h1><p class="s-lede" style="margin-top:var(--space-8)">Sign in to pick up where you left off.</p></div>
             <label class="p-field"><span>Email</span><input class="p-inp" type="email" value="raman@example.com" readonly></label>
             <label class="p-field"><span>Password</span><input class="p-inp" type="password" value="••••••••" readonly></label>
-            <div class="p-banner" role="alert"><i>!</i><span>You&rsquo;re offline. Check your connection and try again.</span></div>
+            <div class="p-banner" role="alert"><i>!</i><span>Can&rsquo;t reach the server. Check your connection.</span></div>
             <button class="p-btn">Try again</button>
           </div>
         </div>
@@ -1003,7 +1003,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
             <label class="p-field"><span>Username</span><input class="p-inp" type="text" readonly></label>
             <label class="p-field"><span>Email</span><input class="p-inp" type="email" readonly></label>
             <label class="p-field"><span>Password</span><input class="p-inp" type="password" readonly>
-              <span class="p-hint">At least 6 characters, with an uppercase letter, a lowercase letter, a number and a symbol.</span></label>
+              <span class="p-hint">At least 8 characters, with an uppercase letter, a lowercase letter, a number and a symbol.</span></label>
             <button class="p-btn">Create account</button>
           </div>
         </div>
@@ -1173,20 +1173,23 @@ pre u{color:var(--st-done-11);text-decoration:none}
       <thead><tr><th>Cause</th><th>Message</th><th>Placement</th></tr></thead>
       <tbody>
         <tr><td class="use">Credentials don't match</td><td class="num">That email and password don&rsquo;t match.</td><td class="use">Banner</td></tr>
-        <tr><td class="use">Email already registered</td><td class="num">That email already has an account. Try signing in instead.</td><td class="use">Banner + link</td></tr>
+        <tr><td class="use">Email already registered</td><td class="num">That email already has an account. Sign in instead.</td><td class="use">Banner + link</td></tr>
         <tr><td class="use">Invitation gate</td><td class="num">Sign-ups are by invitation. Ask Raman to add your email.</td><td class="use">Banner</td></tr>
-        <tr><td class="use">Password too short</td><td class="num">Passwords need at least 6 characters.</td><td class="use">Inline</td></tr>
-        <tr><td class="use">Password missing a class</td><td class="num">Add an uppercase letter, a number and a symbol.</td><td class="use">Inline</td></tr>
+        <tr><td class="use">Password too short</td><td class="num">At least 8 characters</td><td class="use">Inline</td></tr>
+        <tr><td class="use">Password missing a class</td><td class="num">That password doesn&rsquo;t meet the requirements below.</td><td class="use">Inline</td></tr>
         <tr><td class="use">Username taken</td><td class="num">That username is taken. Try another.</td><td class="use">Inline</td></tr>
         <tr><td class="use">Username too short</td><td class="num">Usernames are at least 3 characters.</td><td class="use">Inline</td></tr>
         <tr><td class="use">Malformed email</td><td class="num">That doesn&rsquo;t look like an email address.</td><td class="use">Inline</td></tr>
-        <tr><td class="use">Offline</td><td class="num">You&rsquo;re offline. Check your connection and try again.</td><td class="use">Banner, submit → &ldquo;Try again&rdquo;</td></tr>
-        <tr><td class="use">Rate limited (429)</td><td class="num">Too many attempts. Try again in about a minute.</td><td class="use">Banner, submit disabled</td></tr>
+        <tr><td class="use">Offline</td><td class="num">Can&rsquo;t reach the server. Check your connection and try again.</td><td class="use">Banner, submit → &ldquo;Try again&rdquo;</td></tr>
+        <tr><td class="use">Rate limited (429)</td><td class="num">Too many attempts. Wait a minute and try again.</td><td class="use">Banner, submit disabled</td></tr>
         <tr><td class="use">Profile write failed</td><td class="num">Your account is ready, but the username didn&rsquo;t save. Pick one to finish.</td><td class="use">Banner + action</td></tr>
         <tr><td class="use">Anything else</td><td class="num">Something went wrong. Try again.</td><td class="use">Banner</td></tr>
       </tbody>
     </table></div>
 
+    <div class="note law"><b>These strings are keyed on <code>error.code</code>, not on prose.</b> Supabase's messages are not a stable contract and its codes are; matching on wording meant a reworded message silently became &ldquo;Something went wrong&rdquo;. Every code in <code>src/modules/entry/messages.js</code> was read off a live response from this project, and the copy above is what shipped &mdash; not what was designed. Where the two differed, the verified string won.</div>
+
+    <div class="note warn"><b>The password rule is 8 characters, not 6.</b> The form promised 6 and Supabase demanded 8, so the only way to learn the real rule was to fail at it. It is now a live checklist under the field &mdash; five requirements that tick green as you satisfy them &mdash; rather than a sentence you read after being refused. <code>PASSWORD_RULES</code> in <code>src/modules/entry/rules.js</code> is the single source, and it must track the Supabase dashboard policy.</div>
     <div class="note law"><b>Typed values survive every error.</b> Except the password after a failed sign-in, which is cleared — that one is a security convention people expect. Everything else stays: making somebody retype an email because the network dropped is the app blaming them for its own problem.</div>
     <div class="note warn"><b>Never leak the taxonomy.</b> On sign-in, a wrong password and an unknown email produce the <i>same</i> message. Distinguishing them tells an attacker which addresses have accounts.</div>
   </div>

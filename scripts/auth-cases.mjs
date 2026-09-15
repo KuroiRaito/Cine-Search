@@ -42,7 +42,8 @@ const SHOT_DIR = fileURLToPath(new URL('../snapshots/auth', import.meta.url));
 // the same 35 states through the desktop shell, which is a different frame
 // entirely: a top bar instead of tabs, and a centred dialog instead of a sheet.
 const WIDE = args.includes('--wide');
-const VIEW = WIDE ? { width: 1280, height: 900 } : { width: 420, height: 900 };
+const asked = Number((args.find((a) => a.startsWith('--w=')) || '').slice(4));
+const VIEW = { width: asked || (WIDE ? 1280 : 420), height: asked && asked < 380 ? 568 : 900 };
 const only = args.filter((a) => !a.startsWith('--')).map(Number);
 
 /* ---- a session Supabase would accept, and the pieces to bend it with ---- */
@@ -633,6 +634,17 @@ for (const c of chosen) {
         const slug = c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 52);
         const file = `${String(c.n).padStart(2, '0')}-${slug}@${VIEW.width}.png`;
         await page.screenshot({ path: join(SHOT_DIR, file) }).catch(() => {});
+    }
+
+    // An invariant, not a case: no state of any screen at any width may make
+    // the page scroll sideways. It is the failure 320 exists to catch, and the
+    // one a text assertion will never notice.
+    if (!problem && !page.isClosed()) {
+        const over = await page.evaluate(() => {
+            const d = document.documentElement;
+            return d.scrollWidth > d.clientWidth ? `${d.scrollWidth} > ${d.clientWidth}` : null;
+        }).catch(() => null);
+        if (over) problem = `the page scrolls sideways (${over})`;
     }
 
     if (!problem) {

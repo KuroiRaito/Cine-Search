@@ -281,6 +281,21 @@ for (const b of BANDS) {
     if (!gutterSteps.includes(b)) fail('gutter-bands', `no --gutter step at the ${b}px band`);
 }
 
+// --shell-max is the other half of the same decision: a container and its
+// inset. It steps once more than the gutter does, at the wide band, where the
+// container caps and the margin takes the rest.
+const CONTAINER_STEPS = ['1120', '1440'];
+const shellSteps = [];
+for (const m of stripComments(css).matchAll(/@media[^{]*\(min-width:\s*(\d+)px\)[^{]*\{((?:[^{}]|\{[^{}]*\})*)\}/g)) {
+    if (/--shell-max\s*:/.test(m[2])) shellSteps.push(m[1]);
+}
+for (const w of shellSteps) {
+    if (!CONTAINER_STEPS.includes(w)) fail('gutter-bands', `--shell-max steps at ${w}px, which is not a container step (${CONTAINER_STEPS.join(', ')})`);
+}
+for (const b of CONTAINER_STEPS) {
+    if (!shellSteps.includes(b)) fail('gutter-bands', `no --shell-max step at the ${b}px band`);
+}
+
 /* ---------------------------------------------------------------
    11. A control that sets a background sets a colour.
 
@@ -349,7 +364,7 @@ const CHECKS = [
     ['class-ownership', "A module's own classes are used only by that module"],
     ['deep-import', 'Modules are imported only through their index'],
     ['token-scale', 'Lengths in a converted module come from the scale'],
-    ['gutter-bands', 'The gutter steps at 600 and 1120, and nowhere else'],
+    ['gutter-bands', 'The gutter and the container step only at their bands'],
     ['control-colour', 'A control with a background declares its colour'],
     ['focus-ring', 'Focus is never removed without a replacement'],
     ['layer-token', 'Five layers, and nothing between them'],

@@ -379,6 +379,13 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   .rail .tile { width: 190px; }
 }
 
+/* A content ladder, not a layout band, so it steps on its own widths.
+   Principle: a poster tile stays roughly 180-260px wide. Below that the year
+   and title stop being readable; above it a row reads as a gallery wall
+   rather than a set you can compare. Five columns held all the way to the
+   1600px cap would put tiles at 293px. */
+@media (min-width: 1440px) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
 
 @media (min-width: 600px) {
   .scrim { align-items: center; }

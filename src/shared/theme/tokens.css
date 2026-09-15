@@ -98,6 +98,12 @@
   --sheet-pad:var(--space-20);
   --form-max:420px;
   --measure:65ch;
+  /* The browse container. Below expanded the viewport is the container; above
+     it, content keeps growing until it reaches this cap and the margin absorbs
+     the rest. Shared by the top bar and the page, which is what puts the
+     wordmark and the page heading on one edge. Stepped in shell.css with the
+     gutter, because a container and its inset are one decision. */
+  --shell-max:none;
 
   --sh:var(--shadow-raised);
 }

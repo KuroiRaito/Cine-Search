@@ -37,6 +37,12 @@ const SHOW = args.includes('--show');
 // is the only way to look at an error state without causing one.
 const SHOTS = args.includes('--shots');
 const SHOT_DIR = fileURLToPath(new URL('../snapshots/auth', import.meta.url));
+// Phone by default, because that is where the layout is tightest and where a
+// banner is most likely to push the submit button off the screen. --wide runs
+// the same 35 states through the desktop shell, which is a different frame
+// entirely: a top bar instead of tabs, and a centred dialog instead of a sheet.
+const WIDE = args.includes('--wide');
+const VIEW = WIDE ? { width: 1280, height: 900 } : { width: 420, height: 900 };
 const only = args.filter((a) => !a.startsWith('--')).map(Number);
 
 /* ---- a session Supabase would accept, and the pieces to bend it with ---- */
@@ -395,12 +401,15 @@ const CASES = [
             await second.waitForTimeout(1200);
             const after = await read(second);
             await second.close();
-            return `before[${before.slice(0, 40)}] after[${after.slice(0, 60)}]`;
+            // Sliced generously and matched on content, not position: at 1280
+            // the top bar is in the text too, and a fixed prefix would only be
+            // asserting which width this ran at.
+            return `before[${before.slice(0, 200)}] after[${after.slice(0, 200)}]`;
         },
         // Before: the signed-in empty state. After: the guest pitch, in a tab
         // nobody touched. Leaving one person's library on screen after another
         // signs out is not a cosmetic bug.
-        expect: ['before[Library Nothing saved yet Save a film', 'An account keeps your watchlist'],
+        expect: ['Save a film or series', 'An account keeps your watchlist'],
         reject: ['Your session ended'],
     },
 
@@ -606,7 +615,7 @@ let failed = 0;
 const chosen = CASES.filter((c) => !only.length || only.includes(c.n));
 
 for (const c of chosen) {
-    const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } });
+    const ctx = await browser.newContext({ viewport: { ...VIEW } });
     await install(ctx, c.opts);
     const page = await ctx.newPage();
     const authCalls = [];
@@ -622,7 +631,8 @@ for (const c of chosen) {
 
     if (SHOTS && !page.isClosed()) {
         const slug = c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 52);
-        await page.screenshot({ path: join(SHOT_DIR, `${String(c.n).padStart(2, '0')}-${slug}.png`) }).catch(() => {});
+        const file = `${String(c.n).padStart(2, '0')}-${slug}@${VIEW.width}.png`;
+        await page.screenshot({ path: join(SHOT_DIR, file) }).catch(() => {});
     }
 
     if (!problem) {
@@ -644,7 +654,7 @@ await browser.close();
 await server.close();
 
 console.log(failed
-    ? `\n  ${failed} of ${chosen.length} cases failed.\n`
-    : `\n  All ${chosen.length} cases pass.\n`);
+    ? `\n  ${failed} of ${chosen.length} cases failed at ${VIEW.width}px.\n`
+    : `\n  All ${chosen.length} cases pass at ${VIEW.width}px.\n`);
 if (SHOTS) console.log(`  ${chosen.length} screenshots → snapshots/auth/\n`);
 process.exit(failed ? 1 : 0);

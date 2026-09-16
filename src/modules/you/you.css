@@ -67,3 +67,70 @@
   font-family: var(--f-s);
 }
 .tc-face img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------------- the medium blocks ----------------
+   One per medium, because a film has a runtime and no episodes and a series
+   has both. docs/profile-module.html §07. */
+
+.sblock {
+  margin: var(--space-16) var(--gutter) 0;
+  background: var(--bg-sub); border: var(--border-hair) solid var(--bd-sub);
+  border-radius: var(--radius-12); padding: var(--space-12);
+}
+.sblock-h { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--space-8); }
+.sblock-h b {
+  font-family: var(--f-d); font-size: var(--text-caption); line-height: var(--lh-caption);
+  font-weight: 700; color: var(--text);
+}
+/* "at least", when series minutes are still arriving season by season. */
+.sblock-h span {
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro);
+  color: var(--faint);
+}
+
+.snums { display: flex; gap: var(--space-16); margin-bottom: var(--space-8); }
+.snum-i { min-width: 0; }
+.snum-i dt {
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro);
+  letter-spacing: .06em; text-transform: uppercase; color: var(--faint);
+}
+.snum-i dd {
+  margin: 0; font-family: var(--f-m);
+  font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 600;
+  color: var(--text); font-variant-numeric: tabular-nums;
+}
+.snum-i dd.rate { color: var(--rate-t); }
+
+/* The stacked bar — six watch states, the hues the foundations already fix.
+   No new colour, no new component: the palette had nowhere to prove itself
+   until this. */
+.dbar {
+  display: flex; height: var(--space-8);
+  border-radius: var(--radius-full); overflow: hidden; background: var(--surface-hv);
+}
+.dbar i { display: block; height: 100%; font-style: normal; }
+
+.dlegend { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-top: var(--space-8); }
+.dlegend span {
+  display: flex; align-items: center; gap: var(--space-4);
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro);
+  color: var(--muted);
+}
+.dlegend i {
+  width: var(--space-8); height: var(--space-8); border-radius: var(--radius-full);
+  font-style: normal; flex: 0 0 auto;
+}
+
+/* Both the bar's segments and the legend's dots take their colour from the
+   status tone, so the two can never drift apart. */
+.dbar i.st-want, .dlegend i.st-want { background: var(--st-want-9); }
+.dbar i.st-ing,  .dlegend i.st-ing  { background: var(--st-ing-9); }
+.dbar i.st-hold, .dlegend i.st-hold { background: var(--st-hold-9); }
+.dbar i.st-done, .dlegend i.st-done { background: var(--st-done-9); }
+.dbar i.st-re,   .dlegend i.st-re   { background: var(--st-re-9); }
+.dbar i.st-drop, .dlegend i.st-drop { background: var(--st-drop-9); }
+
+/* Standard deviation, in words. */
+.spread-line {
+  margin: 0; font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted);
+}

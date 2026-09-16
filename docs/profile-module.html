@@ -150,6 +150,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
     <a href="#stats">07 Stats</a>
     <a href="#states">08 Every state</a>
     <a href="#desktop">08b Desktop</a>
+    <a href="#cold">08c Cold start</a>
     <a href="#schema">09 What it needs</a>
     <a href="#open">10 Decisions</a>
     <a href="#bench">11 Benchmark</a>
@@ -387,6 +388,21 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 .dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
 .dbody{flex:1;overflow:hidden}
 .dcols{display:grid;grid-template-columns:320px 1fr;gap:var(--space-32);padding:var(--space-24) var(--gutter)}
+
+.invite{margin:var(--space-16) var(--gutter) 0;padding:var(--space-16);border-radius:var(--radius-12);
+  border:var(--border-hair) dashed var(--bd-str);background:var(--bg-sub)}
+.invite b{display:block;font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.invite p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-12)}
+.invite .go{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.waiting{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.ladder{margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.lrow{display:grid;grid-template-columns:96px 1fr;gap:var(--space-16);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd-sub);align-items:baseline}
+.lrow:last-child{border-bottom:0}
+.lrow .at{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc-t);font-variant-numeric:tabular-nums}
+.lrow .what{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted)}
+.lrow .what b{color:var(--text);font-weight:600}
 </style>
 
 <!-- ============================== 02 ANATOMY ============================== -->
@@ -963,6 +979,20 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="tok">C6</td><td class="use">Cast list empty</td><td class="use">&ldquo;TMDB has no cast for this yet.&rdquo; with a link to contribute.</td></tr>
         <tr><td class="tok">G1</td><td class="use">Guest reaches a profile control</td><td class="use">The existing sign-in sheet, verb matched — &ldquo;Save Dune: Part Two?&rdquo; becomes &ldquo;Set up your profile?&rdquo;</td></tr>
         <tr><td class="tok">S1</td><td class="use">compact / medium</td><td class="use">One column, rails scroll, banner 3:1.</td></tr>
+        <tr><td class="tok">N1</td><td class="use">0 titles</td><td class="use">Gradient banner, initial, one invitation: start your shelf. Nothing else drawn.</td></tr>
+        <tr><td class="tok">N2</td><td class="use">1 title</td><td class="use">The block appears with real numbers and names the first entry. A 1 is not embarrassing.</td></tr>
+        <tr><td class="tok">N3</td><td class="use">6 titles, partly alive</td><td class="use">Bar has arrived, genres have not; the invitation has given way to a caption.</td></tr>
+        <tr><td class="tok">N4</td><td class="use">Proposed favourites</td><td class="use">Your own 9s and 10s, offered once, in place. Dismissible without penalty.</td></tr>
+        <tr><td class="tok">N5</td><td class="use">Films only</td><td class="use">Series block absent, replaced by one line saying when it arrives.</td></tr>
+        <tr><td class="tok">N6</td><td class="use">Tracked plenty, rated nothing</td><td class="use">Every mean is a dash; counts and bar still real. One invitation, phrased as what it unlocks.</td></tr>
+        <tr><td class="tok">X1</td><td class="use"><b>Imported library</b></td><td class="use">500 titles land at once, so every stat is instantly full — but favourites are still empty and no shelf was ever curated. N4 is the state that matters most here, and it should be offered as soon as the import settles rather than waiting.</td></tr>
+        <tr><td class="tok">X2</td><td class="use"><b>One long series, nothing else</b></td><td class="use"><code>1 title · 1,247 episodes</code> is true and looks broken. The films block is absent, so the series block carries the page alone — it gets the full-width treatment rather than sitting in a half-empty row.</td></tr>
+        <tr><td class="tok">X3</td><td class="use"><b>Everything dropped</b></td><td class="use">A distribution bar that is entirely <code>--st-drop-9</code>. Rendered honestly and without comment. No encouragement copy — that would be the app having an opinion about how someone watches.</td></tr>
+        <tr><td class="tok">X4</td><td class="use"><b>One genre is 100%</b></td><td class="use">Below eight titles genres do not rank at all, which is what stops this. Above it, a dominant genre is a real finding and is shown as one.</td></tr>
+        <tr><td class="tok">X5</td><td class="use"><b>Shelf emptied back to zero</b></td><td class="use">Returns to the invitation state, not a broken empty rail — and it is only the invitation if it is the first empty section. Otherwise it disappears.</td></tr>
+        <tr><td class="tok">X6</td><td class="use"><b>Banner's title removed from the library</b></td><td class="use">The banner stores the image path, not a reference to a library row, so it survives. Un-tracking a film does not silently change your profile's appearance.</td></tr>
+        <tr><td class="tok">X7</td><td class="use"><b>A year with nothing in it</b></td><td class="use">&ldquo;Your years&rdquo; skips it rather than drawing a zero row. A gap year is not a failure to display — this is the rule about nothing decaying, applied to a chart.</td></tr>
+        <tr><td class="tok">X8</td><td class="use"><b>Joined today, watched nothing</b></td><td class="use">Join date reads &ldquo;joined today&rdquo;, not a date. N1.</td></tr>
         <tr><td class="tok">S2</td><td class="use">expanded / wide</td><td class="use">Banner 4:1 at container width with <code>--radius-16</code>; shelves show more per row; identity sits beside the avatar.</td></tr>
       </tbody>
     </table></div>
@@ -1113,6 +1143,228 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 
     <div class="note ok"><b>Four dimensions abreast is what desktop actually buys.</b> On a phone these are stacked sections you scroll past one at a time; here genres, people, countries and your years sit side by side, and the comparison between them — that Japan outscores the US by nearly a point across a third of the volume — is a thing you can see rather than remember.</div>
     <div class="note law"><b>Card heights are content-led, not stretched.</b> Each dimension column holds its own three cards at their natural height. Stretching four columns to a common height would leave dead space under the short ones, which is the single most common way a desktop grid starts looking like a spreadsheet.</div>
+  </div>
+</section>
+
+<!-- ============================== 08c COLD START ============================== -->
+<section id="cold">
+  <div class="wrap">
+    <div class="shead"><span class="snum">08c</span><h2>The cold start</h2></div>
+    <p>Everything above was designed from profiles with <b>1,497 titles</b> on them. That is the destination, and almost nobody is standing there. The profile is the only screen in this product with a real cold-start problem: Discover has the whole catalogue on day one, Search works on day one, and an empty Library is <i>obviously</i> empty. But a profile is supposed to be about you, and on day one there is no you.</p>
+
+    <div class="note law"><b>The constraint that rules out the obvious answer.</b> The <code>you</code> module already carries: <i>no streaks, no nudges, nothing that decays — this is a record, not a game you can lose.</i> So the standard fix is off the table. <b>No completion meter, no &ldquo;your profile is 40% complete&rdquo;, no checklist, no badge for filling a shelf.</b> Those work by making you feel behind, and this product has promised not to do that.</div>
+
+    <h4>The rule</h4>
+    <div class="note ok"><b>A profile shows at most one empty invitation at a time.</b> Everything else that has no content either <b>disappears</b> or is <b>already handsome by default</b>. That is the whole anti-blank-space policy, and it is checkable: count the dashed boxes on any state; if there is more than one, the state is wrong.
+    <br><br>It follows that the sections have to be <i>ordered</i>, because only the first empty one gets to speak. That order is the discovery path — it decides what a new person is taught first.</div>
+
+    <h4>Empty is not one thing</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Section</th><th>When empty, on your own profile</th><th>On someone else's</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Banner</td><td class="use"><b>Already handsome.</b> A gradient keyed to your account id. Never reads as missing.</td><td class="use">Same gradient. No-one can tell.</td></tr>
+        <tr><td class="num">Avatar</td><td class="use"><b>Already handsome.</b> Your initial on that gradient.</td><td class="use">Same.</td></tr>
+        <tr><td class="num">Bio</td><td class="use">A placeholder line, tappable.</td><td class="use"><b>Disappears.</b> An empty quote mark on a stranger's page is just a gap.</td></tr>
+        <tr><td class="num">Stat block</td><td class="use">Real zeroes — dignified, honest. The <b>bar</b> is replaced, because a bar of nothing is a grey stripe that means nothing.</td><td class="use">Whole block disappears.</td></tr>
+        <tr><td class="num">A shelf</td><td class="use">Invitation, <b>if it is the first empty one</b>. Otherwise it disappears.</td><td class="use">Disappears.</td></tr>
+        <tr><td class="num">A stat dimension</td><td class="use">A caption naming what it is waiting for — see the ladder.</td><td class="use">Disappears.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>The ladder — what appears, and when</h4>
+    <p>Not a checklist, because you are never shown the rungs above you as things you are missing. Each one simply <b>arrives</b>, and the thing that is waiting says so in its own caption rather than in a progress meter.</p>
+    <div class="ladder">
+      <div class="lrow"><div class="at">0 titles</div><div class="what">Banner gradient, initial, handle, join date. <b>One invitation: start your shelf.</b> Nothing else is drawn.</div></div>
+      <div class="lrow"><div class="at">1 title</div><div class="what">The film or series block appears with real numbers. <b>&ldquo;Dune: Part Two · 2h 46m&rdquo;</b> — a first entry is worth naming, and a 1 is not embarrassing.</div></div>
+      <div class="lrow"><div class="at">3 rated</div><div class="what"><b>Mean score</b> resolves from <code>—</code>. The floor the <code>you</code> module already uses.</div></div>
+      <div class="lrow"><div class="at">5 titles</div><div class="what">The <b>distribution bar</b> replaces the invitation in that block — five segments is the least that reads as a shape rather than a stripe.</div></div>
+      <div class="lrow"><div class="at">2 of a person</div><div class="what">A <b>people</b> card can rank. One title is not a pattern; the existing rule, unchanged.</div></div>
+      <div class="lrow"><div class="at">8 titles</div><div class="what"><b>Genres and decades</b> rank. Below that a single genre is 100% of everything and says nothing.</div></div>
+      <div class="lrow"><div class="at">rated 8+</div><div class="what"><b>Proposed favourites</b> becomes available — see below. The highest-leverage moment in the whole flow.</div></div>
+      <div class="lrow"><div class="at">2 calendar years</div><div class="what"><b>Your years</b> appears. One year is not a comparison.</div></div>
+    </div>
+
+    <h4>Five ideas, and what I would do</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Idea</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td class="use"><b>1 · Capture four favourites during sign-up.</b> Letterboxd and AL-chan both do this, and it is the single most effective fix — the profile is never empty, and it bootstraps taste for Discover on day one.</td><td class="use"><b>Yes, but on the profile, not in sign-up.</b> Entry is already built and shipped, and the concept doc's own principle is that a guest is never taxed. Somebody who just signed up came to track a specific thing — let them. The same picker lives on the profile as its first-run invitation, where it meets them at the moment of curiosity rather than as a toll.</td></tr>
+        <tr><td class="use"><b>2 · Propose favourites from your own ratings.</b> Once eight things are rated, offer the 9s and 10s: &ldquo;These are the ones you rated highest. Put any on your shelf?&rdquo; One tap each.</td><td class="use"><b>Yes — this is the best idea here.</b> It converts passive tracking into a curated profile without asking anybody to do curation. It uses only data we already hold, it cannot be wrong (they are literally your own top ratings), and it is offered <i>once, in place</i> — not a recurring prompt, so the no-nudges rule holds.</td></tr>
+        <tr><td class="use"><b>3 · Sections say what they are waiting for.</b> A stat that cannot compute yet carries a caption — &ldquo;mean score appears at three ratings&rdquo; — rather than a zero or a blank.</td><td class="use"><b>Yes.</b> It teaches the system's own thresholds at the exact moment they are relevant, and it costs one line of text. Critically it is phrased as <i>what happens next</i>, never as <i>what you have not done</i>.</td></tr>
+        <tr><td class="use"><b>4 · Ghost content — show example posters at low opacity so the shelf has a shape.</b></td><td class="use"><b>No.</b> Either it is unmistakably fake, in which case it is clutter, or it is not, in which case the profile is showing somebody films they have not chosen and calling them favourites. This product has a rule about not fabricating records and it applies to its own empty states.</td></tr>
+        <tr><td class="use"><b>5 · A completion meter.</b></td><td class="use"><b>No.</b> Directly contradicts <i>no streaks, no nudges, nothing that decays</i>. A meter at 40% is a scoreboard, and the moment it exists the profile becomes something you can be failing at.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>The states</h4>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>N1</b> 0 titles · one invitation</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--ink-5),var(--ink-7))">
+            <div class="bscrim"></div><button class="bedit">Add</button>
+            <div class="pname-on-banner">raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div>
+            <div style="min-width:0"><div class="phandle">@raman · joined today</div>
+            <p class="pbio ph" style="margin-top:var(--space-4)">Say something about what you watch.</p></div></div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="invite">
+            <b>Start your shelf</b>
+            <p>Pick four films or series you love. They go on your profile, and Discover starts using them straight away.</p>
+            <button class="go">Pick four</button>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            Your numbers appear as you track things. Nothing to set up.</p>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N2</b> 1 title · first entry named</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--ink-5),var(--beam-7))">
+            <div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div>
+            <div style="min-width:0"><div class="phandle">@raman · joined today</div></div></div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span>1</span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd>1</dd></div>
+              <div class="snum-i"><dt>Runtime</dt><dd>2h 46m</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd style="color:var(--faint)">—</dd></div>
+            </div>
+            <p class="waiting">First one in: <b style="color:var(--text)">Dune: Part Two</b>. Mean score appears at three ratings.</p>
+          </div>
+          <div class="invite">
+            <b>Start your shelf</b>
+            <p>Pick four you love. They go on your profile.</p>
+            <button class="go">Pick four</button>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N3</b> 6 titles · partly alive</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--mar-7),var(--ink-5))">
+            <div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div>
+            <div style="min-width:0"><div class="phandle">@raman · joined Mar 2026</div>
+            <p class="pbio" style="margin-top:var(--space-4)">Starting with the Villeneuve run.</p></div></div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span></span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd>6</dd></div>
+              <div class="snum-i"><dt>Days</dt><dd>0.6</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd class="rate">8.2</dd></div>
+            </div>
+            <div class="dbar">
+              <i style="width:67%;background:var(--st-done-9)"></i><i style="width:33%;background:#7C8AA8"></i>
+            </div>
+            <div class="dlegend"><span><i style="background:var(--st-done-9)"></i>Watched 4</span><span><i style="background:#7C8AA8"></i>Want 2</span></div>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            Series appear here once you track one. Genres rank at eight titles.</p>
+          <div class="shelf">
+            <div class="shelf-h"><h4>Favourite films</h4><span class="shelf-n">3</span></div>
+            <div class="rail">
+              <div class="fti"><div class="art"></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
+              <div class="fti"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Arrival</div><div class="sub">2016</div></div>
+              <button class="addcard"><span class="plus">+</span>Add</button>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N4</b> proposed favourites</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--mar-7),var(--ink-5))"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">You rated these highest</h3>
+          <p class="sh-b">Put any of them on your shelf. You can change it whenever.</p>
+          <div style="display:flex;flex-direction:column;gap:var(--space-8)">
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);border-radius:var(--radius-8);background:var(--acc-bg);min-height:var(--control-h)">
+              <div style="width:var(--space-24);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--mar-7),var(--ink-4));flex:0 0 auto"></div>
+              <div style="min-width:0;flex:1"><div style="font-size:var(--text-caption);font-weight:600;color:var(--acc-t)">Blade Runner 2049</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--muted)">you rated 10</div></div>
+              <div style="color:var(--acc-t)">✓</div>
+            </div>
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);border-radius:var(--radius-8);min-height:var(--control-h)">
+              <div style="width:var(--space-24);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--beam-7),var(--ink-3));flex:0 0 auto"></div>
+              <div style="min-width:0;flex:1"><div style="font-size:var(--text-caption);font-weight:600">Arrival</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--faint)">you rated 10</div></div>
+            </div>
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);border-radius:var(--radius-8);min-height:var(--control-h)">
+              <div style="width:var(--space-24);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--st-done-9),var(--ink-4));flex:0 0 auto"></div>
+              <div style="min-width:0;flex:1"><div style="font-size:var(--text-caption);font-weight:600">Sicario</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--faint)">you rated 9</div></div>
+            </div>
+          </div>
+          <button class="btn" style="margin-top:var(--space-16)">Add 1 to shelf</button>
+          <button class="btn q" style="margin-top:var(--space-8);background:none;color:var(--muted)">Not now</button>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N5</b> films only · series collapsed</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button>Favourites</button><button class="on">Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span></span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd>41</dd></div>
+              <div class="snum-i"><dt>Days</dt><dd>4.1</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd class="rate">7.9</dd></div>
+            </div>
+            <div class="dbar"><i style="width:78%;background:var(--st-done-9)"></i><i style="width:17%;background:#7C8AA8"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            No series tracked yet — that block appears with the first one.</p>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Genres</h4><span class="shelf-n">count · mean</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>Sci-Fi</b><span>18 titles</span></div><div class="mean">8.4</div></div>
+            <div class="dimcard"><div class="lbl"><b>Thriller</b><span>12 titles</span></div><div class="mean">7.6</div></div>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            Your years appears once you have watched across two of them.</p>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N6</b> tracked plenty, rated nothing</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button>Favourites</button><button class="on">Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span></span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd>63</dd></div>
+              <div class="snum-i"><dt>Days</dt><dd>6.3</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd style="color:var(--faint)">—</dd></div>
+            </div>
+            <div class="dbar"><i style="width:82%;background:var(--st-done-9)"></i><i style="width:18%;background:#7C8AA8"></i></div>
+          </div>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Genres</h4><span class="shelf-n">count only</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>Drama</b><span>24 titles</span></div><div class="mean" style="color:var(--faint)">—</div></div>
+            <div class="dimcard"><div class="lbl"><b>Sci-Fi</b><span>19 titles</span></div><div class="mean" style="color:var(--faint)">—</div></div>
+          </div>
+          <div class="invite">
+            <b>Rate three and these come alive</b>
+            <p>Every card here can carry what you thought of it, not just how many you saw.</p>
+            <button class="go">Rate something</button>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="note law"><b>Count the dashed boxes.</b> N1 has one. N2 has one. N3 has none — it has content, so the invitation gave way to a caption. N5 has none. N6 has one. No state in this document shows two, and that is the rule doing its job rather than taste.</div>
+
+    <div class="note warn"><b>N6 is the case I nearly missed, and it is common.</b> Somebody who tracks diligently and never rates has a full profile where <i>every mean is a dash</i>. The counts are real and the distribution bar works — statuses do not need ratings — so the page is not broken, but half of what makes it interesting is switched off. It gets the one invitation, phrased as what it unlocks rather than what they have failed to do.</div>
   </div>
 </section>
 

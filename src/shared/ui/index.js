@@ -8,3 +8,4 @@ export { Skeleton } from './Skeleton.jsx';
 export { Empty } from './Empty.jsx';
 export { ErrorBox } from './ErrorBox.jsx';
 export { Toast } from './Toast.jsx';
+export { default as Icon, ICON_NAMES } from './Icon.jsx';

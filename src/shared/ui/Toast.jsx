@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import Icon from './Icon.jsx';
 
 /**
  * Named, not generic. "Breaking Bad · S2 E4 watched" is worth reading; "Saved"
@@ -21,7 +22,7 @@ export function Toast({ message, actionLabel, onAction, onDismiss, ttl = 6000 })
             <span>{message}</span>
             {actionLabel
                 ? <button type="button" onClick={onAction}>{actionLabel}</button>
-                : <button type="button" onClick={onDismiss} aria-label="Dismiss">✕</button>}
+                : <button type="button" onClick={onDismiss} aria-label="Dismiss"><Icon name="close" size={16} /></button>}
         </div>
     );
 }

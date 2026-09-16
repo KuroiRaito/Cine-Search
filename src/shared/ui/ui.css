@@ -583,3 +583,19 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 }
 .pw-rules li span { width: var(--space-12); text-align: center; font-size: var(--text-micro); }
 .pw-rules li.met { color: var(--st-done-11); }
+
+/* ---------------- icons ---------------- */
+
+/* One box, one stroke. The size comes from the component, which only accepts
+   --icon-16 / 20 / 24; nothing here may resize an icon, because a glyph whose
+   size depends on its container is how twenty mismatched ones happened. */
+.icon { display: block; flex: 0 0 auto; }
+
+/* The unticked counterparts of a check. A ring, not a character: ○ painted
+   81px where ✓ painted 67 at the same font size. */
+.ep-dot, .pw-dot {
+  display: block; width: var(--space-12); height: var(--space-12);
+  border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 var(--border-focus) var(--bd-str);
+}
+.pw-dot { width: var(--space-8); height: var(--space-8); }

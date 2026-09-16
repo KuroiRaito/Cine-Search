@@ -10,6 +10,7 @@ import { totalsFromView, totalsAreFresh, personTotalsSet } from '../library';
 import { profileStats, distribution, scoreSpread, formatDays, formatSpan, SCORE_FLOOR } from './stats.js';
 import Identity from './Identity.jsx';
 import './profile.css';
+import { Icon } from '../../shared/ui/index.js';
 
 /**
  * Your taste, worked out from your own records and nobody else's.
@@ -32,7 +33,7 @@ function YouHead({ name, status }) {
         <>
             <div className="page-head">
                 <h1 className="vh">{name || 'You'}</h1>
-                <Link className="circ" to="/settings" aria-label="Settings">⚙</Link>
+                <Link className="circ" to="/settings" aria-label="Settings"><Icon name="settings" size={20} /></Link>
             </div>
             <Identity status={status} />
         </>
@@ -146,7 +147,7 @@ export default function You() {
                 <div className="sect-h">
                     <span>Your taste · by {order}</span>
                     <button type="button" className="linkish" onClick={() => setOrder(order === 'count' ? 'score' : 'count')}>
-                        {order === 'count' ? 'Score' : 'Count'} ▾
+                        {order === 'count' ? 'Score' : 'Count'} <Icon name="down" size={16} />
                     </button>
                 </div>
             </div>

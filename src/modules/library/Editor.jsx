@@ -5,6 +5,7 @@ import {
     statusesFor, canRate, statusTone, runningOrder, nextUnwatched, lastWatched, epLabel, episodesWatched,
 } from './library.js';
 import './library.css';
+import { Icon } from '../../shared/ui/index.js';
 
 const dateText = (iso) => (iso
     ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
@@ -129,7 +130,7 @@ export default function Editor({ title, onClose }) {
                         aria-pressed={favourite}
                         aria-label={favourite ? 'Remove from favourites' : 'Mark as favourite'}
                         onClick={() => setFavourite((f) => !f)}
-                    >♥</button>
+                    ><Icon name="heart" size={20} /></button>
                     <button type="button" className="btn" disabled={busy} onClick={onSave}>
                         {busy ? 'Saving…' : 'Save'}
                     </button>
@@ -158,9 +159,9 @@ export default function Editor({ title, onClose }) {
                     <div className="fld">
                         <label htmlFor="ed-prog">Progress</label>
                         <div className="prog" id="ed-prog">
-                            <button type="button" className="stp" onClick={() => step(-1)} disabled={!last} aria-label="One fewer episode">−</button>
+                            <button type="button" className="stp" onClick={() => step(-1)} disabled={!last} aria-label="One fewer episode"><Icon name="remove" size={16} /></button>
                             <div className="prog-v"><b>{seen}</b><span>of {total} episodes</span></div>
-                            <button type="button" className="stp" onClick={() => step(1)} disabled={!next} aria-label="One more episode">+</button>
+                            <button type="button" className="stp" onClick={() => step(1)} disabled={!next} aria-label="One more episode"><Icon name="add" size={16} /></button>
                         </div>
                         <div className="jump">
                             {next
@@ -184,7 +185,7 @@ export default function Editor({ title, onClose }) {
                                     aria-label={`${n * 2} out of 10`}
                                     onClick={() => pickRating(n * 2)}
                                     onContextMenu={(e) => { e.preventDefault(); pickRating(n * 2 - 1); }}
-                                >★</button>
+                                ><Icon name="star" size={20} /></button>
                             );
                         })}
                         <span className="sv">{rating != null ? `${rating} / 10` : '—'}</span>
@@ -221,9 +222,9 @@ export default function Editor({ title, onClose }) {
                 <div className="fld">
                     <label htmlFor="ed-rewatch">Rewatches</label>
                     <div className="prog compact" id="ed-rewatch">
-                        <button type="button" className="stp" disabled={rewatches < 1} onClick={() => setRewatches((n) => Math.max(0, n - 1))} aria-label="One fewer rewatch">−</button>
+                        <button type="button" className="stp" disabled={rewatches < 1} onClick={() => setRewatches((n) => Math.max(0, n - 1))} aria-label="One fewer rewatch"><Icon name="remove" size={16} /></button>
                         <div className="prog-v"><b>{rewatches}</b></div>
-                        <button type="button" className="stp" onClick={() => setRewatches((n) => n + 1)} aria-label="One more rewatch">+</button>
+                        <button type="button" className="stp" onClick={() => setRewatches((n) => n + 1)} aria-label="One more rewatch"><Icon name="add" size={16} /></button>
                     </div>
                 </div>
 

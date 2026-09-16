@@ -9,6 +9,7 @@ import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary, useTileStates, useQuickAdd } from '../library';
 import { collectionProgress } from '../library';
 import './person.css';
+import { Icon } from '../../shared/ui/index.js';
 
 const year = (d) => (d ? new Date(d).getFullYear() : null);
 
@@ -74,7 +75,7 @@ export default function Person() {
     return (
         <div className="page">
             <div className="page-head">
-                <button type="button" className="circ" onClick={() => navigate(-1)} aria-label="Back">‹</button>
+                <button type="button" className="circ" onClick={() => navigate(-1)} aria-label="Back"><Icon name="back" size={24} /></button>
             </div>
 
             <div className="phead">

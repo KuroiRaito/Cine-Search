@@ -6,6 +6,7 @@ import { markSeen } from '../../app/firstVisit.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import ThemeToggle from '../../shared/theme/ThemeToggle.jsx';
 import './entry.css';
+import { Icon } from '../../shared/ui/index.js';
 
 /**
  * First visit only. Skippable, and it never comes back.
@@ -75,7 +76,7 @@ export default function Cover() {
                     browsing before committing, and burying the skip loses them
                     at the door. */}
                 <div className="cover-skip">
-                    <button type="button" onClick={() => go('/')}>Browse without an account →</button>
+                    <button type="button" onClick={() => go('/')}>Browse without an account <Icon name="go" size={16} /></button>
                 </div>
 
                 <div className="cover-fine">

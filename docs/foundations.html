@@ -494,7 +494,14 @@ pre u{color:var(--st-done-11);text-decoration:none}
         <tr><td class="tok">--icon-24</td><td class="num">24px</td><td class="num">--text-title-sm and above</td><td class="use">Page-head actions. Standalone icon buttons.</td></tr>
       </tbody>
     </table></div>
-    <div class="note"><b>The icon box is square and fixed; the glyph inside it is not.</b> Optical sizing differs by shape — a circle at 20px reads smaller than a square at 20px. Size the <i>box</i> from the token so layout stays predictable, then let the glyph fill 75–100% of it by eye.</div>
+    <div class="note ok"><b>The set is <a href="https://lucide.dev" style="color:var(--acc-t)">Lucide</a>, chosen 2026-09-16.</b> One 24px grid, one 2px stroke, ISC licence, and <code>lucide-react-native</code> exists for the native milestone. Thirty-three icons ship; measured, they cost <b>3.8&nbsp;KB gzipped</b> over the bundle without them. Roles are named for what the product calls them — <code>discover</code>, <code>want</code>, <code>rewatched</code> — so the drawing can change without touching a screen. The map is <code>src/shared/ui/Icon.jsx</code> and named imports keep it tree-shaken.</div>
+
+    <div class="note law"><b>An icon is a component, never a character.</b> Before this the product drew every icon with a Unicode glyph borrowed from whatever block had roughly the right shape — twenty of them across five unrelated blocks. Painted at one 100px font size they ranged from <b>10px to 86px</b> tall with <b>48px</b> of drift between optical centres, which is why nothing lined up. Search was <code>U+2315 TELEPHONE RECORDER</code>, painting 44px beside a discover icon painting 86. <code>npm run verify</code> now rejects a short text node or string literal containing one.
+    <br><br>The same four tabs after the change: <b>20&times;20 each, zero drift, one stroke weight.</b></div>
+
+    <div class="note"><b>The box is square and fixed; the drawing inside it is not.</b> Optical sizing still differs by shape — a circle at 20px reads slightly smaller than a square at 20px. Size the <i>box</i> from the token so layout stays predictable, and let the artwork sit where it sits.</div>
+
+    <div class="note warn"><b>A 2px stroke does not survive being scaled down.</b> On a 24 grid it becomes 1.33px at 16, which lands between pixels and goes soft. <code>Icon</code> lifts the stroke to <b>2.25</b> at 16px rather than shipping a second icon set.</div>
     <div class="note warn"><b>An icon alone is never a control.</b> Every icon-only button carries <code>aria-label</code>, and the label is the sentence a person would say — <code>aria-label="Back"</code>, not <code>aria-label="chevron-left"</code>.</div>
   </div>
 </section>

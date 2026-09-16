@@ -149,6 +149,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
     <a href="#images">06 Banner &amp; avatar</a>
     <a href="#stats">07 Stats</a>
     <a href="#states">08 Every state</a>
+    <a href="#desktop">08b Desktop</a>
     <a href="#schema">09 What it needs</a>
     <a href="#open">10 Decisions</a>
     <a href="#bench">11 Benchmark</a>
@@ -292,6 +293,100 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 .empty-shelf button{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
   background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
 .callout{display:flex;gap:var(--space-8);margin-top:var(--space-8);padding:0 var(--gutter)}
+
+/* ---- components the benchmark added ---- */
+.ptabs{display:flex;gap:0;overflow:hidden;border-bottom:var(--border-hair) solid var(--bd-sub);padding:0 var(--gutter);margin-top:var(--space-12)}
+.ptabs button{flex:0 0 auto;background:none;border:0;cursor:pointer;padding:var(--space-8) var(--space-12) var(--space-8);
+  font-family:var(--f-s);font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--muted);
+  border-bottom:var(--border-focus) solid transparent;min-height:var(--control-h)}
+.ptabs button.on{color:var(--acc-t);border-bottom-color:var(--acc)}
+.pname-on-banner{position:absolute;left:var(--gutter);bottom:var(--space-12);z-index:2;
+  font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;color:#fff}
+.pbanner.tall{aspect-ratio:2/1}
+.pav-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--gutter) 0}
+.pav-sm{width:var(--space-48);height:var(--space-48);border-radius:var(--radius-full);flex:0 0 auto;
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:2px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:800;color:#fff}
+.pav-sm.empty{background:var(--surface-hv);color:var(--faint)}
+/* split stat block, one per medium */
+.sblock{margin:var(--space-16) var(--gutter) 0;background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);
+  border-radius:var(--radius-12);padding:var(--space-12)}
+.sblock-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
+.sblock-h b{font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text)}
+.sblock-h span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.snums{display:flex;gap:var(--space-16);margin-bottom:var(--space-8)}
+.snum-i{min-width:0}
+.snum-i dt{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.snum-i dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.snum-i dd.rate{color:var(--rate-t)}
+/* the distribution bar — six watch-state hues, already in the foundations */
+.dbar{display:flex;height:var(--space-8);border-radius:var(--radius-full);overflow:hidden;background:var(--surface-hv)}
+.dbar i{display:block;height:100%;font-style:normal}
+.dlegend{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-8)}
+.dlegend span{display:flex;align-items:center;gap:var(--space-4);font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.dlegend i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);font-style:normal;flex:0 0 auto}
+/* a ranked dimension card: count AND mean */
+.dimcard{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8);border-radius:var(--radius-8);
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub)}
+.dimcard .lbl{min-width:0;flex:1}
+.dimcard .lbl b{display:block;font-size:var(--text-caption);font-weight:600;color:var(--text)}
+.dimcard .lbl span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.dimcard .mean{font-family:var(--f-m);font-size:var(--text-body-sm);font-weight:600;color:var(--rate-t);
+  font-variant-numeric:tabular-nums;flex:0 0 auto}
+.dimgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);padding:0 var(--gutter);margin-top:var(--space-8)}
+/* chip row — the fix for 24 screens of scroll */
+.chips{display:flex;gap:var(--space-8);overflow:hidden;padding:var(--space-12) var(--gutter)}
+.chip{flex:0 0 auto;height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-full);
+  border:var(--border-hair) solid var(--bd);background:none;color:var(--muted);cursor:pointer;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.chip.on{background:var(--acc-bg);border-color:var(--acc-bd);color:var(--acc-t)}
+.chip em{font-family:var(--f-m);font-style:normal;font-size:9px;opacity:.8}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);padding:0 var(--gutter)}
+.fgrid .cell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fgrid .cell .art .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px;line-height:1.3}
+.fgrid .cell .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fgrid .cell .sub{font-family:var(--f-m);font-size:8px;color:var(--faint)}
+/* sheets */
+.sheetwrap{position:absolute;inset:0;background:var(--scrim-wash);display:flex;align-items:flex-end}
+.sheet{width:100%;background:var(--bg-sub);border-top:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16) var(--radius-16) 0 0;padding:var(--space-12) var(--space-20) var(--space-20)}
+.grab{width:var(--space-32);height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto var(--space-16)}
+.sh-t{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;letter-spacing:-.02em;margin:0 0 var(--space-4);color:var(--text)}
+.sh-b{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-12)}
+.fld{display:flex;flex-direction:column;gap:var(--field-gap);margin-bottom:var(--field-stack)}
+.fld>span{font-size:var(--text-label);font-weight:600;color:var(--muted)}
+.inp{height:var(--control-h);border-radius:var(--radius-control);background:var(--bg);color:var(--text);
+  border:0;box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);padding:0 var(--space-16);
+  font-family:var(--f-s);font-size:var(--text-body);display:flex;align-items:center}
+.inp.ta{height:auto;min-height:var(--space-64);padding:var(--space-12) var(--space-16);align-items:flex-start;line-height:var(--lh-body-sm);font-size:var(--text-body-sm)}
+.cnt{font-family:var(--f-m);font-size:9px;color:var(--faint);text-align:right}
+.btn{height:var(--control-h);border-radius:var(--radius-control);border:0;cursor:pointer;width:100%;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-label);font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center}
+.btn.q{background:var(--surface-hv);color:var(--text)}
+.skel{background:var(--surface-hv);border-radius:var(--radius-4);animation:none}
+/* desktop frames, drawn at true width then scaled to fit this page */
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px;height:700px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;height:700px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px;display:flex;flex-direction:column}
+.dtop{display:flex;align-items:center;gap:var(--space-24);padding:var(--space-12) var(--gutter);
+  border-bottom:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:var(--space-8);font-family:var(--f-d);font-weight:800;font-size:var(--text-title-sm);letter-spacing:-.03em}
+.dwm i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:var(--space-4)}
+.dnav a{padding:0 var(--space-12);height:var(--control-h);display:inline-flex;align-items:center;border-radius:var(--radius-8);
+  font-size:var(--text-body-sm);color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+.dbody{flex:1;overflow:hidden}
+.dcols{display:grid;grid-template-columns:320px 1fr;gap:var(--space-32);padding:var(--space-24) var(--gutter)}
 </style>
 
 <!-- ============================== 02 ANATOMY ============================== -->
@@ -302,110 +397,127 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 
   <div class="phones">
     <div class="phone">
-      <div class="phone-cap"><b>P1</b> your own profile · filled</div>
+      <div class="phone-cap"><b>P1</b> overview · filled</div>
       <div class="screen"><div class="scroll">
-        <div class="pbanner">
+        <div class="pbanner tall">
           <div class="bscrim"></div>
           <button class="bedit">Edit</button>
+          <div class="pname-on-banner">Raman</div>
         </div>
-        <div class="phead">
-          <div class="pav">R</div>
-          <div class="pname-row">
-            <div>
-              <h3 class="pname">Raman</h3>
-              <div class="phandle">@raman · joined Mar 2026</div>
-            </div>
-            <button class="pbtn">Edit profile</button>
-          </div>
-          <p class="pbio">Watching my way through Villeneuve. Sci-fi, slow burns, and anything shot by Roger Deakins.</p>
-        </div>
-        <dl class="pstats">
-          <div class="pstat"><dt>Titles</dt><dd>168</dd></div>
-          <div class="pstat"><dt>Episodes</dt><dd>1.2<small>k</small></dd></div>
-          <div class="pstat"><dt>Days</dt><dd>18.4</dd></div>
-          <div class="pstat"><dt>Mean</dt><dd>7.8</dd></div>
-        </dl>
-        <div class="shelf">
-          <div class="shelf-h"><h4>Favourite films</h4><span class="shelf-n">4 / 8</span></div>
-          <div class="rail">
-            <div class="fti"><div class="art"></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
-            <div class="fti"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Arrival</div><div class="sub">2016</div></div>
-            <div class="fti"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div><div class="nm">Blade Runner 2049</div><div class="sub">2017</div></div>
-            <button class="addcard"><span class="plus">+</span>Add</button>
+        <div class="pav-row">
+          <div class="pav-sm">R</div>
+          <div style="min-width:0">
+            <div class="phandle">@raman · joined Mar 2026</div>
+            <p class="pbio" style="margin-top:var(--space-4)">Watching my way through Villeneuve. Sci-fi and slow burns.</p>
           </div>
         </div>
+        <div class="ptabs">
+          <button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button>
+        </div>
+        <div class="sblock">
+          <div class="sblock-h"><b>Films</b><span>at least</span></div>
+          <div class="snums">
+            <div class="snum-i"><dt>Watched</dt><dd>112</dd></div>
+            <div class="snum-i"><dt>Days</dt><dd>11.3</dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div>
+          </div>
+          <div class="dbar">
+            <i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:var(--st-want-9,#7C8AA8)"></i>
+            <i style="width:9%;background:var(--st-re-9,#9B7BD4)"></i><i style="width:5%;background:var(--st-hold-9,#C87A3C)"></i>
+            <i style="width:3%;background:var(--st-drop-9)"></i>
+          </div>
+          <div class="dlegend">
+            <span><i style="background:var(--st-done-9)"></i>Watched 72</span>
+            <span><i style="background:#7C8AA8"></i>Want 21</span>
+            <span><i style="background:#9B7BD4"></i>Rewatched 10</span>
+            <span><i style="background:var(--st-drop-9)"></i>Dropped 3</span>
+          </div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-h"><b>Series</b><span></span></div>
+          <div class="snums">
+            <div class="snum-i"><dt>Watched</dt><dd>56</dd></div>
+            <div class="snum-i"><dt>Episodes</dt><dd>1.2<span style="font-size:var(--text-micro)">k</span></dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div>
+          </div>
+          <div class="dbar">
+            <i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i>
+            <i style="width:18%;background:#7C8AA8"></i><i style="width:9%;background:#C87A3C"></i>
+            <i style="width:5%;background:var(--st-drop-9)"></i>
+          </div>
+          <div class="dlegend">
+            <span><i style="background:var(--st-done-9)"></i>Watched 23</span>
+            <span><i style="background:#2ABFA0"></i>Watching 15</span>
+            <span><i style="background:#7C8AA8"></i>Want 10</span>
+            <span><i style="background:#C87A3C"></i>On hold 5</span>
+          </div>
+        </div>
         <div class="shelf">
-          <div class="shelf-h"><h4>Favourite people</h4><span class="shelf-n">3 / 8</span></div>
+          <div class="shelf-h"><h4>Favourite characters</h4><span class="shelf-n">See all 14 →</span></div>
           <div class="rail">
-            <div class="fpe"><div class="face"></div><div class="nm">Denis Villeneuve</div><div class="sub">Director</div></div>
-            <div class="fpe"><div class="face" style="background:linear-gradient(140deg,var(--beam-7),var(--ink-4))"></div><div class="nm">Roger Deakins</div><div class="sub">Cinematography</div></div>
+            <div class="fch"><div class="face"><div class="tag">Bryan Cranston</div></div><div class="nm">Walter White</div><div class="sub">Breaking Bad</div></div>
+            <div class="fch"><div class="face" style="background:linear-gradient(140deg,var(--ink-6),var(--ink-3))"><div class="tag">Brad Pitt</div></div><div class="nm">Tyler Durden</div><div class="sub">Fight Club</div></div>
+            <div class="fch"><div class="face" style="background:linear-gradient(140deg,var(--st-done-9),var(--ink-4))"><div class="tag">poster</div></div><div class="nm">Levi</div><div class="sub">Attack on Titan</div></div>
           </div>
         </div>
       </div></div>
     </div>
 
     <div class="phone">
-      <div class="phone-cap"><b>P2</b> characters shelf · the payload</div>
-      <div class="screen"><div class="scroll" style="padding-top:var(--space-16)">
-        <div class="shelf" style="margin-top:0">
-          <div class="shelf-h"><h4>Favourite characters</h4><span class="shelf-n">4 / 8</span></div>
-          <div class="rail">
-            <div class="fch">
-              <div class="face"><div class="tag">Bryan Cranston</div></div>
-              <div class="nm">Walter White</div><div class="sub">Breaking Bad</div>
-            </div>
-            <div class="fch">
-              <div class="face" style="background:linear-gradient(140deg,var(--ink-6),var(--ink-3))"><div class="tag">Brad Pitt</div></div>
-              <div class="nm">Tyler Durden</div><div class="sub">Fight Club</div>
-            </div>
-            <div class="fch">
-              <div class="face" style="background:linear-gradient(140deg,var(--st-done-9),var(--ink-4))"><div class="tag">poster</div></div>
-              <div class="nm">Levi</div><div class="sub">Attack on Titan</div>
-            </div>
-          </div>
-          <div class="callout"><span style="font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.5">
-            Levi falls back to the poster: the credit's face is Hiroshi Kamiya, his voice actor.</span></div>
-        </div>
-        <div class="shelf">
-          <div class="shelf-h"><h4>Favourite series</h4><span class="shelf-n">0 / 8</span></div>
-          <div class="empty-shelf">
-            <p>Nothing here yet. Series you mark as a favourite show up on your profile.</p>
-            <button>Choose from your library</button>
-          </div>
-        </div>
-      </div></div>
-    </div>
-
-    <div class="phone">
-      <div class="phone-cap"><b>P3</b> a brand-new account</div>
+      <div class="phone-cap"><b>P2</b> overview · brand-new account</div>
       <div class="screen"><div class="scroll">
-        <div class="pbanner empty"><span class="ecap">no banner</span><button class="bedit">Add</button></div>
-        <div class="phead">
-          <div class="pav empty">R</div>
-          <div class="pname-row">
-            <div>
-              <h3 class="pname">raman</h3>
-              <div class="phandle">@raman · joined today</div>
-            </div>
-            <button class="pbtn">Edit profile</button>
+        <div class="pbanner tall empty"><span class="ecap">no banner</span><button class="bedit">Add</button>
+          <div class="pname-on-banner" style="color:var(--text)">raman</div></div>
+        <div class="pav-row">
+          <div class="pav-sm empty">R</div>
+          <div style="min-width:0">
+            <div class="phandle">@raman · joined today</div>
+            <p class="pbio ph" style="margin-top:var(--space-4)">Say something about what you watch.</p>
           </div>
-          <p class="pbio ph">Say something about what you watch.</p>
         </div>
-        <dl class="pstats">
-          <div class="pstat"><dt>Titles</dt><dd style="color:var(--faint)">0</dd></div>
-          <div class="pstat"><dt>Episodes</dt><dd style="color:var(--faint)">0</dd></div>
-          <div class="pstat"><dt>Days</dt><dd style="color:var(--faint)">0</dd></div>
-          <div class="pstat"><dt>Mean</dt><dd style="color:var(--faint)">—</dd></div>
-        </dl>
-        <div class="shelf">
-          <div class="empty-shelf" style="margin-top:var(--space-8)">
-            <p><b style="color:var(--text)">Your profile fills itself in.</b><br>Mark something a favourite and it appears here. Nothing to set up.</p>
-            <button>Find something to watch</button>
+        <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+        <div class="sblock">
+          <div class="sblock-h"><b>Films</b><span></span></div>
+          <div class="snums">
+            <div class="snum-i"><dt>Watched</dt><dd style="color:var(--faint)">0</dd></div>
+            <div class="snum-i"><dt>Days</dt><dd style="color:var(--faint)">0</dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd style="color:var(--faint)">—</dd></div>
           </div>
+          <div class="dbar"><i style="width:100%;background:var(--surface-hv)"></i></div>
+        </div>
+        <div class="empty-shelf" style="margin-top:var(--space-16)">
+          <p><b style="color:var(--text)">Your profile fills itself in.</b><br>Mark something a favourite and it appears here. Nothing to set up.</p>
+          <button>Find something to watch</button>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>P3</b> overview · loading</div>
+      <div class="screen"><div class="scroll">
+        <div class="pbanner tall" style="background:var(--surface-hv)"></div>
+        <div class="pav-row">
+          <div class="pav-sm skel" style="background:var(--surface-hv);color:transparent">.</div>
+          <div style="min-width:0;flex:1">
+            <div class="skel" style="height:var(--space-12);width:60%;margin-bottom:var(--space-8)"></div>
+            <div class="skel" style="height:var(--space-8);width:85%"></div>
+          </div>
+        </div>
+        <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+        <div class="sblock">
+          <div class="sblock-h"><b>Films</b><span></span></div>
+          <div class="snums">
+            <div class="snum-i"><dt>Watched</dt><dd><span class="skel" style="display:block;width:var(--space-32);height:var(--space-16)"></span></dd></div>
+            <div class="snum-i"><dt>Days</dt><dd><span class="skel" style="display:block;width:var(--space-32);height:var(--space-16)"></span></dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd><span class="skel" style="display:block;width:var(--space-24);height:var(--space-16)"></span></dd></div>
+          </div>
+          <div class="dbar"></div>
         </div>
       </div></div>
     </div>
   </div>
+
+  <div class="note law"><b>The labels never skeleton, only the numbers.</b> P3 keeps &ldquo;Watched / Days / Mean&rdquo; and the block's own frame at full opacity and greys only the figures. Skeletoning the whole strip makes it resize when the data lands, which is the single most common way a loading state introduces a layout shift on the screen a person is already reading.</div>
 
   <div class="note ok"><b>The profile is tabbed, not one long scroll.</b> This is the structural change the benchmark forced. AL-chan runs Overview · Anime List · Manga List · Favorites · Stats · Social · Reviews, and with five favourite shelves, nine rankable stat dimensions and two distribution bars, one column of everything is a page nobody reaches the bottom of. Four tabs here: <b>Overview</b> (identity, headline stats, a shelf preview), <b>Favourites</b> (all five shelves in full), <b>Stats</b> (the dimensions and the bars), <b>Library</b> (what the library module already draws). The banner, name and handle persist above the tabs on every one.</div>
 
@@ -639,6 +751,191 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 <section id="states">
   <div class="wrap">
     <div class="shead"><span class="snum">08</span><h2>Every state</h2></div>
+    <p>Every frame below is <b>320&times;600</b> — the supported floor. Desktop follows in §08b.</p>
+
+    <h4>The three tabs that carry new work</h4>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>P4</b> stats tab</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button>Favourites</button><button class="on">Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Score spread</b><span>σ 1.4</span></div>
+            <p style="font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0">
+              You rate generously, and you rarely sit on the fence.</p>
+          </div>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Genres</h4><span class="shelf-n">count · mean</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>Sci-Fi</b><span>38 titles</span></div><div class="mean">8.4</div></div>
+            <div class="dimcard"><div class="lbl"><b>Drama</b><span>41 titles</span></div><div class="mean">7.6</div></div>
+            <div class="dimcard"><div class="lbl"><b>Thriller</b><span>29 titles</span></div><div class="mean">7.9</div></div>
+            <div class="dimcard"><div class="lbl"><b>Comedy</b><span>18 titles</span></div><div class="mean">6.9</div></div>
+          </div>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Decades</h4><span class="shelf-n">released</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>2010s</b><span>61 titles</span></div><div class="mean">7.9</div></div>
+            <div class="dimcard"><div class="lbl"><b>2020s</b><span>44 titles</span></div><div class="mean">7.7</div></div>
+          </div>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Countries</h4><span class="shelf-n">new</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>United States</b><span>98 titles</span></div><div class="mean">7.6</div></div>
+            <div class="dimcard"><div class="lbl"><b>Japan</b><span>31 titles</span></div><div class="mean">8.5</div></div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P5</b> favourites · chip row</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="chips">
+            <button class="chip on">Films <em>8</em></button>
+            <button class="chip">Series <em>5</em></button>
+            <button class="chip">People <em>6</em></button>
+            <button class="chip">Characters <em>14</em></button>
+          </div>
+          <div class="fgrid">
+            <div class="cell"><div class="art"></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Arrival</div><div class="sub">2016</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div><div class="nm">Blade Runner 2049</div><div class="sub">2017</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"></div><div class="nm">Sicario</div><div class="sub">2015</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"></div><div class="nm">Prisoners</div><div class="sub">2013</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"></div><div class="nm">Enemy</div><div class="sub">2013</div></div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P6</b> favourites · characters</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="chips">
+            <button class="chip">Films <em>8</em></button>
+            <button class="chip">Series <em>5</em></button>
+            <button class="chip">People <em>6</em></button>
+            <button class="chip on">Characters <em>14</em></button>
+          </div>
+          <div class="fgrid">
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"><div class="tag">Bryan Cranston</div></div><div class="nm">Walter White</div><div class="sub">Breaking Bad</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"><div class="tag">Brad Pitt</div></div><div class="nm">Tyler Durden</div><div class="sub">Fight Club</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"><div class="tag">poster · voice</div></div><div class="nm">Levi</div><div class="sub">Attack on Titan</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"><div class="tag">Rebecca Ferguson</div></div><div class="nm">Lady Jessica</div><div class="sub">Dune</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#C87A3C,var(--ink-4))"><div class="tag">Adam Scott</div></div><div class="nm">Mark Scout</div><div class="sub">Severance</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"><div class="tag">Anna Gunn</div></div><div class="nm">Skyler White</div><div class="sub">Breaking Bad</div></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="note ok"><b>P5 and P6 are the fix for the twenty-four screens.</b> Same grid, same generosity, but the chip row makes Characters one tap from the top instead of 11.7 screens down. The counts on the chips do a second job: they show the shape of somebody's taste before you open anything.</div>
+
+    <h4>Editing, and the states that only appear when something goes wrong</h4>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>P7</b> edit identity</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div><div class="phandle">@raman</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">Edit profile</h3>
+          <label class="fld"><span>Display name</span><div class="inp">Raman</div></label>
+          <label class="fld"><span>Handle</span><div class="inp" style="color:var(--muted)">@raman</div></label>
+          <label class="fld"><span>Bio</span><div class="inp ta">Watching my way through Villeneuve. Sci-fi and slow burns.</div>
+            <span class="cnt">58 / 1000</span></label>
+          <button class="btn">Save</button>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P8</b> choose a banner</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">Choose a banner</h3>
+          <p class="sh-b">From something you've watched.</p>
+          <div class="chips" style="padding:0 0 var(--space-12)">
+            <button class="chip on">Favourites</button><button class="chip">Library</button><button class="chip">Colour</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8)">
+            <div style="aspect-ratio:16/9;border-radius:var(--radius-8);background:linear-gradient(115deg,var(--ink-5),var(--beam-7));box-shadow:inset 0 0 0 var(--border-focus) var(--acc)"></div>
+            <div style="aspect-ratio:16/9;border-radius:var(--radius-8);background:linear-gradient(115deg,var(--mar-7),var(--ink-4))"></div>
+            <div style="aspect-ratio:16/9;border-radius:var(--radius-8);background:linear-gradient(115deg,var(--st-done-9),var(--ink-3))"></div>
+            <div style="aspect-ratio:16/9;border-radius:var(--radius-8);background:linear-gradient(115deg,#9B7BD4,var(--ink-4))"></div>
+          </div>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P9</b> shelf full · E7</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">Your films shelf is full</h3>
+          <p class="sh-b">Which one does <b style="color:var(--text)">Arrival</b> replace?</p>
+          <div class="fgrid" style="padding:0;grid-template-columns:repeat(4,1fr)">
+            <div class="cell"><div class="art"></div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4));box-shadow:inset 0 0 0 var(--border-focus) var(--acc)"></div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"></div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"></div></div>
+          </div>
+          <div style="display:flex;gap:var(--space-8);margin-top:var(--space-16)">
+            <button class="btn q">Cancel</button><button class="btn">Replace</button>
+          </div>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P10</b> stats failed · profile fine</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div><div class="phandle">@raman · joined Mar 2026</div></div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="sblock" style="border-color:var(--st-drop-9);background:var(--st-drop-3)">
+            <div class="sblock-h"><b style="color:var(--st-drop-11)">Couldn't load your stats</b></div>
+            <p style="font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-12)">
+              The rest of this page is unaffected.</p>
+            <button class="btn q" style="height:var(--control-sm);width:auto;padding:0 var(--space-12)">Try again</button>
+          </div>
+          <div class="shelf">
+            <div class="shelf-h"><h4>Favourite characters</h4><span class="shelf-n">See all 14 →</span></div>
+            <div class="rail">
+              <div class="fch"><div class="face"><div class="tag">Bryan Cranston</div></div><div class="nm">Walter White</div><div class="sub">Breaking Bad</div></div>
+              <div class="fch"><div class="face" style="background:linear-gradient(140deg,var(--ink-6),var(--ink-3))"><div class="tag">Brad Pitt</div></div><div class="nm">Tyler Durden</div><div class="sub">Fight Club</div></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P11</b> guest reaches a profile control</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall empty"><span class="ecap">no banner</span></div>
+          <div class="pav-row"><div class="pav-sm empty">?</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <div style="display:flex;gap:var(--space-12);align-items:center;margin-bottom:var(--space-12)">
+            <div style="width:var(--space-48);aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--mar-7),var(--ink-4));flex:0 0 auto"></div>
+            <h3 class="sh-t" style="margin:0">Set up your profile?</h3>
+          </div>
+          <p class="sh-b">You'll need an account to keep favourites and build a record.</p>
+          <button class="btn" style="margin-bottom:var(--space-8)">Create account</button>
+          <button class="btn q">Sign in</button>
+        </div></div>
+        </div>
+      </div>
+    </div>
+
+    <h4>The state index</h4>
     <div class="tbl-wrap"><table>
       <thead><tr><th>#</th><th>State</th><th>What is on screen</th></tr></thead>
       <tbody>
@@ -669,6 +966,153 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="tok">S2</td><td class="use">expanded / wide</td><td class="use">Banner 4:1 at container width with <code>--radius-16</code>; shelves show more per row; identity sits beside the avatar.</td></tr>
       </tbody>
     </table></div>
+  </div>
+</section>
+
+<!-- ============================== 08b DESKTOP ============================== -->
+<section id="desktop">
+  <div class="wrap">
+    <div class="shead"><span class="snum">08b</span><h2>Desktop</h2></div>
+    <p>Drawn at <b>1120&times;700</b> — the expanded band's own width — and scaled to fit this page. At wide (1440+) the container caps at 1600 and the margin takes the rest; nothing below reflows, the columns simply get wider.</p>
+
+    <div class="deskcap"><b>D1</b> overview · expanded</div>
+    <div class="deskwrap"><div style="height:592px"><div class="deskscale" style="height:950px"><div class="desk" style="height:950px">
+      <div class="dtop">
+        <div class="dwm"><i></i>Cine Search</div>
+        <div class="dnav"><a href="#x">Discover</a><a href="#x">Search</a><a href="#x">Library</a><a class="on" href="#x">You</a></div>
+      </div>
+      <div class="dbody">
+        <div style="position:relative;aspect-ratio:4/1;background:linear-gradient(115deg,var(--ink-5),var(--beam-7) 55%,var(--mar-7));overflow:hidden">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 62%)"></div>
+          <div style="position:absolute;left:40px;bottom:16px;z-index:2;font-family:var(--f-d);font-size:40px;line-height:44px;font-weight:800;letter-spacing:-.04em;color:#fff">Raman</div>
+          <button style="position:absolute;right:40px;top:16px;height:36px;padding:0 12px;border-radius:999px;border:0;cursor:pointer;background:rgba(4,6,12,.6);color:#fff;font-family:var(--f-s);font-size:12px;font-weight:600">Edit banner</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:16px 40px 0">
+          <div style="width:96px;height:96px;border-radius:999px;margin-top:-48px;background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:3px solid var(--bg);display:grid;place-items:center;font-family:var(--f-d);font-size:32px;font-weight:800;color:#fff">R</div>
+          <div style="min-width:0;flex:1">
+            <div style="font-family:var(--f-m);font-size:12px;color:var(--muted)">@raman · joined Mar 2026</div>
+            <p style="font-size:13px;line-height:20px;color:var(--muted);margin:4px 0 0;max-width:65ch">Watching my way through Villeneuve. Sci-fi, slow burns, and anything shot by Roger Deakins.</p>
+          </div>
+          <button style="height:44px;padding:0 16px;border-radius:12px;border:0;cursor:pointer;background:var(--surface-hv);color:var(--text);font-family:var(--f-s);font-size:13px;font-weight:600">Edit profile</button>
+        </div>
+        <div style="display:flex;gap:0;padding:0 40px;border-bottom:1px solid var(--bd-sub);margin-top:12px">
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--acc-t);border-bottom:2px solid var(--acc)">Overview</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Favourites</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Stats</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Library</button>
+        </div>
+        <div class="dcols">
+          <div>
+            <div class="sblock" style="margin:0 0 12px">
+              <div class="sblock-h"><b>Films</b><span>at least</span></div>
+              <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>112</dd></div><div class="snum-i"><dt>Days</dt><dd>11.3</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div></div>
+              <div class="dbar"><i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:#7C8AA8"></i><i style="width:9%;background:#9B7BD4"></i><i style="width:5%;background:#C87A3C"></i><i style="width:3%;background:var(--st-drop-9)"></i></div>
+            </div>
+            <div class="sblock" style="margin:0">
+              <div class="sblock-h"><b>Series</b><span></span></div>
+              <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>56</dd></div><div class="snum-i"><dt>Episodes</dt><dd>1.2k</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div></div>
+              <div class="dbar"><i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i><i style="width:18%;background:#7C8AA8"></i><i style="width:9%;background:#C87A3C"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+              <h4 style="font-family:var(--f-d);font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none">Favourite characters</h4>
+              <span style="font-family:var(--f-m);font-size:11px;color:var(--faint)">See all 14 →</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--mar-7),var(--ink-4));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">Bryan Cranston</div></div><div style="font-size:11px;color:var(--text)">Walter White</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Breaking Bad</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--ink-6),var(--ink-3));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">Brad Pitt</div></div><div style="font-size:11px;color:var(--text)">Tyler Durden</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Fight Club</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--st-done-9),var(--ink-4));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">poster · voice</div></div><div style="font-size:11px;color:var(--text)">Levi</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Attack on Titan</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--beam-7),var(--ink-3));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">R. Ferguson</div></div><div style="font-size:11px;color:var(--text)">Lady Jessica</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Dune</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,#C87A3C,var(--ink-4));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">Adam Scott</div></div><div style="font-size:11px;color:var(--text)">Mark Scout</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Severance</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,#9B7BD4,var(--ink-4));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">Anna Gunn</div></div><div style="font-size:11px;color:var(--text)">Skyler White</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Breaking Bad</div></div>
+            </div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 8px">
+              <h4 style="font-family:var(--f-d);font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none">Favourite films</h4>
+              <span style="font-family:var(--f-m);font-size:11px;color:var(--faint)">See all 8 →</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--ink-5),var(--ink-3));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Dune: Part Two</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--beam-7),var(--ink-3));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Arrival</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--mar-7),var(--ink-4));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Blade Runner 2049</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--st-done-9),var(--ink-4));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Sicario</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--ink-6),var(--ink-3));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Prisoners</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,#9B7BD4,var(--ink-4));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Enemy</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div></div></div>
+
+    <div class="note"><b>The two-column split is the only structural change from mobile.</b> Stats go left in a fixed 320px rail, favourites go right and fill. Nothing is added and nothing is hidden — a profile that needed a desktop-only section would be a profile that does not fit on a phone.</div>
+    <div class="note warn"><b>The banner is 4:1 here, not 2:1.</b> A 2:1 banner at 1120 wide is 560px tall — half the window spent on decoration before a single number. The name scales with it, to <code>--text-display</code>.</div>
+
+    <div class="deskcap"><b>D2</b> stats · expanded</div>
+    <div class="deskwrap"><div style="height:436px"><div class="deskscale"><div class="desk">
+      <div class="dtop">
+        <div class="dwm"><i></i>Cine Search</div>
+        <div class="dnav"><a href="#x">Discover</a><a href="#x">Search</a><a href="#x">Library</a><a class="on" href="#x">You</a></div>
+      </div>
+      <div class="dbody" style="padding:24px 40px">
+        <div style="display:flex;gap:0;border-bottom:1px solid var(--bd-sub);margin-bottom:20px">
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Overview</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Favourites</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--acc-t);border-bottom:2px solid var(--acc)">Stats</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Library</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+          <div class="sblock" style="margin:0">
+            <div class="sblock-h"><b>Films</b><span>at least</span></div>
+            <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>112</dd></div><div class="snum-i"><dt>Days</dt><dd>11.3</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div></div>
+            <div class="dbar"><i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:#7C8AA8"></i><i style="width:9%;background:#9B7BD4"></i><i style="width:5%;background:#C87A3C"></i><i style="width:3%;background:var(--st-drop-9)"></i></div>
+            <div class="dlegend"><span><i style="background:var(--st-done-9)"></i>Watched 72</span><span><i style="background:#7C8AA8"></i>Want 21</span><span><i style="background:#9B7BD4"></i>Rewatched 10</span><span><i style="background:#C87A3C"></i>On hold 6</span><span><i style="background:var(--st-drop-9)"></i>Dropped 3</span></div>
+          </div>
+          <div class="sblock" style="margin:0">
+            <div class="sblock-h"><b>Series</b><span></span></div>
+            <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>56</dd></div><div class="snum-i"><dt>Episodes</dt><dd>1.2k</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div></div>
+            <div class="dbar"><i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i><i style="width:18%;background:#7C8AA8"></i><i style="width:9%;background:#C87A3C"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
+            <div class="dlegend"><span><i style="background:var(--st-done-9)"></i>Watched 23</span><span><i style="background:#2ABFA0"></i>Watching 15</span><span><i style="background:#7C8AA8"></i>Want 10</span><span><i style="background:#C87A3C"></i>On hold 5</span><span><i style="background:var(--st-drop-9)"></i>Dropped 3</span></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+          <div>
+            <div style="font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Genres</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="dimcard"><div class="lbl"><b>Sci-Fi</b><span>38 titles</span></div><div class="mean">8.4</div></div>
+              <div class="dimcard"><div class="lbl"><b>Drama</b><span>41 titles</span></div><div class="mean">7.6</div></div>
+              <div class="dimcard"><div class="lbl"><b>Thriller</b><span>29 titles</span></div><div class="mean">7.9</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">People</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="dimcard"><div class="lbl"><b>Denis Villeneuve</b><span>6 of 26</span></div><div class="mean">8.6</div></div>
+              <div class="dimcard"><div class="lbl"><b>Roger Deakins</b><span>9 titles</span></div><div class="mean">8.2</div></div>
+              <div class="dimcard"><div class="lbl"><b>Jóhann Jóhannsson</b><span>4 titles</span></div><div class="mean">8.5</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Countries</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="dimcard"><div class="lbl"><b>United States</b><span>98 titles</span></div><div class="mean">7.6</div></div>
+              <div class="dimcard"><div class="lbl"><b>Japan</b><span>31 titles</span></div><div class="mean">8.5</div></div>
+              <div class="dimcard"><div class="lbl"><b>South Korea</b><span>12 titles</span></div><div class="mean">8.3</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Your years</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="dimcard"><div class="lbl"><b>2026</b><span>41 watched</span></div><div class="mean">7.9</div></div>
+              <div class="dimcard"><div class="lbl"><b>2025</b><span>63 watched</span></div><div class="mean">7.7</div></div>
+              <div class="dimcard"><div class="lbl"><b>2024</b><span>52 watched</span></div><div class="mean">8.0</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div></div></div>
+
+    <div class="note ok"><b>Four dimensions abreast is what desktop actually buys.</b> On a phone these are stacked sections you scroll past one at a time; here genres, people, countries and your years sit side by side, and the comparison between them — that Japan outscores the US by nearly a point across a third of the volume — is a thing you can see rather than remember.</div>
+    <div class="note law"><b>Card heights are content-led, not stretched.</b> Each dimension column holds its own three cards at their natural height. Stretching four columns to a common height would leave dead space under the short ones, which is the single most common way a desktop grid starts looking like a spreadsheet.</div>
   </div>
 </section>
 

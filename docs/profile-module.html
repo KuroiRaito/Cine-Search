@@ -151,6 +151,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
     <a href="#states">08 Every state</a>
     <a href="#schema">09 What it needs</a>
     <a href="#open">10 Decisions</a>
+    <a href="#bench">11 Benchmark</a>
   </div>
 </nav>
 
@@ -406,6 +407,8 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     </div>
   </div>
 
+  <div class="note ok"><b>The profile is tabbed, not one long scroll.</b> This is the structural change the benchmark forced. AL-chan runs Overview · Anime List · Manga List · Favorites · Stats · Social · Reviews, and with five favourite shelves, nine rankable stat dimensions and two distribution bars, one column of everything is a page nobody reaches the bottom of. Four tabs here: <b>Overview</b> (identity, headline stats, a shelf preview), <b>Favourites</b> (all five shelves in full), <b>Stats</b> (the dimensions and the bars), <b>Library</b> (what the library module already draws). The banner, name and handle persist above the tabs on every one.</div>
+
   <div class="note"><b>The order is not arbitrary.</b> Identity, then evidence, then taste. The stat strip sits directly under the bio because it is the cheapest possible proof that the rest of the page is worth reading — and on a new account it is the honest zero rather than a hidden section.</div>
 
   <div class="tbl-wrap"><table>
@@ -425,8 +428,8 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 <!-- ============================== 03 FAVOURITES ============================== -->
 <section id="favourites">
   <div class="wrap">
-    <div class="shead"><span class="snum">03</span><h2>Four shelves</h2></div>
-    <p>AL-chan separates favourite anime, manga, characters and staff. The film-and-TV equivalent is not a straight translation: <b>manga has no counterpart, and crew do</b>.</p>
+    <div class="shead"><span class="snum">03</span><h2>Five shelves</h2></div>
+    <p>AL-chan carries five: anime, manga, characters, staff and studios. The film-and-TV translation is not one-to-one — <b>manga has no counterpart, so films and series take the two title shelves</b> — but studios translate directly, and that shelf was missing from the first draft of this page.</p>
     <div class="tbl-wrap"><table>
       <thead><tr><th>Shelf</th><th>Card</th><th>Stored as</th><th>Cap</th><th>Source</th></tr></thead>
       <tbody>
@@ -434,6 +437,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="num">Series</td><td class="use">Poster 2:3, title, year</td><td class="tok">tmdb_id + 'tv'</td><td class="num">8</td><td class="use">Same column, different media_type</td></tr>
         <tr><td class="num">People</td><td class="use">Round face, name, the role you know them for</td><td class="tok">person_id</td><td class="num">8</td><td class="use">New. Actors and crew share one shelf.</td></tr>
         <tr><td class="num">Characters</td><td class="use">Square face, character, title, actor</td><td class="tok">credit_id</td><td class="num">8</td><td class="use">New. §04.</td></tr>
+        <tr><td class="num"><b>Studios</b></td><td class="use">Wordmark on a plate, title count</td><td class="tok">company_id</td><td class="num">8</td><td class="use"><b>Added after the benchmark.</b> AL-chan has a studios shelf and it is the one shelf I had missed — A24, Ghibli and Blumhouse are as much a reason to watch something as a director. TMDB <code>production_companies</code>.</td></tr>
       </tbody>
     </table></div>
 
@@ -578,19 +582,46 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 <section id="stats">
   <div class="wrap">
     <div class="shead"><span class="snum">07</span><h2>Stats</h2></div>
-    <p>Three of the four tiles come free — <code>taste_summary()</code> already returns them in one round trip.</p>
+    <p>This section was four tiles. Then I read what AL-chan actually computes for one person, and four tiles is not a profile — it is a summary of a profile.</p>
+
+    <div class="note ok"><b>The thing I had missed: AL-chan carries a mean score on <i>every</i> dimension, not just overall.</b> Pulled from a real account with 1,497 titles — <code>Action = 724 titles, mean 54.9</code> against <code>Comedy = 703, mean 59.2</code>. Nearly the same volume, four points apart. <b>You watch more action and you enjoy comedy more</b>, and that sentence is only available because the mean rides along with the count. A bare count says what you consumed. A count with a mean says something about you.</div>
+
+    <h4>Films and series get their own block</h4>
+    <p>AL-chan splits anime from manga — two headline rows, each with its own totals, mean and distribution bar. The translation here is <b>films and series</b>, and it is not cosmetic: a film has a runtime and no episodes, a series has both, and one blended &ldquo;titles&rdquo; number hides which you actually are.</p>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>Tile</th><th>Source</th><th>Formatting</th><th>Zero state</th></tr></thead>
+      <thead><tr><th>Block</th><th>Headline</th><th>Second</th><th>Third</th></tr></thead>
       <tbody>
-        <tr><td class="num">Titles</td><td class="tok">totals.titles</td><td class="use">Integer, tabular</td><td class="use"><code>0</code> in --faint</td></tr>
-        <tr><td class="num">Episodes</td><td class="tok">totals.episodes</td><td class="use">1.2k above 999</td><td class="use"><code>0</code> in --faint</td></tr>
-        <tr><td class="num">Days</td><td class="tok">totals.minutes</td><td class="use"><code>formatDays()</code> — one decimal</td><td class="use"><code>0</code> in --faint</td></tr>
-        <tr><td class="num">Mean</td><td class="use"><b>New.</b> avg(rating) over rated rows</td><td class="use">One decimal, --rate colour</td><td class="use"><code>—</code>, not <code>0</code></td></tr>
+        <tr><td class="num">Films</td><td class="num">count</td><td class="num">days watched</td><td class="num">mean score</td></tr>
+        <tr><td class="num">Series</td><td class="num">count</td><td class="num">episodes</td><td class="num">mean score</td></tr>
       </tbody>
     </table></div>
-    <div class="note law"><b><code>totals.partial</code> is not decoration.</b> It is true while any watched season's runtime is still unknown, and the Days tile must then read <b>&ldquo;at least 18.4&rdquo;</b> rather than presenting an undercount as a total. The RPC went to the trouble of computing it; the tile has to honour it.</div>
-    <div class="note warn"><b>Mean score shows a dash, never a zero, below three ratings.</b> Same floor the taste cards use — one 10 you gave in a good mood is not an average. The tile reads <code>—</code> and the tooltip says &ldquo;rate three titles&rdquo;.</div>
-    <div class="note"><b>No streaks, no percentiles, no comparison.</b> Every number here is cumulative, and skipping a month costs nothing. That rule is already carried by the <code>you</code> module and it extends unchanged — a profile is a record, not a scoreboard.</div>
+
+    <h4>The distribution bar</h4>
+    <p>Under each block, one stacked bar — the signature element of an AL-chan profile, and the one thing that makes the numbers feel like a life rather than a receipt. The real account reads:</p>
+    <pre>COMPLETED <b>1189</b>   PLANNING <b>840</b>   CURRENT <b>204</b>   DROPPED <b>95</b>   PAUSED <b>9</b></pre>
+    <div class="note ok"><b>This lands here for free.</b> Projector already has six watch states, each with its own hue and its own icon — the palette was built in the foundations and has had nowhere to prove itself. The bar is those six tokens, in order, at their true proportions. <b>No new colour, no new component.</b></div>
+    <div class="note warn"><b>Two rules the bar needs.</b> A segment under 2% still renders at 2% so it cannot vanish — a person with three dropped films out of four hundred should still see that they drop things. And the bar is never the only carrier: the legend below it names each state with its count, because six hues in a row is exactly the case the foundations warn about.</div>
+
+    <h4>Every dimension worth ranking</h4>
+    <p>All of these were verified against a live account. Each is a card carrying <b>a count and a mean</b>, ranked per kind and interleaved — the rule the <code>you</code> module already follows so decades cannot win by tautology.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Dimension</th><th>AL-chan</th><th>Here</th><th>Available?</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Genre</td><td class="use">Action 724 / 54.9 · Comedy 703 / 59.2</td><td class="use">Same</td><td class="use"><b>Already in <code>taste_summary</code></b> — needs the mean adding</td></tr>
+        <tr><td class="num">Release decade</td><td class="use">releaseYears</td><td class="use">Same</td><td class="use"><b>Already there</b></td></tr>
+        <tr><td class="num">People</td><td class="use">staff, separately from voiceActors</td><td class="use">One people ranking</td><td class="use"><b>Already there</b> — needs the mean</td></tr>
+        <tr><td class="num"><b>Watch year</b></td><td class="use">startYears — 2018=138, 2016=123</td><td class="use"><b>New.</b> &ldquo;Your 2026&rdquo;</td><td class="use">Needs a watched-on date</td></tr>
+        <tr><td class="num"><b>Country</b></td><td class="use">JP 1489 · CN 7 · KR 1</td><td class="use"><b>New.</b> A cinephile's shape</td><td class="use">TMDB <code>origin_country</code></td></tr>
+        <tr><td class="num"><b>Studio</b></td><td class="use">A-1 85 · MADHOUSE 76</td><td class="use"><b>New.</b> A24, Ghibli</td><td class="use">TMDB <code>production_companies</code></td></tr>
+        <tr><td class="num"><b>Format</b></td><td class="use">TV 997 · MOVIE 195 · OVA 157</td><td class="use">Film / series / limited</td><td class="use">Derivable today</td></tr>
+        <tr><td class="num"><b>Keyword</b></td><td class="use">tags — Male Protagonist 937</td><td class="use">TMDB keywords</td><td class="use">Verified in the capabilities doc</td></tr>
+        <tr><td class="num"><b>Score spread</b></td><td class="use">standardDeviation 16.7</td><td class="use">&ldquo;How harsh you are&rdquo;</td><td class="use">One SQL function</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note"><b>Standard deviation, in words.</b> 16.7 on a 100-point scale means this person spreads their scores. Shown as a number it is trivia; shown as <b>&ldquo;you rate generously, and you rarely sit on the fence&rdquo;</b> it is the most personal line on the page. Two thresholds, three sentences, no new data.</div>
+
+    <div class="note law"><b>What stays from the first draft.</b> <code>totals.partial</code> still forces &ldquo;at least 18.4 days&rdquo; rather than an undercount. Mean score still reads <code>—</code> below three ratings. And there are still <b>no streaks, no percentiles and no comparison</b> — every number is cumulative, and skipping a month costs nothing. AL-chan is the reference for how a tracker should feel, not for turning a record into a scoreboard.</div>
   </div>
 </section>
 
@@ -667,10 +698,48 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="tok">D1</td><td class="use"><b>Followers and following.</b> You asked for follow counts. On 2026-09-13 you parked Layers 3 and 4 — public profiles and follows — <i>indefinitely</i>, on the grounds that both need a community to be worth anything and there is no rollout planned. Six of the seven things on this page work perfectly in a private instrument; this one does not.</td><td class="use"><b>Leave it parked.</b> A follower count that reads <code>0</code> forever is worse than no tile, and the surface it opens — cross-user RLS, a public read policy, moderation — is the largest single piece of work in the product. The four-tile strip is designed without it and does not have a hole where it would go. Reverse it when there is a second person.</td></tr>
         <tr><td class="tok">D2</td><td class="use"><b>Upload, or catalogue only?</b> Both are designed. This is a product call about what a banner <i>is</i> on a film tracker.</td><td class="use"><b>Catalogue only, first.</b> Faster to use, impossible to get wrong visually, and more personal on a tracker than a photograph. Upload is fully drawn; add it if you miss it.</td></tr>
         <tr><td class="tok">D3</td><td class="use"><b>Does this module replace <code>you</code>, or sit beside it?</b> <code>you</code> already owns taste, stats and settings.</td><td class="use"><b>Absorb it.</b> One screen — identity and favourites on top, the existing taste cards below, settings behind a control in the header. Two screens showing the same numbers is how they drift apart, and there is no second user to need a separate public view.</td></tr>
-        <tr><td class="tok">D4</td><td class="use"><b>Eight per shelf?</b> AL-chan allows more and lets you page through them.</td><td class="use"><b>Eight.</b> Two phone rows, and the constraint is what makes the shelf mean something. Easy to raise later; painful to lower once people have filled them.</td></tr>
+        <tr><td class="tok">D4</td><td class="use"><b>How many per shelf?</b> I recommended eight. The benchmark says otherwise: the account I looked at has <b>roughly 25 favourite anime</b>, shown as a full grid on its own tab. AL-chan does not cap.</td><td class="use"><b>Both, and the tabs make it free.</b> The <b>Overview</b> shelf shows the first 8 as a rail — that is the statement, and the constraint still does its work. The <b>Favourites</b> tab shows everything as a grid, uncapped. The cap becomes a display rule rather than a limit, which is what AL-chan is actually doing. I was wrong to make it a limit.</td></tr>
+        <tr><td class="tok">D5</td><td class="use"><b>How long is a bio?</b> I specified 280 characters. The account I pulled has a <b>10,104-character</b> bio: markdown, images, custom headers, a Discord card, links to MAL and Steam. AL-chan profiles are a decorating culture.</td><td class="use"><b>Longer, but not a canvas — 1,000 characters, plain text with links.</b> 280 is a tweet and too short for &ldquo;what I watch and why&rdquo;. But the full markdown canvas brings an editor, image hosting, sanitising and a maintenance surface, for a product with one user. If you want the canvas, that is a real product direction and it should be its own decision rather than a field length.</td></tr>
       </tbody>
     </table></div>
     <div class="note law" style="margin-bottom:0"><b>Nothing here is built.</b> This is design, for grooming. The acceptance criteria are yours to write, and the working order has not changed: concept &rarr; design &rarr; <b>grooming</b> &rarr; development.</div>
+  </div>
+</section>
+
+<!-- ============================== 11 BENCHMARK ============================== -->
+<section id="bench">
+  <div class="wrap">
+    <div class="shead"><span class="snum">11</span><h2>What came from AL-chan</h2></div>
+    <p>Read off a live account with <b>1,497 titles, 22,638 episodes and 482 manga</b> — a profile someone has actually lived in for eleven years, not a demo. Six things changed. Four were deliberately left behind.</p>
+
+    <h4>Taken</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Change</th><th>Was</th><th>Now</th></tr></thead>
+      <tbody>
+        <tr><td class="num">A mean on every dimension</td><td class="use">Counts only</td><td class="use">Count <b>and</b> mean per genre, decade, person, studio. This is the whole benchmark in one row — it turns a consumption log into a sentence about taste.</td></tr>
+        <tr><td class="num">Tabs</td><td class="use">One long scroll</td><td class="use">Overview · Favourites · Stats · Library</td></tr>
+        <tr><td class="num">Distribution bar</td><td class="use">Absent</td><td class="use">A stacked bar per medium, in the six watch-state hues the foundations already define</td></tr>
+        <tr><td class="num">Per-medium stats</td><td class="use">One blended 4-tile strip</td><td class="use">Films and series get separate blocks — a film has no episodes</td></tr>
+        <tr><td class="num">Studios shelf</td><td class="use">Four shelves</td><td class="use">Five. A24 and Ghibli are as much a reason to watch as a director.</td></tr>
+        <tr><td class="num">Name on the banner</td><td class="use">Name below it</td><td class="use">On the artwork, which makes the banner a nameplate instead of decoration</td></tr>
+        <tr><td class="num">Three new dimensions</td><td class="use">Genre, decade, people</td><td class="use">Plus watch year, country and score spread</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>Left behind, on purpose</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Theirs</th><th>Why not here</th></tr></thead>
+      <tbody>
+        <tr><td class="num">The markdown bio canvas</td><td class="use">10,104 characters of custom headers, images, a Discord status card and links to MAL, Simkl and Steam. It is a decorating culture, and it exists because thousands of people visit each other's profiles. One reader does not decorate a room nobody enters. §10 D5.</td></tr>
+        <tr><td class="num">Activity feed with likes</td><td class="use">Layer 4. A feed with one person in it is a log, and the library already is one.</td></tr>
+        <tr><td class="num">Social tab, reviews tab</td><td class="use">Layers 3 and 4, parked. §10 D1.</td></tr>
+        <tr><td class="num">Voice actors as a ranking</td><td class="use">Meaningful in anime, where one actor carries a hundred roles. In film the actor <i>is</i> the person ranking — there is nothing to separate.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note law"><b>The pattern in what was left behind.</b> Every one of them is load-bearing only when somebody else is looking. AL-chan is the reference for <b>how a tracker should feel</b> — generous with numbers, honest about what you dropped, never scolding you for a gap — and that is exactly what was taken. What was left is the part that needs an audience.</div>
+
+    <div class="note warn"><b>One thing they have that we cannot.</b> AL-chan ships real character portraits — <code>anilistcdn/character/large/b40-….png</code> for Luffy. TMDB has no character images at all, which is why §04 exists and why an animated title falls back to its poster. This is the single place the design is worse than the reference, and it is a data limit rather than a choice.</div>
   </div>
 </section>
 

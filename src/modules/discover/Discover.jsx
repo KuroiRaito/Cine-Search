@@ -4,7 +4,7 @@ import { trending, nowPlaying, upcoming, onTheAir } from '../../shared/tmdb/endp
 import { fromItem } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { useRegion } from '../../shared/hooks/useRegion.js';
-import { Rail, Skeleton, ErrorBox } from '../../shared/ui/index.js';
+import { Rail, Skeleton, ErrorBox, Icon } from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useTileStates, useQuickAdd } from '../library';
 import { SignInPrompt } from '../entry';

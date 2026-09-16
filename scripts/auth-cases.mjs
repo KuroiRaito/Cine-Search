@@ -136,8 +136,22 @@ async function install(ctx, o) {
     }, [`sb-${REF}-auth-token`, o.stored ? JSON.stringify(o.stored()) : '']);
 }
 
-const read = async (page) =>
-    (await page.locator('#root').innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
+/**
+ * The rendered text, once there is any.
+ *
+ * Fixed waits after a goto were fine until the icon set landed: lucide adds
+ * enough modules for Vite to transform on a cold dev server that first paint
+ * moved past them, and four cases started reading an empty page and calling it
+ * a failure. Waiting for the app to exist is both faster and honest — a test
+ * that passes because of a sleep is a test that will fail on a slower machine.
+ */
+const read = async (page) => {
+    await page.waitForFunction(() => {
+        const r = document.getElementById('root');
+        return r && r.innerText.trim().length > 0;
+    }, null, { timeout: 8000 }).catch(() => {});
+    return (await page.locator('#root').innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
+};
 
 const fill = async (page, fields) => {
     for (const [id, value] of Object.entries(fields)) await page.fill(`#auth-${id}`, value);
@@ -388,7 +402,8 @@ const CASES = [
             await page.getByRole('button', { name: 'Sign out' }).first().click();
             await page.waitForTimeout(200);
             await page.getByRole('button', { name: 'Sign out' }).last().click();
-            await page.waitForTimeout(900);
+            await page.getByRole('link', { name: 'Sign in' }).first()
+                .waitFor({ timeout: 8000 }).catch(() => {});
             return `${new URL(page.url()).pathname} ${await read(page)}`;
         },
         expect: ['Sign in'], reject: ['Your session ended'],
@@ -645,7 +660,12 @@ const CASES = [
             const asked = await read(page);
 
             await page.getByRole('button', { name: 'Sign out' }).last().click();
-            await page.waitForTimeout(1000);
+            // Wait for the signed-out shell, not for a stopwatch: `read` returns
+            // as soon as there is any text, which after a sign-out is the tab
+            // bar — a beat before the session question has settled and the
+            // "Sign in" link appears.
+            await page.getByRole('link', { name: 'Sign in' }).first()
+                .waitFor({ timeout: 8000 }).catch(() => {});
             return `landed[${landed.slice(0, 300)}] settings[${settings.slice(0, 900)}]`
                 + ` asked[${asked.includes('library stays exactly as it is')}]`
                 + ` end[${new URL(page.url()).pathname}] ${await read(page)}`;

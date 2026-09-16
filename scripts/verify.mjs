@@ -387,6 +387,44 @@ for (const f of jsx) {
     }
 }
 
+/* ---------------------------------------------------------------
+   15. A component used is a component imported.
+
+   ESLint cannot do this one. Its core scope analysis does not treat a
+   JSX element name as a reference, which is why `no-unused-vars` here
+   carries `varsIgnorePattern: '^[A-Z_]'` — capitalised imports would
+   otherwise all read as unused. The same blindness means a capitalised
+   name used and never imported is invisible, and `vite build` is happy
+   too: it is a valid identifier that simply is not there.
+
+   It reached main. #58 swept Discover onto <Icon> without adding the
+   import, and every visit to the home screen threw
+   "ReferenceError: Icon is not defined" — past lint, past the build,
+   past a green CI.
+   --------------------------------------------------------------- */
+for (const f of jsx) {
+    const rel = relative(ROOT, f);
+    const body = readFileSync(f, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/^\s*\/\/.*$/gm, '');
+
+    // Names this file brings in or declares itself.
+    const known = new Set(['React', 'Fragment']);
+    for (const m of body.matchAll(/import\s+([\s\S]*?)\s+from\s+['"][^'"]+['"]/g)) {
+        for (const n of m[1].matchAll(/[A-Za-z_$][\w$]*/g)) known.add(n[0]);
+    }
+    for (const m of body.matchAll(/(?:function|class)\s+([A-Z][\w$]*)/g)) known.add(m[1]);
+    for (const m of body.matchAll(/(?:const|let|var)\s+([A-Z][\w$]*)\s*=/g)) known.add(m[1]);
+
+    const seen = new Set();
+    for (const m of body.matchAll(/<([A-Z][\w$]*)[\s/>]/g)) {
+        const name = m[1];
+        if (known.has(name) || seen.has(name)) continue;
+        seen.add(name);
+        fail('component-import', `${rel}: <${name}> is used but never imported or defined here`);
+    }
+}
+
 // Aggregate last, after every check has run — a map built before a check
 // reports into it is a check that can never fail.
 const byCheck = new Map();
@@ -407,6 +445,7 @@ const CHECKS = [
     ['focus-ring', 'Focus is never removed without a replacement'],
     ['layer-token', 'Five layers, and nothing between them'],
     ['icon-component', 'An icon is a component, never a character'],
+    ['component-import', 'A component used is a component imported'],
 ];
 
 let failed = 0;

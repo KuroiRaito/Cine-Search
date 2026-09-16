@@ -55,7 +55,7 @@ const MODULES = {
                { name: 'film', path: '/title/movie/27205' }],
     person:   [{ name: 'director', path: '/person/137427' }],
     library:  [{ name: 'library', path: '/library' }],
-    you:      [{ name: 'taste', path: '/you' },
+    profile:  [{ name: 'profile', path: '/you' },
                { name: 'settings', path: '/settings' }],
 };
 const WIDTHS = [390, 900, 1280];

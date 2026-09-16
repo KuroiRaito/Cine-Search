@@ -1,12 +1,13 @@
-# You
+# Profile
 
-Taste, worked out from your own records, and settings. Screen 7; acceptance
-criteria M3 §3.3–3.7.
+Module 8. Identity, the numbers behind it, and settings —
+`docs/profile-module.html`. Absorbs what used to be `you`: screen 7 and
+acceptance criteria M3 §3.3–3.7 still apply to the taste half.
 
 ## Public surface
 
 ```js
-import { You, Settings } from '../modules/you';
+import { Profile, Settings } from '../modules/profile';
 ```
 
 ## Becoming the profile
@@ -21,20 +22,35 @@ Landing in order, one PR each:
 
 | | | |
 | --- | --- | --- |
-| 1 | **Stats** | done — two medium blocks, distribution bars, score spread |
-| 2 | Identity | banner, avatar, bio, display name, the edit sheet |
+| 1 | Stats | done — two medium blocks, distribution bars, score spread |
+| 2 | **Identity** | done — banner, avatar, bio, display name, edit sheet, banner picker |
 | 3 | Favourites | order column, favourites table, shelves, chip row |
 | 4 | Characters | the picker, `credit_id`, `/credit/{id}` in the proxy allowlist |
 
-The directory is renamed to `profile` with step 2, when the screen actually
-becomes one. Renaming it now would be a large diff that changes nothing you
-can see.
+The directory was renamed with step 2. The route stays `/you` and the tab still
+reads **You**, because that is what your own profile is called from the inside.
 
 Studios is a fifth shelf in the design and is **deliberately not built in v1**
 — it needs a company page that no module owns. It stays documented so v2 does
 not have to rediscover it.
 
 ## What it owns
+
+`identity.js` — the decisions behind the band. Which of the three banner kinds
+to draw and what to fall back to; the avatar's letter and its gradient; the
+1,000-character bio limit, which is a database constraint as well, because a
+limit enforced only in a sheet is not enforced.
+
+Two things in there are less obvious than they look. `firstGrapheme` uses
+`Intl.Segmenter` rather than `name[0]`, because 神谷 must render 神 and an emoji
+must not render as half of itself. And `colourClass` maps a key to a whole
+class name instead of interpolating one: `bg-${key}` builds a name no tool can
+see, and `npm run verify` reads it as a class called `bg-`.
+
+**Uploads are not built.** The design draws them; §06 recommends the
+catalogue-first route partly because it needs no Storage bucket, and none
+exists. Picking a still from your library arrives with favourites, since it
+reads from the shelves.
 
 `taste.js` — the one query behind the whole screen (`profile_stats()`, which
 replaced `taste_summary()`), the formatters that turn stored minutes into

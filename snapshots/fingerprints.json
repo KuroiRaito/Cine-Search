@@ -24,28 +24,28 @@
     "hash": "3958658a"
   },
   "entry/cover@1280-dark": {
-    "elements": 42,
-    "hash": "e5e06a0c"
+    "elements": 30,
+    "hash": "baec8204"
   },
   "entry/cover@1280-light": {
-    "elements": 42,
-    "hash": "e5e06a0c"
+    "elements": 30,
+    "hash": "baec8204"
   },
   "entry/cover@390-dark": {
-    "elements": 42,
-    "hash": "a1518d3d"
+    "elements": 30,
+    "hash": "1ac48c35"
   },
   "entry/cover@390-light": {
-    "elements": 42,
-    "hash": "a1518d3d"
+    "elements": 30,
+    "hash": "1ac48c35"
   },
   "entry/cover@900-dark": {
-    "elements": 42,
-    "hash": "71a2df5f"
+    "elements": 30,
+    "hash": "275c99df"
   },
   "entry/cover@900-light": {
-    "elements": 42,
-    "hash": "71a2df5f"
+    "elements": 30,
+    "hash": "275c99df"
   },
   "entry/forgot@1280-dark": {
     "elements": 16,
@@ -167,6 +167,54 @@
     "elements": 111,
     "hash": "5e1e2e00"
   },
+  "profile/profile@1280-dark": {
+    "elements": 30,
+    "hash": "4e10a66"
+  },
+  "profile/profile@1280-light": {
+    "elements": 30,
+    "hash": "4e10a66"
+  },
+  "profile/profile@390-dark": {
+    "elements": 30,
+    "hash": "11816e93"
+  },
+  "profile/profile@390-light": {
+    "elements": 30,
+    "hash": "11816e93"
+  },
+  "profile/profile@900-dark": {
+    "elements": 30,
+    "hash": "d938d6d9"
+  },
+  "profile/profile@900-light": {
+    "elements": 30,
+    "hash": "d938d6d9"
+  },
+  "profile/settings@1280-dark": {
+    "elements": 43,
+    "hash": "a3a4655b"
+  },
+  "profile/settings@1280-light": {
+    "elements": 43,
+    "hash": "1dc78b44"
+  },
+  "profile/settings@390-dark": {
+    "elements": 43,
+    "hash": "d51b40ba"
+  },
+  "profile/settings@390-light": {
+    "elements": 43,
+    "hash": "12c49aef"
+  },
+  "profile/settings@900-dark": {
+    "elements": 43,
+    "hash": "5cdf9ade"
+  },
+  "profile/settings@900-light": {
+    "elements": 43,
+    "hash": "6a53928b"
+  },
   "search/results@1280-dark": {
     "elements": 108,
     "hash": "49b43cad"
@@ -238,53 +286,5 @@
   "title/series@900-light": {
     "elements": 296,
     "hash": "e0e44d3f"
-  },
-  "you/settings@1280-dark": {
-    "elements": 49,
-    "hash": "2bc1905d"
-  },
-  "you/settings@1280-light": {
-    "elements": 49,
-    "hash": "cab28c06"
-  },
-  "you/settings@390-dark": {
-    "elements": 49,
-    "hash": "3773aa2f"
-  },
-  "you/settings@390-light": {
-    "elements": 49,
-    "hash": "3752d286"
-  },
-  "you/settings@900-dark": {
-    "elements": 49,
-    "hash": "b7c9301d"
-  },
-  "you/settings@900-light": {
-    "elements": 49,
-    "hash": "9892f0c6"
-  },
-  "you/taste@1280-dark": {
-    "elements": 453,
-    "hash": "a4af87f0"
-  },
-  "you/taste@1280-light": {
-    "elements": 453,
-    "hash": "a4af87f0"
-  },
-  "you/taste@390-dark": {
-    "elements": 453,
-    "hash": "9a28638f"
-  },
-  "you/taste@390-light": {
-    "elements": 453,
-    "hash": "9a28638f"
-  },
-  "you/taste@900-dark": {
-    "elements": 453,
-    "hash": "9203d37a"
-  },
-  "you/taste@900-light": {
-    "elements": 453,
-    "hash": "9203d37a"
   }
 }

@@ -255,6 +255,32 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   background: var(--scrim-wash);
   display: flex; align-items: flex-end; justify-content: center;
 }
+/* The sheet's own furniture. Shared with .scrim and .sheet above, because a
+   sheet raised by the entry module and one raised by the profile module are
+   the same object — and a seam between two modules' sheets would be visible.
+   Hidden from medium up: there is nothing to drag with a mouse. */
+.grab {
+  width: var(--space-32); height: var(--space-4);
+  border-radius: var(--radius-full); background: var(--bd-str);
+  margin: 0 auto var(--space-16);
+}
+
+/* "Mark watched" plus a Tolkien title is 62 characters. Three lines is the
+   longest a sheet head may grow: the actions must never leave the viewport,
+   because a decision you cannot reach is a trap. */
+.sheet-title {
+  font-family: var(--f-d);
+  font-size: var(--text-title-sm); line-height: var(--lh-title-sm);
+  font-weight: 700; letter-spacing: -.02em;
+  margin-bottom: var(--space-4);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.sheet-body {
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  color: var(--muted); margin-bottom: var(--space-16);
+}
+
 .sheet {
   /* A sheet is a fixed-width surface, not the page, so --gutter is the wrong
      number for its insets: at expanded the page gutter is 40px and this box
@@ -430,3 +456,130 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   /* The tab bar is gone up here, so the gap it was clearing is just a gap. */
   .toast { bottom: var(--space-24); }
 }
+
+/* A heading that is read but not drawn.
+   Used where the visible title is artwork — the profile's name sits on its
+   banner, so the page would otherwise have no h1 at all for a screen reader
+   to land on. Not `display:none`, which removes it from the tree entirely. */
+.vh {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* ---------------- form fields ----------------
+   A labelled control, its hint slot and the problem that replaces it. Shared,
+   because entry's sign-in form and the profile's edit sheet are the same
+   object wearing two names — and a form that looks different depending on
+   which module raised it is two design systems. */
+
+.field { display: flex; flex-direction: column; gap: var(--field-gap); }
+
+.field > span {
+  font-size: var(--text-label); line-height: var(--lh-label);
+  font-weight: 600; color: var(--muted);
+}
+
+/* The label and anything that belongs to this field share one row. */
+.field-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-12); }
+
+.field-aside { font-weight: 600; color: var(--acc-t); }
+
+/* Hint and error share one slot, and the slot is reserved at render rather
+   than inserted on failure — otherwise every field below jumps down the
+   screen at exactly the moment the person is reading. */
+.field-hint {
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  color: var(--muted); font-weight: 400; min-height: var(--lh-caption);
+}
+
+.field-hint.bad { color: var(--st-drop-11); font-weight: 500; }
+
+/* Caps Lock, and anything else that is worth saying but is not a fault.
+   Deliberately not in the hint slot: the hint slot is where problems go, and
+   colouring this one like a problem would say something is wrong when nothing
+   is. Foundations §12, I9. */
+.field-note {
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  color: var(--muted); font-weight: 500;
+}
+
+/* Above the submit button, inside the form — never at the top of the page,
+   where somebody who has scrolled to the button will not see it. */
+.form-error {
+  display: flex; align-items: flex-start; gap: var(--space-12);
+  background: var(--st-drop-3);
+  border-radius: var(--radius-8);
+  padding: var(--space-12) var(--space-16);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  color: var(--st-drop-11);
+}
+/* Colour is never the only signal. */
+.form-error::before {
+  content: "!"; flex: 0 0 auto;
+  width: var(--icon-20); height: var(--icon-20); border-radius: var(--radius-full);
+  background: var(--st-drop-9); color: #fff;
+  display: grid; place-items: center;
+  font-size: var(--text-caption); font-weight: 700;
+}
+/* It takes focus when it appears, and a focus ring is how anyone can tell.
+   Removing the outline here without a replacement is the one thing §05 forbids. */
+.form-error:focus-visible { outline: var(--border-focus) solid var(--acc); outline-offset: var(--space-2); }
+.form-error a { color: inherit; font-weight: 700; text-decoration: underline; }
+
+/* U4 — the flow succeeded and cannot finish here. One icon, one sentence,
+   one action; centred, because there is nothing to compare it against. */
+.auth-done { text-align: center; }
+.auth-done .auth-lede { margin-bottom: var(--space-24); }
+.done-mark {
+  width: var(--space-48); height: var(--space-48); margin: 0 auto var(--space-16);
+  border-radius: var(--radius-full); background: var(--st-done-3); color: var(--st-done-11);
+  display: grid; place-items: center; font-size: var(--text-title-sm); font-weight: 700;
+}
+.auth-done .form-error { text-align: left; margin-top: var(--space-12); }
+
+/* A password manager paints its own background over the field, and Chrome's
+   is an opaque wash that hides an inset ring entirely — the one state where
+   the person most needs to see the field is autofill. A large inset shadow in
+   the field's own colour repaints the ground, and the ring rides on top. */
+.searchbox:-webkit-autofill,
+.searchbox:-webkit-autofill:hover,
+.searchbox:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  box-shadow: inset 0 0 0 var(--space-40) var(--bg-sub), inset 0 0 0 var(--border-hair) var(--bd-sub);
+}
+.searchbox:-webkit-autofill:focus {
+  box-shadow: inset 0 0 0 var(--space-40) var(--bg-sub), inset 0 0 0 var(--border-focus) var(--acc);
+}
+.searchbox[aria-invalid="true"]:-webkit-autofill {
+  box-shadow: inset 0 0 0 var(--space-40) var(--bg-sub), inset 0 0 0 var(--border-focus) var(--st-drop-9);
+}
+
+/* I3 / U9 — submitting. Dimmed and frozen, never `disabled`: a disabled field
+   leaves the tab order, so the keyboard jumps somewhere unrelated for the
+   second the request takes and the person loses their place. */
+.auth-form.busy .field,
+.auth-form.busy .pw-rules { opacity: .6; pointer-events: none; }
+
+/* The password field and the control that reveals it are one object. The
+   input reserves room on the right so the two never overlap. */
+.pw-wrap { position: relative; display: block; }
+.pw-wrap .searchbox { padding-right: var(--space-64); }
+.pw-peek {
+  position: absolute; right: var(--space-4); top: 50%; transform: translateY(-50%);
+  min-height: var(--control-h); display: grid; place-items: center;
+  background: none; border: 0; padding: 0 var(--space-8); border-radius: var(--radius-8);
+  font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
+  font-weight: 600; color: var(--muted); cursor: pointer;
+}
+.pw-peek:hover { color: var(--text); background: var(--surface-hv); }
+
+/* Requirements you watch yourself meet, rather than a rule read out after you
+   have already failed it. */
+.pw-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
+.pw-rules li {
+  display: flex; align-items: center; gap: var(--space-8);
+  font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.pw-rules li span { width: var(--space-12); text-align: center; font-size: var(--text-micro); }
+.pw-rules li.met { color: var(--st-done-11); }

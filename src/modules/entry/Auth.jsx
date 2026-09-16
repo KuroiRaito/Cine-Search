@@ -435,7 +435,7 @@ export default function Auth() {
 
                 {resetWithoutLink ? (
                     <>
-                        <p className="auth-error" role="alert">
+                        <p className="form-error" role="alert">
                             This link has expired or has already been used.
                         </p>
                         <Link className="btn block" to="/welcome/forgot" state={{ from: back }}>
@@ -522,7 +522,7 @@ export default function Auth() {
                     )}
 
                     {fail && !fail.field && (
-                        <p className="auth-error" role="alert" tabIndex={-1} ref={bannerRef}>
+                        <p className="form-error" role="alert" tabIndex={-1} ref={bannerRef}>
                             <span>
                                 {fail.message}
                                 {fail.kind === 'email-taken' && (
@@ -600,7 +600,7 @@ function Done({ panel, back, onBack }) {
                     </button>
                 )}
                 {state === 'failed' && (
-                    <p className="auth-error" role="alert"><span>Couldn’t send it again. Try in a minute.</span></p>
+                    <p className="form-error" role="alert"><span>Couldn’t send it again. Try in a minute.</span></p>
                 )}
 
                 <p className="auth-alt quiet">

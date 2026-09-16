@@ -7,8 +7,9 @@ import { useAsync } from '../../shared/hooks/useAsync.js';
 import { posterUrl, profileUrl, toPersonView, roleForJob } from '../../shared/tmdb/view.js';
 import { person as fetchPerson } from '../../shared/tmdb/endpoints.js';
 import { totalsFromView, totalsAreFresh, personTotalsSet } from '../library';
-import { profileStats, distribution, scoreSpread, formatDays, formatSpan, SCORE_FLOOR } from './taste.js';
-import './you.css';
+import { profileStats, distribution, scoreSpread, formatDays, formatSpan, SCORE_FLOOR } from './stats.js';
+import Identity from './Identity.jsx';
+import './profile.css';
 
 /**
  * Your taste, worked out from your own records and nobody else's.
@@ -26,12 +27,15 @@ import './you.css';
  * nothing yet marked watched sits on the empty state, which had no gear, so
  * there was no way to sign out at all.
  */
-function YouHead({ name }) {
+function YouHead({ name, status }) {
     return (
-        <div className="page-head">
-            <h1>{name || 'You'}</h1>
-            <Link className="circ" to="/settings" aria-label="Settings">⚙</Link>
-        </div>
+        <>
+            <div className="page-head">
+                <h1 className="vh">{name || 'You'}</h1>
+                <Link className="circ" to="/settings" aria-label="Settings">⚙</Link>
+            </div>
+            <Identity status={status} />
+        </>
     );
 }
 
@@ -55,7 +59,10 @@ export default function You() {
     if (authReady && !isSignedIn) {
         return (
             <div className="page">
-                <YouHead />
+                {/* No identity band for a guest: a banner and an initial would
+                    be asserting an account that does not exist. G1 sends them
+                    to the sign-in sheet from the control they reached for. */}
+                <div className="page-head"><h1>You</h1></div>
                 <Empty
                     title="Nothing to work from yet"
                     body="Your taste is worked out from what you’ve watched and rated — and only ever shown to you."
@@ -72,7 +79,7 @@ export default function You() {
     if (!authReady || loading || (!data && !error)) {
         return (
             <div className="page">
-                <YouHead name={profile?.username} />
+                <YouHead name={profile?.username} status={loading ? 'loading' : 'ready'} />
                 <div className="stiles">
                     {[0, 1, 2].map((i) => <Skeleton key={i} h={40} />)}
                 </div>
@@ -86,7 +93,7 @@ export default function You() {
     if (error) {
         return (
             <div className="page">
-                <YouHead name={profile?.username} />
+                <YouHead name={profile?.username} status={loading ? 'loading' : 'ready'} />
                 <Empty
                     title="Couldn’t work out your taste"
                     body="Your records are safe — this screen just couldn’t reach them."
@@ -105,7 +112,7 @@ export default function You() {
     if (!totals.titles) {
         return (
             <div className="page">
-                <YouHead name={profile?.username} />
+                <YouHead name={profile?.username} status={loading ? 'loading' : 'ready'} />
                 <Empty
                     title="Nothing watched yet"
                     body="Mark something watched and this fills in — genres, decades and the people whose work you keep coming back to."
@@ -119,7 +126,7 @@ export default function You() {
 
     return (
         <div className="page">
-            <YouHead name={profile?.username} />
+            <YouHead name={profile?.username} status={loading ? 'loading' : 'ready'} />
 
             {/* A film has a runtime and no episodes; a series has both. One
                 blended "titles" number hid which of the two you actually are. */}

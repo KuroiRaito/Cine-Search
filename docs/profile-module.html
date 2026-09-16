@@ -1,0 +1,1473 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Profile Module</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Projector — the profile module. Built on the tokens in docs/foundations.html;
+   no loose numbers here either. */
+:root{
+  color-scheme:dark;
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-3:#0A2530;--beam-7:#155A72;--beam-9:#25BADF;--beam-11:#6FDCF5;
+  --mar-3:#2B210B;--mar-7:#6B5316;--mar-9:#F5C45C;--mar-11:#F0C468;
+  --st-done-3:#07241F;--st-done-9:#2ABFA0;--st-done-11:#6FE0C8;
+  --st-drop-3:#26100C;--st-drop-9:#B5594A;--st-drop-11:#DC8E7F;
+  --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
+  --on-beam-9:#06333F;
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);
+  --grid-line:rgba(111,220,245,.13);
+  --space-0:0px;--space-2:2px;--space-4:4px;--space-8:8px;--space-12:12px;
+  --space-16:16px;--space-20:20px;--space-24:24px;--space-32:32px;--space-40:40px;
+  --space-48:48px;--space-64:64px;--space-80:80px;
+  --radius-4:4px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-full:999px;
+  --border-hair:1px;--border-focus:2px;
+  --control-sm:36px;--control-md:44px;--control-lg:52px;
+  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+  --f-d:'Archivo',system-ui,sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',ui-monospace,monospace;
+  --dur-fast:120ms;--dur-base:200ms;--ease-out:cubic-bezier(.2,0,0,1);
+  --shadow-raised:0 6px 16px -4px rgba(0,0,0,.6);--scrim-wash:rgba(4,6,12,.62);
+  --z-nav:40;--z-scrim:60;
+  --gutter:var(--space-16);--control-h:var(--control-md);--radius-control:var(--radius-12);
+  --field-gap:var(--space-8);--field-stack:var(--space-16);--section-gap:var(--space-24);
+  --form-max:420px;--measure:65ch;--shell-max:none;
+  --text-micro:11px;--lh-micro:16px;--text-caption:12px;--lh-caption:16px;
+  --text-body-sm:13px;--lh-body-sm:20px;--text-label:13px;--lh-label:16px;
+  --text-body:15px;--lh-body:24px;--text-title-sm:17px;--lh-title-sm:24px;
+  --text-title:21px;--lh-title:28px;--text-display-sm:27px;--lh-display-sm:32px;
+  --text-display:40px;--lh-display:44px;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-s);font-size:var(--text-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:var(--border-focus) solid var(--acc);outline-offset:3px;border-radius:var(--radius-4)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 var(--space-24)}
+.mast{border-bottom:var(--border-hair) solid var(--bd-sub);padding:var(--space-64) 0 var(--space-40);position:relative;overflow:hidden}
+.mast::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to right,var(--grid-line) 0 1px,transparent 1px var(--space-4)),
+             repeating-linear-gradient(to bottom,var(--grid-line) 0 1px,transparent 1px var(--space-4));
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%);
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%)}
+.mast .wrap{position:relative}
+.eyebrow{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t);display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-16)}
+.eyebrow i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal;flex:0 0 auto}
+h1{font-family:var(--f-d);font-size:var(--text-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.04em;margin:0 0 var(--space-16);text-wrap:balance}
+.lede{font-size:var(--text-body);line-height:var(--lh-body);color:var(--muted);max-width:62ch;margin:0}
+.lede b{color:var(--text);font-weight:600}
+nav.toc{border-bottom:var(--border-hair) solid var(--bd-sub);position:sticky;top:0;z-index:var(--z-nav);
+  background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px)}
+nav.toc .wrap{display:flex;gap:var(--space-4);overflow-x:auto;padding-top:var(--space-8);padding-bottom:var(--space-8)}
+nav.toc a{flex:0 0 auto;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);
+  letter-spacing:.04em;color:var(--muted);text-decoration:none;padding:var(--space-8) var(--space-12);border-radius:var(--radius-8)}
+nav.toc a:hover{background:var(--surface);color:var(--text)}
+section{padding:var(--space-64) 0;border-bottom:var(--border-hair) solid var(--bd-sub)}
+.shead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
+.snum{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc);flex:0 0 auto}
+h2{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+h3{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;margin:var(--space-40) 0 var(--space-12)}
+h4{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:var(--space-24) 0 var(--space-12)}
+section > .wrap > p,.prose{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0 0 var(--space-12)}
+section > .wrap > p b,.prose b{color:var(--text);font-weight:600}
+code{font-family:var(--f-m);font-size:.92em;background:var(--surface);padding:var(--space-2) var(--space-4);border-radius:var(--radius-4);color:var(--acc-t)}
+.tbl-wrap{overflow-x:auto;margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12)}
+table{width:100%;border-collapse:collapse;font-size:var(--text-body-sm);line-height:var(--lh-body-sm)}
+th{text-align:left;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd);background:var(--bg-sub);white-space:nowrap}
+td{padding:var(--space-12) var(--space-16);border-bottom:var(--border-hair) solid var(--bd-sub);vertical-align:top;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.tok,td.num{font-family:var(--f-m);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.tok{color:var(--acc-t)}td.num{color:var(--text)}
+tbody tr:hover td{background:color-mix(in srgb,var(--surface) 55%,transparent)}
+.note{border-left:var(--border-focus) solid var(--acc-bd);background:var(--acc-bg);padding:var(--space-12) var(--space-16);
+  border-radius:0 var(--radius-8) var(--radius-8) 0;margin:var(--space-16) 0;font-size:var(--text-body-sm);
+  line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure)}
+.note b{color:var(--acc-t);font-weight:600}
+.note.warn{border-left-color:var(--rate-bd);background:var(--rate-bg)}
+.note.warn b{color:var(--rate-t)}
+.note.law{border-left-color:var(--st-drop-9);background:var(--st-drop-3)}
+.note.law b{color:var(--st-drop-11)}
+.note.ok{border-left-color:var(--st-done-9);background:var(--st-done-3)}
+.note.ok b{color:var(--st-done-11)}
+pre{background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);
+  padding:var(--space-16);overflow-x:auto;margin:var(--space-16) 0;font-family:var(--f-m);
+  font-size:var(--text-caption);line-height:var(--lh-body-sm);color:var(--muted)}
+pre b{color:var(--acc-t);font-weight:500}pre i{color:var(--faint);font-style:normal}
+pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11);text-decoration:none}
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="eyebrow"><i></i>Projector · module 8</div>
+    <h1>Profile</h1>
+    <p class="lede">A banner, a face, a bio, four shelves of favourites and the numbers behind them. Everything below was checked against the live TMDB API and this project's own schema before it was drawn — <b>including the one thing that turned out not to exist</b>.</p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#found">01 What's actually there</a>
+    <a href="#anatomy">02 Anatomy</a>
+    <a href="#favourites">03 Favourites</a>
+    <a href="#characters">04 Characters</a>
+    <a href="#picker">05 The picker</a>
+    <a href="#images">06 Banner &amp; avatar</a>
+    <a href="#stats">07 Stats</a>
+    <a href="#states">08 Every state</a>
+    <a href="#desktop">08b Desktop</a>
+    <a href="#cold">08c Cold start</a>
+    <a href="#schema">09 What it needs</a>
+    <a href="#open">10 Decisions</a>
+    <a href="#bench">11 Benchmark</a>
+  </div>
+</nav>
+
+<!-- ============================== 01 FOUND ============================== -->
+<section id="found">
+  <div class="wrap">
+    <div class="shead"><span class="snum">01</span><h2>What's actually there</h2></div>
+    <p>Four questions had to be answered before any of this could be drawn. All four were answered by calling the API, not by reading documentation.</p>
+
+    <h4>Characters exist — as strings on a credit, not as things</h4>
+    <pre><i>GET /movie/550/credits</i>
+cast[0] keys: … name, <b>character</b>, <b>credit_id</b>, order
+  Edward Norton as <u>"Narrator"</u> · Brad Pitt as <u>"Tyler Durden"</u>
+  Helena Bonham Carter as <u>"Marla Singer"</u>
+
+<i>GET /tv/1396/aggregate_credits</i>   <i>// Breaking Bad — the TV-correct call</i>
+cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
+                     "character": "<u>Walter White</u>", "episode_count": 62 }
+
+<i>GET /person/17419/combined_credits</i>   <i>// Bryan Cranston</i>
+234 cast roles, <b>221 carry a character string</b></pre>
+
+    <div class="note ok"><b>A favourite character is one string: its <code>credit_id</code>.</b> <code>GET /credit/52542282760ee313280017f9</code> returns the character name, the person with their <code>profile_path</code>, and the title with its <code>poster_path</code> — everything a card needs, from one stored id. No triple to keep in sync, no free-text tag to normalise. This is better than the workaround, and it is TMDB's own identifier for exactly &ldquo;this person, playing this character, in this title&rdquo;.</div>
+
+    <h4>But there is no character entity, and that changes the interface</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Asked</th><th>Answer</th><th>Consequence</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">/search/character?query=Walter White</td><td class="num">HTTP 404</td><td class="use"><b>You cannot type a character's name to find them.</b> The picker has to start somewhere else.</td></tr>
+        <tr><td class="tok">/character/1</td><td class="num">HTTP 404</td><td class="use">No canonical character page, no character id, no character art.</td></tr>
+        <tr><td class="tok">/search/keyword?query=Walter White</td><td class="num">OK — but returns<br>&ldquo;white water rafting&rdquo;</td><td class="use">Keywords are not a back door. They are about subject matter.</td></tr>
+        <tr><td class="tok">/person/{id}/images</td><td class="num">9 profiles</td><td class="use">Plenty of faces — but they are the <i>actor's</i> face.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>The anime case, checked because you asked for Levi</h4>
+    <pre><i>GET /tv/1429/aggregate_credits</i>   <i>// Attack on Titan, 221 cast</i>
+  Hiroshi Kamiya as <s>"Levi (voice)"</s>   profile_path: /5aAAOlQ2hW…jpg
+  Yuki Kaji      as <s>"Eren Yeager (voice)"</s>
+<i>…same call at language=ja-JP:</i>
+  神谷浩史 as "Levi (voice)"</pre>
+    <div class="note warn"><b>Two things break for animation.</b> The character name carries a <code>(voice)</code> suffix that has to be stripped for display. And the face attached to that credit is <b>Hiroshi Kamiya's</b>, not Levi's — for live action the actor <i>is</i> the character's face, and for animation it is a photograph of a stranger. §04 handles both.</div>
+
+    <h4>The schema has none of the profile fields yet</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Wanted</th><th>Today</th><th>Needed</th></tr></thead>
+      <tbody>
+        <tr><td class="num">username</td><td class="use"><code>profiles.username</code> — exists, unique</td><td class="use">nothing</td></tr>
+        <tr><td class="num">display name, bio</td><td class="use">absent</td><td class="use">two columns</td></tr>
+        <tr><td class="num">avatar, banner</td><td class="use">absent, and <b>no Storage bucket exists</b></td><td class="use">columns + a bucket, or §06's cheaper answer</td></tr>
+        <tr><td class="num">favourite titles</td><td class="use"><code>user_library.is_favourite</code> — a boolean, already there</td><td class="use">an order column</td></tr>
+        <tr><td class="num">favourite people, characters</td><td class="use">absent</td><td class="use">one table</td></tr>
+        <tr><td class="num">watch stats</td><td class="use"><code>taste_summary()</code> returns titles, episodes, minutes, partial</td><td class="use">nothing</td></tr>
+        <tr><td class="num">followers</td><td class="use">absent by decision — Layers 3 and 4 parked 2026-09-13</td><td class="use">a reversal, not a column. §10</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<style>
+.phones{display:flex;flex-wrap:wrap;gap:var(--space-24);margin-top:var(--space-16);align-items:flex-start}
+.phone{flex:0 0 auto;width:320px;max-width:100%}
+.phone-cap{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:var(--space-8);display:flex;gap:var(--space-8)}
+.phone-cap b{color:var(--acc-t);font-weight:600}
+.screen{width:320px;max-width:100%;height:600px;overflow:hidden;position:relative;background:var(--bg);
+  border:var(--border-hair) solid var(--bd);border-radius:var(--radius-16);--gutter:var(--space-16)}
+.screen *{box-sizing:border-box}
+.scroll{height:100%;overflow:hidden}
+
+/* --- banner + avatar --- */
+.pbanner{position:relative;aspect-ratio:3/1;background:linear-gradient(115deg,var(--ink-5),var(--beam-7) 55%,var(--mar-7));overflow:hidden}
+.pbanner.empty{background:repeating-linear-gradient(45deg,var(--ink-3) 0 6px,var(--ink-2) 6px 12px);display:grid;place-items:center}
+.pbanner .ecap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.pbanner .bscrim{position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 62%)}
+.pbanner .bedit{position:absolute;right:var(--space-8);top:var(--space-8);height:var(--control-sm);min-width:var(--control-sm);
+  padding:0 var(--space-12);border-radius:var(--radius-full);border:0;cursor:pointer;
+  background:rgba(4,6,12,.6);backdrop-filter:blur(6px);color:#fff;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.phead{padding:0 var(--gutter);margin-top:calc(var(--space-32) * -1);position:relative}
+.pav{width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:3px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title);font-weight:800;color:#fff}
+.pav.empty{background:var(--surface-hv);color:var(--faint)}
+.pname-row{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:var(--space-8)}
+.pname{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+.phandle{font-family:var(--f-m);font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted)}
+.pbio{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:var(--space-12) 0 0;max-width:var(--measure)}
+.pbio.ph{color:var(--faint);font-style:italic}
+.pbtn{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--surface-hv);color:var(--text);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;
+  display:inline-flex;align-items:center;gap:var(--space-4);flex:0 0 auto}
+
+/* --- stat strip --- */
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--border-hair);margin:var(--space-20) var(--gutter) 0;
+  background:var(--bd-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.pstat{background:var(--bg-sub);padding:var(--space-8) var(--space-4);text-align:center}
+.pstat dt{font-family:var(--f-m);font-size:9px;line-height:var(--lh-micro);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.pstat dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.pstat dd small{font-size:var(--text-micro);color:var(--muted);font-weight:400}
+
+/* --- shelves --- */
+.shelf{margin-top:var(--section-gap)}
+.shelf-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-8);padding:0 var(--gutter);margin-bottom:var(--space-8)}
+.shelf-h h4{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;
+  letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none}
+.shelf-n{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);font-variant-numeric:tabular-nums}
+.rail{display:flex;gap:var(--space-8);overflow:hidden;padding:0 var(--gutter) var(--space-4)}
+.fti{flex:0 0 auto;width:78px}
+.fti .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden;position:relative}
+.fti .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fti .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.fpe{flex:0 0 auto;width:72px;text-align:center}
+.fpe .face{width:72px;height:72px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-6),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden}
+.fpe .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text)}
+.fpe .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+/* a character card is a face plus the two things that disambiguate it */
+.fch{flex:0 0 auto;width:96px}
+.fch .face{width:96px;aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(140deg,var(--mar-7),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fch .face .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;
+  font-family:var(--f-m);font-size:9px;line-height:1.3}
+.fch .nm{font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fch .sub{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.addcard{flex:0 0 auto;width:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-4);
+  aspect-ratio:2/3;border-radius:var(--radius-8);border:var(--border-hair) dashed var(--bd-str);background:none;
+  color:var(--muted);cursor:pointer;font-family:var(--f-s);font-size:var(--text-micro)}
+.addcard .plus{font-size:var(--text-title-sm);line-height:1;color:var(--acc-t)}
+.empty-shelf{margin:0 var(--gutter);padding:var(--space-16);border:var(--border-hair) dashed var(--bd-str);
+  border-radius:var(--radius-12);text-align:center}
+.empty-shelf p{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-8)}
+.empty-shelf button{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.callout{display:flex;gap:var(--space-8);margin-top:var(--space-8);padding:0 var(--gutter)}
+
+/* ---- components the benchmark added ---- */
+.ptabs{display:flex;gap:0;overflow:hidden;border-bottom:var(--border-hair) solid var(--bd-sub);padding:0 var(--gutter);margin-top:var(--space-12)}
+.ptabs button{flex:0 0 auto;background:none;border:0;cursor:pointer;padding:var(--space-8) var(--space-12) var(--space-8);
+  font-family:var(--f-s);font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--muted);
+  border-bottom:var(--border-focus) solid transparent;min-height:var(--control-h)}
+.ptabs button.on{color:var(--acc-t);border-bottom-color:var(--acc)}
+.pname-on-banner{position:absolute;left:var(--gutter);bottom:var(--space-12);z-index:2;
+  font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;color:#fff}
+.pbanner.tall{aspect-ratio:2/1}
+.pav-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--gutter) 0}
+.pav-sm{width:var(--space-48);height:var(--space-48);border-radius:var(--radius-full);flex:0 0 auto;
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:2px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:800;color:#fff}
+.pav-sm.empty{background:var(--surface-hv);color:var(--faint)}
+/* split stat block, one per medium */
+.sblock{margin:var(--space-16) var(--gutter) 0;background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);
+  border-radius:var(--radius-12);padding:var(--space-12)}
+.sblock-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
+.sblock-h b{font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text)}
+.sblock-h span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.snums{display:flex;gap:var(--space-16);margin-bottom:var(--space-8)}
+.snum-i{min-width:0}
+.snum-i dt{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.snum-i dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.snum-i dd.rate{color:var(--rate-t)}
+/* the distribution bar — six watch-state hues, already in the foundations */
+.dbar{display:flex;height:var(--space-8);border-radius:var(--radius-full);overflow:hidden;background:var(--surface-hv)}
+.dbar i{display:block;height:100%;font-style:normal}
+.dlegend{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-8)}
+.dlegend span{display:flex;align-items:center;gap:var(--space-4);font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.dlegend i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);font-style:normal;flex:0 0 auto}
+/* a ranked dimension card: count AND mean */
+.dimcard{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8);border-radius:var(--radius-8);
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub)}
+.dimcard .lbl{min-width:0;flex:1}
+.dimcard .lbl b{display:block;font-size:var(--text-caption);font-weight:600;color:var(--text)}
+.dimcard .lbl span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.dimcard .mean{font-family:var(--f-m);font-size:var(--text-body-sm);font-weight:600;color:var(--rate-t);
+  font-variant-numeric:tabular-nums;flex:0 0 auto}
+.dimgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);padding:0 var(--gutter);margin-top:var(--space-8)}
+/* chip row — the fix for 24 screens of scroll */
+.chips{display:flex;gap:var(--space-8);overflow:hidden;padding:var(--space-12) var(--gutter)}
+.chip{flex:0 0 auto;height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-full);
+  border:var(--border-hair) solid var(--bd);background:none;color:var(--muted);cursor:pointer;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.chip.on{background:var(--acc-bg);border-color:var(--acc-bd);color:var(--acc-t)}
+.chip em{font-family:var(--f-m);font-style:normal;font-size:9px;opacity:.8}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);padding:0 var(--gutter)}
+.fgrid .cell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fgrid .cell .art .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px;line-height:1.3}
+.fgrid .cell .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fgrid .cell .sub{font-family:var(--f-m);font-size:8px;color:var(--faint)}
+/* sheets */
+.sheetwrap{position:absolute;inset:0;background:var(--scrim-wash);display:flex;align-items:flex-end}
+.sheet{width:100%;background:var(--bg-sub);border-top:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16) var(--radius-16) 0 0;padding:var(--space-12) var(--space-20) var(--space-20)}
+.grab{width:var(--space-32);height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto var(--space-16)}
+.sh-t{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;letter-spacing:-.02em;margin:0 0 var(--space-4);color:var(--text)}
+.sh-b{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-12)}
+.fld{display:flex;flex-direction:column;gap:var(--field-gap);margin-bottom:var(--field-stack)}
+.fld>span{font-size:var(--text-label);font-weight:600;color:var(--muted)}
+.inp{height:var(--control-h);border-radius:var(--radius-control);background:var(--bg);color:var(--text);
+  border:0;box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);padding:0 var(--space-16);
+  font-family:var(--f-s);font-size:var(--text-body);display:flex;align-items:center}
+.inp.ta{height:auto;min-height:var(--space-64);padding:var(--space-12) var(--space-16);align-items:flex-start;line-height:var(--lh-body-sm);font-size:var(--text-body-sm)}
+.cnt{font-family:var(--f-m);font-size:9px;color:var(--faint);text-align:right}
+.btn{height:var(--control-h);border-radius:var(--radius-control);border:0;cursor:pointer;width:100%;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-label);font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center}
+.btn.q{background:var(--surface-hv);color:var(--text)}
+.skel{background:var(--surface-hv);border-radius:var(--radius-4);animation:none}
+/* desktop frames, drawn at true width then scaled to fit this page */
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px;height:700px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;height:700px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px;display:flex;flex-direction:column}
+.dtop{display:flex;align-items:center;gap:var(--space-24);padding:var(--space-12) var(--gutter);
+  border-bottom:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:var(--space-8);font-family:var(--f-d);font-weight:800;font-size:var(--text-title-sm);letter-spacing:-.03em}
+.dwm i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:var(--space-4)}
+.dnav a{padding:0 var(--space-12);height:var(--control-h);display:inline-flex;align-items:center;border-radius:var(--radius-8);
+  font-size:var(--text-body-sm);color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+.dbody{flex:1;overflow:hidden}
+.dcols{display:grid;grid-template-columns:320px 1fr;gap:var(--space-32);padding:var(--space-24) var(--gutter)}
+
+.invite{margin:var(--space-16) var(--gutter) 0;padding:var(--space-16);border-radius:var(--radius-12);
+  border:var(--border-hair) dashed var(--bd-str);background:var(--bg-sub)}
+.invite b{display:block;font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.invite p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-12)}
+.invite .go{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.waiting{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.ladder{margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.lrow{display:grid;grid-template-columns:96px 1fr;gap:var(--space-16);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd-sub);align-items:baseline}
+.lrow:last-child{border-bottom:0}
+.lrow .at{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc-t);font-variant-numeric:tabular-nums}
+.lrow .what{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted)}
+.lrow .what b{color:var(--text);font-weight:600}
+</style>
+
+<!-- ============================== 02 ANATOMY ============================== -->
+<section id="anatomy">
+  <div class="shead wrap"><span class="snum">02</span><h2>Anatomy</h2></div>
+  <div class="wrap">
+  <p>Six bands, in this order, at every width. Drawn at <b>320&times;600</b> — the floor — because a profile that works there works everywhere above it.</p>
+
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>P1</b> overview · filled</div>
+      <div class="screen"><div class="scroll">
+        <div class="pbanner tall">
+          <div class="bscrim"></div>
+          <button class="bedit">Edit</button>
+          <div class="pname-on-banner">Raman</div>
+        </div>
+        <div class="pav-row">
+          <div class="pav-sm">R</div>
+          <div style="min-width:0">
+            <div class="phandle">@raman · joined Mar 2026</div>
+            <p class="pbio" style="margin-top:var(--space-4)">Watching my way through Villeneuve. Sci-fi and slow burns.</p>
+          </div>
+        </div>
+        <div class="ptabs">
+          <button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button>
+        </div>
+        <div class="sblock">
+          <div class="sblock-h"><b>Films</b><span>at least</span></div>
+          <div class="snums">
+            <div class="snum-i"><dt>Watched</dt><dd>112</dd></div>
+            <div class="snum-i"><dt>Days</dt><dd>11.3</dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div>
+          </div>
+          <div class="dbar">
+            <i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:var(--st-want-9,#7C8AA8)"></i>
+            <i style="width:9%;background:var(--st-re-9,#9B7BD4)"></i><i style="width:5%;background:var(--st-hold-9,#C87A3C)"></i>
+            <i style="width:3%;background:var(--st-drop-9)"></i>
+          </div>
+          <div class="dlegend">
+            <span><i style="background:var(--st-done-9)"></i>Watched 72</span>
+            <span><i style="background:#7C8AA8"></i>Want 21</span>
+            <span><i style="background:#9B7BD4"></i>Rewatched 10</span>
+            <span><i style="background:var(--st-drop-9)"></i>Dropped 3</span>
+          </div>
+        </div>
+        <div class="sblock">
+          <div class="sblock-h"><b>Series</b><span></span></div>
+          <div class="snums">
+            <div class="snum-i"><dt>Watched</dt><dd>56</dd></div>
+            <div class="snum-i"><dt>Episodes</dt><dd>1.2<span style="font-size:var(--text-micro)">k</span></dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div>
+          </div>
+          <div class="dbar">
+            <i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i>
+            <i style="width:18%;background:#7C8AA8"></i><i style="width:9%;background:#C87A3C"></i>
+            <i style="width:5%;background:var(--st-drop-9)"></i>
+          </div>
+          <div class="dlegend">
+            <span><i style="background:var(--st-done-9)"></i>Watched 23</span>
+            <span><i style="background:#2ABFA0"></i>Watching 15</span>
+            <span><i style="background:#7C8AA8"></i>Want 10</span>
+            <span><i style="background:#C87A3C"></i>On hold 5</span>
+          </div>
+        </div>
+        <div class="shelf">
+          <div class="shelf-h"><h4>Favourite characters</h4><span class="shelf-n">See all 14 →</span></div>
+          <div class="rail">
+            <div class="fch"><div class="face"><div class="tag">Bryan Cranston</div></div><div class="nm">Walter White</div><div class="sub">Breaking Bad</div></div>
+            <div class="fch"><div class="face" style="background:linear-gradient(140deg,var(--ink-6),var(--ink-3))"><div class="tag">Brad Pitt</div></div><div class="nm">Tyler Durden</div><div class="sub">Fight Club</div></div>
+            <div class="fch"><div class="face" style="background:linear-gradient(140deg,var(--st-done-9),var(--ink-4))"><div class="tag">poster</div></div><div class="nm">Levi</div><div class="sub">Attack on Titan</div></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>P2</b> overview · brand-new account</div>
+      <div class="screen"><div class="scroll">
+        <div class="pbanner tall empty"><span class="ecap">no banner</span><button class="bedit">Add</button>
+          <div class="pname-on-banner" style="color:var(--text)">raman</div></div>
+        <div class="pav-row">
+          <div class="pav-sm empty">R</div>
+          <div style="min-width:0">
+            <div class="phandle">@raman · joined today</div>
+            <p class="pbio ph" style="margin-top:var(--space-4)">Say something about what you watch.</p>
+          </div>
+        </div>
+        <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+        <div class="sblock">
+          <div class="sblock-h"><b>Films</b><span></span></div>
+          <div class="snums">
+            <div class="snum-i"><dt>Watched</dt><dd style="color:var(--faint)">0</dd></div>
+            <div class="snum-i"><dt>Days</dt><dd style="color:var(--faint)">0</dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd style="color:var(--faint)">—</dd></div>
+          </div>
+          <div class="dbar"><i style="width:100%;background:var(--surface-hv)"></i></div>
+        </div>
+        <div class="empty-shelf" style="margin-top:var(--space-16)">
+          <p><b style="color:var(--text)">Your profile fills itself in.</b><br>Mark something a favourite and it appears here. Nothing to set up.</p>
+          <button>Find something to watch</button>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>P3</b> overview · loading</div>
+      <div class="screen"><div class="scroll">
+        <div class="pbanner tall" style="background:var(--surface-hv)"></div>
+        <div class="pav-row">
+          <div class="pav-sm skel" style="background:var(--surface-hv);color:transparent">.</div>
+          <div style="min-width:0;flex:1">
+            <div class="skel" style="height:var(--space-12);width:60%;margin-bottom:var(--space-8)"></div>
+            <div class="skel" style="height:var(--space-8);width:85%"></div>
+          </div>
+        </div>
+        <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+        <div class="sblock">
+          <div class="sblock-h"><b>Films</b><span></span></div>
+          <div class="snums">
+            <div class="snum-i"><dt>Watched</dt><dd><span class="skel" style="display:block;width:var(--space-32);height:var(--space-16)"></span></dd></div>
+            <div class="snum-i"><dt>Days</dt><dd><span class="skel" style="display:block;width:var(--space-32);height:var(--space-16)"></span></dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd><span class="skel" style="display:block;width:var(--space-24);height:var(--space-16)"></span></dd></div>
+          </div>
+          <div class="dbar"></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="note law"><b>The labels never skeleton, only the numbers.</b> P3 keeps &ldquo;Watched / Days / Mean&rdquo; and the block's own frame at full opacity and greys only the figures. Skeletoning the whole strip makes it resize when the data lands, which is the single most common way a loading state introduces a layout shift on the screen a person is already reading.</div>
+
+  <div class="note ok"><b>The profile is tabbed, not one long scroll.</b> This is the structural change the benchmark forced. AL-chan runs Overview · Anime List · Manga List · Favorites · Stats · Social · Reviews, and with five favourite shelves, nine rankable stat dimensions and two distribution bars, one column of everything is a page nobody reaches the bottom of. Four tabs here: <b>Overview</b> (identity, headline stats, a shelf preview), <b>Favourites</b> (all five shelves in full), <b>Stats</b> (the dimensions and the bars), <b>Library</b> (what the library module already draws). The banner, name and handle persist above the tabs on every one.</div>
+
+  <div class="note"><b>The order is not arbitrary.</b> Identity, then evidence, then taste. The stat strip sits directly under the bio because it is the cheapest possible proof that the rest of the page is worth reading — and on a new account it is the honest zero rather than a hidden section.</div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Band</th><th>Compact</th><th>Expanded / wide</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Banner</td><td class="num">3:1, full bleed</td><td class="num">4:1, container width, --radius-16</td><td class="use">Taller than 3:1 on a phone eats the fold; wider than 4:1 on desktop becomes a letterbox.</td></tr>
+      <tr><td class="num">Avatar</td><td class="num">64px, overlaps by 32</td><td class="num">96px, overlaps by 48</td><td class="use">--radius-full, 3px --bg ring. The ring is what separates it from the banner in both themes.</td></tr>
+      <tr><td class="num">Identity</td><td class="num">stacked</td><td class="num">stacked, beside the avatar</td><td class="use">Display name --text-title; handle and join date --text-caption in mono.</td></tr>
+      <tr><td class="num">Bio</td><td class="num">full width</td><td class="num">capped at --measure</td><td class="use">Four lines then &ldquo;more&rdquo;. 280 characters stored.</td></tr>
+      <tr><td class="num">Stats</td><td class="num">4 across</td><td class="num">4 across, wider</td><td class="use">Never wraps to two rows — a 2&times;2 stat block reads as a dashboard.</td></tr>
+      <tr><td class="num">Shelves</td><td class="num">rails, scroll</td><td class="num">rails, more visible</td><td class="use">Never a whole number of tiles. The same rule as everywhere else.</td></tr>
+    </tbody>
+  </table></div>
+  </div>
+</section>
+
+<!-- ============================== 03 FAVOURITES ============================== -->
+<section id="favourites">
+  <div class="wrap">
+    <div class="shead"><span class="snum">03</span><h2>Five shelves</h2></div>
+    <p>AL-chan carries five: anime, manga, characters, staff and studios. The film-and-TV translation is not one-to-one — <b>manga has no counterpart, so films and series take the two title shelves</b> — but studios translate directly, and that shelf was missing from the first draft of this page.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Shelf</th><th>Card</th><th>Stored as</th><th>Cap</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Films</td><td class="use">Poster 2:3, title, year</td><td class="tok">tmdb_id + 'movie'</td><td class="num">8</td><td class="use"><code>user_library.is_favourite</code> — already exists</td></tr>
+        <tr><td class="num">Series</td><td class="use">Poster 2:3, title, year</td><td class="tok">tmdb_id + 'tv'</td><td class="num">8</td><td class="use">Same column, different media_type</td></tr>
+        <tr><td class="num">People</td><td class="use">Round face, name, the role you know them for</td><td class="tok">person_id</td><td class="num">8</td><td class="use">New. Actors and crew share one shelf.</td></tr>
+        <tr><td class="num">Characters</td><td class="use">Square face, character, title, actor</td><td class="tok">credit_id</td><td class="num">8</td><td class="use">New. §04.</td></tr>
+        <tr><td class="num"><b>Studios</b></td><td class="use">Wordmark on a plate, title count</td><td class="tok">company_id</td><td class="num">8</td><td class="use"><b>Added after the benchmark.</b> AL-chan has a studios shelf and it is the one shelf I had missed — A24, Ghibli and Blumhouse are as much a reason to watch something as a director. TMDB <code>production_companies</code>.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note warn"><b>Films and series are separate shelves; actors and directors are not.</b> The split that matters in this product is the one that already runs through it — a film is finished, a series is in progress, and they carry different status vocabularies. A cinematographer and a lead actor are both just <i>people whose work you follow</i>, and forcing them apart would mean deciding what to do with someone who is both.</div>
+
+    <div class="note law"><b>Eight, and the cap is the feature.</b> A favourites shelf with no limit becomes a second watchlist, and then it says nothing. Eight is two full rows on a phone rail and forces a choice. When the ninth is added, the sheet asks which one it replaces — it does not silently refuse, and it does not silently drop the oldest.</div>
+
+    <h4>The Favourites tab needs sub-navigation, and that is a measurement</h4>
+    <p>AL-chan's favourites tab is one uncapped grid per kind, stacked. On a 430&times;900 phone, a well-filled profile measured:</p>
+    <pre>document height   <b>21,624px</b>   =  <b>24 screens</b> of scroll
+  anime       y=    298   screen  0.3
+  manga       y=  6,111   screen  6.8
+  <b>characters  y= 10,525   screen 11.7</b>
+  staff       y= 19,418   screen 21.6</pre>
+    <div class="note law"><b>Characters is the shelf people fill most, and it is eleven screens down.</b> Across every profile sampled, <code>characters</code> was at the API's page cap while <code>studios</code> sat between 0 and 11 — characters are the emotional centre of one of these pages, and the layout buries them. One profile's bio literally reads &ldquo;click favourites tabs for full favourite list&rdquo;, which is a person working around their own profile.
+    <br><br>So: the Favourites tab opens on a <b>chip row</b> — Films · Series · People · Characters · Studios, each with its count — and shows one grid at a time. Every shelf is one tap from the top of the page instead of up to twenty-one screens of scrolling. Same content, same generosity, no burial.</div>
+
+    <h4>Ordering</h4>
+    <p>Favourites are <b>ordered by the person, not by rating or recency</b> — the first film on the shelf is a statement. Drag to reorder on touch; on a pointer, the same handle plus <kbd>↑</kbd>/<kbd>↓</kbd> keyboard support. Order is stored as an integer; a gap-based sequence (10, 20, 30) so a reorder is one row's update rather than eight.</p>
+  </div>
+</section>
+
+<!-- ============================== 04 CHARACTERS ============================== -->
+<section id="characters">
+  <div class="wrap">
+    <div class="shead"><span class="snum">04</span><h2>Characters</h2></div>
+    <p>The shelf you asked for, and the one with real problems behind it. All of them are solvable; none of them are guessable.</p>
+
+    <h4>The card</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Line</th><th>Shows</th><th>Type</th><th>Why there</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Face</td><td class="use"><b>2:3 portrait</b>, <code>--radius-8</code></td><td class="num">—</td><td class="use"><b>Revised after looking.</b> TMDB profile images are natively 2:3, so a portrait card crops nothing — and AL-chan draws character cards at the same aspect as its posters, which is what keeps a favourites grid reading as one system. A round face means <i>person</i> here; a character is not a person.</td></tr>
+        <tr><td class="num">Overlay</td><td class="use">Actor's name, bottom of the face</td><td class="num">--f-m 9px on a scrim</td><td class="use">The face is the actor's, so the face should say so. Removes the lie rather than hiding it.</td></tr>
+        <tr><td class="num">Primary</td><td class="use">Character name</td><td class="num">--text-caption 600</td><td class="use">The thing being favourited.</td></tr>
+        <tr><td class="num">Secondary</td><td class="use">Title</td><td class="num">--f-m 9px</td><td class="use">&ldquo;Levi&rdquo; is meaningless without it, and two shows can share a character name.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>Three rules the API forces</h4>
+    <div class="note law"><b>R-C1 — strip the role qualifier.</b> TMDB stores <code>"Levi (voice)"</code>, <code>"Walter White (uncredited)"</code>, <code>"Young Paul (archive footage)"</code>. Display strips a trailing parenthetical; the raw string is never shown. The stored value is the <code>credit_id</code>, so nothing is lost by cleaning the display.</div>
+
+    <div class="note law"><b>R-C2 — animation falls back to the poster.</b> For live action the actor's photograph <i>is</i> the character's face and the card is honest. For animation it is a photograph of the voice actor, which is worse than no face at all. Detect via the title's genre <code>16</code> (Animation) and use the poster, cropped square, with the character name over it. The actor line then reads <code>Voice · Hiroshi Kamiya</code>.</div>
+
+    <div class="note law"><b>R-C3 — a character is a credit, so it can vanish.</b> TMDB credits are user-edited and <code>credit_id</code>s can be removed when a title's cast is restructured. A card whose <code>/credit/{id}</code> 404s keeps the character name and title <b>from our own stored copy</b> and drops to a poster face — it never disappears from someone's profile because an editor tidied a cast list. Store the display strings alongside the id for exactly this reason.</div>
+
+    <div class="note warn"><b>The denormalisation is deliberate and it is the second time this project has made this call.</b> <code>catalog_people</code> exists so Villeneuve's biography is not repeated inside 26 titles. Here the opposite applies: the character name and title are copied onto the favourite row, because the alternative is a profile that degrades when someone else edits TMDB. Normalise what you own; copy what you do not.</div>
+  </div>
+</section>
+
+<!-- ============================== 05 PICKER ============================== -->
+<section id="picker">
+  <div class="wrap">
+    <div class="shead"><span class="snum">05</span><h2>The picker</h2></div>
+    <p><b>You cannot type &ldquo;Walter White&rdquo;.</b> <code>/search/character</code> is a 404 and there is no character index to build one from. That single fact decides the whole interaction — so the picker asks a question it <i>can</i> answer, and arrives at the character from there.</p>
+
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>K1</b> step one · two doors</div>
+        <div class="screen"><div class="scroll" style="padding:var(--space-16)">
+          <h3 class="pname" style="font-size:var(--text-title-sm)">Add a character</h3>
+          <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:var(--space-8) 0 var(--space-16)">
+            Characters live inside their cast lists, so start with what you know.</p>
+          <div style="display:flex;flex-direction:column;gap:var(--space-8)">
+            <button class="pbtn" style="height:var(--control-h);justify-content:flex-start;font-size:var(--text-label);width:100%">🎬&nbsp; From a film or series</button>
+            <button class="pbtn" style="height:var(--control-h);justify-content:flex-start;font-size:var(--text-label);width:100%">👤&nbsp; From an actor</button>
+          </div>
+          <p style="font-family:var(--f-m);font-size:9px;color:var(--faint);margin-top:var(--space-16);line-height:1.5">
+            Recently watched, offered first — most favourites come from something you just finished.</p>
+          <div class="rail" style="padding-inline:0;margin-top:var(--space-8)">
+            <div class="fti" style="width:64px"><div class="art"></div><div class="nm">Dune</div></div>
+            <div class="fti" style="width:64px"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Severance</div></div>
+            <div class="fti" style="width:64px"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div><div class="nm">Shogun</div></div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>K2</b> step two · pick the role</div>
+        <div class="screen"><div class="scroll" style="padding:var(--space-16)">
+          <div style="display:flex;gap:var(--space-8);align-items:center;margin-bottom:var(--space-12)">
+            <div style="width:32px;aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--mar-7),var(--ink-4));flex:0 0 auto"></div>
+            <div><div style="font-family:var(--f-d);font-size:var(--text-body);font-weight:700">Breaking Bad</div>
+            <div style="font-family:var(--f-m);font-size:9px;color:var(--faint)">221 cast · ordered by episode count</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-4)">
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);border-radius:var(--radius-8);background:var(--acc-bg);min-height:var(--control-h)">
+              <div style="width:32px;height:32px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-6),var(--ink-4));flex:0 0 auto"></div>
+              <div style="min-width:0"><div style="font-size:var(--text-caption);font-weight:600;color:var(--acc-t)">Walter White</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--muted)">Bryan Cranston · 62 eps</div></div>
+              <div style="margin-left:auto;color:var(--acc-t);font-size:var(--text-body)">✓</div>
+            </div>
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);min-height:var(--control-h)">
+              <div style="width:32px;height:32px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-5),var(--ink-3));flex:0 0 auto"></div>
+              <div><div style="font-size:var(--text-caption);font-weight:600">Jesse Pinkman</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--faint)">Aaron Paul · 62 eps</div></div>
+            </div>
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);min-height:var(--control-h)">
+              <div style="width:32px;height:32px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-5),var(--ink-3));flex:0 0 auto"></div>
+              <div><div style="font-size:var(--text-caption);font-weight:600">Skyler White</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--faint)">Anna Gunn · 62 eps</div></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="note ok"><b>Ordering the cast by episode count is what makes this usable.</b> Breaking Bad returns <b>221</b> cast members and Attack on Titan returns <b>221</b> as well. TMDB's default <code>order</code> is billing order, which buries a recurring character behind one-scene guests. <code>aggregate_credits</code> gives <code>total_episode_count</code> per person — sort by it and the character somebody actually means is in the first five. For films there is no episode count, so billing order is correct and the list is short anyway.</div>
+
+    <div class="note warn"><b>A search box inside step two, not on step one.</b> Once a title is chosen, filtering 221 names by typing is useful and it works — because at that point the cast list is in hand. What cannot exist is a character search across the whole catalogue.</div>
+  </div>
+</section>
+
+<!-- ============================== 06 IMAGES ============================== -->
+<section id="images">
+  <div class="wrap">
+    <div class="shead"><span class="snum">06</span><h2>Banner and avatar</h2></div>
+    <p>There are two ways to put an image on a profile, and they produce genuinely different products — not just different build costs.</p>
+
+    <h4>Two ways to get an image, and the cheap one is also the better one</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th></th><th>Pick from the catalogue</th><th>Upload your own</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Stored</td><td class="use">A <code>backdrop_path</code> string — 40 bytes</td><td class="use">A file, in a bucket that must first exist</td></tr>
+        <tr><td class="num">To choose one</td><td class="use">Two taps, from titles you already watched</td><td class="use">Leave the app, find a file, crop it</td></tr>
+        <tr><td class="num">Always looks right</td><td class="use">Yes — every backdrop is 16:9 and made to sit behind something</td><td class="use">Only after cropping, and a busy photo fights the name on top of it</td></tr>
+        <tr><td class="num">To build</td><td class="use">Nothing new</td><td class="use">Storage that does not exist yet</td></tr>
+        <tr><td class="num">Feels like</td><td class="use">&ldquo;My banner is the desert from <i>Dune</i>&rdquo;</td><td class="use">&ldquo;My banner is a photo&rdquo;</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note ok"><b>Recommendation: ship &ldquo;pick from the catalogue&rdquo; first, and it may be all you ever need.</b> Every title already carries a 16:9 backdrop — a still from something you actually watched, which on a film tracker is <i>more</i> personal than an uploaded photograph, not less. It also composes correctly by construction: a backdrop is already an image designed to have things sit on top of it. Upload stays fully drawn (E4, E5), so adding it later is a build rather than a redesign.</div>
+
+    <h4>Banner source, in order of offer</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Source</th><th>Shown as</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td class="num">From your favourites</td><td class="use">Backdrops of the 8 films and 8 series on your shelves</td><td class="use">First, because they are already the titles you chose to display.</td></tr>
+        <tr><td class="num">From your library</td><td class="use">Backdrops of everything watched, newest first</td><td class="use">Searchable. A title with no backdrop is not offered.</td></tr>
+        <tr><td class="num">A colour</td><td class="use">Six gradients from the scales</td><td class="use">The honest default. Never a stock photograph.</td></tr>
+        <tr><td class="num">Upload</td><td class="use">If the bucket exists</td><td class="use">JPEG/PNG/WebP, ≤ 4 MB, cropped client-side to 4:1 before upload.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note law"><b>The banner is furniture, not content.</b> It sits behind a scrim that fades to <code>--bg</code> by 62% of its height, in both themes, because the name and handle sit on it. Artwork has no theme — the scrim is the same recipe the cover uses, and nothing readable is ever placed on the unscrimmed part.</div>
+
+    <div class="note warn"><b>The avatar is an initial until it is not.</b> No default illustration, no generated identicon: the first letter of the display name on a two-stop gradient keyed to the account id. It is legible at 64px, needs no request, and never looks like a stock silhouette. An uploaded avatar is a square crop, ≤ 1 MB, rendered at <code>--radius-full</code>.</div>
+  </div>
+</section>
+
+<!-- ============================== 07 STATS ============================== -->
+<section id="stats">
+  <div class="wrap">
+    <div class="shead"><span class="snum">07</span><h2>Stats</h2></div>
+    <p>This section was four tiles. Then I read what AL-chan actually computes for one person, and four tiles is not a profile — it is a summary of a profile.</p>
+
+    <div class="note ok"><b>The thing I had missed: AL-chan carries a mean score on <i>every</i> dimension, not just overall.</b> Pulled from a real account with 1,497 titles — <code>Action = 724 titles, mean 54.9</code> against <code>Comedy = 703, mean 59.2</code>. Nearly the same volume, four points apart. <b>You watch more action and you enjoy comedy more</b>, and that sentence is only available because the mean rides along with the count. A bare count says what you consumed. A count with a mean says something about you.</div>
+
+    <h4>Films and series get their own block</h4>
+    <p>AL-chan splits anime from manga — two headline rows, each with its own totals, mean and distribution bar. The translation here is <b>films and series</b>, and it is not cosmetic: a film has a runtime and no episodes, a series has both, and one blended &ldquo;titles&rdquo; number hides which you actually are.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Block</th><th>Headline</th><th>Second</th><th>Third</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Films</td><td class="num">count</td><td class="num">days watched</td><td class="num">mean score</td></tr>
+        <tr><td class="num">Series</td><td class="num">count</td><td class="num">episodes</td><td class="num">mean score</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>The distribution bar</h4>
+    <p>Under each block, one stacked bar — the signature element of an AL-chan profile, and the one thing that makes the numbers feel like a life rather than a receipt. The real account reads:</p>
+    <pre>COMPLETED <b>1189</b>   PLANNING <b>840</b>   CURRENT <b>204</b>   DROPPED <b>95</b>   PAUSED <b>9</b></pre>
+    <div class="note ok"><b>This lands here for free.</b> Projector already has six watch states, each with its own hue and its own icon — the palette was built in the foundations and has had nowhere to prove itself. The bar is those six tokens, in order, at their true proportions. <b>No new colour, no new component.</b></div>
+    <div class="note warn"><b>Two rules the bar needs.</b> A segment under 2% still renders at 2% so it cannot vanish — a person with three dropped films out of four hundred should still see that they drop things. And the bar is never the only carrier: the legend below it names each state with its count, because six hues in a row is exactly the case the foundations warn about.</div>
+
+    <h4>Every dimension worth ranking</h4>
+    <p>All of these were verified against a live account. Each is a card carrying <b>a count and a mean</b>, ranked per kind and interleaved — the rule the <code>you</code> module already follows so decades cannot win by tautology.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Dimension</th><th>AL-chan</th><th>Here</th><th>Available?</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Genre</td><td class="use">Action 724 / 54.9 · Comedy 703 / 59.2</td><td class="use">Same</td><td class="use"><b>Already in <code>taste_summary</code></b> — needs the mean adding</td></tr>
+        <tr><td class="num">Release decade</td><td class="use">releaseYears</td><td class="use">Same</td><td class="use"><b>Already there</b></td></tr>
+        <tr><td class="num">People</td><td class="use">staff, separately from voiceActors</td><td class="use">One people ranking</td><td class="use"><b>Already there</b> — needs the mean</td></tr>
+        <tr><td class="num"><b>Watch year</b></td><td class="use">startYears — 2018=138, 2016=123</td><td class="use"><b>New.</b> &ldquo;Your 2026&rdquo;</td><td class="use">Needs a watched-on date</td></tr>
+        <tr><td class="num"><b>Country</b></td><td class="use">JP 1489 · CN 7 · KR 1</td><td class="use"><b>New.</b> A cinephile's shape</td><td class="use">TMDB <code>origin_country</code></td></tr>
+        <tr><td class="num"><b>Studio</b></td><td class="use">A-1 85 · MADHOUSE 76</td><td class="use"><b>New.</b> A24, Ghibli</td><td class="use">TMDB <code>production_companies</code></td></tr>
+        <tr><td class="num"><b>Format</b></td><td class="use">TV 997 · MOVIE 195 · OVA 157</td><td class="use">Film / series / limited</td><td class="use">Derivable today</td></tr>
+        <tr><td class="num"><b>Keyword</b></td><td class="use">tags — Male Protagonist 937</td><td class="use">TMDB keywords</td><td class="use">Verified in the capabilities doc</td></tr>
+        <tr><td class="num"><b>Score spread</b></td><td class="use">standardDeviation 16.7</td><td class="use">&ldquo;How harsh you are&rdquo;</td><td class="use">One SQL function</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note"><b>Standard deviation, in words.</b> 16.7 on a 100-point scale means this person spreads their scores. Shown as a number it is trivia; shown as <b>&ldquo;you rate generously, and you rarely sit on the fence&rdquo;</b> it is the most personal line on the page. Two thresholds, three sentences, no new data.</div>
+
+    <div class="note law"><b>What stays from the first draft.</b> <code>totals.partial</code> still forces &ldquo;at least 18.4 days&rdquo; rather than an undercount. Mean score still reads <code>—</code> below three ratings. And there are still <b>no streaks, no percentiles and no comparison</b> — every number is cumulative, and skipping a month costs nothing. AL-chan is the reference for how a tracker should feel, not for turning a record into a scoreboard.</div>
+  </div>
+</section>
+
+<!-- ============================== 08 STATES ============================== -->
+<section id="states">
+  <div class="wrap">
+    <div class="shead"><span class="snum">08</span><h2>Every state</h2></div>
+    <p>Every frame below is <b>320&times;600</b> — the supported floor. Desktop follows in §08b.</p>
+
+    <h4>The three tabs that carry new work</h4>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>P4</b> stats tab</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button>Favourites</button><button class="on">Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Score spread</b><span>σ 1.4</span></div>
+            <p style="font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0">
+              You rate generously, and you rarely sit on the fence.</p>
+          </div>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Genres</h4><span class="shelf-n">count · mean</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>Sci-Fi</b><span>38 titles</span></div><div class="mean">8.4</div></div>
+            <div class="dimcard"><div class="lbl"><b>Drama</b><span>41 titles</span></div><div class="mean">7.6</div></div>
+            <div class="dimcard"><div class="lbl"><b>Thriller</b><span>29 titles</span></div><div class="mean">7.9</div></div>
+            <div class="dimcard"><div class="lbl"><b>Comedy</b><span>18 titles</span></div><div class="mean">6.9</div></div>
+          </div>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Decades</h4><span class="shelf-n">released</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>2010s</b><span>61 titles</span></div><div class="mean">7.9</div></div>
+            <div class="dimcard"><div class="lbl"><b>2020s</b><span>44 titles</span></div><div class="mean">7.7</div></div>
+          </div>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Countries</h4><span class="shelf-n">new</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>United States</b><span>98 titles</span></div><div class="mean">7.6</div></div>
+            <div class="dimcard"><div class="lbl"><b>Japan</b><span>31 titles</span></div><div class="mean">8.5</div></div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P5</b> favourites · chip row</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="chips">
+            <button class="chip on">Films <em>8</em></button>
+            <button class="chip">Series <em>5</em></button>
+            <button class="chip">People <em>6</em></button>
+            <button class="chip">Characters <em>14</em></button>
+          </div>
+          <div class="fgrid">
+            <div class="cell"><div class="art"></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Arrival</div><div class="sub">2016</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div><div class="nm">Blade Runner 2049</div><div class="sub">2017</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"></div><div class="nm">Sicario</div><div class="sub">2015</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"></div><div class="nm">Prisoners</div><div class="sub">2013</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"></div><div class="nm">Enemy</div><div class="sub">2013</div></div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P6</b> favourites · characters</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="chips">
+            <button class="chip">Films <em>8</em></button>
+            <button class="chip">Series <em>5</em></button>
+            <button class="chip">People <em>6</em></button>
+            <button class="chip on">Characters <em>14</em></button>
+          </div>
+          <div class="fgrid">
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"><div class="tag">Bryan Cranston</div></div><div class="nm">Walter White</div><div class="sub">Breaking Bad</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"><div class="tag">Brad Pitt</div></div><div class="nm">Tyler Durden</div><div class="sub">Fight Club</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"><div class="tag">poster · voice</div></div><div class="nm">Levi</div><div class="sub">Attack on Titan</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"><div class="tag">Rebecca Ferguson</div></div><div class="nm">Lady Jessica</div><div class="sub">Dune</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#C87A3C,var(--ink-4))"><div class="tag">Adam Scott</div></div><div class="nm">Mark Scout</div><div class="sub">Severance</div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"><div class="tag">Anna Gunn</div></div><div class="nm">Skyler White</div><div class="sub">Breaking Bad</div></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="note ok"><b>P5 and P6 are the fix for the twenty-four screens.</b> Same grid, same generosity, but the chip row makes Characters one tap from the top instead of 11.7 screens down. The counts on the chips do a second job: they show the shape of somebody's taste before you open anything.</div>
+
+    <h4>Editing, and the states that only appear when something goes wrong</h4>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>P7</b> edit identity</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div><div class="phandle">@raman</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">Edit profile</h3>
+          <label class="fld"><span>Display name</span><div class="inp">Raman</div></label>
+          <label class="fld"><span>Handle</span><div class="inp" style="color:var(--muted)">@raman</div></label>
+          <label class="fld"><span>Bio</span><div class="inp ta">Watching my way through Villeneuve. Sci-fi and slow burns.</div>
+            <span class="cnt">58 / 1000</span></label>
+          <button class="btn">Save</button>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P8</b> choose a banner</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">Choose a banner</h3>
+          <p class="sh-b">From something you've watched.</p>
+          <div class="chips" style="padding:0 0 var(--space-12)">
+            <button class="chip on">Favourites</button><button class="chip">Library</button><button class="chip">Colour</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8)">
+            <div style="aspect-ratio:16/9;border-radius:var(--radius-8);background:linear-gradient(115deg,var(--ink-5),var(--beam-7));box-shadow:inset 0 0 0 var(--border-focus) var(--acc)"></div>
+            <div style="aspect-ratio:16/9;border-radius:var(--radius-8);background:linear-gradient(115deg,var(--mar-7),var(--ink-4))"></div>
+            <div style="aspect-ratio:16/9;border-radius:var(--radius-8);background:linear-gradient(115deg,var(--st-done-9),var(--ink-3))"></div>
+            <div style="aspect-ratio:16/9;border-radius:var(--radius-8);background:linear-gradient(115deg,#9B7BD4,var(--ink-4))"></div>
+          </div>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P9</b> shelf full · E7</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">Your films shelf is full</h3>
+          <p class="sh-b">Which one does <b style="color:var(--text)">Arrival</b> replace?</p>
+          <div class="fgrid" style="padding:0;grid-template-columns:repeat(4,1fr)">
+            <div class="cell"><div class="art"></div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4));box-shadow:inset 0 0 0 var(--border-focus) var(--acc)"></div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"></div></div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"></div></div>
+          </div>
+          <div style="display:flex;gap:var(--space-8);margin-top:var(--space-16)">
+            <button class="btn q">Cancel</button><button class="btn">Replace</button>
+          </div>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P10</b> stats failed · profile fine</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div><div class="phandle">@raman · joined Mar 2026</div></div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="sblock" style="border-color:var(--st-drop-9);background:var(--st-drop-3)">
+            <div class="sblock-h"><b style="color:var(--st-drop-11)">Couldn't load your stats</b></div>
+            <p style="font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-12)">
+              The rest of this page is unaffected.</p>
+            <button class="btn q" style="height:var(--control-sm);width:auto;padding:0 var(--space-12)">Try again</button>
+          </div>
+          <div class="shelf">
+            <div class="shelf-h"><h4>Favourite characters</h4><span class="shelf-n">See all 14 →</span></div>
+            <div class="rail">
+              <div class="fch"><div class="face"><div class="tag">Bryan Cranston</div></div><div class="nm">Walter White</div><div class="sub">Breaking Bad</div></div>
+              <div class="fch"><div class="face" style="background:linear-gradient(140deg,var(--ink-6),var(--ink-3))"><div class="tag">Brad Pitt</div></div><div class="nm">Tyler Durden</div><div class="sub">Fight Club</div></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>P11</b> guest reaches a profile control</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall empty"><span class="ecap">no banner</span></div>
+          <div class="pav-row"><div class="pav-sm empty">?</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <div style="display:flex;gap:var(--space-12);align-items:center;margin-bottom:var(--space-12)">
+            <div style="width:var(--space-48);aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--mar-7),var(--ink-4));flex:0 0 auto"></div>
+            <h3 class="sh-t" style="margin:0">Set up your profile?</h3>
+          </div>
+          <p class="sh-b">You'll need an account to keep favourites and build a record.</p>
+          <button class="btn" style="margin-bottom:var(--space-8)">Create account</button>
+          <button class="btn q">Sign in</button>
+        </div></div>
+        </div>
+      </div>
+    </div>
+
+    <h4>The state index</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>State</th><th>What is on screen</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">P1</td><td class="use">Own profile, filled</td><td class="use">Banner, avatar, bio, four stats, four shelves. Edit affordances visible but quiet.</td></tr>
+        <tr><td class="tok">P2</td><td class="use">Own profile, brand new</td><td class="use">Hatched banner, initial avatar, bio placeholder, honest zeroes, one combined empty shelf saying the profile fills itself in.</td></tr>
+        <tr><td class="tok">P3</td><td class="use">Loading</td><td class="use">Banner and avatar as skeletons; stat tiles keep their labels and skeleton only the numbers, so the strip does not resize.</td></tr>
+        <tr><td class="tok">P4</td><td class="use">Stats failed, profile fine</td><td class="use">Strip shows <code>—</code> with a Try again. The rest of the page is unaffected — errors are scoped to the section that failed.</td></tr>
+        <tr><td class="tok">P5</td><td class="use">Offline</td><td class="use">Everything from <code>catalog_*</code> renders; banner and faces fall back to gradients.</td></tr>
+        <tr><td class="tok">P6</td><td class="use">Bio longer than four lines</td><td class="use">Clamped with an inline &ldquo;more&rdquo;. Never a scroll region.</td></tr>
+        <tr><td class="tok">P7</td><td class="use">Very long display name</td><td class="use">Two lines then ellipsis. The handle never wraps — it truncates from the end.</td></tr>
+        <tr><td class="tok">P8</td><td class="use">Non-Latin name</td><td class="use">Avatar initial uses the first grapheme, not the first byte. 神谷 renders 神.</td></tr>
+        <tr><td class="tok">E1</td><td class="use">Editing identity</td><td class="use">Sheet: display name, handle, bio with a live 280 counter. Handle uniqueness checked on blur.</td></tr>
+        <tr><td class="tok">E2</td><td class="use">Handle taken</td><td class="use">Inline under the field, in the reserved hint slot. Save disabled.</td></tr>
+        <tr><td class="tok">E3</td><td class="use">Choosing a banner</td><td class="use">Sheet with the four sources of §06. Current selection ticked.</td></tr>
+        <tr><td class="tok">E4</td><td class="use">Uploading</td><td class="use">Crop frame at 4:1, progress on the confirm button, cancel returns the old banner.</td></tr>
+        <tr><td class="tok">E5</td><td class="use">Upload rejected</td><td class="use">&ldquo;Images need to be JPEG, PNG or WebP, under 4 MB.&rdquo; Banner unchanged.</td></tr>
+        <tr><td class="tok">E6</td><td class="use">Reordering a shelf</td><td class="use">Drag handles appear; other shelves dim. Save is implicit, with an undo toast.</td></tr>
+        <tr><td class="tok">E7</td><td class="use">Ninth favourite</td><td class="use">Sheet: &ldquo;Your shelf is full. Which one does <i>Arrival</i> replace?&rdquo; with the eight shown. Never a silent refusal.</td></tr>
+        <tr><td class="tok">E8</td><td class="use">Removing a favourite</td><td class="use">Immediate, with an undo toast. No confirmation dialog for a reversible act.</td></tr>
+        <tr><td class="tok">C1</td><td class="use">Character picker, step one</td><td class="use">Two doors plus recently watched.</td></tr>
+        <tr><td class="tok">C2</td><td class="use">Character picker, step two</td><td class="use">Cast ordered by episode count, filterable.</td></tr>
+        <tr><td class="tok">C3</td><td class="use">Character already favourited</td><td class="use">Row ticked and disabled, not hidden — hiding it reads as missing data.</td></tr>
+        <tr><td class="tok">C4</td><td class="use">Animated title</td><td class="use">Poster face, <code>Voice · Hiroshi Kamiya</code> on the actor line.</td></tr>
+        <tr><td class="tok">C5</td><td class="use">Credit has gone from TMDB</td><td class="use">Stored strings still render; face drops to the poster. Never blank, never removed.</td></tr>
+        <tr><td class="tok">C6</td><td class="use">Cast list empty</td><td class="use">&ldquo;TMDB has no cast for this yet.&rdquo; with a link to contribute.</td></tr>
+        <tr><td class="tok">G1</td><td class="use">Guest reaches a profile control</td><td class="use">The existing sign-in sheet, verb matched — &ldquo;Save Dune: Part Two?&rdquo; becomes &ldquo;Set up your profile?&rdquo;</td></tr>
+        <tr><td class="tok">S1</td><td class="use">compact / medium</td><td class="use">One column, rails scroll, banner 3:1.</td></tr>
+        <tr><td class="tok">N1</td><td class="use">0 titles</td><td class="use">Gradient banner, initial, one invitation: start your shelf. Nothing else drawn.</td></tr>
+        <tr><td class="tok">N2</td><td class="use">1 title</td><td class="use">The block appears with real numbers and names the first entry. A 1 is not embarrassing.</td></tr>
+        <tr><td class="tok">N3</td><td class="use">6 titles, partly alive</td><td class="use">Bar has arrived, genres have not; the invitation has given way to a caption.</td></tr>
+        <tr><td class="tok">N4</td><td class="use">Proposed favourites</td><td class="use">Your own 9s and 10s, offered once, in place. Dismissible without penalty.</td></tr>
+        <tr><td class="tok">N5</td><td class="use">Films only</td><td class="use">Series block absent, replaced by one line saying when it arrives.</td></tr>
+        <tr><td class="tok">N6</td><td class="use">Tracked plenty, rated nothing</td><td class="use">Every mean is a dash; counts and bar still real. One invitation, phrased as what it unlocks.</td></tr>
+        <tr><td class="tok">X1</td><td class="use"><b>Imported library</b></td><td class="use">500 titles land at once, so every stat is instantly full — but favourites are still empty and no shelf was ever curated. N4 is the state that matters most here, and it should be offered as soon as the import settles rather than waiting.</td></tr>
+        <tr><td class="tok">X2</td><td class="use"><b>One long series, nothing else</b></td><td class="use"><code>1 title · 1,247 episodes</code> is true and looks broken. The films block is absent, so the series block carries the page alone — it gets the full-width treatment rather than sitting in a half-empty row.</td></tr>
+        <tr><td class="tok">X3</td><td class="use"><b>Everything dropped</b></td><td class="use">A distribution bar that is entirely <code>--st-drop-9</code>. Rendered honestly and without comment. No encouragement copy — that would be the app having an opinion about how someone watches.</td></tr>
+        <tr><td class="tok">X4</td><td class="use"><b>One genre is 100%</b></td><td class="use">Below eight titles genres do not rank at all, which is what stops this. Above it, a dominant genre is a real finding and is shown as one.</td></tr>
+        <tr><td class="tok">X5</td><td class="use"><b>Shelf emptied back to zero</b></td><td class="use">Returns to the invitation state, not a broken empty rail — and it is only the invitation if it is the first empty section. Otherwise it disappears.</td></tr>
+        <tr><td class="tok">X6</td><td class="use"><b>Banner's title removed from the library</b></td><td class="use">The banner stores the image path, not a reference to a library row, so it survives. Un-tracking a film does not silently change your profile's appearance.</td></tr>
+        <tr><td class="tok">X7</td><td class="use"><b>A year with nothing in it</b></td><td class="use">&ldquo;Your years&rdquo; skips it rather than drawing a zero row. A gap year is not a failure to display — this is the rule about nothing decaying, applied to a chart.</td></tr>
+        <tr><td class="tok">X8</td><td class="use"><b>Joined today, watched nothing</b></td><td class="use">Join date reads &ldquo;joined today&rdquo;, not a date. N1.</td></tr>
+        <tr><td class="tok">S2</td><td class="use">expanded / wide</td><td class="use">Banner 4:1 at container width with <code>--radius-16</code>; shelves show more per row; identity sits beside the avatar.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============================== 08b DESKTOP ============================== -->
+<section id="desktop">
+  <div class="wrap">
+    <div class="shead"><span class="snum">08b</span><h2>Desktop</h2></div>
+    <p>Drawn at <b>1120&times;700</b> — the expanded band's own width — and scaled to fit this page. At wide (1440+) the container caps at 1600 and the margin takes the rest; nothing below reflows, the columns simply get wider.</p>
+
+    <div class="deskcap"><b>D1</b> overview · expanded</div>
+    <div class="deskwrap"><div style="height:592px"><div class="deskscale" style="height:950px"><div class="desk" style="height:950px">
+      <div class="dtop">
+        <div class="dwm"><i></i>Cine Search</div>
+        <div class="dnav"><a href="#x">Discover</a><a href="#x">Search</a><a href="#x">Library</a><a class="on" href="#x">You</a></div>
+      </div>
+      <div class="dbody">
+        <div style="position:relative;aspect-ratio:4/1;background:linear-gradient(115deg,var(--ink-5),var(--beam-7) 55%,var(--mar-7));overflow:hidden">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 62%)"></div>
+          <div style="position:absolute;left:40px;bottom:16px;z-index:2;font-family:var(--f-d);font-size:40px;line-height:44px;font-weight:800;letter-spacing:-.04em;color:#fff">Raman</div>
+          <button style="position:absolute;right:40px;top:16px;height:36px;padding:0 12px;border-radius:999px;border:0;cursor:pointer;background:rgba(4,6,12,.6);color:#fff;font-family:var(--f-s);font-size:12px;font-weight:600">Edit banner</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:16px 40px 0">
+          <div style="width:96px;height:96px;border-radius:999px;margin-top:-48px;background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:3px solid var(--bg);display:grid;place-items:center;font-family:var(--f-d);font-size:32px;font-weight:800;color:#fff">R</div>
+          <div style="min-width:0;flex:1">
+            <div style="font-family:var(--f-m);font-size:12px;color:var(--muted)">@raman · joined Mar 2026</div>
+            <p style="font-size:13px;line-height:20px;color:var(--muted);margin:4px 0 0;max-width:65ch">Watching my way through Villeneuve. Sci-fi, slow burns, and anything shot by Roger Deakins.</p>
+          </div>
+          <button style="height:44px;padding:0 16px;border-radius:12px;border:0;cursor:pointer;background:var(--surface-hv);color:var(--text);font-family:var(--f-s);font-size:13px;font-weight:600">Edit profile</button>
+        </div>
+        <div style="display:flex;gap:0;padding:0 40px;border-bottom:1px solid var(--bd-sub);margin-top:12px">
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--acc-t);border-bottom:2px solid var(--acc)">Overview</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Favourites</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Stats</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Library</button>
+        </div>
+        <div class="dcols">
+          <div>
+            <div class="sblock" style="margin:0 0 12px">
+              <div class="sblock-h"><b>Films</b><span>at least</span></div>
+              <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>112</dd></div><div class="snum-i"><dt>Days</dt><dd>11.3</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div></div>
+              <div class="dbar"><i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:#7C8AA8"></i><i style="width:9%;background:#9B7BD4"></i><i style="width:5%;background:#C87A3C"></i><i style="width:3%;background:var(--st-drop-9)"></i></div>
+            </div>
+            <div class="sblock" style="margin:0">
+              <div class="sblock-h"><b>Series</b><span></span></div>
+              <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>56</dd></div><div class="snum-i"><dt>Episodes</dt><dd>1.2k</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div></div>
+              <div class="dbar"><i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i><i style="width:18%;background:#7C8AA8"></i><i style="width:9%;background:#C87A3C"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+              <h4 style="font-family:var(--f-d);font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none">Favourite characters</h4>
+              <span style="font-family:var(--f-m);font-size:11px;color:var(--faint)">See all 14 →</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--mar-7),var(--ink-4));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">Bryan Cranston</div></div><div style="font-size:11px;color:var(--text)">Walter White</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Breaking Bad</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--ink-6),var(--ink-3));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">Brad Pitt</div></div><div style="font-size:11px;color:var(--text)">Tyler Durden</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Fight Club</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--st-done-9),var(--ink-4));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">poster · voice</div></div><div style="font-size:11px;color:var(--text)">Levi</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Attack on Titan</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--beam-7),var(--ink-3));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">R. Ferguson</div></div><div style="font-size:11px;color:var(--text)">Lady Jessica</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Dune</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,#C87A3C,var(--ink-4));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">Adam Scott</div></div><div style="font-size:11px;color:var(--text)">Mark Scout</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Severance</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,#9B7BD4,var(--ink-4));position:relative;margin-bottom:4px"><div style="position:absolute;left:0;right:0;bottom:0;padding:4px;background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px">Anna Gunn</div></div><div style="font-size:11px;color:var(--text)">Skyler White</div><div style="font-family:var(--f-m);font-size:8px;color:var(--faint)">Breaking Bad</div></div>
+            </div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 8px">
+              <h4 style="font-family:var(--f-d);font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none">Favourite films</h4>
+              <span style="font-family:var(--f-m);font-size:11px;color:var(--faint)">See all 8 →</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--ink-5),var(--ink-3));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Dune: Part Two</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--beam-7),var(--ink-3));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Arrival</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--mar-7),var(--ink-4));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Blade Runner 2049</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--st-done-9),var(--ink-4));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Sicario</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,var(--ink-6),var(--ink-3));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Prisoners</div></div>
+              <div><div style="aspect-ratio:2/3;border-radius:8px;background:linear-gradient(150deg,#9B7BD4,var(--ink-4));margin-bottom:4px"></div><div style="font-size:11px;color:var(--text)">Enemy</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div></div></div>
+
+    <div class="note"><b>The two-column split is the only structural change from mobile.</b> Stats go left in a fixed 320px rail, favourites go right and fill. Nothing is added and nothing is hidden — a profile that needed a desktop-only section would be a profile that does not fit on a phone.</div>
+    <div class="note warn"><b>The banner is 4:1 here, not 2:1.</b> A 2:1 banner at 1120 wide is 560px tall — half the window spent on decoration before a single number. The name scales with it, to <code>--text-display</code>.</div>
+
+    <div class="deskcap"><b>D2</b> stats · expanded</div>
+    <div class="deskwrap"><div style="height:436px"><div class="deskscale"><div class="desk">
+      <div class="dtop">
+        <div class="dwm"><i></i>Cine Search</div>
+        <div class="dnav"><a href="#x">Discover</a><a href="#x">Search</a><a href="#x">Library</a><a class="on" href="#x">You</a></div>
+      </div>
+      <div class="dbody" style="padding:24px 40px">
+        <div style="display:flex;gap:0;border-bottom:1px solid var(--bd-sub);margin-bottom:20px">
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Overview</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Favourites</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--acc-t);border-bottom:2px solid var(--acc)">Stats</button>
+          <button style="background:none;border:0;cursor:pointer;height:44px;padding:0 16px;font-family:var(--f-s);font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent">Library</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+          <div class="sblock" style="margin:0">
+            <div class="sblock-h"><b>Films</b><span>at least</span></div>
+            <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>112</dd></div><div class="snum-i"><dt>Days</dt><dd>11.3</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div></div>
+            <div class="dbar"><i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:#7C8AA8"></i><i style="width:9%;background:#9B7BD4"></i><i style="width:5%;background:#C87A3C"></i><i style="width:3%;background:var(--st-drop-9)"></i></div>
+            <div class="dlegend"><span><i style="background:var(--st-done-9)"></i>Watched 72</span><span><i style="background:#7C8AA8"></i>Want 21</span><span><i style="background:#9B7BD4"></i>Rewatched 10</span><span><i style="background:#C87A3C"></i>On hold 6</span><span><i style="background:var(--st-drop-9)"></i>Dropped 3</span></div>
+          </div>
+          <div class="sblock" style="margin:0">
+            <div class="sblock-h"><b>Series</b><span></span></div>
+            <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>56</dd></div><div class="snum-i"><dt>Episodes</dt><dd>1.2k</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div></div>
+            <div class="dbar"><i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i><i style="width:18%;background:#7C8AA8"></i><i style="width:9%;background:#C87A3C"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
+            <div class="dlegend"><span><i style="background:var(--st-done-9)"></i>Watched 23</span><span><i style="background:#2ABFA0"></i>Watching 15</span><span><i style="background:#7C8AA8"></i>Want 10</span><span><i style="background:#C87A3C"></i>On hold 5</span><span><i style="background:var(--st-drop-9)"></i>Dropped 3</span></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+          <div>
+            <div style="font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Genres</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="dimcard"><div class="lbl"><b>Sci-Fi</b><span>38 titles</span></div><div class="mean">8.4</div></div>
+              <div class="dimcard"><div class="lbl"><b>Drama</b><span>41 titles</span></div><div class="mean">7.6</div></div>
+              <div class="dimcard"><div class="lbl"><b>Thriller</b><span>29 titles</span></div><div class="mean">7.9</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">People</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="dimcard"><div class="lbl"><b>Denis Villeneuve</b><span>6 of 26</span></div><div class="mean">8.6</div></div>
+              <div class="dimcard"><div class="lbl"><b>Roger Deakins</b><span>9 titles</span></div><div class="mean">8.2</div></div>
+              <div class="dimcard"><div class="lbl"><b>Jóhann Jóhannsson</b><span>4 titles</span></div><div class="mean">8.5</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Countries</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="dimcard"><div class="lbl"><b>United States</b><span>98 titles</span></div><div class="mean">7.6</div></div>
+              <div class="dimcard"><div class="lbl"><b>Japan</b><span>31 titles</span></div><div class="mean">8.5</div></div>
+              <div class="dimcard"><div class="lbl"><b>South Korea</b><span>12 titles</span></div><div class="mean">8.3</div></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--f-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Your years</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="dimcard"><div class="lbl"><b>2026</b><span>41 watched</span></div><div class="mean">7.9</div></div>
+              <div class="dimcard"><div class="lbl"><b>2025</b><span>63 watched</span></div><div class="mean">7.7</div></div>
+              <div class="dimcard"><div class="lbl"><b>2024</b><span>52 watched</span></div><div class="mean">8.0</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div></div></div>
+
+    <div class="note ok"><b>Four dimensions abreast is what desktop actually buys.</b> On a phone these are stacked sections you scroll past one at a time; here genres, people, countries and your years sit side by side, and the comparison between them — that Japan outscores the US by nearly a point across a third of the volume — is a thing you can see rather than remember.</div>
+    <div class="note law"><b>Card heights are content-led, not stretched.</b> Each dimension column holds its own three cards at their natural height. Stretching four columns to a common height would leave dead space under the short ones, which is the single most common way a desktop grid starts looking like a spreadsheet.</div>
+  </div>
+</section>
+
+<!-- ============================== 08c COLD START ============================== -->
+<section id="cold">
+  <div class="wrap">
+    <div class="shead"><span class="snum">08c</span><h2>The cold start</h2></div>
+    <p>Everything above was designed from profiles with <b>1,497 titles</b> on them. That is the destination, and almost nobody is standing there. The profile is the only screen in this product with a real cold-start problem: Discover has the whole catalogue on day one, Search works on day one, and an empty Library is <i>obviously</i> empty. But a profile is supposed to be about you, and on day one there is no you.</p>
+
+    <div class="note law"><b>The constraint that rules out the obvious answer.</b> The <code>you</code> module already carries: <i>no streaks, no nudges, nothing that decays — this is a record, not a game you can lose.</i> So the standard fix is off the table. <b>No completion meter, no &ldquo;your profile is 40% complete&rdquo;, no checklist, no badge for filling a shelf.</b> Those work by making you feel behind, and this product has promised not to do that.</div>
+
+    <h4>The rule</h4>
+    <div class="note ok"><b>A profile shows at most one empty invitation at a time.</b> Everything else that has no content either <b>disappears</b> or is <b>already handsome by default</b>. That is the whole anti-blank-space policy, and it is checkable: count the dashed boxes on any state; if there is more than one, the state is wrong.
+    <br><br>It follows that the sections have to be <i>ordered</i>, because only the first empty one gets to speak. That order is the discovery path — it decides what a new person is taught first.</div>
+
+    <h4>Empty is not one thing</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Section</th><th>When empty, on your own profile</th><th>On someone else's</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Banner</td><td class="use"><b>Already handsome.</b> A gradient keyed to your account id. Never reads as missing.</td><td class="use">Same gradient. No-one can tell.</td></tr>
+        <tr><td class="num">Avatar</td><td class="use"><b>Already handsome.</b> Your initial on that gradient.</td><td class="use">Same.</td></tr>
+        <tr><td class="num">Bio</td><td class="use">A placeholder line, tappable.</td><td class="use"><b>Disappears.</b> An empty quote mark on a stranger's page is just a gap.</td></tr>
+        <tr><td class="num">Stat block</td><td class="use">Real zeroes — dignified, honest. The <b>bar</b> is replaced, because a bar of nothing is a grey stripe that means nothing.</td><td class="use">Whole block disappears.</td></tr>
+        <tr><td class="num">A shelf</td><td class="use">Invitation, <b>if it is the first empty one</b>. Otherwise it disappears.</td><td class="use">Disappears.</td></tr>
+        <tr><td class="num">A stat dimension</td><td class="use">A caption naming what it is waiting for — see the ladder.</td><td class="use">Disappears.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>The ladder — what appears, and when</h4>
+    <p>Not a checklist, because you are never shown the rungs above you as things you are missing. Each one simply <b>arrives</b>, and the thing that is waiting says so in its own caption rather than in a progress meter.</p>
+    <div class="ladder">
+      <div class="lrow"><div class="at">0 titles</div><div class="what">Banner gradient, initial, handle, join date. <b>One invitation: start your shelf.</b> Nothing else is drawn.</div></div>
+      <div class="lrow"><div class="at">1 title</div><div class="what">The film or series block appears with real numbers. <b>&ldquo;Dune: Part Two · 2h 46m&rdquo;</b> — a first entry is worth naming, and a 1 is not embarrassing.</div></div>
+      <div class="lrow"><div class="at">3 rated</div><div class="what"><b>Mean score</b> resolves from <code>—</code>. The floor the <code>you</code> module already uses.</div></div>
+      <div class="lrow"><div class="at">5 titles</div><div class="what">The <b>distribution bar</b> replaces the invitation in that block — five segments is the least that reads as a shape rather than a stripe.</div></div>
+      <div class="lrow"><div class="at">2 of a person</div><div class="what">A <b>people</b> card can rank. One title is not a pattern; the existing rule, unchanged.</div></div>
+      <div class="lrow"><div class="at">8 titles</div><div class="what"><b>Genres and decades</b> rank. Below that a single genre is 100% of everything and says nothing.</div></div>
+      <div class="lrow"><div class="at">rated 8+</div><div class="what"><b>Proposed favourites</b> becomes available — see below. The highest-leverage moment in the whole flow.</div></div>
+      <div class="lrow"><div class="at">2 calendar years</div><div class="what"><b>Your years</b> appears. One year is not a comparison.</div></div>
+    </div>
+
+    <h4>Five ideas, and what I would do</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Idea</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td class="use"><b>1 · Where does &ldquo;pick four&rdquo; live?</b> Capturing favourites during sign-up is what Letterboxd and AL-chan both do. Letterboxd and AL-chan both do this, and it is the single most effective fix — the profile is never empty, and it bootstraps taste for Discover on day one.</td><td class="use"><b>DECIDED 2026-09-16 — on the profile, not in sign-up.</b> Entry is already built and shipped, and the concept doc's own principle is that a guest is never taxed. Somebody who just signed up came to track a specific thing — let them. The same picker lives on the profile as its first-run invitation, where it meets them at the moment of curiosity rather than as a toll.</td></tr>
+        <tr><td class="use"><b>2 · Propose favourites from your own ratings.</b> Once eight things are rated, offer the 9s and 10s: &ldquo;These are the ones you rated highest. Put any on your shelf?&rdquo; One tap each.</td><td class="use"><b>Yes — this is the best idea here.</b> It converts passive tracking into a curated profile without asking anybody to do curation. It uses only data we already hold, it cannot be wrong (they are literally your own top ratings), and it is offered <i>once, in place</i> — not a recurring prompt, so the no-nudges rule holds.</td></tr>
+        <tr><td class="use"><b>3 · Sections say what they are waiting for.</b> A stat that cannot compute yet carries a caption — &ldquo;mean score appears at three ratings&rdquo; — rather than a zero or a blank.</td><td class="use"><b>Yes.</b> It teaches the system's own thresholds at the exact moment they are relevant, and it costs one line of text. Critically it is phrased as <i>what happens next</i>, never as <i>what you have not done</i>.</td></tr>
+        <tr><td class="use"><b>4 · Ghost content — show example posters at low opacity so the shelf has a shape.</b></td><td class="use"><b>No.</b> Either it is unmistakably fake, in which case it is clutter, or it is not, in which case the profile is showing somebody films they have not chosen and calling them favourites. This product has a rule about not fabricating records and it applies to its own empty states.</td></tr>
+        <tr><td class="use"><b>5 · A completion meter.</b></td><td class="use"><b>No.</b> Directly contradicts <i>no streaks, no nudges, nothing that decays</i>. A meter at 40% is a scoreboard, and the moment it exists the profile becomes something you can be failing at.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>The states</h4>
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-cap"><b>N1</b> 0 titles · one invitation</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--ink-5),var(--ink-7))">
+            <div class="bscrim"></div><button class="bedit">Add</button>
+            <div class="pname-on-banner">raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div>
+            <div style="min-width:0"><div class="phandle">@raman · joined today</div>
+            <p class="pbio ph" style="margin-top:var(--space-4)">Say something about what you watch.</p></div></div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="invite">
+            <b>Start your shelf</b>
+            <p>Pick four films or series you love. They go on your profile, and Discover starts using them straight away.</p>
+            <button class="go">Pick four</button>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            Your numbers appear as you track things. Nothing to set up.</p>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N2</b> 1 title · first entry named</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--ink-5),var(--beam-7))">
+            <div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div>
+            <div style="min-width:0"><div class="phandle">@raman · joined today</div></div></div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span>1</span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd>1</dd></div>
+              <div class="snum-i"><dt>Runtime</dt><dd>2h 46m</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd style="color:var(--faint)">—</dd></div>
+            </div>
+            <p class="waiting">First one in: <b style="color:var(--text)">Dune: Part Two</b>. Mean score appears at three ratings.</p>
+          </div>
+          <div class="invite">
+            <b>Start your shelf</b>
+            <p>Pick four you love. They go on your profile.</p>
+            <button class="go">Pick four</button>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N3</b> 6 titles · partly alive</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--mar-7),var(--ink-5))">
+            <div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pav-row"><div class="pav-sm">R</div>
+            <div style="min-width:0"><div class="phandle">@raman · joined Mar 2026</div>
+            <p class="pbio" style="margin-top:var(--space-4)">Starting with the Villeneuve run.</p></div></div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span></span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd>6</dd></div>
+              <div class="snum-i"><dt>Days</dt><dd>0.6</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd class="rate">8.2</dd></div>
+            </div>
+            <div class="dbar">
+              <i style="width:67%;background:var(--st-done-9)"></i><i style="width:33%;background:#7C8AA8"></i>
+            </div>
+            <div class="dlegend"><span><i style="background:var(--st-done-9)"></i>Watched 4</span><span><i style="background:#7C8AA8"></i>Want 2</span></div>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            Series appear here once you track one. Genres rank at eight titles.</p>
+          <div class="shelf">
+            <div class="shelf-h"><h4>Favourite films</h4><span class="shelf-n">3</span></div>
+            <div class="rail">
+              <div class="fti"><div class="art"></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
+              <div class="fti"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Arrival</div><div class="sub">2016</div></div>
+              <button class="addcard"><span class="plus">+</span>Add</button>
+            </div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N4</b> proposed favourites</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--mar-7),var(--ink-5))"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">You rated these highest</h3>
+          <p class="sh-b">Put any of them on your shelf. You can change it whenever.</p>
+          <div style="display:flex;flex-direction:column;gap:var(--space-8)">
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);border-radius:var(--radius-8);background:var(--acc-bg);min-height:var(--control-h)">
+              <div style="width:var(--space-24);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--mar-7),var(--ink-4));flex:0 0 auto"></div>
+              <div style="min-width:0;flex:1"><div style="font-size:var(--text-caption);font-weight:600;color:var(--acc-t)">Blade Runner 2049</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--muted)">you rated 10</div></div>
+              <div style="color:var(--acc-t)">✓</div>
+            </div>
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);border-radius:var(--radius-8);min-height:var(--control-h)">
+              <div style="width:var(--space-24);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--beam-7),var(--ink-3));flex:0 0 auto"></div>
+              <div style="min-width:0;flex:1"><div style="font-size:var(--text-caption);font-weight:600">Arrival</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--faint)">you rated 10</div></div>
+            </div>
+            <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);border-radius:var(--radius-8);min-height:var(--control-h)">
+              <div style="width:var(--space-24);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--st-done-9),var(--ink-4));flex:0 0 auto"></div>
+              <div style="min-width:0;flex:1"><div style="font-size:var(--text-caption);font-weight:600">Sicario</div>
+              <div style="font-family:var(--f-m);font-size:9px;color:var(--faint)">you rated 9</div></div>
+            </div>
+          </div>
+          <button class="btn" style="margin-top:var(--space-16)">Add 1 to shelf</button>
+          <button class="btn q" style="margin-top:var(--space-8);background:none;color:var(--muted)">Not now</button>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N5</b> films only · series collapsed</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button>Favourites</button><button class="on">Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span></span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd>41</dd></div>
+              <div class="snum-i"><dt>Days</dt><dd>4.1</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd class="rate">7.9</dd></div>
+            </div>
+            <div class="dbar"><i style="width:78%;background:var(--st-done-9)"></i><i style="width:17%;background:#7C8AA8"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            No series tracked yet — that block appears with the first one.</p>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Genres</h4><span class="shelf-n">count · mean</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>Sci-Fi</b><span>18 titles</span></div><div class="mean">8.4</div></div>
+            <div class="dimcard"><div class="lbl"><b>Thriller</b><span>12 titles</span></div><div class="mean">7.6</div></div>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            Your years appears once you have watched across two of them.</p>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>N6</b> tracked plenty, rated nothing</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button>Favourites</button><button class="on">Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span></span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd>63</dd></div>
+              <div class="snum-i"><dt>Days</dt><dd>6.3</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd style="color:var(--faint)">—</dd></div>
+            </div>
+            <div class="dbar"><i style="width:82%;background:var(--st-done-9)"></i><i style="width:18%;background:#7C8AA8"></i></div>
+          </div>
+          <div class="shelf-h" style="margin-top:var(--space-20)"><h4>Genres</h4><span class="shelf-n">count only</span></div>
+          <div class="dimgrid" style="margin-top:0">
+            <div class="dimcard"><div class="lbl"><b>Drama</b><span>24 titles</span></div><div class="mean" style="color:var(--faint)">—</div></div>
+            <div class="dimcard"><div class="lbl"><b>Sci-Fi</b><span>19 titles</span></div><div class="mean" style="color:var(--faint)">—</div></div>
+          </div>
+          <div class="invite">
+            <b>Rate three and these come alive</b>
+            <p>Every card here can carry what you thought of it, not just how many you saw.</p>
+            <button class="go">Rate something</button>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="note law"><b>Count the dashed boxes.</b> N1 has one. N2 has one. N3 has none — it has content, so the invitation gave way to a caption. N5 has none. N6 has one. No state in this document shows two, and that is the rule doing its job rather than taste.</div>
+
+    <div class="note warn"><b>N6 is the case I nearly missed, and it is common.</b> Somebody who tracks diligently and never rates has a full profile where <i>every mean is a dash</i>. The counts are real and the distribution bar works — statuses do not need ratings — so the page is not broken, but half of what makes it interesting is switched off. It gets the one invitation, phrased as what it unlocks rather than what they have failed to do.</div>
+  </div>
+</section>
+
+<!-- ============================== 09 NEEDS ============================== -->
+<section id="schema">
+  <div class="wrap">
+    <div class="shead"><span class="snum">09</span><h2>What the design needs to exist</h2></div>
+    <p>Stated as requirements, not as a schema — <b>how these are stored is the architecture agent's call.</b> What matters to the design is that each of these can be read, written and ordered, and that two of them survive TMDB changing underneath us.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>The design needs</th><th>Shape</th><th>Non-negotiable because</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Display name</td><td class="use">Separate from the handle</td><td class="use">The handle is unique and immutable-ish; the display name is neither. P7 truncates them differently.</td></tr>
+        <tr><td class="num">Bio</td><td class="use">Free text, <b>280 characters</b></td><td class="use">The editor draws a live counter against that number, and the card clamps at four lines.</td></tr>
+        <tr><td class="num">Banner reference</td><td class="use">One value, plus which <i>kind</i> it is — catalogue still, colour, or uploaded file</td><td class="use">E3 offers four sources and ticks the current one. Without the kind, the sheet cannot show what is already selected.</td></tr>
+        <tr><td class="num">Avatar reference</td><td class="use">Optional. Absent is a valid, designed state.</td><td class="use">The initial-on-a-gradient is the default, not a fallback — see §06.</td></tr>
+        <tr><td class="num">Joined date</td><td class="use">A date</td><td class="use">Rendered beside the handle on every profile, including P2's &ldquo;joined today&rdquo;.</td></tr>
+        <tr><td class="num">Favourite people</td><td class="use">A person reference</td><td class="use">New — nothing stores this today.</td></tr>
+        <tr><td class="num">Favourite characters</td><td class="use">A TMDB <code>credit_id</code></td><td class="use">One value rehydrates the whole card via <code>/credit/{id}</code>. §01.</td></tr>
+        <tr><td class="num"><b>Order</b>, on all four shelves</td><td class="use">Explicit, person-set</td><td class="use">The first film on a shelf is a statement. Films and series rely on <code>user_library.is_favourite</code>, which is a bare boolean today and has no order at all.</td></tr>
+        <tr><td class="num"><b>Copied display strings</b> on every favourite</td><td class="use">Character/person name, title, image path — stored, not joined</td><td class="use"><b>R-C3.</b> TMDB credits are user-edited and can vanish. A profile must not degrade because a stranger tidied a cast list. This is the one place denormalisation is the requirement rather than the compromise.</td></tr>
+        <tr><td class="num">Mean score</td><td class="use">Average of ratings, with a count</td><td class="use">The tile shows <code>—</code> below three ratings, so it needs the count as well as the average.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note law"><b>Two behaviours the interface cannot guarantee on its own.</b> The <b>eight-per-shelf cap</b> — E7's &ldquo;which one does this replace?&rdquo; sheet is the designed path, but a cap enforced only in a sheet is not enforced. And the <b>280-character bio</b>, for the same reason. Both are stated here so they are not read as presentation details.</div>
+    <div class="note"><b>Uploads need storage that does not exist yet</b> — no bucket, no policies. That is a build question, not a design one; §06 recommends the catalogue-first route partly because it sidesteps it entirely, and the upload flow (E4, E5) is drawn either way.</div>
+  </div>
+</section>
+
+<!-- ============================== 10 OPEN ============================== -->
+<section id="open">
+  <div class="wrap">
+    <div class="shead"><span class="snum">10</span><h2>Decisions</h2></div>
+    <p>Everything above is designed and buildable. These four are yours.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Decision</th><th>Recommendation</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">D1</td><td class="use"><b>Followers and following.</b> You asked for follow counts. On 2026-09-13 you parked Layers 3 and 4 — public profiles and follows — <i>indefinitely</i>, on the grounds that both need a community to be worth anything and there is no rollout planned. Six of the seven things on this page work perfectly in a private instrument; this one does not.</td><td class="use"><b>Leave it parked.</b> A follower count that reads <code>0</code> forever is worse than no tile, and the surface it opens — cross-user RLS, a public read policy, moderation — is the largest single piece of work in the product. The four-tile strip is designed without it and does not have a hole where it would go. Reverse it when there is a second person.</td></tr>
+        <tr><td class="tok">D2</td><td class="use"><b>Upload, or catalogue only?</b> Both are designed. This is a product call about what a banner <i>is</i> on a film tracker.</td><td class="use"><b>Catalogue only, first.</b> Faster to use, impossible to get wrong visually, and more personal on a tracker than a photograph. Upload is fully drawn; add it if you miss it.</td></tr>
+        <tr><td class="tok">D3</td><td class="use"><b>Does this module replace <code>you</code>, or sit beside it?</b> <code>you</code> already owns taste, stats and settings.</td><td class="use"><b>Absorb it.</b> One screen — identity and favourites on top, the existing taste cards below, settings behind a control in the header. Two screens showing the same numbers is how they drift apart, and there is no second user to need a separate public view.</td></tr>
+        <tr><td class="tok">D4</td><td class="use"><b>How many per shelf?</b> I recommended eight. The benchmark says otherwise: the account I looked at has <b>roughly 25 favourite anime</b>, shown as a full grid on its own tab. AL-chan does not cap.</td><td class="use"><b>Both, and the tabs make it free.</b> The <b>Overview</b> shelf shows the first 8 as a rail — that is the statement, and the constraint still does its work. The <b>Favourites</b> tab shows everything as a grid, uncapped. The cap becomes a display rule rather than a limit, which is what AL-chan is actually doing. I was wrong to make it a limit.</td></tr>
+        <tr><td class="tok">D6</td><td class="use"><b>Where &ldquo;pick four&rdquo; lives.</b></td><td class="use"><b>Settled 2026-09-16: on the profile, as its first-run invitation — not a sign-up step.</b> Sign-up capture converts better, and it was still the wrong trade here: entry is shipped, and a guest is never taxed. Drawn as N1.</td></tr>
+        <tr><td class="tok">D5</td><td class="use"><b>How long is a bio?</b> I specified 280 characters. The account I pulled has a <b>10,104-character</b> bio: markdown, images, custom headers, a Discord card, links to MAL and Steam. AL-chan profiles are a decorating culture.</td><td class="use"><b>Longer, but not a canvas — 1,000 characters, plain text with links.</b> 280 is a tweet and too short for &ldquo;what I watch and why&rdquo;. But the full markdown canvas brings an editor, image hosting, sanitising and a maintenance surface, for a product with one user. If you want the canvas, that is a real product direction and it should be its own decision rather than a field length.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note law" style="margin-bottom:0"><b>Nothing here is built.</b> This is design, for grooming. The acceptance criteria are yours to write, and the working order has not changed: concept &rarr; design &rarr; <b>grooming</b> &rarr; development.</div>
+  </div>
+</section>
+
+<!-- ============================== 11 BENCHMARK ============================== -->
+<section id="bench">
+  <div class="wrap">
+    <div class="shead"><span class="snum">11</span><h2>What came from AL-chan</h2></div>
+    <p>Read off a live account with <b>1,497 titles, 22,638 episodes and 482 manga</b> — a profile someone has actually lived in for eleven years, not a demo. Six things changed. Four were deliberately left behind.</p>
+
+    <h4>Taken</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Change</th><th>Was</th><th>Now</th></tr></thead>
+      <tbody>
+        <tr><td class="num">A mean on every dimension</td><td class="use">Counts only</td><td class="use">Count <b>and</b> mean per genre, decade, person, studio. This is the whole benchmark in one row — it turns a consumption log into a sentence about taste.</td></tr>
+        <tr><td class="num">Tabs</td><td class="use">One long scroll</td><td class="use">Overview · Favourites · Stats · Library</td></tr>
+        <tr><td class="num">Distribution bar</td><td class="use">Absent</td><td class="use">A stacked bar per medium, in the six watch-state hues the foundations already define</td></tr>
+        <tr><td class="num">Per-medium stats</td><td class="use">One blended 4-tile strip</td><td class="use">Films and series get separate blocks — a film has no episodes</td></tr>
+        <tr><td class="num">Studios shelf</td><td class="use">Four shelves</td><td class="use">Five. A24 and Ghibli are as much a reason to watch as a director.</td></tr>
+        <tr><td class="num">Name on the banner</td><td class="use">Name below it</td><td class="use">On the artwork, which makes the banner a nameplate instead of decoration</td></tr>
+        <tr><td class="num">Three new dimensions</td><td class="use">Genre, decade, people</td><td class="use">Plus watch year, country and score spread</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>Left behind, on purpose</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Theirs</th><th>Why not here</th></tr></thead>
+      <tbody>
+        <tr><td class="num">The markdown bio canvas</td><td class="use">10,104 characters of custom headers, images, a Discord status card and links to MAL, Simkl and Steam. It is a decorating culture, and it exists because thousands of people visit each other's profiles. One reader does not decorate a room nobody enters. §10 D5.</td></tr>
+        <tr><td class="num">Activity feed with likes</td><td class="use">Layer 4. A feed with one person in it is a log, and the library already is one.</td></tr>
+        <tr><td class="num">Social tab, reviews tab</td><td class="use">Layers 3 and 4, parked. §10 D1.</td></tr>
+        <tr><td class="num">Voice actors as a ranking</td><td class="use">Meaningful in anime, where one actor carries a hundred roles. In film the actor <i>is</i> the person ranking — there is nothing to separate.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>Two places the design deliberately diverges</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Theirs</th><th>Ours</th><th>Because</th></tr></thead>
+      <tbody>
+        <tr><td class="use">Avatar is a rounded square</td><td class="use"><b>Round</b></td><td class="use">Their avatars are usually character art, where a squircle reads as a picture frame. Ours is a photograph of a person, and round already means <i>person</i> throughout this system — the cast rail, the people shelf, <code>.circ</code>. Changing it here would break a language that is already consistent.</td></tr>
+        <tr><td class="use">Character cards are pure art, <b>no text at rest</b></td><td class="use"><b>Always labelled</b></td><td class="use">Theirs works because the art is the character and fans know the face. Ours is an <i>actor's headshot</i> — unlabelled, it is genuinely ambiguous whether you are looking at a favourite performer or a favourite character. The label is not clutter here; it is the difference between two features.</td></tr>
+        <tr><td class="use">A per-user accent colour</td><td class="use"><b>Rejected</b></td><td class="use">Considered, and it is a nice touch — one profile ran green, another pink. But the foundations fix <b>cyan = interaction, gold = status and rating</b>, and a user-chosen accent either breaks that rule or is scoped so narrowly it stops being noticeable. Their banner is optional, so the accent is their personalisation lever; ours is a still from a film you watched, which is a stronger one.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note law"><b>The pattern in what was left behind.</b> Every one of them is load-bearing only when somebody else is looking. AL-chan is the reference for <b>how a tracker should feel</b> — generous with numbers, honest about what you dropped, never scolding you for a gap — and that is exactly what was taken. What was left is the part that needs an audience.</div>
+
+    <div class="note warn"><b>One thing they have that we cannot.</b> AL-chan ships real character portraits — <code>anilistcdn/character/large/b40-….png</code> for Luffy. TMDB has no character images at all, which is why §04 exists and why an animated title falls back to its poster. This is the single place the design is worse than the reference, and it is a data limit rather than a choice.</div>
+  </div>
+</section>
+
+<footer style="padding:var(--space-48) 0 var(--space-64)">
+  <div class="wrap">
+    <p style="font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 var(--space-8)">Projector · profile · designed on the foundations</p>
+    <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0">
+      Every measurement on this page comes from <code>docs/foundations.html</code> — no new atoms were needed, which is the first real test the system has passed. Every TMDB claim was verified against a live response. §09 states what the design needs to exist; <b>how it is stored, and the infrastructure behind it, is the architecture agent's call</b>.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

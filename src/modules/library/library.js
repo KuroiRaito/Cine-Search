@@ -118,6 +118,38 @@ export async function upsert({
     }).then(unwrap);
 }
 
+/**
+ * Just the favourites, with enough catalogue to draw a card.
+ *
+ * Narrower than loadEntries() on purpose: a shelf needs four columns and a
+ * poster, and the profile has no business pulling episode maps and notes to
+ * render eight tiles.
+ */
+export async function loadFavourites() {
+    return supabase
+        .from('user_library')
+        .select(`
+            tmdb_id, media_type, favourite_order, added_at,
+            catalog_titles!inner ( title, release_date, poster_path )
+        `)
+        .eq('is_favourite', true)
+        .then(unwrap);
+}
+
+/**
+ * The person's own order for one shelf, as a list.
+ *
+ * A gap-based sequence (10, 20, 30…) written in one call: reordering is a
+ * property of the list, not of any row in it, so sending eight separate
+ * updates would be eight chances to leave the shelf half-sorted.
+ */
+export async function setFavouriteOrder(mediaType, ids) {
+    return supabase.rpc('library_favourite_order', {
+        p_media_type: mediaType,
+        p_ids: ids,
+    }).then(unwrap);
+}
+
 export async function remove(id, mediaType) {
     return supabase.rpc('library_remove', { p_tmdb_id: id, p_media_type: mediaType }).then(unwrap);
 }
@@ -143,7 +175,7 @@ export async function setEpisodes({ id, season, episodes, catalog }) {
 export async function loadAll() {
     return supabase
         .from('user_library')
-        .select('tmdb_id, media_type, status, rating, is_favourite, watched_episodes, rewatch_count, recommended_by, recommended_at, notes, added_at, started_at, completed_at, updated_at')
+        .select('tmdb_id, media_type, status, rating, is_favourite, favourite_order, watched_episodes, rewatch_count, recommended_by, recommended_at, notes, added_at, started_at, completed_at, updated_at')
         .order('updated_at', { ascending: false })
         .then(unwrap);
 }
@@ -153,8 +185,8 @@ export async function loadEntries() {
     return supabase
         .from('user_library')
         .select(`
-            tmdb_id, media_type, status, rating, is_favourite, watched_episodes,
-            added_at, updated_at, completed_at,
+            tmdb_id, media_type, status, rating, is_favourite, favourite_order,
+            watched_episodes, added_at, updated_at, completed_at,
             catalog_titles!inner ( title, release_date, poster_path, number_of_episodes, seasons )
         `)
         .order('updated_at', { ascending: false })

@@ -17,4 +17,5 @@ export {
     episodesWatched, runningOrder, isWatched, nextUnwatched, lastWatched, epLabel,
     rememberSeasonRuntime, totalsFromView, totalsAreFresh,
     personTotalsGet, personTotalsSet, creditsForPeople,
+    setFavouriteOrder, loadFavourites,
 } from './library.js';

@@ -200,6 +200,7 @@ const normalise = (r) => ({
     status: r.status,
     rating: r.rating,
     is_favourite: r.is_favourite,
+    favourite_order: r.favourite_order ?? null,
     watched_episodes: r.watched_episodes ?? {},
     rewatch_count: r.rewatch_count ?? 0,
     recommended_by: r.recommended_by ?? null,

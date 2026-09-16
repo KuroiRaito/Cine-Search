@@ -9,6 +9,8 @@ import { person as fetchPerson } from '../../shared/tmdb/endpoints.js';
 import { totalsFromView, totalsAreFresh, personTotalsSet } from '../library';
 import { profileStats, distribution, scoreSpread, formatDays, formatSpan, SCORE_FLOOR } from './stats.js';
 import Identity from './Identity.jsx';
+import { useFavourites, ShelfRail, FavouritesTab } from './Favourites.jsx';
+import { SHELVES } from './favourites.js';
 import './profile.css';
 
 /**
@@ -43,6 +45,8 @@ export default function You() {
     const { isSignedIn, authReady, profile } = useAuth();
     const lib = useLibrary();
     const [order, setOrder] = useState('count');
+    const [tab, setTab] = useState('Overview');
+    const fav = useFavourites();
 
     const { data, error, loading, retry } = useAsync(
         () => profileStats(),
@@ -128,6 +132,24 @@ export default function You() {
         <div className="page">
             <YouHead name={profile?.username} status={loading ? 'loading' : 'ready'} />
 
+            {/* One column of everything is a page nobody reaches the bottom
+                of. The banner, name and handle persist above the tabs. */}
+            <div className="ptabs" role="tablist" aria-label="Profile">
+                {['Overview', 'Favourites', 'Stats'].map((t) => (
+                    <button
+                        key={t} type="button" role="tab" aria-selected={tab === t}
+                        className={tab === t ? 'ptab on' : 'ptab'}
+                        onClick={() => setTab(t)}
+                    >{t}</button>
+                ))}
+                {/* Not a tab: the library is a screen the library module owns,
+                    and pretending otherwise would put two routes behind one
+                    control. */}
+                <Link className="ptab" to="/library">Library →</Link>
+            </div>
+
+            {tab === 'Overview' && (
+                <>
             {/* A film has a runtime and no episodes; a series has both. One
                 blended "titles" number hid which of the two you actually are. */}
             <MediumBlock
@@ -142,6 +164,21 @@ export default function You() {
 
             <ScoreSpread spread={data.spread} />
 
+                    {/* The first eight are the statement; the tab behind them
+                        is the whole collection. */}
+                    {SHELVES.map((sh) => (
+                        <ShelfRail
+                            key={sh.key} shelf={sh} cards={fav.shelves[sh.key] || []}
+                            onSeeAll={() => setTab('Favourites')}
+                        />
+                    ))}
+                </>
+            )}
+
+            {tab === 'Favourites' && <FavouritesTab shelves={fav.shelves} />}
+
+            {tab === 'Stats' && (
+                <>
             <div className="sect taste-head">
                 <div className="sect-h">
                     <span>Your taste · by {order}</span>
@@ -167,6 +204,8 @@ export default function You() {
                         total={filmographies[c.person_id]}
                     />
                 ))
+            )}
+                </>
             )}
         </div>
     );

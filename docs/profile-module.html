@@ -274,7 +274,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 .fpe .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
 /* a character card is a face plus the two things that disambiguate it */
 .fch{flex:0 0 auto;width:96px}
-.fch .face{width:96px;height:96px;border-radius:var(--radius-12);background:linear-gradient(140deg,var(--mar-7),var(--ink-4));
+.fch .face{width:96px;aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(140deg,var(--mar-7),var(--ink-4));
   border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
 .fch .face .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
   background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;
@@ -445,6 +445,16 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 
     <div class="note law"><b>Eight, and the cap is the feature.</b> A favourites shelf with no limit becomes a second watchlist, and then it says nothing. Eight is two full rows on a phone rail and forces a choice. When the ninth is added, the sheet asks which one it replaces — it does not silently refuse, and it does not silently drop the oldest.</div>
 
+    <h4>The Favourites tab needs sub-navigation, and that is a measurement</h4>
+    <p>AL-chan's favourites tab is one uncapped grid per kind, stacked. On a 430&times;900 phone, a well-filled profile measured:</p>
+    <pre>document height   <b>21,624px</b>   =  <b>24 screens</b> of scroll
+  anime       y=    298   screen  0.3
+  manga       y=  6,111   screen  6.8
+  <b>characters  y= 10,525   screen 11.7</b>
+  staff       y= 19,418   screen 21.6</pre>
+    <div class="note law"><b>Characters is the shelf people fill most, and it is eleven screens down.</b> Across every profile sampled, <code>characters</code> was at the API's page cap while <code>studios</code> sat between 0 and 11 — characters are the emotional centre of one of these pages, and the layout buries them. One profile's bio literally reads &ldquo;click favourites tabs for full favourite list&rdquo;, which is a person working around their own profile.
+    <br><br>So: the Favourites tab opens on a <b>chip row</b> — Films · Series · People · Characters · Studios, each with its count — and shows one grid at a time. Every shelf is one tap from the top of the page instead of up to twenty-one screens of scrolling. Same content, same generosity, no burial.</div>
+
     <h4>Ordering</h4>
     <p>Favourites are <b>ordered by the person, not by rating or recency</b> — the first film on the shelf is a statement. Drag to reorder on touch; on a pointer, the same handle plus <kbd>↑</kbd>/<kbd>↓</kbd> keyboard support. Order is stored as an integer; a gap-based sequence (10, 20, 30) so a reorder is one row's update rather than eight.</p>
   </div>
@@ -460,7 +470,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     <div class="tbl-wrap"><table>
       <thead><tr><th>Line</th><th>Shows</th><th>Type</th><th>Why there</th></tr></thead>
       <tbody>
-        <tr><td class="num">Face</td><td class="use">96&times;96, <code>--radius-12</code></td><td class="num">—</td><td class="use">Square, not round: a round face is a <i>person</i> in this system, and a character is not a person.</td></tr>
+        <tr><td class="num">Face</td><td class="use"><b>2:3 portrait</b>, <code>--radius-8</code></td><td class="num">—</td><td class="use"><b>Revised after looking.</b> TMDB profile images are natively 2:3, so a portrait card crops nothing — and AL-chan draws character cards at the same aspect as its posters, which is what keeps a favourites grid reading as one system. A round face means <i>person</i> here; a character is not a person.</td></tr>
         <tr><td class="num">Overlay</td><td class="use">Actor's name, bottom of the face</td><td class="num">--f-m 9px on a scrim</td><td class="use">The face is the actor's, so the face should say so. Removes the lie rather than hiding it.</td></tr>
         <tr><td class="num">Primary</td><td class="use">Character name</td><td class="num">--text-caption 600</td><td class="use">The thing being favourited.</td></tr>
         <tr><td class="num">Secondary</td><td class="use">Title</td><td class="num">--f-m 9px</td><td class="use">&ldquo;Levi&rdquo; is meaningless without it, and two shows can share a character name.</td></tr>
@@ -734,6 +744,16 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="num">Activity feed with likes</td><td class="use">Layer 4. A feed with one person in it is a log, and the library already is one.</td></tr>
         <tr><td class="num">Social tab, reviews tab</td><td class="use">Layers 3 and 4, parked. §10 D1.</td></tr>
         <tr><td class="num">Voice actors as a ranking</td><td class="use">Meaningful in anime, where one actor carries a hundred roles. In film the actor <i>is</i> the person ranking — there is nothing to separate.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4>Two places the design deliberately diverges</h4>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Theirs</th><th>Ours</th><th>Because</th></tr></thead>
+      <tbody>
+        <tr><td class="use">Avatar is a rounded square</td><td class="use"><b>Round</b></td><td class="use">Their avatars are usually character art, where a squircle reads as a picture frame. Ours is a photograph of a person, and round already means <i>person</i> throughout this system — the cast rail, the people shelf, <code>.circ</code>. Changing it here would break a language that is already consistent.</td></tr>
+        <tr><td class="use">Character cards are pure art, <b>no text at rest</b></td><td class="use"><b>Always labelled</b></td><td class="use">Theirs works because the art is the character and fans know the face. Ours is an <i>actor's headshot</i> — unlabelled, it is genuinely ambiguous whether you are looking at a favourite performer or a favourite character. The label is not clutter here; it is the difference between two features.</td></tr>
+        <tr><td class="use">A per-user accent colour</td><td class="use"><b>Rejected</b></td><td class="use">Considered, and it is a nice touch — one profile ran green, another pink. But the foundations fix <b>cyan = interaction, gold = status and rating</b>, and a user-chosen accent either breaks that rule or is scoped so narrowly it stops being noticeable. Their banner is optional, so the accent is their personalisation lever; ours is a still from a film you watched, which is a stronger one.</td></tr>
       </tbody>
     </table></div>
 

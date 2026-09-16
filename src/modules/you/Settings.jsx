@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { useNavigate } from 'react-router-dom';
+import { AccountCard } from '../entry';
 import { useRegion } from '../../shared/hooks/useRegion.js';
 import { activeTheme, applyTheme } from '../../shared/theme/theme.js';
 import './you.css';
@@ -11,10 +11,8 @@ import './you.css';
  */
 export default function Settings() {
     const navigate = useNavigate();
-    const { user, profile, signOut, isSignedIn, authReady } = useAuth();
     const { region, setRegion } = useRegion();
     const [theme, setTheme] = useState(activeTheme);
-    const [confirming, setConfirming] = useState(false);
 
     const flip = (next) => { applyTheme(next); setTheme(next); };
 
@@ -71,47 +69,9 @@ export default function Settings() {
             </div>
 
             {/* Theme and region are as useful to a guest as to anyone — they are
-                about this browser, not this account. Everything below is not. */}
-            {authReady && !isSignedIn && (
-                <div className="setblock">
-                    <div className="setlabel">Account</div>
-                    <p className="hint">
-                        You&apos;re browsing without one. An account keeps your watchlist,
-                        ratings and episode progress.
-                    </p>
-                    <Link className="btn" to="/welcome/signup" state={{ from: '/settings' }}>Create an account</Link>
-                </div>
-            )}
-
-            {authReady && isSignedIn && (
-            <div className="setblock">
-                <div className="setlabel">Account</div>
-                <div className="setrow"><span>Username</span><b>{profile?.username || '—'}</b></div>
-                <div className="setrow"><span>Email</span><b>{user?.email}</b></div>
-            </div>
-            )}
-
-            {authReady && isSignedIn && (
-            <div className="setblock">
-                {confirming ? (
-                    <>
-                        <p className="del-confirm">
-                            Your library stays exactly as it is — you&apos;ll just need to sign in again to see it.
-                        </p>
-                        <div className="del-row">
-                            <button type="button" className="btn quiet" onClick={() => setConfirming(false)}>Stay signed in</button>
-                            <button
-                                type="button"
-                                className="del"
-                                onClick={async () => { await signOut(); navigate('/', { replace: true }); }}
-                            >Sign out</button>
-                        </div>
-                    </>
-                ) : (
-                    <button type="button" className="del" onClick={() => setConfirming(true)}>Sign out</button>
-                )}
-            </div>
-            )}
+                about this browser, not this account. Everything below is not,
+                and belongs to the module that owns sessions. */}
+            <AccountCard from="/settings" />
         </div>
     );
 }

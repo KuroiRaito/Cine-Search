@@ -67,6 +67,15 @@
 }
 .dismiss:hover { color: var(--text); }
 
+/* ---------------- account ---------------- */
+
+/* The sign-out control sits apart from the rows above it: it is the one thing
+   on the block that changes something rather than reporting it. */
+.acct-out { margin-top: var(--space-16); }
+/* Holds the block's height while the session question is still being answered,
+   so the screen does not jump when the answer lands. */
+.acct-wait { height: var(--space-64); }
+
 /* ---------------- cover ---------------- */
 
 /* The artwork is the pitch: a full-bleed mosaic of real posters, turned off

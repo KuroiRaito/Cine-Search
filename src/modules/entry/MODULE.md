@@ -8,11 +8,15 @@ criteria M1 §1.2 and M2 part one.
 ## Public surface
 
 ```js
-import { Cover, Auth, SignInPrompt } from '../modules/entry';
+import { Cover, Auth, SignInPrompt, AccountCard } from '../modules/entry';
 ```
 
 `SignInPrompt` is the piece other modules use: every control a guest can reach
 raises it, naming the title and the verb of the control that was tapped.
+
+`AccountCard` is the account surface — the signed-in identity and the way out,
+or the invitation if there isn't one. It answers all three session states
+itself, so a screen that carries it never has to.
 
 `Auth` is one component over five steps — `/welcome/signin`, `/welcome/signup`,
 `/welcome/forgot`, `/welcome/reset`, `/welcome/username` — because they are not
@@ -45,6 +49,12 @@ already have.
 
 ## Rules it carries
 
+- **Signing out belongs here.** `AccountCard` is the visible other end of
+  signing in: who you are, and how to stop being. Settings renders it; the
+  module owns it. Splitting the two ends across modules is how the product
+  ended up with a session you could start and not finish.
+
+
 - The cover greets a first visit to the front door only. A shared link to a
   title or a person goes straight there; the catalogue is never gated.
 - "Just looking around" is remembered, and never asked again.
@@ -65,14 +75,17 @@ already have.
 
 ## Every state, and how to look at one
 
-`docs/foundations.html` §12 numbers 38 states across four screens. 35 of them
-are driven by `npm run auth`, which runs the real app against Supabase
+`docs/foundations.html` §12 numbers 38 states across four screens. All but
+three are driven by `npm run auth`, which runs the real app against Supabase
 responses recorded off this project — no credentials, no network, no test
-accounts left behind.
+accounts left behind. The harness carries a few more cases than the document
+carries states, because some things worth checking are walks rather than
+states: reaching sign-out by clicking only what is on screen, for one.
 
 ```bash
-npm run auth              # 35 cases
+npm run auth              # every case, at phone width
 npm run auth -- --shots   # and a screenshot of each, to snapshots/auth/
+npm run auth -- --w=320   # or any width; 320 is the floor
 npm run auth -- 26 29     # just those
 ```
 
@@ -107,7 +120,7 @@ Three of the 38 are not machine-checked, and each has a reason:
 ## Seeing it
 
 ```bash
-npm run auth                     # 35 cases: every way this can go wrong
+npm run auth                     # every way this can go wrong
 npm run auth -- --shots          # and a photograph of each state
 npm run auth -- --show 15        # what case 15 actually rendered
 npm run snap -- entry            # cover / signin / signup / forgot, both themes

@@ -1,7 +1,7 @@
 -- ============================================================
 -- Retire taste_summary().
--- NOT YET APPLIED. Run this AFTER the profile-stats PR is merged
--- and deployed — not before.
+-- APPLIED to project unmzchgflrnppjwafmus on 2026-09-17
+-- via migration: retire_taste_summary
 -- ============================================================
 --
 -- 007 deliberately left this in place: a migration lands before the code that

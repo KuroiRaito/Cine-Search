@@ -539,7 +539,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 <!-- ============================== 03 FAVOURITES ============================== -->
 <section id="favourites">
   <div class="wrap">
-    <div class="shead"><span class="snum">03</span><h2>Five shelves</h2></div>
+    <div class="shead"><span class="snum">03</span><h2>Five shelves, four of them built</h2></div>
     <p>AL-chan carries five: anime, manga, characters, staff and studios. The film-and-TV translation is not one-to-one — <b>manga has no counterpart, so films and series take the two title shelves</b> — but studios translate directly, and that shelf was missing from the first draft of this page.</p>
     <div class="tbl-wrap"><table>
       <thead><tr><th>Shelf</th><th>Card</th><th>Stored as</th><th>On Overview</th><th>Source</th></tr></thead>
@@ -548,7 +548,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="num">Series</td><td class="use">Poster 2:3, title, year</td><td class="tok">tmdb_id + 'tv'</td><td class="num">first 8</td><td class="use">Same column, different media_type</td></tr>
         <tr><td class="num">People</td><td class="use">Round face, name, the role you know them for</td><td class="tok">person_id</td><td class="num">first 8</td><td class="use">New. Actors and crew share one shelf.</td></tr>
         <tr><td class="num">Characters</td><td class="use">Square face, character, title, actor</td><td class="tok">credit_id</td><td class="num">first 8</td><td class="use">New. §04.</td></tr>
-        <tr><td class="num"><b>Studios</b></td><td class="use">Wordmark on a plate, title count</td><td class="tok">company_id</td><td class="num">first 8</td><td class="use"><b>Added after the benchmark.</b> AL-chan has a studios shelf and it is the one shelf I had missed — A24, Ghibli and Blumhouse are as much a reason to watch something as a director. TMDB <code>production_companies</code>.</td></tr>
+        <tr><td class="num"><b>Studios</b> <i>(v2)</i></td><td class="use">Wordmark on a plate, title count</td><td class="tok">company_id</td><td class="num">first 8</td><td class="use"><b>Designed, not built.</b> <b>Added after the benchmark.</b> AL-chan has a studios shelf and it is the one shelf I had missed — A24, Ghibli and Blumhouse are as much a reason to watch something as a director. TMDB <code>production_companies</code>.</td></tr>
       </tbody>
     </table></div>
 
@@ -556,6 +556,14 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 
     <div class="note law"><b>Eight is a display rule, not a limit.</b> Overview previews the first eight of a shelf; the Favourites tab shows the whole thing, uncapped. The benchmark settled this — the accounts sampled carried roughly twenty-five favourites each, on a grid of their own.
     <br><br>So <b>nothing ever refuses a ninth favourite</b>, and there is no &ldquo;which one does this replace?&rdquo; sheet. The constraint that makes a shelf mean something is doing its work on the Overview rail, where the first eight are the statement; the tab behind it is the full collection.</div>
+
+    <div class="note warn"><b>Studios is designed and deliberately not built in v1.</b>
+    A studio card has nowhere to go: there is no company page, and no module owns
+    one — so the shelf would be four cards that do not respond to a tap. It stays
+    drawn here in full so v2 does not have to rediscover it, and it is absent
+    from the chip row above, from <code>SHELVES</code> in
+    <code>src/modules/profile/favourites.js</code>, and from the proxy allowlist
+    (<code>/company/{id}</code> is not permitted). Raman's ruling, 2026-09-16.</div>
 
     <h4>The Favourites tab needs sub-navigation, and that is a measurement</h4>
     <p>AL-chan's favourites tab is one uncapped grid per kind, stacked. On a 430&times;900 phone, a well-filled profile measured:</p>
@@ -565,7 +573,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
   <b>characters  y= 10,525   screen 11.7</b>
   staff       y= 19,418   screen 21.6</pre>
     <div class="note law"><b>Characters is the shelf people fill most, and it is eleven screens down.</b> Across every profile sampled, <code>characters</code> was at the API's page cap while <code>studios</code> sat between 0 and 11 — characters are the emotional centre of one of these pages, and the layout buries them. One profile's bio literally reads &ldquo;click favourites tabs for full favourite list&rdquo;, which is a person working around their own profile.
-    <br><br>So: the Favourites tab opens on a <b>chip row</b> — Films · Series · People · Characters · Studios, each with its count — and shows one grid at a time. Every shelf is one tap from the top of the page instead of up to twenty-one screens of scrolling. Same content, same generosity, no burial.</div>
+    <br><br>So: the Favourites tab opens on a <b>chip row</b> — Films · Series · People · Characters, each with its count — and shows one grid at a time. Every shelf is one tap from the top of the page instead of up to twenty-one screens of scrolling. Same content, same generosity, no burial.</div>
 
     <h4>Ordering</h4>
     <p>Favourites are <b>ordered by the person, not by rating or recency</b> — the first film on the shelf is a statement. Drag to reorder on touch; on a pointer, the same handle plus <kbd><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7" /> <path d="M12 19V5" /></svg></kbd>/<kbd><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14" /> <path d="m19 12-7 7-7-7" /></svg></kbd> keyboard support. Order is stored as an integer; a gap-based sequence (10, 20, 30) so a reorder is one row's update rather than eight.</p>
@@ -1542,7 +1550,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="num">Tabs</td><td class="use">One long scroll</td><td class="use">Overview · Favourites · Stats · Library</td></tr>
         <tr><td class="num">Distribution bar</td><td class="use">Absent</td><td class="use">A stacked bar per medium, in the six watch-state hues the foundations already define</td></tr>
         <tr><td class="num">Per-medium stats</td><td class="use">One blended 4-tile strip</td><td class="use">Films and series get separate blocks — a film has no episodes</td></tr>
-        <tr><td class="num">Studios shelf</td><td class="use">Four shelves</td><td class="use">Five. A24 and Ghibli are as much a reason to watch as a director.</td></tr>
+        <tr><td class="num">Studios shelf</td><td class="use">Four shelves</td><td class="use">Five in the design, four built — A24 and Ghibli are as much a reason to watch as a director, but the card needs a company page that does not exist. v2.</td></tr>
         <tr><td class="num">Name on the banner</td><td class="use">Name below it</td><td class="use">On the artwork, which makes the banner a nameplate instead of decoration</td></tr>
         <tr><td class="num">Three new dimensions</td><td class="use">Genre, decade, people</td><td class="use">Plus watch year, country and score spread</td></tr>
       </tbody>

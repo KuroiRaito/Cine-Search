@@ -1,6 +1,7 @@
 -- ============================================================
 -- Entry module — two gaps in how a username is claimed.
--- NOT YET APPLIED. Run this in the Supabase SQL editor.
+-- APPLIED to project unmzchgflrnppjwafmus on 2026-09-17
+-- via migration: username_case_insensitive
 -- Safe to re-run.
 -- ============================================================
 

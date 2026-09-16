@@ -24,8 +24,8 @@ Landing in order, one PR each:
 | --- | --- | --- |
 | 1 | Stats | done — two medium blocks, distribution bars, score spread |
 | 2 | **Identity** | done — banner, avatar, bio, display name, edit sheet, banner picker |
-| 3 | Favourites | order column, favourites table, shelves, chip row |
-| 4 | Characters | the picker, `credit_id`, `/credit/{id}` in the proxy allowlist |
+| 3 | **Favourites** | done — order column, tab shell, chip row, films and series shelves |
+| 4 | People & characters | both shelves, the picker, `credit_id`, `/credit/{id}` in the proxy allowlist |
 
 The directory was renamed with step 2. The route stays `/you` and the tab still
 reads **You**, because that is what your own profile is called from the inside.
@@ -46,6 +46,23 @@ Two things in there are less obvious than they look. `firstGrapheme` uses
 must not render as half of itself. And `colourClass` maps a key to a whole
 class name instead of interpolating one: `bg-${key}` builds a name no tool can
 see, and `npm run verify` reads it as a class called `bg-`.
+
+`favourites.js` — which shelves exist, the order rule, and the pure `moved()`
+that a reorder is expressed as.
+
+**Eight is a display rule, not a limit.** Overview previews the first eight of
+a shelf; the Favourites tab shows the whole thing. Nothing refuses a ninth
+favourite and there is no "which one does this replace?" sheet — the
+constraint does its work on the rail, where the first eight are the statement.
+
+**Two shelves, not four.** Films and series are the two whose ♥ already exists
+on a title page. People and characters need a picker they do not have yet, so
+they arrive together with it — a chip that opens an empty grid you cannot fill
+is worse than a chip that is not there.
+
+**The Library tab is a link, not a tab.** It goes to the screen the library
+module owns. Putting two routes behind one control would make the back button
+mean two different things.
 
 **Uploads are not built.** The design draws them; §06 recommends the
 catalogue-first route partly because it needs no Storage bucket, and none

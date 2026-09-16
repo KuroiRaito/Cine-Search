@@ -94,11 +94,11 @@ async function install(ctx, o) {
     // Registered before the specific one: Playwright matches the most recently
     // added route first.
     await ctx.route('**/rest/v1/**', (r) => json(r, 200, '[]'));
-    // The shape taste_summary() really returns for an account with nothing
+    // The shape profile_stats() really returns for an account with nothing
     // watched — always an object, never an empty list. Mocking it as `[]` is
     // what the catch-all below would do, and that is not what the database
-    // does.
-    await ctx.route('**/rest/v1/rpc/taste_summary**', (r) => json(r, 200, o.taste || {
+    // does. (taste_summary() was retired in migration 008.)
+    await ctx.route('**/rest/v1/rpc/profile_stats**', (r) => json(r, 200, o.taste || {
         totals: { titles: 0, episodes: 0, minutes: 0, partial: false },
         genres: [], decades: [], people: [],
     }));

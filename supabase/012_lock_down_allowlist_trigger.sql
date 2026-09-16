@@ -1,0 +1,21 @@
+-- ============================================================
+-- enforce_auth_allowlist() is a trigger, not an endpoint.
+-- APPLIED to project unmzchgflrnppjwafmus on 2026-09-17
+-- via migration: lock_down_allowlist_trigger
+--
+-- This file is the record of what was applied. Safe to re-run.
+-- ============================================================
+--
+-- Found by Supabase's own security advisor: the function was reachable at
+-- /rest/v1/rpc/enforce_auth_allowlist by both anon and authenticated. Postgres
+-- grants EXECUTE to PUBLIC on creation and 004 never revoked it.
+--
+-- Calling it outside a trigger errors rather than leaking anything — `new` does
+-- not exist there — but an endpoint that exists is an endpoint that can be
+-- probed, and this one names the gate that keeps sign-ups invitation-only.
+--
+-- The trigger is unaffected: it runs as the table owner and does not consult
+-- these grants. Verified after applying — an uninvited sign-up is still
+-- refused with "Database error saving new user".
+
+revoke all on function public.enforce_auth_allowlist() from public, anon, authenticated;

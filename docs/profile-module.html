@@ -489,37 +489,10 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       </div></div>
     </div>
 
-    <div class="phone">
-      <div class="phone-cap"><b>P2</b> overview · brand-new account</div>
-      <div class="screen"><div class="scroll">
-        <div class="pbanner tall empty"><span class="ecap">no banner</span><button class="bedit">Add</button>
-          <div class="pname-on-banner" style="color:var(--text)">raman</div></div>
-        <div class="pav-row">
-          <div class="pav-sm empty">R</div>
-          <div style="min-width:0">
-            <div class="phandle">@raman · joined today</div>
-            <p class="pbio ph" style="margin-top:var(--space-4)">Say something about what you watch.</p>
-          </div>
-        </div>
-        <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
-        <div class="sblock">
-          <div class="sblock-h"><b>Films</b><span></span></div>
-          <div class="snums">
-            <div class="snum-i"><dt>Watched</dt><dd style="color:var(--faint)">0</dd></div>
-            <div class="snum-i"><dt>Days</dt><dd style="color:var(--faint)">0</dd></div>
-            <div class="snum-i"><dt>Mean</dt><dd style="color:var(--faint)">—</dd></div>
-          </div>
-          <div class="dbar"><i style="width:100%;background:var(--surface-hv)"></i></div>
-        </div>
-        <div class="empty-shelf" style="margin-top:var(--space-16)">
-          <p><b style="color:var(--text)">Your profile fills itself in.</b><br>Mark something a favourite and it appears here. Nothing to set up.</p>
-          <button>Find something to watch</button>
-        </div>
-      </div></div>
-    </div>
+
 
     <div class="phone">
-      <div class="phone-cap"><b>P3</b> overview · loading</div>
+      <div class="phone-cap"><b>P2</b> overview · loading</div>
       <div class="screen"><div class="scroll">
         <div class="pbanner tall" style="background:var(--surface-hv)"></div>
         <div class="pav-row">
@@ -555,7 +528,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <tr><td class="num">Banner</td><td class="num">3:1, full bleed</td><td class="num">4:1, container width, --radius-16</td><td class="use">Taller than 3:1 on a phone eats the fold; wider than 4:1 on desktop becomes a letterbox.</td></tr>
       <tr><td class="num">Avatar</td><td class="num">64px, overlaps by 32</td><td class="num">96px, overlaps by 48</td><td class="use">--radius-full, 3px --bg ring. The ring is what separates it from the banner in both themes.</td></tr>
       <tr><td class="num">Identity</td><td class="num">stacked</td><td class="num">stacked, beside the avatar</td><td class="use">Display name --text-title; handle and join date --text-caption in mono.</td></tr>
-      <tr><td class="num">Bio</td><td class="num">full width</td><td class="num">capped at --measure</td><td class="use">Four lines then &ldquo;more&rdquo;. 280 characters stored.</td></tr>
+      <tr><td class="num">Bio</td><td class="num">full width</td><td class="num">capped at --measure</td><td class="use">Four lines then &ldquo;more&rdquo;. <b>1,000 characters</b> stored.</td></tr>
       <tr><td class="num">Stats</td><td class="num">4 across</td><td class="num">4 across, wider</td><td class="use">Never wraps to two rows — a 2&times;2 stat block reads as a dashboard.</td></tr>
       <tr><td class="num">Shelves</td><td class="num">rails, scroll</td><td class="num">rails, more visible</td><td class="use">Never a whole number of tiles. The same rule as everywhere else.</td></tr>
     </tbody>
@@ -569,19 +542,20 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     <div class="shead"><span class="snum">03</span><h2>Five shelves</h2></div>
     <p>AL-chan carries five: anime, manga, characters, staff and studios. The film-and-TV translation is not one-to-one — <b>manga has no counterpart, so films and series take the two title shelves</b> — but studios translate directly, and that shelf was missing from the first draft of this page.</p>
     <div class="tbl-wrap"><table>
-      <thead><tr><th>Shelf</th><th>Card</th><th>Stored as</th><th>Cap</th><th>Source</th></tr></thead>
+      <thead><tr><th>Shelf</th><th>Card</th><th>Stored as</th><th>On Overview</th><th>Source</th></tr></thead>
       <tbody>
-        <tr><td class="num">Films</td><td class="use">Poster 2:3, title, year</td><td class="tok">tmdb_id + 'movie'</td><td class="num">8</td><td class="use"><code>user_library.is_favourite</code> — already exists</td></tr>
-        <tr><td class="num">Series</td><td class="use">Poster 2:3, title, year</td><td class="tok">tmdb_id + 'tv'</td><td class="num">8</td><td class="use">Same column, different media_type</td></tr>
-        <tr><td class="num">People</td><td class="use">Round face, name, the role you know them for</td><td class="tok">person_id</td><td class="num">8</td><td class="use">New. Actors and crew share one shelf.</td></tr>
-        <tr><td class="num">Characters</td><td class="use">Square face, character, title, actor</td><td class="tok">credit_id</td><td class="num">8</td><td class="use">New. §04.</td></tr>
-        <tr><td class="num"><b>Studios</b></td><td class="use">Wordmark on a plate, title count</td><td class="tok">company_id</td><td class="num">8</td><td class="use"><b>Added after the benchmark.</b> AL-chan has a studios shelf and it is the one shelf I had missed — A24, Ghibli and Blumhouse are as much a reason to watch something as a director. TMDB <code>production_companies</code>.</td></tr>
+        <tr><td class="num">Films</td><td class="use">Poster 2:3, title, year</td><td class="tok">tmdb_id + 'movie'</td><td class="num">first 8</td><td class="use"><code>user_library.is_favourite</code> — already exists</td></tr>
+        <tr><td class="num">Series</td><td class="use">Poster 2:3, title, year</td><td class="tok">tmdb_id + 'tv'</td><td class="num">first 8</td><td class="use">Same column, different media_type</td></tr>
+        <tr><td class="num">People</td><td class="use">Round face, name, the role you know them for</td><td class="tok">person_id</td><td class="num">first 8</td><td class="use">New. Actors and crew share one shelf.</td></tr>
+        <tr><td class="num">Characters</td><td class="use">Square face, character, title, actor</td><td class="tok">credit_id</td><td class="num">first 8</td><td class="use">New. §04.</td></tr>
+        <tr><td class="num"><b>Studios</b></td><td class="use">Wordmark on a plate, title count</td><td class="tok">company_id</td><td class="num">first 8</td><td class="use"><b>Added after the benchmark.</b> AL-chan has a studios shelf and it is the one shelf I had missed — A24, Ghibli and Blumhouse are as much a reason to watch something as a director. TMDB <code>production_companies</code>.</td></tr>
       </tbody>
     </table></div>
 
     <div class="note warn"><b>Films and series are separate shelves; actors and directors are not.</b> The split that matters in this product is the one that already runs through it — a film is finished, a series is in progress, and they carry different status vocabularies. A cinematographer and a lead actor are both just <i>people whose work you follow</i>, and forcing them apart would mean deciding what to do with someone who is both.</div>
 
-    <div class="note law"><b>Eight, and the cap is the feature.</b> A favourites shelf with no limit becomes a second watchlist, and then it says nothing. Eight is two full rows on a phone rail and forces a choice. When the ninth is added, the sheet asks which one it replaces — it does not silently refuse, and it does not silently drop the oldest.</div>
+    <div class="note law"><b>Eight is a display rule, not a limit.</b> Overview previews the first eight of a shelf; the Favourites tab shows the whole thing, uncapped. The benchmark settled this — the accounts sampled carried roughly twenty-five favourites each, on a grid of their own.
+    <br><br>So <b>nothing ever refuses a ninth favourite</b>, and there is no &ldquo;which one does this replace?&rdquo; sheet. The constraint that makes a shelf mean something is doing its work on the Overview rail, where the first eight are the statement; the tab behind it is the full collection.</div>
 
     <h4>The Favourites tab needs sub-navigation, and that is a measurement</h4>
     <p>AL-chan's favourites tab is one uncapped grid per kind, stacked. On a 430&times;900 phone, a well-filled profile measured:</p>
@@ -782,7 +756,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     <h4>The three tabs that carry new work</h4>
     <div class="phones">
       <div class="phone">
-        <div class="phone-cap"><b>P4</b> stats tab</div>
+        <div class="phone-cap"><b>T1</b> stats tab</div>
         <div class="screen"><div class="scroll">
           <div class="ptabs" style="margin-top:0"><button>Overview</button><button>Favourites</button><button class="on">Stats</button><button>Library</button></div>
           <div class="sblock">
@@ -811,7 +785,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       </div>
 
       <div class="phone">
-        <div class="phone-cap"><b>P5</b> favourites · chip row</div>
+        <div class="phone-cap"><b>F1</b> favourites · chip row</div>
         <div class="screen"><div class="scroll">
           <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
           <div class="chips">
@@ -832,7 +806,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       </div>
 
       <div class="phone">
-        <div class="phone-cap"><b>P6</b> favourites · characters</div>
+        <div class="phone-cap"><b>F2</b> favourites · characters</div>
         <div class="screen"><div class="scroll">
           <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
           <div class="chips">
@@ -858,7 +832,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     <h4>Editing, and the states that only appear when something goes wrong</h4>
     <div class="phones">
       <div class="phone">
-        <div class="phone-cap"><b>P7</b> edit identity</div>
+        <div class="phone-cap"><b>E1</b> edit identity</div>
         <div class="screen"><div class="scroll" style="filter:brightness(.5)">
           <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
           <div class="pav-row"><div class="pav-sm">R</div><div class="phandle">@raman</div></div>
@@ -876,7 +850,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       </div>
 
       <div class="phone">
-        <div class="phone-cap"><b>P8</b> choose a banner</div>
+        <div class="phone-cap"><b>E5</b> choose a banner</div>
         <div class="screen"><div class="scroll" style="filter:brightness(.5)">
           <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
         </div>
@@ -897,30 +871,10 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         </div>
       </div>
 
-      <div class="phone">
-        <div class="phone-cap"><b>P9</b> shelf full · E7</div>
-        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
-          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
-        </div>
-        <div class="sheetwrap"><div class="sheet">
-          <div class="grab"></div>
-          <h3 class="sh-t">Your films shelf is full</h3>
-          <p class="sh-b">Which one does <b style="color:var(--text)">Arrival</b> replace?</p>
-          <div class="fgrid" style="padding:0;grid-template-columns:repeat(4,1fr)">
-            <div class="cell"><div class="art"></div></div>
-            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4));box-shadow:inset 0 0 0 var(--border-focus) var(--acc)"></div></div>
-            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"></div></div>
-            <div class="cell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"></div></div>
-          </div>
-          <div style="display:flex;gap:var(--space-8);margin-top:var(--space-16)">
-            <button class="btn q">Cancel</button><button class="btn">Replace</button>
-          </div>
-        </div></div>
-        </div>
-      </div>
+
 
       <div class="phone">
-        <div class="phone-cap"><b>P10</b> stats failed · profile fine</div>
+        <div class="phone-cap"><b>P4</b> stats failed · profile fine</div>
         <div class="screen"><div class="scroll">
           <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
           <div class="pav-row"><div class="pav-sm">R</div><div class="phandle">@raman · joined Mar 2026</div></div>
@@ -942,7 +896,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       </div>
 
       <div class="phone">
-        <div class="phone-cap"><b>P11</b> guest reaches a profile control</div>
+        <div class="phone-cap"><b>G1</b> guest reaches a profile control</div>
         <div class="screen"><div class="scroll" style="filter:brightness(.5)">
           <div class="pbanner tall empty"><span class="ecap">no banner</span></div>
           <div class="pav-row"><div class="pav-sm empty">?</div></div>
@@ -961,49 +915,200 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       </div>
     </div>
 
+    <h4>Cases found in review, 2026-09-16</h4>
+    <p>Six states the first draft did not cover. Each was a real hole, not a variant of something already drawn.</p>
+    <div class="phones">
+
+      <div class="phone">
+        <div class="phone-cap"><b>P3</b> session restoring</div>
+        <div class="screen"><div class="scroll">
+          <div class="pbanner tall" style="background:var(--surface-hv)"></div>
+          <div class="pav-row">
+            <div class="pav-sm skel" style="background:var(--surface-hv);color:transparent">.</div>
+            <div style="min-width:0;flex:1">
+              <div class="skel" style="height:var(--space-12);width:55%;margin-bottom:var(--space-8)"></div>
+              <div class="skel" style="height:var(--space-8);width:80%"></div>
+            </div>
+          </div>
+          <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="sblock">
+            <div class="sblock-h"><b>Films</b><span></span></div>
+            <div class="snums">
+              <div class="snum-i"><dt>Watched</dt><dd><span class="skel" style="display:block;width:var(--space-32);height:var(--space-16)"></span></dd></div>
+              <div class="snum-i"><dt>Days</dt><dd><span class="skel" style="display:block;width:var(--space-32);height:var(--space-16)"></span></dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd><span class="skel" style="display:block;width:var(--space-24);height:var(--space-16)"></span></dd></div>
+            </div>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">No invitation, no sign-in prompt, no zeroes — we do not yet know who this is.</p>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>E3</b> bio over the limit</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">Edit profile</h3>
+          <label class="fld"><span>Bio</span>
+            <div class="inp ta" style="box-shadow:inset 0 0 0 var(--border-focus) var(--st-drop-9)">Watching my way through Villeneuve. Sci-fi, slow burns, anything shot by Roger Deakins, and a standing weakness for any film where someone stares meaningfully at a horizon for slightly too long…</div>
+            <span class="cnt" style="color:var(--st-drop-11);font-weight:600">1,043 / 1,000</span></label>
+          <p style="font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--st-drop-11);margin:0 0 var(--space-12)">43 characters over. Trim it to save.</p>
+          <button class="btn" disabled style="opacity:.55;cursor:not-allowed">Save</button>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>E4</b> saving failed</div>
+        <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+        </div>
+        <div class="sheetwrap"><div class="sheet">
+          <div class="grab"></div>
+          <h3 class="sh-t">Edit profile</h3>
+          <label class="fld"><span>Display name</span><div class="inp">Raman</div></label>
+          <label class="fld"><span>Bio</span><div class="inp ta">Watching my way through Villeneuve.</div><span class="cnt">35 / 1,000</span></label>
+          <div style="display:flex;gap:var(--space-12);align-items:flex-start;background:var(--st-drop-3);border-radius:var(--radius-8);padding:var(--space-12) var(--space-16);margin-bottom:var(--space-12)">
+            <span style="flex:0 0 auto;width:var(--icon-20);height:var(--icon-20);border-radius:var(--radius-full);background:var(--st-drop-9);color:#fff;display:grid;place-items:center;font-size:var(--text-caption);font-weight:700">!</span>
+            <span style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--st-drop-11)">Couldn&rsquo;t save. Check your connection and try again.</span>
+          </div>
+          <button class="btn">Try again</button>
+        </div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>F3</b> a favourite that left TMDB</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="chips">
+            <button class="chip">Films <em>8</em></button><button class="chip">People <em>6</em></button>
+            <button class="chip on">Characters <em>14</em></button>
+          </div>
+          <div class="fgrid">
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"><div class="tag">Bryan Cranston</div></div><div class="nm">Walter White</div><div class="sub">Breaking Bad</div></div>
+            <div class="cell">
+              <div class="art" style="background:linear-gradient(150deg,var(--ink-5),var(--ink-3))">
+                <div class="tag" style="background:linear-gradient(to top,rgba(4,6,12,.9),transparent)">no longer listed</div>
+              </div>
+              <div class="nm">Gus Fring</div><div class="sub">Breaking Bad</div>
+            </div>
+            <div class="cell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"><div class="tag">R. Ferguson</div></div><div class="nm">Lady Jessica</div><div class="sub">Dune</div></div>
+          </div>
+          <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+            The card keeps the name and title we stored. Only the face is gone.</p>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>F4</b> one shelf empty, others full</div>
+        <div class="screen"><div class="scroll">
+          <div class="ptabs" style="margin-top:0"><button>Overview</button><button class="on">Favourites</button><button>Stats</button><button>Library</button></div>
+          <div class="chips">
+            <button class="chip">Films <em>8</em></button>
+            <button class="chip">Series <em>5</em></button>
+            <button class="chip">People <em>6</em></button>
+            <button class="chip on">Characters <em>0</em></button>
+          </div>
+          <div class="invite">
+            <b>No characters yet</b>
+            <p>Pick one from a cast list — start with something you&rsquo;ve just finished.</p>
+            <button class="go">Add a character</button>
+          </div>
+          <p class="waiting" style="padding:var(--space-16) var(--gutter) 0">
+            Your other shelves are full. This is the only one still empty.</p>
+        </div></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-cap"><b>K5</b> picker · no cast to show</div>
+        <div class="screen"><div class="scroll" style="padding:var(--space-16)">
+          <div style="display:flex;gap:var(--space-8);align-items:center;margin-bottom:var(--space-16)">
+            <div style="width:var(--space-32);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));flex:0 0 auto"></div>
+            <div><div style="font-family:var(--f-d);font-size:var(--text-body);font-weight:700">A Short Film</div>
+            <div style="font-family:var(--f-m);font-size:9px;color:var(--faint)">2019</div></div>
+          </div>
+          <div class="invite" style="margin-inline:0">
+            <b>TMDB has no cast for this one</b>
+            <p>Character favourites come from cast lists, and this title doesn&rsquo;t have one yet. Anyone can add it on TMDB.</p>
+            <button class="go">Pick a different title</button>
+          </div>
+          <p class="waiting" style="margin-top:var(--space-16)">
+            Same screen when an actor&rsquo;s roles are all unnamed &mdash; &ldquo;Self&rdquo;, &ldquo;Narrator&rdquo;, &ldquo;Man in Bar&rdquo;. A character needs a name to be a favourite.</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="note law"><b>P3 is the one that would have shipped as a bug.</b> A restoring session is not a loading screen and it is <b>certainly</b> not a guest — that confusion is what showed signed-in people &ldquo;Create an account&rdquo; for a second and a half on every Library and You screen, and it was fixed across the app on 2026-09-15. The correct guest check is <code>authReady &amp;&amp; !isSignedIn</code>. While restoring, the profile draws its chrome and skeletons its figures, and shows <b>no invitation, no sign-in prompt and no zeroes</b> — every one of those is an assertion about who this is, and we do not know yet.</div>
+
+    <div class="note warn"><b>F3 is why §09 asks for copied strings.</b> TMDB credits are user-edited and can be removed. The card keeps the character name and the title from our own row and drops only the face, so a profile never loses an entry because a stranger tidied a cast list. It is marked, not hidden — a favourite that silently vanished would be worse than one that says what happened.</div>
+
     <h4>The state index</h4>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>#</th><th>State</th><th>What is on screen</th></tr></thead>
+    <p><b>These ids are the test names.</b> Entry already works this way — <code>npm run auth</code> runs 35 cases numbered to <code>foundations.html</code> §12. Profile deliberately avoids <code>I</code>, <code>U</code>, <code>C</code> and <code>S</code>, which entry owns, so no id means two things across the two modules.</p>
+    <div class="tbl-wrap" style="margin-bottom:var(--space-16)"><table>
+      <thead><tr><th>Prefix</th><th>Covers</th></tr></thead>
       <tbody>
-        <tr><td class="tok">P1</td><td class="use">Own profile, filled</td><td class="use">Banner, avatar, bio, four stats, four shelves. Edit affordances visible but quiet.</td></tr>
-        <tr><td class="tok">P2</td><td class="use">Own profile, brand new</td><td class="use">Hatched banner, initial avatar, bio placeholder, honest zeroes, one combined empty shelf saying the profile fills itself in.</td></tr>
-        <tr><td class="tok">P3</td><td class="use">Loading</td><td class="use">Banner and avatar as skeletons; stat tiles keep their labels and skeleton only the numbers, so the strip does not resize.</td></tr>
-        <tr><td class="tok">P4</td><td class="use">Stats failed, profile fine</td><td class="use">Strip shows <code>—</code> with a Try again. The rest of the page is unaffected — errors are scoped to the section that failed.</td></tr>
-        <tr><td class="tok">P5</td><td class="use">Offline</td><td class="use">Everything from <code>catalog_*</code> renders; banner and faces fall back to gradients.</td></tr>
-        <tr><td class="tok">P6</td><td class="use">Bio longer than four lines</td><td class="use">Clamped with an inline &ldquo;more&rdquo;. Never a scroll region.</td></tr>
-        <tr><td class="tok">P7</td><td class="use">Very long display name</td><td class="use">Two lines then ellipsis. The handle never wraps — it truncates from the end.</td></tr>
-        <tr><td class="tok">P8</td><td class="use">Non-Latin name</td><td class="use">Avatar initial uses the first grapheme, not the first byte. 神谷 renders 神.</td></tr>
-        <tr><td class="tok">E1</td><td class="use">Editing identity</td><td class="use">Sheet: display name, handle, bio with a live 280 counter. Handle uniqueness checked on blur.</td></tr>
-        <tr><td class="tok">E2</td><td class="use">Handle taken</td><td class="use">Inline under the field, in the reserved hint slot. Save disabled.</td></tr>
-        <tr><td class="tok">E3</td><td class="use">Choosing a banner</td><td class="use">Sheet with the four sources of §06. Current selection ticked.</td></tr>
-        <tr><td class="tok">E4</td><td class="use">Uploading</td><td class="use">Crop frame at 4:1, progress on the confirm button, cancel returns the old banner.</td></tr>
-        <tr><td class="tok">E5</td><td class="use">Upload rejected</td><td class="use">&ldquo;Images need to be JPEG, PNG or WebP, under 4 MB.&rdquo; Banner unchanged.</td></tr>
-        <tr><td class="tok">E6</td><td class="use">Reordering a shelf</td><td class="use">Drag handles appear; other shelves dim. Save is implicit, with an undo toast.</td></tr>
-        <tr><td class="tok">E7</td><td class="use">Ninth favourite</td><td class="use">Sheet: &ldquo;Your shelf is full. Which one does <i>Arrival</i> replace?&rdquo; with the eight shown. Never a silent refusal.</td></tr>
-        <tr><td class="tok">E8</td><td class="use">Removing a favourite</td><td class="use">Immediate, with an undo toast. No confirmation dialog for a reversible act.</td></tr>
-        <tr><td class="tok">C1</td><td class="use">Character picker, step one</td><td class="use">Two doors plus recently watched.</td></tr>
-        <tr><td class="tok">C2</td><td class="use">Character picker, step two</td><td class="use">Cast ordered by episode count, filterable.</td></tr>
-        <tr><td class="tok">C3</td><td class="use">Character already favourited</td><td class="use">Row ticked and disabled, not hidden — hiding it reads as missing data.</td></tr>
-        <tr><td class="tok">C4</td><td class="use">Animated title</td><td class="use">Poster face, <code>Voice · Hiroshi Kamiya</code> on the actor line.</td></tr>
-        <tr><td class="tok">C5</td><td class="use">Credit has gone from TMDB</td><td class="use">Stored strings still render; face drops to the poster. Never blank, never removed.</td></tr>
-        <tr><td class="tok">C6</td><td class="use">Cast list empty</td><td class="use">&ldquo;TMDB has no cast for this yet.&rdquo; with a link to contribute.</td></tr>
-        <tr><td class="tok">G1</td><td class="use">Guest reaches a profile control</td><td class="use">The existing sign-in sheet, verb matched — &ldquo;Save Dune: Part Two?&rdquo; becomes &ldquo;Set up your profile?&rdquo;</td></tr>
-        <tr><td class="tok">S1</td><td class="use">compact / medium</td><td class="use">One column, rails scroll, banner 3:1.</td></tr>
-        <tr><td class="tok">N1</td><td class="use">0 titles</td><td class="use">Gradient banner, initial, one invitation: start your shelf. Nothing else drawn.</td></tr>
-        <tr><td class="tok">N2</td><td class="use">1 title</td><td class="use">The block appears with real numbers and names the first entry. A 1 is not embarrassing.</td></tr>
-        <tr><td class="tok">N3</td><td class="use">6 titles, partly alive</td><td class="use">Bar has arrived, genres have not; the invitation has given way to a caption.</td></tr>
-        <tr><td class="tok">N4</td><td class="use">Proposed favourites</td><td class="use">Your own 9s and 10s, offered once, in place. Dismissible without penalty.</td></tr>
-        <tr><td class="tok">N5</td><td class="use">Films only</td><td class="use">Series block absent, replaced by one line saying when it arrives.</td></tr>
-        <tr><td class="tok">N6</td><td class="use">Tracked plenty, rated nothing</td><td class="use">Every mean is a dash; counts and bar still real. One invitation, phrased as what it unlocks.</td></tr>
-        <tr><td class="tok">X1</td><td class="use"><b>Imported library</b></td><td class="use">500 titles land at once, so every stat is instantly full — but favourites are still empty and no shelf was ever curated. N4 is the state that matters most here, and it should be offered as soon as the import settles rather than waiting.</td></tr>
-        <tr><td class="tok">X2</td><td class="use"><b>One long series, nothing else</b></td><td class="use"><code>1 title · 1,247 episodes</code> is true and looks broken. The films block is absent, so the series block carries the page alone — it gets the full-width treatment rather than sitting in a half-empty row.</td></tr>
-        <tr><td class="tok">X3</td><td class="use"><b>Everything dropped</b></td><td class="use">A distribution bar that is entirely <code>--st-drop-9</code>. Rendered honestly and without comment. No encouragement copy — that would be the app having an opinion about how someone watches.</td></tr>
-        <tr><td class="tok">X4</td><td class="use"><b>One genre is 100%</b></td><td class="use">Below eight titles genres do not rank at all, which is what stops this. Above it, a dominant genre is a real finding and is shown as one.</td></tr>
-        <tr><td class="tok">X5</td><td class="use"><b>Shelf emptied back to zero</b></td><td class="use">Returns to the invitation state, not a broken empty rail — and it is only the invitation if it is the first empty section. Otherwise it disappears.</td></tr>
-        <tr><td class="tok">X6</td><td class="use"><b>Banner's title removed from the library</b></td><td class="use">The banner stores the image path, not a reference to a library row, so it survives. Un-tracking a film does not silently change your profile's appearance.</td></tr>
-        <tr><td class="tok">X7</td><td class="use"><b>A year with nothing in it</b></td><td class="use">&ldquo;Your years&rdquo; skips it rather than drawing a zero row. A gap year is not a failure to display — this is the rule about nothing decaying, applied to a chart.</td></tr>
-        <tr><td class="tok">X8</td><td class="use"><b>Joined today, watched nothing</b></td><td class="use">Join date reads &ldquo;joined today&rdquo;, not a date. N1.</td></tr>
-        <tr><td class="tok">S2</td><td class="use">expanded / wide</td><td class="use">Banner 4:1 at container width with <code>--radius-16</code>; shelves show more per row; identity sits beside the avatar.</td></tr>
+        <tr><td class="tok">P</td><td class="use">The profile view itself — overview, loading, failure, text extremes</td></tr>
+        <tr><td class="tok">T</td><td class="use">Stats tab</td></tr>
+        <tr><td class="tok">F</td><td class="use">Favourites tab</td></tr>
+        <tr><td class="tok">E</td><td class="use">Editing and saving</td></tr>
+        <tr><td class="tok">K</td><td class="use">Character picker</td></tr>
+        <tr><td class="tok">N</td><td class="use">Cold start and growth</td></tr>
+        <tr><td class="tok">X</td><td class="use">Edge cases of real data</td></tr>
+        <tr><td class="tok">G</td><td class="use">Guest</td></tr>
+        <tr><td class="tok">R</td><td class="use">Responsive bands</td></tr>
+      </tbody>
+    </table></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>State</th><th>What is on screen</th><th>Drawn</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">P1</td><td class="num">Overview, filled</td><td class="use">Banner, avatar, bio, both stat blocks with their bars, a preview of every shelf that has content.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">P2</td><td class="num">Overview, loading</td><td class="use">Banner and avatar skeleton; stat labels stay and only the figures grey, so the strip cannot resize.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">P3</td><td class="num"><b>Session restoring</b></td><td class="use">Chrome drawn, figures skeletoned, and <b>no invitation, no sign-in prompt, no zeroes</b> — each would be an assertion about who this is.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">P4</td><td class="num">Stats failed, profile fine</td><td class="use">The block turns into its own error with a Try again. Everything else renders.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">P5</td><td class="num">Offline</td><td class="use">Everything from <code>catalog_*</code> renders; banner and faces fall back to gradients.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">P6</td><td class="num">Bio longer than four lines</td><td class="use">Clamped with an inline &ldquo;more&rdquo;. Never a scroll region.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">P7</td><td class="num">Very long display name</td><td class="use">Two lines then ellipsis. The handle truncates from the end and never wraps.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">P8</td><td class="num">Non-Latin name</td><td class="use">Avatar initial takes the first grapheme, not the first byte. 神谷 renders 神.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">T1</td><td class="num">Stats tab</td><td class="use">Score spread in words, then genres, decades, countries and years as count+mean cards.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">T2</td><td class="num">Counts but no means</td><td class="use">Every mean is a dash while counts and bars stay real. Same page, half switched off — see N6.</td><td class="use"><b style="color:var(--st-done-11)">N6</b></td></tr>
+        <tr><td class="tok">F1</td><td class="num">Favourites, chip row</td><td class="use">One grid at a time; each chip carries its count.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">F2</td><td class="num">Favourites, characters</td><td class="use">2:3 portraits, actor named on the art.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">F3</td><td class="num"><b>A favourite that left TMDB</b></td><td class="use">Stored name and title still render; only the face drops to a placeholder, marked &ldquo;no longer listed&rdquo;. Never silently removed.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">F4</td><td class="num"><b>One shelf empty, others full</b></td><td class="use">The selected chip reads 0 and its grid is replaced by that shelf&rsquo;s invitation. The other chips keep their counts.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">F5</td><td class="num">Shelf emptied back to zero</td><td class="use">Returns to F4, not a broken empty rail.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">F6</td><td class="num">Reordering</td><td class="use">Drag handles appear, other shelves dim. Save is implicit with an undo toast.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">E1</td><td class="num">Edit identity</td><td class="use">Display name, handle, bio with a live 1,000 counter. Handle uniqueness checked on blur.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">E2</td><td class="num">Handle taken</td><td class="use">Inline in the reserved hint slot. Save disabled.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">E3</td><td class="num"><b>Bio over the limit</b></td><td class="use">Counter turns red and shows the overage, field ring goes red, Save disabled. Nothing is truncated for you.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">E4</td><td class="num"><b>Saving failed</b></td><td class="use">Banner above the button, every typed value preserved, Save relabelled &ldquo;Try again&rdquo;.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">E5</td><td class="num">Choosing a banner</td><td class="use">Favourites / Library / Colour, current selection ticked.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">E6</td><td class="num">Uploading</td><td class="use">Crop frame at 4:1, progress on the confirm button; cancel restores the old banner.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">E7</td><td class="num">Upload rejected</td><td class="use">&ldquo;Images need to be JPEG, PNG or WebP, under 4&nbsp;MB.&rdquo; Banner unchanged.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">E8</td><td class="num">Removing a favourite</td><td class="use">Immediate, with an undo toast. No confirmation for a reversible act.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">K1</td><td class="num">Picker, step one</td><td class="use">Two doors — from a title, or from an actor — plus recently watched.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">K2</td><td class="num">Picker, step two</td><td class="use">Cast ordered by <code>total_episode_count</code>, filterable by typing.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">K3</td><td class="num">Already favourited</td><td class="use">Row ticked and disabled, not hidden — hiding it reads as missing data.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">K4</td><td class="num">Animated title</td><td class="use">Poster face; the actor line reads <code>Voice · Hiroshi Kamiya</code>.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">K5</td><td class="num"><b>No cast, or no named roles</b></td><td class="use">TMDB has no cast, or every role is &ldquo;Self&rdquo; / &ldquo;Man in Bar&rdquo;. Says so plainly and offers another title. A character needs a name to be a favourite.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">N1</td><td class="num">0 titles</td><td class="use">Gradient banner, initial, one invitation: start your shelf. Nothing else drawn.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">N2</td><td class="num">1 title</td><td class="use">Block appears with real numbers and names the first entry.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">N3</td><td class="num">6 titles, partly alive</td><td class="use">Bar arrived, genres have not; the invitation gave way to a caption.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">N4</td><td class="num">Proposed favourites</td><td class="use">Your own 9s and 10s, offered once, in place. Dismissible without penalty.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">N5</td><td class="num">Films only</td><td class="use">Series block absent, replaced by one line saying when it arrives.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">N6</td><td class="num">Tracked plenty, rated nothing</td><td class="use">Every mean a dash; counts and bar real. One invitation, phrased as what it unlocks.</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">X1</td><td class="num">Imported library</td><td class="use">500 titles land at once so stats are instantly full, but no shelf was ever curated. Offer N4 as soon as the import settles.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">X2</td><td class="num">One long series, nothing else</td><td class="use"><code>1 title · 1,247 episodes</code> is true and looks broken. Films block absent, so series takes the full width.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">X3</td><td class="num">Everything dropped</td><td class="use">A bar entirely in <code>--st-drop-9</code>. Rendered without comment — no encouragement copy.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">X4</td><td class="num">One genre at 100%</td><td class="use">Genres do not rank below eight titles, which is what prevents this. Above it, dominance is a real finding.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">X5</td><td class="num">Banner&rsquo;s title left the library</td><td class="use">The banner stores the image path, not a library reference, so it survives.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">X6</td><td class="num">A year with nothing in it</td><td class="use">&ldquo;Your years&rdquo; skips it rather than drawing a zero row.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">X7</td><td class="num">Joined today, watched nothing</td><td class="use">Join date reads &ldquo;joined today&rdquo;. See N1.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">G1</td><td class="num">Guest reaches a profile control</td><td class="use">The existing sign-in sheet, verb matched: &ldquo;Set up your profile?&rdquo;</td><td class="use"><b style="color:var(--st-done-11)">§08</b></td></tr>
+        <tr><td class="tok">R1</td><td class="num">compact / medium</td><td class="use">One column, rails scroll, banner 2:1, name on the banner.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">R2</td><td class="num">expanded / wide</td><td class="use">Banner 4:1 at container width; 320px stat rail left, favourites right.</td><td class="use"><b style="color:var(--st-done-11)">§08b</b></td></tr>
       </tbody>
     </table></div>
   </div>
@@ -1387,7 +1492,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <thead><tr><th>The design needs</th><th>Shape</th><th>Non-negotiable because</th></tr></thead>
       <tbody>
         <tr><td class="num">Display name</td><td class="use">Separate from the handle</td><td class="use">The handle is unique and immutable-ish; the display name is neither. P7 truncates them differently.</td></tr>
-        <tr><td class="num">Bio</td><td class="use">Free text, <b>280 characters</b></td><td class="use">The editor draws a live counter against that number, and the card clamps at four lines.</td></tr>
+        <tr><td class="num">Bio</td><td class="use">Free text, <b>1,000 characters</b></td><td class="use">The editor draws a live counter against that number (E3), and the card clamps at four lines.</td></tr>
         <tr><td class="num">Banner reference</td><td class="use">One value, plus which <i>kind</i> it is — catalogue still, colour, or uploaded file</td><td class="use">E3 offers four sources and ticks the current one. Without the kind, the sheet cannot show what is already selected.</td></tr>
         <tr><td class="num">Avatar reference</td><td class="use">Optional. Absent is a valid, designed state.</td><td class="use">The initial-on-a-gradient is the default, not a fallback — see §06.</td></tr>
         <tr><td class="num">Joined date</td><td class="use">A date</td><td class="use">Rendered beside the handle on every profile, including P2's &ldquo;joined today&rdquo;.</td></tr>
@@ -1398,7 +1503,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="num">Mean score</td><td class="use">Average of ratings, with a count</td><td class="use">The tile shows <code>—</code> below three ratings, so it needs the count as well as the average.</td></tr>
       </tbody>
     </table></div>
-    <div class="note law"><b>Two behaviours the interface cannot guarantee on its own.</b> The <b>eight-per-shelf cap</b> — E7's &ldquo;which one does this replace?&rdquo; sheet is the designed path, but a cap enforced only in a sheet is not enforced. And the <b>280-character bio</b>, for the same reason. Both are stated here so they are not read as presentation details.</div>
+    <div class="note law"><b>One behaviour the interface cannot guarantee on its own: the 1,000-character bio.</b> E3 draws the counter and disables Save, but a limit enforced only in a sheet is not enforced. Stated here so it is not read as a presentation detail.<br><br><b>There is deliberately no shelf cap to enforce.</b> Eight is what Overview previews, not a limit on what may be stored — see §03.</div>
     <div class="note"><b>Uploads need storage that does not exist yet</b> — no bucket, no policies. That is a build question, not a design one; §06 recommends the catalogue-first route partly because it sidesteps it entirely, and the upload flow (E4, E5) is drawn either way.</div>
   </div>
 </section>
@@ -1414,9 +1519,9 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <tr><td class="tok">D1</td><td class="use"><b>Followers and following.</b> You asked for follow counts. On 2026-09-13 you parked Layers 3 and 4 — public profiles and follows — <i>indefinitely</i>, on the grounds that both need a community to be worth anything and there is no rollout planned. Six of the seven things on this page work perfectly in a private instrument; this one does not.</td><td class="use"><b>Leave it parked.</b> A follower count that reads <code>0</code> forever is worse than no tile, and the surface it opens — cross-user RLS, a public read policy, moderation — is the largest single piece of work in the product. The four-tile strip is designed without it and does not have a hole where it would go. Reverse it when there is a second person.</td></tr>
         <tr><td class="tok">D2</td><td class="use"><b>Upload, or catalogue only?</b> Both are designed. This is a product call about what a banner <i>is</i> on a film tracker.</td><td class="use"><b>Catalogue only, first.</b> Faster to use, impossible to get wrong visually, and more personal on a tracker than a photograph. Upload is fully drawn; add it if you miss it.</td></tr>
         <tr><td class="tok">D3</td><td class="use"><b>Does this module replace <code>you</code>, or sit beside it?</b> <code>you</code> already owns taste, stats and settings.</td><td class="use"><b>Absorb it.</b> One screen — identity and favourites on top, the existing taste cards below, settings behind a control in the header. Two screens showing the same numbers is how they drift apart, and there is no second user to need a separate public view.</td></tr>
-        <tr><td class="tok">D4</td><td class="use"><b>How many per shelf?</b> I recommended eight. The benchmark says otherwise: the account I looked at has <b>roughly 25 favourite anime</b>, shown as a full grid on its own tab. AL-chan does not cap.</td><td class="use"><b>Both, and the tabs make it free.</b> The <b>Overview</b> shelf shows the first 8 as a rail — that is the statement, and the constraint still does its work. The <b>Favourites</b> tab shows everything as a grid, uncapped. The cap becomes a display rule rather than a limit, which is what AL-chan is actually doing. I was wrong to make it a limit.</td></tr>
+        <tr><td class="tok">D4</td><td class="use"><b>How many per shelf?</b> I recommended eight. The benchmark says otherwise: the account I looked at has <b>roughly 25 favourite anime</b>, shown as a full grid on its own tab. AL-chan does not cap.</td><td class="use"><b>SETTLED — a display rule, not a limit.</b> Overview previews the first 8 as a rail; the Favourites tab shows everything, uncapped. Nothing ever refuses a ninth, and the &ldquo;which one does this replace?&rdquo; sheet is deleted. §03, §09 and the state index all say this now — they disagreed until 2026-09-16.</td></tr>
         <tr><td class="tok">D6</td><td class="use"><b>Where &ldquo;pick four&rdquo; lives.</b></td><td class="use"><b>Settled 2026-09-16: on the profile, as its first-run invitation — not a sign-up step.</b> Sign-up capture converts better, and it was still the wrong trade here: entry is shipped, and a guest is never taxed. Drawn as N1.</td></tr>
-        <tr><td class="tok">D5</td><td class="use"><b>How long is a bio?</b> I specified 280 characters. The account I pulled has a <b>10,104-character</b> bio: markdown, images, custom headers, a Discord card, links to MAL and Steam. AL-chan profiles are a decorating culture.</td><td class="use"><b>Longer, but not a canvas — 1,000 characters, plain text with links.</b> 280 is a tweet and too short for &ldquo;what I watch and why&rdquo;. But the full markdown canvas brings an editor, image hosting, sanitising and a maintenance surface, for a product with one user. If you want the canvas, that is a real product direction and it should be its own decision rather than a field length.</td></tr>
+        <tr><td class="tok">D5</td><td class="use"><b>How long is a bio? SETTLED at 1,000.</b> I first specified 280, and the document carried both numbers until 2026-09-16. The account I pulled has a <b>10,104-character</b> bio: markdown, images, custom headers, a Discord card, links to MAL and Steam. AL-chan profiles are a decorating culture.</td><td class="use"><b>1,000 characters, plain text with links — now used everywhere in this document.</b> 280 is a tweet and too short for &ldquo;what I watch and why&rdquo;. But the full markdown canvas brings an editor, image hosting, sanitising and a maintenance surface, for a product with one user. If you want the canvas, that is a real product direction and it should be its own decision rather than a field length.</td></tr>
       </tbody>
     </table></div>
     <div class="note law" style="margin-bottom:0"><b>Nothing here is built.</b> This is design, for grooming. The acceptance criteria are yours to write, and the working order has not changed: concept &rarr; design &rarr; <b>grooming</b> &rarr; development.</div>

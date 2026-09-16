@@ -25,6 +25,9 @@ const ALLOWED = [
     /^(movie|tv)\/\d+\/watch\/providers$/,
     /^tv\/\d+\/season\/\d+$/,
     /^person\/\d+(\/combined_credits)?$/,
+    // One credit_id rehydrates a whole favourite-character card: the character
+    // name, the person with their profile_path, and the title with its poster.
+    /^credit\/[A-Za-z0-9]+$/,
     /^collection\/\d+$/,
     /^configuration$/,
 ];

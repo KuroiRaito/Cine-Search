@@ -6,6 +6,7 @@ import { useAsync } from '../../shared/hooks/useAsync.js';
 import { Tile, Skeleton, Empty, initialsOf } from '../../shared/ui/index.js';
 import { SignInPrompt } from '../entry';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { usePersonFavourite } from '../profile';
 import { useLibrary, useTileStates, useQuickAdd } from '../library';
 import { collectionProgress } from '../library';
 import './person.css';
@@ -29,6 +30,7 @@ export default function Person() {
     const onAdd = useQuickAdd((x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' }));
     const stateFor = useTileStates();
     const { isSignedIn, authReady } = useAuth();
+    const fav = usePersonFavourite(p);
     const lib = useLibrary();
 
     const { data, error, loading, retry } = useAsync(
@@ -89,6 +91,19 @@ export default function Person() {
                         {p.placeOfBirth && <><br />{p.placeOfBirth}</>}
                     </div>
                 </div>
+                {/* Actors and crew share one shelf on the profile, so this is
+                    the same control on everybody's page. Hidden for a guest
+                    rather than raising a sheet: there is no title here for one
+                    to name. */}
+                {fav.canFavourite && (
+                    <button
+                        type="button"
+                        className={fav.on ? 'ibtn like on' : 'ibtn like'}
+                        aria-pressed={fav.on}
+                        aria-label={fav.on ? `Remove ${p.name} from favourites` : `Add ${p.name} to favourites`}
+                        onClick={fav.toggle}
+                    ><Icon name="heart" size={20} /></button>
+                )}
             </div>
 
             {/* Above the filmography, not buried in stats: "6 of 10 directed"

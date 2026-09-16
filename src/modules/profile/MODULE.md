@@ -25,7 +25,7 @@ Landing in order, one PR each:
 | 1 | Stats | done — two medium blocks, distribution bars, score spread |
 | 2 | **Identity** | done — banner, avatar, bio, display name, edit sheet, banner picker |
 | 3 | **Favourites** | done — order column, tab shell, chip row, films and series shelves |
-| 4 | People & characters | both shelves, the picker, `credit_id`, `/credit/{id}` in the proxy allowlist |
+| 4 | **People & characters** | done — both shelves, the picker, `credit_id`, `/credit/{id}` allowed through the proxy |
 
 The directory was renamed with step 2. The route stays `/you` and the tab still
 reads **You**, because that is what your own profile is called from the inside.
@@ -55,10 +55,26 @@ a shelf; the Favourites tab shows the whole thing. Nothing refuses a ninth
 favourite and there is no "which one does this replace?" sheet — the
 constraint does its work on the rail, where the first eight are the statement.
 
-**Two shelves, not four.** Films and series are the two whose ♥ already exists
-on a title page. People and characters need a picker they do not have yet, so
-they arrive together with it — a chip that opens an empty grid you cannot fill
-is worse than a chip that is not there.
+**Four shelves, two homes.** Films and series live in `user_library` behind the
+♥ on a title page. People and characters live in `user_favourites`, with their
+display strings **copied rather than joined** — R-C3, and the second time this
+project has made that call in the opposite direction. `catalog_people` exists
+so Villeneuve's biography is not repeated inside 26 titles; here the character
+name and title are copied onto the row, because the alternative is a profile
+that degrades when somebody else edits TMDB. Normalise what you own; copy what
+you do not.
+
+**You cannot search for a character.** `/search/character` is a 404 and there
+is no character index to build one from, so the picker asks a question it can
+answer — which title, or which actor — and arrives at the character from there.
+A search box lives inside step two, where the cast list is already in hand.
+
+**Three rules the API forces**, all in `shelves.js` and all checked against
+strings TMDB really stores: the trailing parenthetical is stripped for display
+(`Levi (voice)` → `Levi`); an animated title falls back to its poster, because
+the face on the credit is the voice actor's and a photograph of a stranger is
+worse than no face; and a TV cast is sorted by episode count, without which
+Breaking Bad's 221 names bury Walter White behind a one-scene guest.
 
 **The Library tab is a link, not a tab.** It goes to the screen the library
 module owns. Putting two routes behind one control would make the back button

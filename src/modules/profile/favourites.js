@@ -3,15 +3,18 @@ import { keyOf } from '../library';
 /**
  * The shelves. docs/profile-module.html §03.
  *
- * Four of them, and the two built here are the two whose ♥ already exists on a
- * title page. People and characters need a picker, so they arrive with it.
+ * Four of them. Films and series live in user_library behind a ♥ on a title
+ * page; people and characters live in user_favourites, with their display
+ * strings copied rather than joined (R-C3).
  *
  * Studios is a fifth shelf in the design and is deliberately not built: it
  * needs a company page that no module owns. It stays documented for v2.
  */
 export const SHELVES = [
-    { key: 'movie', label: 'Films' },
-    { key: 'tv', label: 'Series' },
+    { key: 'movie', label: 'Films', from: 'library' },
+    { key: 'tv', label: 'Series', from: 'library' },
+    { key: 'person', label: 'People', from: 'shelf' },
+    { key: 'character', label: 'Characters', from: 'shelf' },
 ];
 
 /**

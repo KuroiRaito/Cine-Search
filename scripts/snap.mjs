@@ -63,6 +63,25 @@ const THEMES = ['dark', 'light'];
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
+
+/**
+ * Modules whose fingerprint is not a fact about the code.
+ *
+ * `discover` is rails of whatever TMDB is trending this minute, so its element
+ * count is live data: three consecutive runs measured 579, 576 and 756. A
+ * check that cannot agree with itself is worse than no check — it goes red for
+ * reasons nobody caused and teaches everyone to ignore it.
+ *
+ * It is still screenshot, because the pictures are for a person to look at and
+ * changing artwork is the point there. Only the comparison is skipped.
+ *
+ * The real fix is for snap to serve a fixed TMDB payload while it measures,
+ * which would make every module deterministic rather than just this one —
+ * search, title and person all drift when TMDB edits a cast list. That is its
+ * own piece of work: the screenshots want the real artwork, so it means two
+ * passes rather than one flag.
+ */
+const NOT_COMPARED = new Set(['discover']);
 const wanted = args.filter((a) => !a.startsWith('--'));
 const modules = Object.keys(MODULES).filter((m) => !wanted.length || wanted.includes(m));
 
@@ -144,9 +163,13 @@ if (CHECK) {
         process.exit(1);
     }
     const before = JSON.parse(readFileSync(FINGERPRINTS, 'utf8'));
-    const moved = Object.entries(results).filter(([k, v]) =>
+    const comparable = Object.fromEntries(
+        Object.entries(results).filter(([k]) => !NOT_COMPARED.has(k.split('/')[0])),
+    );
+    const skipped = Object.keys(results).length - Object.keys(comparable).length;
+    const moved = Object.entries(comparable).filter(([k, v]) =>
         before[k] && (before[k].hash !== v.hash || before[k].elements !== v.elements));
-    const added = Object.keys(results).filter((k) => !before[k]);
+    const added = Object.keys(comparable).filter((k) => !before[k]);
     if (moved.length) {
         console.log('\n  LAYOUT CHANGED\n');
         for (const [k, v] of moved) {
@@ -157,7 +180,9 @@ if (CHECK) {
         console.log('\n  Intended? Commit the new snapshots and fingerprints.\n');
         process.exit(1);
     }
-    console.log(`\n  ${Object.keys(results).length} screens unchanged${added.length ? `, ${added.length} new` : ''}.\n`);
+    console.log(`\n  ${Object.keys(comparable).length} screens unchanged`
+        + `${added.length ? `, ${added.length} new` : ''}`
+        + `${skipped ? `, ${skipped} not compared (live data)` : ''}.\n`);
 } else {
     const merged = existsSync(FINGERPRINTS)
         ? { ...JSON.parse(readFileSync(FINGERPRINTS, 'utf8')), ...results }

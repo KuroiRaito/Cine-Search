@@ -30,13 +30,16 @@ export default function Person() {
     const onAdd = useQuickAdd((x) => setPrompt({ title: x.title, poster: x.poster, action: 'save' }));
     const stateFor = useTileStates();
     const { isSignedIn, authReady } = useAuth();
-    const fav = usePersonFavourite(p);
     const lib = useLibrary();
 
     const { data, error, loading, retry } = useAsync(
         ({ signal }) => fetchPerson(id, { signal }).then(toPersonView),
         [id],
     );
+
+    // After the fetch it reads from, and before any early return: hooks do not
+    // get to be conditional, and `data` does not exist until the line above.
+    const fav = usePersonFavourite(data);
 
     if (loading) {
         return (

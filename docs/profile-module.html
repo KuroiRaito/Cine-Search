@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>
+/* Icons: Lucide (lucide.dev), ISC licence.
+   Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022
+   as part of Feather (MIT). All other copyright (c) for Lucide are held
+   by Lucide Contributors 2022. */
+*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
 <title>Profile Module</title>
@@ -403,6 +408,11 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 .lrow .at{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc-t);font-variant-numeric:tabular-nums}
 .lrow .what{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted)}
 .lrow .what b{color:var(--text);font-weight:600}
+
+/* Icons in the mock screens are the shipped Lucide set, drawn inline. Sized
+   in em so each mock keeps its own scale, with the baseline nudge that puts
+   an inline SVG where the glyph used to sit — minus the glyph's drift. */
+.di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
 </style>
 
 <!-- ============================== 02 ANATOMY ============================== -->
@@ -584,7 +594,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     <br><br>So: the Favourites tab opens on a <b>chip row</b> — Films · Series · People · Characters · Studios, each with its count — and shows one grid at a time. Every shelf is one tap from the top of the page instead of up to twenty-one screens of scrolling. Same content, same generosity, no burial.</div>
 
     <h4>Ordering</h4>
-    <p>Favourites are <b>ordered by the person, not by rating or recency</b> — the first film on the shelf is a statement. Drag to reorder on touch; on a pointer, the same handle plus <kbd>↑</kbd>/<kbd>↓</kbd> keyboard support. Order is stored as an integer; a gap-based sequence (10, 20, 30) so a reorder is one row's update rather than eight.</p>
+    <p>Favourites are <b>ordered by the person, not by rating or recency</b> — the first film on the shelf is a statement. Drag to reorder on touch; on a pointer, the same handle plus <kbd><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7" /> <path d="M12 19V5" /></svg></kbd>/<kbd><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14" /> <path d="m19 12-7 7-7-7" /></svg></kbd> keyboard support. Order is stored as an integer; a gap-based sequence (10, 20, 30) so a reorder is one row's update rather than eight.</p>
   </div>
 </section>
 
@@ -656,7 +666,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
               <div style="width:32px;height:32px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-6),var(--ink-4));flex:0 0 auto"></div>
               <div style="min-width:0"><div style="font-size:var(--text-caption);font-weight:600;color:var(--acc-t)">Walter White</div>
               <div style="font-family:var(--f-m);font-size:9px;color:var(--muted)">Bryan Cranston · 62 eps</div></div>
-              <div style="margin-left:auto;color:var(--acc-t);font-size:var(--text-body)">✓</div>
+              <div style="margin-left:auto;color:var(--acc-t);font-size:var(--text-body)"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg></div>
             </div>
             <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);min-height:var(--control-h)">
               <div style="width:32px;height:32px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-5),var(--ink-3));flex:0 0 auto"></div>
@@ -1291,7 +1301,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
               <div style="width:var(--space-24);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--mar-7),var(--ink-4));flex:0 0 auto"></div>
               <div style="min-width:0;flex:1"><div style="font-size:var(--text-caption);font-weight:600;color:var(--acc-t)">Blade Runner 2049</div>
               <div style="font-family:var(--f-m);font-size:9px;color:var(--muted)">you rated 10</div></div>
-              <div style="color:var(--acc-t)">✓</div>
+              <div style="color:var(--acc-t)"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg></div>
             </div>
             <div style="display:flex;gap:var(--space-8);align-items:center;padding:var(--space-8);border-radius:var(--radius-8);min-height:var(--control-h)">
               <div style="width:var(--space-24);aspect-ratio:2/3;border-radius:var(--radius-4);background:linear-gradient(150deg,var(--beam-7),var(--ink-3));flex:0 0 auto"></div>

@@ -9,10 +9,37 @@ criteria M3 §3.3–3.7.
 import { You, Settings } from '../modules/you';
 ```
 
+## Becoming the profile
+
+This module is being absorbed into **module 8, Profile**
+(`docs/profile-module.html`). The design's D3 ruling is that the profile does
+not sit beside `you` — it *is* `you`, with identity and favourites above the
+numbers, because two screens showing the same figures is how they come to
+disagree.
+
+Landing in order, one PR each:
+
+| | | |
+| --- | --- | --- |
+| 1 | **Stats** | done — two medium blocks, distribution bars, score spread |
+| 2 | Identity | banner, avatar, bio, display name, the edit sheet |
+| 3 | Favourites | order column, favourites table, shelves, chip row |
+| 4 | Characters | the picker, `credit_id`, `/credit/{id}` in the proxy allowlist |
+
+The directory is renamed to `profile` with step 2, when the screen actually
+becomes one. Renaming it now would be a large diff that changes nothing you
+can see.
+
+Studios is a fifth shelf in the design and is **deliberately not built in v1**
+— it needs a company page that no module owns. It stays documented so v2 does
+not have to rediscover it.
+
 ## What it owns
 
-`taste.js` — the one query behind the whole screen, and the formatters that
-turn stored minutes into "18.4 days" or "3d 4h". Minutes are stored and
+`taste.js` — the one query behind the whole screen (`profile_stats()`, which
+replaced `taste_summary()`), the formatters that turn stored minutes into
+"18.4 days" or "3d 4h", and the two rules that turn numbers into sentences:
+the distribution bar's 2% floor, and the score spread's thresholds. Minutes are stored and
 returned as integers; the shape they take is decided where they are drawn.
 
 ## Rules it carries

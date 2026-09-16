@@ -20,7 +20,7 @@ import Discover from '../modules/discover';   // the route component
 ## Known headroom
 
 - Four fixed rails. The design's guest home also shows genre rails and a
-  "because you watched" rail — the second is buildable from `taste_summary`.
+  "because you watched" rail — the second is buildable from `profile_stats`.
 - `.head-actions` duplicates controls the shell's top bar owns at desktop. One
   of the two should go.
 

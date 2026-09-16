@@ -7,7 +7,7 @@ import { useAsync } from '../../shared/hooks/useAsync.js';
 import { posterUrl, profileUrl, toPersonView, roleForJob } from '../../shared/tmdb/view.js';
 import { person as fetchPerson } from '../../shared/tmdb/endpoints.js';
 import { totalsFromView, totalsAreFresh, personTotalsSet } from '../library';
-import { tasteSummary, formatDays, formatSpan, SCORE_FLOOR } from './taste.js';
+import { profileStats, distribution, scoreSpread, formatDays, formatSpan, SCORE_FLOOR } from './taste.js';
 import './you.css';
 
 /**
@@ -41,7 +41,7 @@ export default function You() {
     const [order, setOrder] = useState('count');
 
     const { data, error, loading, retry } = useAsync(
-        () => tasteSummary(),
+        () => profileStats(),
         [isSignedIn, lib.ready],
         { skip: !isSignedIn },
     );
@@ -121,16 +121,19 @@ export default function You() {
         <div className="page">
             <YouHead name={profile?.username} />
 
-            <div className="stiles">
-                <div className="st-t"><b>{totals.titles}</b><span>Titles</span></div>
-                <div className="st-t"><b>{totals.episodes}</b><span>Episodes</span></div>
-                {/* Series minutes arrive as seasons are opened, so until then
-                    this is a floor rather than a total, and says so. */}
-                <div className="st-t">
-                    <b>{formatDays(totals.minutes)}</b>
-                    <span>{totals.partial ? 'Days, at least' : 'Days'}</span>
-                </div>
-            </div>
+            {/* A film has a runtime and no episodes; a series has both. One
+                blended "titles" number hid which of the two you actually are. */}
+            <MediumBlock
+                title="Films" block={data.films} dist={data.distribution?.movie}
+                second={{ label: data.films?.partial ? 'Days, at least' : 'Days',
+                    value: formatDays(data.films?.minutes) }}
+            />
+            <MediumBlock
+                title="Series" block={data.series} dist={data.distribution?.tv}
+                second={{ label: 'Episodes', value: data.series?.episodes ?? 0 }}
+            />
+
+            <ScoreSpread spread={data.spread} />
 
             <div className="sect taste-head">
                 <div className="sect-h">
@@ -163,6 +166,66 @@ export default function You() {
 }
 
 /**
+ * One medium's headline numbers and the bar under them.
+ *
+ * The labels never skeleton and the block never disappears: a person who has
+ * watched no series still sees the Series block reading zero, because a hidden
+ * section is indistinguishable from a section that failed.
+ */
+function MediumBlock({ title, block, dist, second }) {
+    const { total, rows } = distribution(dist);
+    const watched = block?.watched ?? 0;
+    // "Mean score still reads — below three ratings." A single 10 is not an
+    // average, it is one opinion.
+    const mean = (block?.rated ?? 0) >= SCORE_FLOOR ? block.mean : null;
+
+    return (
+        <div className="sblock">
+            <div className="sblock-h">
+                <b>{title}</b>
+                {block?.partial && <span>at least</span>}
+            </div>
+            <div className="snums">
+                <div className="snum-i"><dt>Watched</dt><dd>{watched}</dd></div>
+                <div className="snum-i"><dt>{second.label}</dt><dd>{second.value}</dd></div>
+                <div className="snum-i"><dt>Mean</dt><dd className="rate">{mean ?? '—'}</dd></div>
+            </div>
+
+            {total > 0 && (
+                <>
+                    <div className="dbar">
+                        {rows.map((r) => (
+                            <i key={r.key} className={r.tone} style={{ width: `${r.pct}%` }} />
+                        ))}
+                    </div>
+                    {/* Six hues in a row is exactly the case the foundations
+                        warn about, so the bar is never the only carrier. */}
+                    <div className="dlegend">
+                        {rows.map((r) => (
+                            <span key={r.key}><i className={r.tone} />{r.label} {r.n}</span>
+                        ))}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
+/**
+ * The most personal line on the page, and it is the same number as "σ 1.4".
+ */
+function ScoreSpread({ spread }) {
+    const said = scoreSpread(spread);
+    if (!said) return null;
+    return (
+        <div className="sblock">
+            <div className="sblock-h"><b>Score spread</b><span>σ {said.sigma}</span></div>
+            <p className="spread-line">{said.sentence}</p>
+        </div>
+    );
+}
+
+/**
  * One ranked list, drawn from every kind — but not ranked by raw count.
  *
  * Counting everything together lets decades win, and a decade winning says
@@ -178,11 +241,12 @@ export default function You() {
 function interleave(data, order) {
     const rank = (list) => (order === 'score'
         ? list.filter((c) => c.rated >= SCORE_FLOOR)
-            .sort((a, b) => b.avg - a.avg || b.count - a.count)
+            .sort((a, b) => b.mean - a.mean || b.count - a.count)
         : [...list].sort((a, b) => b.count - a.count || String(a.key).localeCompare(String(b.key))));
 
     // Genre, person, decade — in order of how much the answer tells you.
-    const lanes = [rank(data.genres), rank(data.people), rank(data.decades)]
+    const d = data.dimensions || {};
+    const lanes = [rank(d.genre || []), rank(data.people || []), rank(d.decade || [])]
         .filter((l) => l.length);
     const out = [];
     for (let i = 0; out.length < lanes.reduce((n, l) => n + l.length, 0); i += 1) {
@@ -225,7 +289,7 @@ function TasteCard({ card, rank, total }) {
                             : `title${card.count === 1 ? '' : 's'}`}
                     </span>
                 </div>
-                <div><b>{card.avg ?? '—'}</b><span>avg</span></div>
+                <div><b>{card.mean ?? '—'}</b><span>mean</span></div>
                 {/* A season whose runtime has not been gathered yet contributes
                     nothing, so the figure is a floor. The "+" says so without
                     turning a card into a footnote. */}

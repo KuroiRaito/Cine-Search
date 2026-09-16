@@ -17,6 +17,24 @@ import './you.css';
  * skipping a month costs you nothing, because this is a record of what you have
  * watched and not a game you can be losing.
  */
+/**
+ * The same head on every state of this screen.
+ *
+ * It used to be written out four times, and the gear — the only route to
+ * Settings, and therefore the only route to signing out anywhere in the
+ * product — was in exactly one of them: the populated one. A new account with
+ * nothing yet marked watched sits on the empty state, which had no gear, so
+ * there was no way to sign out at all.
+ */
+function YouHead({ name }) {
+    return (
+        <div className="page-head">
+            <h1>{name || 'You'}</h1>
+            <Link className="circ" to="/settings" aria-label="Settings">⚙</Link>
+        </div>
+    );
+}
+
 export default function You() {
     const { isSignedIn, authReady, profile } = useAuth();
     const lib = useLibrary();
@@ -37,7 +55,7 @@ export default function You() {
     if (authReady && !isSignedIn) {
         return (
             <div className="page">
-                <div className="page-head"><h1>You</h1></div>
+                <YouHead />
                 <Empty
                     title="Nothing to work from yet"
                     body="Your taste is worked out from what you’ve watched and rated — and only ever shown to you."
@@ -54,7 +72,7 @@ export default function You() {
     if (!authReady || loading || (!data && !error)) {
         return (
             <div className="page">
-                <div className="page-head"><h1>{profile?.username || 'You'}</h1></div>
+                <YouHead name={profile?.username} />
                 <div className="stiles">
                     {[0, 1, 2].map((i) => <Skeleton key={i} h={40} />)}
                 </div>
@@ -68,7 +86,7 @@ export default function You() {
     if (error) {
         return (
             <div className="page">
-                <div className="page-head"><h1>{profile?.username || 'You'}</h1></div>
+                <YouHead name={profile?.username} />
                 <Empty
                     title="Couldn’t work out your taste"
                     body="Your records are safe — this screen just couldn’t reach them."
@@ -78,12 +96,16 @@ export default function You() {
         );
     }
 
-    const { totals } = data;
+    // The database always answers with a totals object, even for an account
+    // that has watched nothing. Read it defensively anyway: this screen is the
+    // only route to Settings, so a shape that surprises it would take signing
+    // out down with it.
+    const totals = data?.totals || { titles: 0, episodes: 0, minutes: 0, partial: false };
 
     if (!totals.titles) {
         return (
             <div className="page">
-                <div className="page-head"><h1>{profile?.username || 'You'}</h1></div>
+                <YouHead name={profile?.username} />
                 <Empty
                     title="Nothing watched yet"
                     body="Mark something watched and this fills in — genres, decades and the people whose work you keep coming back to."
@@ -97,10 +119,7 @@ export default function You() {
 
     return (
         <div className="page">
-            <div className="page-head">
-                <h1>{profile?.username || 'You'}</h1>
-                <Link className="circ" to="/settings" aria-label="Settings">⚙</Link>
-            </div>
+            <YouHead name={profile?.username} />
 
             <div className="stiles">
                 <div className="st-t"><b>{totals.titles}</b><span>Titles</span></div>

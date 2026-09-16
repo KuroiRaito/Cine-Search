@@ -48,18 +48,13 @@
 .sect.taste-head { margin: var(--section-gap) var(--gutter) 0; max-width: 440px; }
 
 /* ---------------- settings ----------------
-   Plain and conventional by decision, not omission. Standard rows and toggles. */
+   Plain and conventional by decision, not omission. Standard rows and toggles.
 
-.setblock { margin: var(--section-gap) var(--gutter) 0; max-width: 440px; }
-.setlabel { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+   The block, label and row primitives moved to ui.css: they are the shape of a
+   settings screen, not of this one, and the account surface in the entry module
+   has to wear the same clothes as the blocks around it. */
+
 .segs.two { grid-template-columns: repeat(2, 1fr); }
-.setrow {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-  padding: 10px 0; border-top: 1px solid var(--bd-sub); font-size: 13px;
-}
-.setrow:first-of-type { border-top: 0; }
-.setrow span { color: var(--muted); }
-.setrow b { font-weight: 500; min-width: 0; overflow-wrap: anywhere; text-align: right; }
 /* Keeps the title centred when the head carries a back button on one side. */
 .head-spacer { width: 34px; flex: 0 0 auto; }
 

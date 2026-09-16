@@ -94,6 +94,14 @@ async function install(ctx, o) {
     // Registered before the specific one: Playwright matches the most recently
     // added route first.
     await ctx.route('**/rest/v1/**', (r) => json(r, 200, '[]'));
+    // The shape taste_summary() really returns for an account with nothing
+    // watched — always an object, never an empty list. Mocking it as `[]` is
+    // what the catch-all below would do, and that is not what the database
+    // does.
+    await ctx.route('**/rest/v1/rpc/taste_summary**', (r) => json(r, 200, o.taste || {
+        totals: { titles: 0, episodes: 0, minutes: 0, partial: false },
+        genres: [], decades: [], people: [],
+    }));
     await ctx.route('**/rest/v1/rpc/username_available**', (r) =>
         json(r, o.usernameFree === false ? 200 : 404, o.usernameFree === false ? 'false' : { code: 'PGRST202' }));
     await ctx.route('**/rest/v1/profiles**', (r) => {
@@ -601,6 +609,67 @@ const CASES = [
         // is where a ref that was only ever cleared — never re-set on the
         // StrictMode remount — left every submit reading "One moment…".
         expect: ['during="One moment…"', 'back="Sign in"', 'disabled=false', 'email=""'],
+    },
+    {
+        n: 36, name: 'Signed in with nothing watched yet — can still get to sign out',
+        opts: { stored: live, profile: PROFILE },
+        async run(page, base) {
+            await page.goto(`${base}/you`); await page.waitForTimeout(1200);
+            const state = await read(page);
+            const gear = await page.locator('a[href="/settings"]').count();
+            return `gear=${gear} ${state.slice(0, 90)}`;
+        },
+        // The commonest state a new account is in: signed in, nothing marked
+        // watched. The way to settings — and therefore the only way to sign
+        // out anywhere in the app — used to be rendered only once this screen
+        // had content to show.
+        expect: ['gear=1'],
+    },
+    {
+        n: 37, name: 'A brand new account can sign out, by clicking only what it can see',
+        opts: { stored: live, profile: PROFILE },
+        async run(page, base) {
+            // No URLs typed. Everything below is a control that has to be on
+            // screen, because this is the walk that was impossible: the gear
+            // was drawn only once the taste screen had content, so an account
+            // with nothing watched had no route to Settings and therefore no
+            // route to signing out anywhere in the product.
+            await page.goto(`${base}/you`); await page.waitForTimeout(1200);
+            const landed = await read(page);
+
+            await page.getByRole('link', { name: 'Settings' }).click();
+            await page.waitForTimeout(800);
+            const settings = await read(page);
+
+            await page.getByRole('button', { name: 'Sign out' }).first().click();
+            await page.waitForTimeout(300);
+            const asked = await read(page);
+
+            await page.getByRole('button', { name: 'Sign out' }).last().click();
+            await page.waitForTimeout(1000);
+            return `landed[${landed.slice(0, 300)}] settings[${settings.slice(0, 900)}]`
+                + ` asked[${asked.includes('library stays exactly as it is')}]`
+                + ` end[${new URL(page.url()).pathname}] ${await read(page)}`;
+        },
+        expect: [
+            'Nothing watched yet',      // the state a new account is actually in
+            'Account',                  // the account block, now owned by entry
+            'qa@cinesearch.test',       // and it says who you are signed in as
+            'asked[true]',              // the reassurance before the scary button
+            'end[/]',
+            'Sign in',                  // signed out, and the top bar says so
+        ],
+        reject: ['Your session ended'],
+    },
+    {
+        n: 38, name: 'A guest reaching Settings is offered an account, not an empty block',
+        opts: {},
+        async run(page, base) {
+            await page.goto(`${base}/settings`); await page.waitForTimeout(900);
+            return read(page);
+        },
+        expect: ['Account', 'browsing without one', 'Create an account'],
+        reject: ['Sign out'],
     },
 ];
 

@@ -48,7 +48,7 @@ export default function Discover() {
             <div className="page-head">
                 <h1>Discover</h1>
                 <div className="head-actions">
-                    <Link to="/search" className="circ" aria-label="Search">⌕</Link>
+                    <Link to="/search" className="circ" aria-label="Search"><Icon name="search" size={20} /></Link>
                     <ThemeToggle />
                     {!authReady ? <span className="btn quiet is-waiting" aria-hidden="true" />
                         : isSignedIn

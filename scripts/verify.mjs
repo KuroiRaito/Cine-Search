@@ -349,6 +349,44 @@ for (const f of cssFiles) {
     }
 }
 
+/* ---------------------------------------------------------------
+   14. An icon is a component, never a character.
+
+   Every icon in this product used to be a Unicode glyph borrowed from
+   whatever block had roughly the right shape — twenty of them, across
+   five unrelated blocks. Painted at one 100px font size they ranged
+   from 10px to 86px tall and their optical centres drifted 48px, which
+   is why nothing ever lined up. The search icon was U+2315 TELEPHONE
+   RECORDER, painting 44px beside a discover icon painting 86.
+
+   Without this rule the next person needing an icon in a hurry types a
+   character that looks about right, and in six months there are twenty
+   again. Prose keeps its typography: this only fires on a short text
+   node, which is what an icon-as-character always is.
+   --------------------------------------------------------------- */
+const ICON_GLYPH = /[←-⇿⌀-⏿■-◿☀-➿]/u;
+
+for (const f of jsx) {
+    const rel = relative(ROOT, f);
+    if (rel.endsWith('shared/ui/Icon.jsx')) continue;   // the map itself may name them
+    const body = readFileSync(f, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')               // block comments are prose
+        .replace(/^\s*\/\/.*$/gm, '');                  // and so are line comments
+    // a JSX text node: >…< with no tag inside
+    for (const m of body.matchAll(/>([^<>{}]{1,3})</g)) {
+        const t = m[1].trim();
+        if (t && ICON_GLYPH.test(t)) {
+            fail('icon-component', `${rel}: “${t}” is a character used as an icon — use <Icon name="…" />`);
+        }
+    }
+    // and the same thing hidden in a short string literal
+    for (const m of body.matchAll(/'([^']{1,3})'/g)) {
+        if (ICON_GLYPH.test(m[1])) {
+            fail('icon-component', `${rel}: '${m[1]}' is a character used as an icon — use a role name and <Icon />`);
+        }
+    }
+}
+
 // Aggregate last, after every check has run — a map built before a check
 // reports into it is a check that can never fail.
 const byCheck = new Map();
@@ -368,6 +406,7 @@ const CHECKS = [
     ['control-colour', 'A control with a background declares its colour'],
     ['focus-ring', 'Focus is never removed without a replacement'],
     ['layer-token', 'Five layers, and nothing between them'],
+    ['icon-component', 'An icon is a component, never a character'],
 ];
 
 let failed = 0;

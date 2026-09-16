@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { activeTheme, applyTheme } from './theme.js';
+import { Icon } from '../ui/index.js';
 
 export default function ThemeToggle() {
     const [theme, setTheme] = useState(activeTheme);
@@ -18,7 +19,7 @@ export default function ThemeToggle() {
             aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
         >
-            ◑
+            <Icon name="dark" size={20} />
         </button>
     );
 }

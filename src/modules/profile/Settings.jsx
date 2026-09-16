@@ -4,6 +4,7 @@ import { AccountCard } from '../entry';
 import { useRegion } from '../../shared/hooks/useRegion.js';
 import { activeTheme, applyTheme } from '../../shared/theme/theme.js';
 import './profile.css';
+import { Icon } from '../../shared/ui/index.js';
 
 /**
  * Plain and conventional by decision, not by omission — settings has no bespoke
@@ -27,7 +28,7 @@ export default function Settings() {
     return (
         <div className="page">
             <div className="page-head">
-                <button type="button" className="circ" onClick={() => navigate(-1)} aria-label="Back">‹</button>
+                <button type="button" className="circ" onClick={() => navigate(-1)} aria-label="Back"><Icon name="back" size={24} /></button>
                 <h1>Settings</h1>
                 <span className="head-spacer" />
             </div>
@@ -43,7 +44,7 @@ export default function Settings() {
                             aria-pressed={theme === t}
                             onClick={() => flip(t)}
                         >
-                            {t === 'dark' ? '◐' : '◑'}<i>{t === 'dark' ? 'Dark' : 'Light'}</i>
+                            <Icon name={t === 'dark' ? 'dark' : 'light'} size={20} /><i>{t === 'dark' ? 'Dark' : 'Light'}</i>
                         </button>
                     ))}
                 </div>

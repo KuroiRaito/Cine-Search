@@ -27,12 +27,12 @@ import { toCatalog } from '../../shared/tmdb/view.js';
  * no longer offer must still render.
  */
 export const STATUSES = [
-    { key: 'want_to_watch', label: 'Want to watch', short: 'Want',       icon: '\u25F7', tone: 'st-want', film: true },
-    { key: 'watching',      label: 'Watching',      short: 'Watching',   icon: '\u25B6', tone: 'st-ing',  film: false },
-    { key: 'on_hold',       label: 'On hold',       short: 'On hold',    icon: '\u2016', tone: 'st-hold', film: false },
-    { key: 'watched',       label: 'Watched',       short: 'Watched',    icon: '\u2713', tone: 'st-done', film: true },
-    { key: 'rewatching',    label: 'Rewatching',    short: 'Rewatch',    icon: '\u21BB', tone: 'st-re',   film: false },
-    { key: 'dropped',       label: 'Dropped',       short: 'Dropped',    icon: '\u2715', tone: 'st-drop', film: true },
+    { key: 'want_to_watch', label: 'Want to watch', short: 'Want',       icon: 'want', tone: 'st-want', film: true },
+    { key: 'watching',      label: 'Watching',      short: 'Watching',   icon: 'watching', tone: 'st-ing',  film: false },
+    { key: 'on_hold',       label: 'On hold',       short: 'On hold',    icon: 'hold', tone: 'st-hold', film: false },
+    { key: 'watched',       label: 'Watched',       short: 'Watched',    icon: 'watched', tone: 'st-done', film: true },
+    { key: 'rewatching',    label: 'Rewatching',    short: 'Rewatch',    icon: 'rewatched', tone: 'st-re',   film: false },
+    { key: 'dropped',       label: 'Dropped',       short: 'Dropped',    icon: 'dropped', tone: 'st-drop', film: true },
 ];
 
 export const statusesFor = (mediaType) =>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import Icon from './Icon.jsx';
 
 export const initialsOf = (name = '') =>
     name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
@@ -18,7 +19,7 @@ export function PersonRow({ person, sub }) {
                 <b>{person.name}</b>
                 {sub && <span>{sub}</span>}
             </span>
-            <span className="go" aria-hidden="true">›</span>
+            <span className="go"><Icon name="forward" size={16} /></span>
         </Link>
     );
 }

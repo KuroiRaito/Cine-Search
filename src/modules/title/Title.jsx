@@ -5,7 +5,7 @@ import { titleFull, season as fetchSeason } from '../../shared/tmdb/endpoints.js
 import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { useRegion } from '../../shared/hooks/useRegion.js';
-import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, initialsOf } from '../../shared/ui/index.js';
+import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, Icon, initialsOf } from '../../shared/ui/index.js';
 import { TitleSkeleton } from './TitleSkeleton.jsx';
 import { SignInPrompt } from '../entry';
 import { Editor } from '../library';
@@ -37,7 +37,7 @@ function PreviewCard({ label, summary, faces, open, onToggle, children }) {
             <button type="button" className="pc-top" onClick={onToggle} aria-expanded={open}>
                 <span className="pc-h">
                     <b>{label}</b>
-                    <i aria-hidden="true">{open ? '⌃' : '⌄'}</i>
+                    <Icon name={open ? 'up' : 'down'} size={16} />
                 </span>
                 {faces}
                 <span className="ptx">{summary}</span>
@@ -170,8 +170,8 @@ export default function Title() {
                     onClick={() => gate(saved ? 'edit' : primaryVerb, () => (saved ? setEditing(true) : quickSave()))}
                 >
                     {saved
-                        ? <>{state?.icon} {state?.label} <span className="caret" aria-hidden="true">▾</span></>
-                        : (isTV ? 'Track this series' : '+ Want to watch')}
+                        ? <>{state?.icon && <Icon name={state.icon} size={16} />} {state?.label} <Icon name="down" size={16} /></>
+                        : (isTV ? 'Track this series' : <><Icon name="add" size={16} /> Want to watch</>)}
                 </button>
                 <button
                     type="button"
@@ -179,13 +179,13 @@ export default function Title() {
                     aria-pressed={isSignedIn ? Boolean(entry?.is_favourite) : undefined}
                     aria-label={entry?.is_favourite ? 'Remove from favourites' : 'Mark as favourite'}
                     onClick={() => gate('like', () => lib.save(t, { favourite: !entry?.is_favourite }))}
-                >♥</button>
+                ><Icon name="heart" size={20} /></button>
                 <button
                     type="button"
                     className="ibtn"
                     aria-label="Edit"
                     onClick={() => gate('edit', () => setEditing(true))}
-                >✎</button>
+                ><Icon name="edit" size={20} /></button>
             </div>
 
             {/* Episodes, never seasons: "3 of 5 seasons" hides that season three
@@ -309,7 +309,7 @@ export default function Title() {
             <div className="hero">
                 {t.backdrop && <img src={t.backdrop} alt="" fetchPriority="high" />}
                 <div className="hero-nav">
-                    <button type="button" className="circ on-image" onClick={() => navigate(-1)} aria-label="Back">‹</button>
+                    <button type="button" className="circ on-image" onClick={() => navigate(-1)} aria-label="Back"><Icon name="back" size={24} /></button>
                 </div>
             </div>
 
@@ -491,7 +491,7 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
                                 <div className="en">{e.number}. {e.name}</div>
                                 <div className="ed">
                                     {[e.airDate || 'TBA', e.runtime].filter(Boolean).join(' · ')}
-                                    {e.voteAverage > 0 && <> · <span className="sc">★ {e.voteAverage}</span></>}
+                                    {e.voteAverage > 0 && <> · <span className="sc"><Icon name="star" size={12} /> {e.voteAverage}</span></>}
                                 </div>
                             </div>
                             {/* An unaired episode cannot be watched, so it cannot
@@ -504,7 +504,7 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
                                 aria-label={`${on ? 'Un-mark' : 'Mark'} episode ${e.number} watched`}
                                 title={e.aired ? undefined : 'Not aired yet'}
                                 onClick={() => tick(e, !on)}
-                            >{on ? '✓' : '○'}</button>
+                            >{on ? <Icon name="check" size={16} /> : <span className="ep-dot" />}</button>
                         </div>
                     );
                 })}

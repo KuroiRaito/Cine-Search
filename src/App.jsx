@@ -20,14 +20,15 @@ import ThemeToggle from './shared/theme/ThemeToggle.jsx';
 import './shared/theme/tokens.css';
 import './app/shell.css';
 import './shared/ui/ui.css';
+import { Icon } from './shared/ui/index.js';
 
 // Tabs appear only on top-level destinations — never on a title or person page,
 // which are places you arrive at and come back from.
 const TABS = [
-    { to: '/', label: 'Discover', icon: '◎' },
-    { to: '/search', label: 'Search', icon: '⌕' },
-    { to: '/library', label: 'Library', icon: '▤' },
-    { to: '/you', label: 'You', icon: '◍' },
+    { to: '/', label: 'Discover', icon: 'discover' },
+    { to: '/search', label: 'Search', icon: 'search' },
+    { to: '/library', label: 'Library', icon: 'library' },
+    { to: '/you', label: 'You', icon: 'you' },
 ];
 
 const isTopLevel = (pathname) => TABS.some((t) => t.to === pathname);
@@ -82,7 +83,7 @@ function Shell({ children }) {
                     {TABS.map((t) => (
                         <NavLink key={t.to} to={t.to} end={t.to === '/'}
                             className={({ isActive }) => `tab-item${isActive ? ' on' : ''}`}>
-                            <span className="ico" aria-hidden="true">{t.icon}</span>
+                            <Icon name={t.icon} size={20} />
                             {t.label}
                         </NavLink>
                     ))}

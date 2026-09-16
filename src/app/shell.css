@@ -85,7 +85,9 @@ img { max-width: 100%; display: block; }
   font-size: var(--text-micro); line-height: var(--lh-micro); letter-spacing: .03em;
   padding: var(--space-2) var(--space-4);
 }
-.tab-item .ico { font-size: var(--icon-16); font-family: var(--f-s); line-height: 1; }
+/* The tab icon is a component at --icon-20; the old `.ico` span is gone.
+   Its size is set by the component, never by this rule. */
+.tab-item .icon { margin-bottom: var(--space-2); }
 .tab-item.on { color: var(--acc-t); }
 
 .topbar { display: none; }

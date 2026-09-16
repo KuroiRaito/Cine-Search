@@ -6,6 +6,7 @@ import { humanError, signUpOutcome, failureKind, RATE_LIMIT_WAIT } from './messa
 import { emailProblem, passwordProblem, usernameProblem, PASSWORD_RULES } from './rules.js';
 import { supabase } from '../../shared/auth/supabaseClient.js';
 import './entry.css';
+import { Icon } from '../../shared/ui/index.js';
 
 /**
  * One screen, five steps, one flow.
@@ -426,7 +427,7 @@ export default function Auth() {
     return (
         <div className="page">
             <div className="page-head">
-                <button type="button" className="circ" onClick={goBack} aria-label="Back">‹</button>
+                <button type="button" className="circ" onClick={goBack} aria-label="Back"><Icon name="back" size={24} /></button>
             </div>
 
             <div className="auth-body">
@@ -513,7 +514,7 @@ export default function Auth() {
                                 const met = r.test(values.password);
                                 return (
                                     <li key={r.id} className={met ? 'met' : undefined}>
-                                        <span aria-hidden="true">{met ? '✓' : '○'}</span>
+                                        <span aria-hidden="true">{met ? <Icon name="check" size={16} /> : <span className="pw-dot" />}</span>
                                         {r.label}
                                     </li>
                                 );
@@ -587,10 +588,10 @@ function Done({ panel, back, onBack }) {
     return (
         <div className="page">
             <div className="page-head">
-                <button type="button" className="circ" onClick={onBack} aria-label="Back">‹</button>
+                <button type="button" className="circ" onClick={onBack} aria-label="Back"><Icon name="back" size={24} /></button>
             </div>
             <div className="auth-body auth-done">
-                <div className="done-mark" aria-hidden="true">✓</div>
+                <div className="done-mark" aria-hidden="true"><Icon name="check" size={24} /></div>
                 <h1>{panel.title}</h1>
                 <p className="auth-lede">{panel.body}</p>
 

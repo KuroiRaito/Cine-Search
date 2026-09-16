@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Poster, TILE_SIZES } from './Poster.jsx';
+import Icon from './Icon.jsx';
 
 /**
  * The quick-add stays visible rather than appearing on hover. Hidden-until-hover
@@ -35,7 +36,7 @@ export function Tile({ item, state, onAdd }) {
                     >{state ? state.icon : '+'}</button>
                 )}
                 {item.voteAverage > 0 && (
-                    <span className="score-badge">★ {Number(item.voteAverage).toFixed(1)}</span>
+                    <span className="score-badge"><Icon name="star" size={16} /> {Number(item.voteAverage).toFixed(1)}</span>
                 )}
             </div>
             <div className="name">{item.title}</div>

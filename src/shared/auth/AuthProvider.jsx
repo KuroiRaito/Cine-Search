@@ -92,7 +92,8 @@ export function AuthProvider({ children }) {
         }
         setProfileState(PROFILE_LOADING);
         const { data, error } = await supabase
-            .from('profiles').select('id, username, region, services, theme')
+            .from('profiles')
+            .select('id, username, display_name, bio, banner_kind, banner_value, avatar_path, created_at, region, services, theme')
             .eq('id', userId).maybeSingle();
 
         // A newer load started while this one was in flight: its answer wins.
@@ -207,6 +208,26 @@ export function AuthProvider({ children }) {
             const { error } = await supabase.from('profiles').insert({ id, username });
             if (!error) await loadProfile(id, { force: true });
             return { error };
+        },
+
+        /**
+         * Write to the signed-in person's own profile row.
+         *
+         * Returns the saved row rather than re-fetching: the editor needs to
+         * know the write landed before it closes, and a second round trip to
+         * find out is a second chance to fail.
+         */
+        updateProfile: async (patch) => {
+            const id = session?.user?.id;
+            if (!id) return { error: new Error('Not signed in') };
+            const { data, error } = await supabase
+                .from('profiles').update(patch).eq('id', id).select().maybeSingle();
+            if (!error && data) {
+                setProfile(data);
+                setProfileState(PROFILE_READY);
+                profileFor.current = id;
+            }
+            return { data, error };
         },
 
         refreshProfile: () => loadProfile(session?.user?.id, { force: true }),

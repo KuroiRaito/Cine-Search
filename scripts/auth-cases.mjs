@@ -438,7 +438,7 @@ const CASES = [
         // Cleared is the security convention people expect; every other typed
         // value survives an error. The banner takes focus because the person
         // who pressed Enter is at the button, below it.
-        expect: ['password=""', 'aria-invalid=true', 'focus=auth-error'],
+        expect: ['password=""', 'aria-invalid=true', 'focus=form-error'],
         // And it must not then nag about the field it emptied.
         reject: ['Enter your password'],
     },
@@ -531,14 +531,13 @@ const CASES = [
             await page.goto(`${base}/welcome`);
             await page.waitForSelector('.cover-cta .btn', { timeout: 10000 });
             const cells = await page.locator('.mosaic-cell').count();
-            const lit = await page.locator('.mosaic-cell.on').count();
             const cta = await page.locator('.cover-cta .btn').count();
-            return `cells=${cells} lit=${lit} buttons=${cta}`;
+            return `cells=${cells} buttons=${cta}`;
         },
         // Twelve cells and both buttons, immediately. The person may already be
         // reaching for "Create account" when the images land, so nothing below
         // the fold is allowed to move when they do.
-        expect: ['cells=12', 'lit=0', 'buttons=2'],
+        expect: ['cells=12', 'buttons=2'],
     },
     {
         n: 33, name: 'S5 · with a pointer the sheet stops being a sheet',

@@ -7,8 +7,8 @@ const SearchPage = lazy(() => import('./modules/search'));
 const Title = lazy(() => import('./modules/title'));
 const Person = lazy(() => import('./modules/person'));
 const Library = lazy(() => import('./modules/library').then((m) => ({ default: m.Library })));
-const You = lazy(() => import('./modules/you').then((m) => ({ default: m.You })));
-const Settings = lazy(() => import('./modules/you').then((m) => ({ default: m.Settings })));
+const Profile = lazy(() => import('./modules/profile').then((m) => ({ default: m.Profile })));
+const Settings = lazy(() => import('./modules/profile').then((m) => ({ default: m.Settings })));
 const Cover = lazy(() => import('./modules/entry').then((m) => ({ default: m.Cover })));
 const Auth = lazy(() => import('./modules/entry').then((m) => ({ default: m.Auth })));
 // Small, static, and always present: no reason to split these out.
@@ -137,7 +137,7 @@ export default function App() {
                             <Route path="/title/:mediaType/:id" element={<Title />} />
                             <Route path="/person/:id" element={<Person />} />
                             <Route path="/library" element={<Library />} />
-                            <Route path="/you" element={<You />} />
+                            <Route path="/you" element={<Profile />} />
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/about" element={<About />} />
                             <Route path="*" element={<NotFound />} />

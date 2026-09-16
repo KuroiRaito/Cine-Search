@@ -134,3 +134,121 @@
 .spread-line {
   margin: 0; font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted);
 }
+
+/* ---------------- identity ----------------
+   Banner, face, name, handle, bio. docs/profile-module.html §02 and §06. */
+
+.pid { margin-bottom: var(--space-16); }
+
+/* 3:1 on a phone: taller eats the fold. 4:1 from medium up: wider becomes a
+   letterbox. The banner is furniture, not content. */
+.pbanner { position: relative; aspect-ratio: 3 / 1; overflow: hidden; }
+.pbanner-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* Artwork has no theme, and neither does what sits on it.
+   Fading to --bg was right for the cover, where the text below the fade is the
+   page's own colour. Here the name sits ON the banner, so in light mode a
+   white name met a near-white fade and disappeared. This wash is dark in both
+   themes — the same decision as the cover's theme toggle keeping its dark
+   ground over the poster mosaic. */
+.bscrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(4, 6, 12, .78), rgba(4, 6, 12, .18) 68%, transparent);
+}
+
+.bedit {
+  position: absolute; right: var(--space-8); top: var(--space-8);
+  height: var(--control-sm); min-width: var(--control-sm); padding: 0 var(--space-12);
+  border-radius: var(--radius-full); border: 0; cursor: pointer;
+  background: rgba(4, 6, 12, .6); backdrop-filter: blur(6px); color: #fff;
+  font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
+  font-weight: 600;
+}
+.bedit:hover { background: rgba(4, 6, 12, .78); }
+
+/* On the artwork, which is what makes the banner a nameplate rather than
+   decoration. Two lines then ellipsis — P7. */
+.pname {
+  position: absolute; left: var(--gutter); right: var(--space-64); bottom: var(--space-12); z-index: 2;
+  margin: 0; font-family: var(--f-d);
+  font-size: var(--text-title); line-height: var(--lh-title);
+  font-weight: 800; letter-spacing: -.03em; color: #fff;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.pav-row {
+  display: flex; align-items: flex-start; gap: var(--space-12);
+  padding: var(--space-12) var(--gutter) 0;
+}
+/* The ring is what separates it from the banner, in both themes. */
+.pav {
+  width: var(--space-48); height: var(--space-48); flex: 0 0 auto;
+  border-radius: var(--radius-full); border: var(--border-focus) solid var(--bg);
+  display: grid; place-items: center; overflow: hidden;
+  font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm);
+  font-weight: 800; color: #fff;
+}
+.pav img { width: 100%; height: 100%; object-fit: cover; }
+
+.pid-text { min-width: 0; flex: 1; }
+/* The handle truncates from the end and never wraps — P7. */
+.phandle {
+  font-family: var(--f-m); font-size: var(--text-caption); line-height: var(--lh-caption);
+  color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Four lines, then clamped. Never a scroll region — P6. */
+.pbio {
+  margin: var(--space-4) 0 0; max-width: var(--measure);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted);
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pbio.ph { color: var(--faint); font-style: italic; }
+
+.pbtn {
+  height: var(--control-sm); padding: 0 var(--space-12); flex: 0 0 auto;
+  border-radius: var(--radius-control); border: 0; cursor: pointer;
+  background: var(--surface-hv); color: var(--text);
+  font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
+  font-weight: 600;
+}
+.pbtn:hover { background: var(--surface); }
+
+/* P3 — restoring. The chrome is drawn and the figures are not; nothing here
+   asserts who this is. */
+.pskel {
+  display: block; height: var(--space-12); margin-bottom: var(--space-8);
+  background: var(--surface-hv); border-radius: var(--radius-4);
+}
+.pskel.w60 { width: 60%; }
+.pskel.w85 { width: 85%; height: var(--space-8); margin-bottom: 0; }
+
+/* Six gradients from the scales, and never a stock photograph. Shared by the
+   banner and the avatar, so an account's colour is one decision. */
+.bg-dusk { background: linear-gradient(115deg, var(--ink-5), var(--acc-bd) 55%, var(--rate-bd)); }
+.bg-beam { background: linear-gradient(140deg, var(--acc-bd), var(--ink-5)); }
+.bg-gold { background: linear-gradient(140deg, var(--rate-bd), var(--ink-5)); }
+.bg-moss { background: linear-gradient(140deg, var(--st-done-9), var(--ink-5)); }
+.bg-rust { background: linear-gradient(140deg, var(--st-drop-9), var(--ink-5)); }
+.bg-ink  { background: linear-gradient(140deg, var(--ink-6), var(--ink-3)); }
+
+.swatches {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-8);
+  margin-bottom: var(--space-16);
+}
+.swatch {
+  height: var(--space-48); border-radius: var(--radius-8); cursor: pointer;
+  border: var(--border-focus) solid transparent;
+  font-family: var(--f-s); font-size: var(--text-micro); line-height: var(--lh-micro);
+  font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(4, 6, 12, .7);
+}
+.swatch.on { border-color: var(--acc); }
+
+/* E3 — the counter, and what it does when you go past. */
+.cnt {
+  font-family: var(--f-m); font-style: normal;
+  font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.cnt.bad { color: var(--st-drop-11); font-weight: 600; }
+
+.pf-bio { height: auto; min-height: var(--space-80); padding: var(--space-12) var(--space-16); line-height: var(--lh-body-sm); }

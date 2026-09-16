@@ -84,6 +84,26 @@ export const titleFull = (id, mediaType, opts) => {
 export const person = (personId, opts) =>
     get(`/person/${personId}`, { append_to_response: 'combined_credits,external_ids' }, opts);
 
+/**
+ * One credit — "this person, playing this character, in this title".
+ *
+ * TMDB's own identifier for exactly what a favourite character is, and one
+ * request rehydrates the whole card: the character name, the person with their
+ * profile_path, and the title with its poster_path. There is no character
+ * entity behind it, which is why the picker has to arrive at a character
+ * through a title or an actor rather than by searching for one.
+ */
+export const credit = (creditId, opts) => get(`/credit/${creditId}`, {}, opts);
+
+/**
+ * A title's cast. `aggregate_credits` is the TV-correct call: it rolls a
+ * person's several roles into one entry and carries total_episode_count, which
+ * is the only thing that makes a 221-name cast list usable.
+ */
+export const castOf = (mediaType, id, opts) => (mediaType === 'tv'
+    ? get(`/tv/${id}/aggregate_credits`, {}, opts)
+    : get(`/movie/${id}/credits`, {}, opts));
+
 /* ---- Browse feeds. None of these need a query, which is what lets the home
    screen show something before anyone types. ---- */
 

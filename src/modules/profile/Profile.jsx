@@ -176,7 +176,7 @@ export default function You() {
                 </>
             )}
 
-            {tab === 'Favourites' && <FavouritesTab shelves={fav.shelves} />}
+            {tab === 'Favourites' && <FavouritesTab shelves={fav.shelves} onChanged={fav.retry} />}
 
             {tab === 'Stats' && (
                 <>

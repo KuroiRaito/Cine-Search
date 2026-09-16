@@ -5,3 +5,7 @@
 // they come to disagree (docs/profile-module.html D3).
 export { default as Profile } from './Profile.jsx';
 export { default as Settings } from './Settings.jsx';
+
+// The People shelf's rule lives here, so the person page only has to draw a
+// control and say when it was pressed.
+export { usePersonFavourite } from './usePersonFavourite.js';

@@ -348,3 +348,78 @@
   .fgrid { grid-template-columns: repeat(5, 1fr); }
   .frail .fcard { width: var(--space-80); }
 }
+
+/* ---------------- the picker ----------------
+   You cannot type "Walter White": /search/character is a 404 and there is no
+   character index to build one from. So the picker asks a question it can
+   answer — which title, or which actor — and arrives at the character from
+   there. docs/profile-module.html §05. */
+
+.sheet.tall { max-height: 80vh; overflow-y: auto; }
+
+.doors { display: grid; gap: var(--space-8); margin-bottom: var(--space-16); }
+
+.pick-lbl {
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro);
+  letter-spacing: .06em; text-transform: uppercase; color: var(--faint);
+  margin: var(--space-16) 0 var(--space-8);
+}
+.pick-note {
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  color: var(--muted); margin: var(--space-12) 0;
+}
+
+.picklist { list-style: none; margin: var(--space-8) 0 0; padding: 0; display: grid; gap: var(--space-4); }
+.pickrow {
+  width: 100%; display: flex; align-items: center; gap: var(--space-12);
+  min-height: var(--control-h); padding: var(--space-8); cursor: pointer;
+  background: none; border: 0; border-radius: var(--radius-8); text-align: left;
+  font-family: var(--f-s); color: var(--text);
+}
+.pickrow:hover:not(:disabled) { background: var(--surface); }
+.pickrow:disabled { opacity: .55; cursor: default; }
+.pickface {
+  width: var(--space-32); height: var(--space-48); flex: 0 0 auto;
+  border-radius: var(--radius-4); overflow: hidden; background: var(--surface-hv);
+}
+.pickface img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pickmeta { min-width: 0; flex: 1; display: block; }
+.pickmeta b {
+  display: block; font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  font-weight: 600; color: var(--text);
+}
+.pickmeta span, .pickrow > span:last-child {
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro);
+  color: var(--faint);
+}
+.picktick { color: var(--st-done-11); font-weight: 700; flex: 0 0 auto; }
+.linkish.back { display: inline-block; margin-bottom: var(--space-8); }
+
+/* A round face means *person* throughout this system, so a character — which
+   is not a person — is a portrait like every poster around it. */
+.fart.round { aspect-ratio: 1; border-radius: var(--radius-full); }
+/* The face on a character card is the actor's, so the card says whose it is.
+   That removes the lie rather than hiding it. */
+.fwho {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: var(--space-4);
+  background: linear-gradient(to top, rgba(4, 6, 12, .85), transparent);
+  color: #fff; font-family: var(--f-m);
+  font-size: var(--text-micro); line-height: var(--lh-micro);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* E8 — removing is immediate and reversible, so it gets an undo rather than a
+   confirmation. A dialog in front of a reversible act is a tax on the common
+   case. */
+.undo {
+  position: sticky; bottom: var(--space-8); z-index: var(--z-toast);
+  display: flex; align-items: center; gap: var(--space-12);
+  margin: var(--space-16) var(--gutter) 0; padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius-12); background: var(--surface); box-shadow: var(--shadow-raised);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--text);
+}
+.undo button {
+  background: none; border: 0; cursor: pointer; padding: var(--space-4);
+  font-family: var(--f-s); font-size: var(--text-body-sm); font-weight: 600; color: var(--acc-t);
+}
+.undo .dismiss-x { margin-left: auto; color: var(--muted); font-size: var(--text-title-sm); line-height: 1; }

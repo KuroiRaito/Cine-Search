@@ -48,6 +48,11 @@ const SHAPE_PROPS = new Set([
     'display', 'flex', 'grid-template-columns', 'grid-column', 'position', 'gap',
     'aspect-ratio', 'object-fit', 'opacity', 'transform', 'inset', 'color', 'font-size',
     'min-width', 'margin-bottom', 'padding-bottom',
+    // A cap is a shape: `max-height` is what makes the picker sheet scroll
+    // instead of growing past the viewport, and `max-width` is what holds a
+    // form at --form-max. Neither was in this list, so a rule that set only
+    // one of them read as a rule that set nothing.
+    'max-height', 'max-width',
 ]);
 
 const defined = new Set();

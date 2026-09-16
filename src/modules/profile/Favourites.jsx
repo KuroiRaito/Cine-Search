@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Poster, Empty } from '../../shared/ui/index.js';
+import { Poster, Empty, Icon } from '../../shared/ui/index.js';
 import { useLibrary, setFavouriteOrder, loadFavourites } from '../library';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { SHELVES, PREVIEW, shelfOf, moved } from './favourites.js';
@@ -110,11 +110,11 @@ export function FavouritesTab({ shelves }) {
                                 <button
                                     type="button" className="circ sm" aria-label={`Move ${c.title} earlier`}
                                     disabled={i === 0} onClick={() => move(i, -1)}
-                                >↑</button>
+                                ><Icon name="earlier" size={16} /></button>
                                 <button
                                     type="button" className="circ sm" aria-label={`Move ${c.title} later`}
                                     disabled={i === cards.length - 1} onClick={() => move(i, 1)}
-                                >↓</button>
+                                ><Icon name="later" size={16} /></button>
                             </div>
                         </li>
                     ))}

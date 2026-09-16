@@ -16,7 +16,7 @@
  * listed here ships.
  */
 import {
-    ArrowRight, BookMarked, Bookmark, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp,
+    ArrowDown, ArrowRight, ArrowUp, BookMarked, Bookmark, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp,
     CircleCheck, CirclePause, CirclePlay, CircleUser, CircleX, Compass, Ellipsis, Film, GripVertical,
     Heart, Minus, Moon, Pencil, Plus, RotateCcw, Search, Settings, Star, Sun, Tv, X,
 } from 'lucide-react';
@@ -34,6 +34,9 @@ const ICONS = {
     // actions
     add: Plus, remove: Minus, edit: Pencil, close: X, check: Check,
     more: Ellipsis, reorder: GripVertical, go: ArrowRight, settings: Settings,
+    // moving an item within a list — an arrow, not a chevron: a chevron
+    // navigates, an arrow moves the thing you are pointing at
+    earlier: ArrowUp, later: ArrowDown,
     // kind and chrome
     film: Film, series: Tv, dark: Moon, light: Sun,
 };

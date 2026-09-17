@@ -169,7 +169,12 @@
    to link to. */
 .linkish {
   background: none; border: 0; padding: 0; cursor: pointer;
-  font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--acc-t);
+  font-family: var(--f-s); font-weight: 600; color: var(--acc-t);
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  /* Text and its chevron are one label. Inline, the icon is a replaced element
+     the line box can break before — which is how "Score ⌄" ended up on two
+     lines in the taste heading. */
+  display: inline-flex; align-items: center; gap: var(--space-4); white-space: nowrap;
 }
 
 /* Notes are the one field that takes more than a line, so it is the one input

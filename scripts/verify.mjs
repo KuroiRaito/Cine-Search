@@ -237,7 +237,7 @@ for (const f of jsx) {
    the last step of converting it, so this list is also the migration
    board: what is listed is on the scale and stays there.
    --------------------------------------------------------------- */
-const CONVERTED = ['entry'];
+const CONVERTED = ['entry', 'profile'];
 
 // Properties where a raw length is drift. Container caps (max-width) and
 // optical values with no scale (blur radii) are deliberately not here.

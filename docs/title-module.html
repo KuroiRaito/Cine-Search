@@ -372,6 +372,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   <a href="#spine">03 The spine</a>
   <a href="#scope">03b Seasons &amp; episodes</a>
   <a href="#watch">03c Where to watch</a>
+  <a href="#craft">03d Three rules</a>
   <a href="#wiki">04 Wikipedia</a>
   <a href="#person">05 Person page</a>
   <a href="#screens">06 Screens</a>
@@ -562,6 +563,19 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
     </tbody>
   </table></div>
   <div class="note law"><b>The sheet is where per-episode rating would go, and that is the point of choosing a sheet.</b> We do not support it &mdash; rating is per title today &mdash; and it is a real product question rather than a layout one. A sheet leaves the room for it without committing to it, and without a route that would have to be un-built if the answer is no.</div>
+</div></section>
+
+<section id="craft"><div class="wrap">
+  <div class="shead"><span class="snum">03d</span><h2>Three rules the first drawings broke</h2></div>
+  <p>All three came out of review, all three were repeated across several frames, and all three are cheap to state and easy to get wrong again.</p>
+
+  <div class="note law"><b>A primary button is one line.</b> Stacking a label over a caption &mdash; <i>Continue</i> over <i>S2 E5 &middot; Breakage</i> &mdash; pushes the control to 52px and makes it read as two controls in a box. The verb takes the button; the detail goes <b>beside it on the same line</b> when it is short, and <b>below the button</b> when it is not, on the line that already states progress.
+  <br><br>So: <code>Continue &middot; S2 E5</code> in the button, <i>&ldquo;11 of 62 &middot; next up Breakage&rdquo;</i> underneath. And <i>Caught up</i> stands alone, because <i>19 of 19 aired</i> was already written directly below it &mdash; the button was repeating the page.</div>
+
+  <div class="note law"><b>Season selectors are pills.</b> One line, <code>--radius-full</code>, the count inline beside the number rather than stacked under it. A two-line tab in a scrolling row reads as a stack of small boxes, which is what made the first version off-putting.</div>
+
+  <div class="note law"><b>A rating is a <span style="color:var(--rate-t)">filled</span> star and a number, side by side. Always.</b> Never stacked, never outlined. An outlined star is the <i>empty</i> half of a rating control &mdash; using it to display a score says the opposite of what is meant, and it is the difference between &ldquo;rated 9&rdquo; and &ldquo;rate this&rdquo;.
+  <br><br>Lucide's star is a stroke icon by default, so the rating star is drawn with <code>fill="currentColor"</code> and a lighter stroke. This applies everywhere a score appears &mdash; tile badges, episode rows, the scores band, the library's compact row.</div>
 </div></section>
 
 <section id="watch"><div class="wrap">
@@ -784,6 +798,39 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
 .pfilt button.seen{border-style:dashed}
 .wlink{display:inline-flex;align-items:center;gap:var(--space-4);color:var(--acc-t);
   font-size:var(--text-caption);font-weight:600;margin-top:var(--space-8)}
+
+/* --- CTA: one line. A button that stacks a label over a caption grows to 52px
+   and reads as two controls. The detail sits beside the verb, or beneath the
+   button where the progress line already lives. --- */
+.tbig{height:var(--control-md);flex-direction:row;gap:var(--space-8);font-size:var(--text-label)}
+.tbig small{font-family:var(--f-m);font-size:var(--text-caption);font-weight:400;opacity:.85}
+/* --- season pills: one line, round, count inline --- */
+.stabs{display:flex;gap:var(--space-4);overflow:hidden;padding-bottom:var(--space-8);margin-bottom:var(--space-8);border-bottom:0}
+.stab{flex:0 0 auto;height:var(--space-32);padding:0 var(--space-12);border-radius:var(--radius-full);
+  border:0;cursor:pointer;background:var(--surface);color:var(--muted);
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;
+  display:inline-flex;flex-direction:row;align-items:center;gap:var(--space-4);line-height:1}
+.stab em{font-style:normal;font-family:var(--f-m);font-size:9px;font-weight:400;opacity:.7}
+.stab.on{background:var(--acc);color:var(--on-beam-9)}
+.stab.sp{background:none;box-shadow:inset 0 0 0 var(--border-hair) var(--bd)}
+/* --- a rating is a filled star and a number, side by side, always --- */
+.rate{display:inline-flex;align-items:center;gap:var(--space-4);color:var(--rate-t);
+  font-family:var(--f-m);font-size:var(--text-caption);font-variant-numeric:tabular-nums}
+.rate .di{width:.85em;height:.85em}
+/* --- person hero --- */
+.phero{position:relative}
+.phero .bg{aspect-ratio:16/9;background:linear-gradient(140deg,var(--ink-6),var(--beam-7))}
+.phero .sc2{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 10%,transparent 72%)}
+.phdr{display:flex;gap:var(--space-12);padding:0 var(--gutter);margin-top:calc(var(--space-48) * -1);position:relative;z-index:2}
+.phdr .pimg{width:var(--space-80);flex:0 0 auto;aspect-ratio:2/3;border-radius:var(--radius-8);
+  background:linear-gradient(140deg,var(--ink-6),var(--ink-4));border:var(--border-hair) solid var(--bd);
+  box-shadow:var(--shadow-raised)}
+.phdr .pbd{min-width:0;flex:1;padding-top:var(--space-48)}
+.pstrip{display:flex;gap:var(--space-16);padding:var(--space-12) var(--gutter) 0}
+.pstrip div{min-width:0}
+.pstrip dt{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.pstrip dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);font-weight:600;color:var(--text);
+  font-variant-numeric:tabular-nums;line-height:1.2}
 </style>
 
 <section id="screens"><div class="wrap">
@@ -813,7 +860,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
             <span class="pchip" style="opacity:.75">Rent or buy &middot; 5 &nbsp;&rsaquo;</span>
           </div></div>
         <div class="tsec"><div class="tscores">
-          <div><b>8.1</b><span>TMDB</span></div><div><b class="r">9.0</b><span>You</span></div><div><b>1</b><span>Rewatches</span></div>
+          <div><b>8.1</b><span>TMDB</span></div><div><b class="r"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 9.0</b><span>Your rating</span></div><div><b>1</b><span>Rewatches</span></div>
         </div></div>
         <div class="tsec"><h4>Overview</h4>
           <p>Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. <span style="color:var(--acc-t)">more</span></p>
@@ -852,11 +899,11 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
             <div class="twik">American television series</div>
             <div class="tmeta">2022&ndash; &middot; 5 seasons &middot; 46 episodes</div></div></div>
         <div class="tprim">
-          <button class="tbig">Continue<small>S4 E3 &middot; Worms</small></button>
+          <button class="tbig">Continue <small>S4 E3</small></button>
           <button class="tib"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></svg></button>
         </div>
         <div class="tsec"><p style="font-size:var(--text-caption);color:var(--muted);margin-bottom:var(--space-4)">
-          <b style="color:var(--text)">28 of 46 aired</b></p>
+          <b style="color:var(--text)">28 of 46 aired</b> &middot; next up <b style="color:var(--text)">Worms</b></p>
           <div class="pgbar"><i style="width:61%"></i></div>
           <p class="tmeta" style="color:var(--st-ing-11,#6FE0C8)">Next episode Thursday 24 September</p></div>
         <div class="tsec"><h4>Episodes &middot; Season 4</h4>
@@ -879,12 +926,12 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
             <div class="twik">American television series (2022&ndash;present)</div>
             <div class="tmeta">2022&ndash; &middot; 3 seasons &middot; 19 episodes</div></div></div>
         <div class="tprim">
-          <button class="tbig quiet">Caught up<small>19 of 19 aired</small></button>
+          <button class="tbig quiet">Caught up</button>
           <button class="tib"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></svg></button>
         </div>
         <div class="tsec">
           <div class="pgbar"><i style="width:100%"></i></div>
-          <p class="tmeta" style="color:var(--rate-t)">Renewed &mdash; no date announced</p>
+          <p class="tmeta" style="color:var(--rate-t)">19 of 19 aired &middot; renewed, no date announced</p>
           <p class="waiting" style="font-size:9px;color:var(--faint);margin-top:var(--space-8);line-height:1.5">
             Not 100%, and not &ldquo;finished&rdquo;. The total can still move, so the page says what is true today.</p></div>
         <div class="tsec"><h4>Episodes &middot; Season 3</h4>
@@ -904,22 +951,22 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
             <div class="twik">American crime drama television series</div>
             <div class="tmeta">2008&ndash;2013 &middot; 5 seasons &middot; 62 episodes &middot; Ended</div></div></div>
         <div class="tprim">
-          <button class="tbig">Continue<small>S2 E5 &middot; Breakage</small></button>
+          <button class="tbig">Continue <small>S2 E5</small></button>
           <button class="tib"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" /></svg></button>
         </div>
         <div class="tsec"><p style="font-size:var(--text-caption);color:var(--muted);margin-bottom:var(--space-4)">
-          <b style="color:var(--text)">11 of 62</b> &middot; 18%</p>
+          <b style="color:var(--text)">11 of 62</b> &middot; 18% &middot; next up <b style="color:var(--text)">Breakage</b></p>
           <div class="pgbar"><i style="width:18%"></i></div>
           <p class="waiting" style="font-size:9px;color:var(--faint);margin-top:var(--space-8);line-height:1.5">
             The only cohort where a percentage is honest &mdash; the total cannot move.</p></div>
         <div class="tsec"><h4>Episodes</h4>
           <div class="stabs">
-            <button class="stab">S1<em>7</em></button>
-            <button class="stab on">S2<em>13</em></button>
-            <button class="stab">S3<em>13</em></button>
-            <button class="stab">S4<em>13</em></button>
-            <button class="stab">S5<em>16</em></button>
-            <button class="stab sp">Sp<em>9</em></button>
+            <button class="stab">S1 <em>7</em></button>
+            <button class="stab on">S2 <em>13</em></button>
+            <button class="stab">S3 <em>13</em></button>
+            <button class="stab">S4 <em>13</em></button>
+            <button class="stab">S5 <em>16</em></button>
+            <button class="stab sp">Sp <em>9</em></button>
           </div>
           <p class="waiting" style="margin-bottom:var(--space-8)">Season 2 &middot; 2009 &middot; <b style="color:var(--text)">4 of 13</b></p>
           <div class="eprow"><span class="n">4</span><span class="t">Down</span><span class="ck on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M20 6 9 17l-5-5" /></svg></span></div>
@@ -959,26 +1006,29 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
   <h3>The person contrast, drawn</h3>
   <div class="phones">
     <div class="phone">
-      <div class="phone-cap"><b>TP1</b> person &middot; director</div>
+      <div class="phone-cap"><b>TP1</b> person · director</div>
       <div class="screen"><div class="scroll">
-        <div class="tbd" style="aspect-ratio:16/7;background:linear-gradient(140deg,var(--ink-6),var(--beam-7))">
-          <div class="sc2"></div><div class="back"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="m15 18-6-6 6-6" /></svg></div></div>
-        <div class="phdr" style="margin-top:calc(var(--space-24) * -1);position:relative;z-index:2">
-          <div class="pimg"></div>
-          <div class="pbd" style="padding-top:var(--space-24)">
+        <div class="phero">
+          <div class="bg" style="background:linear-gradient(140deg,var(--ink-6),var(--beam-7))"></div><div class="sc2"></div>
+          <div class="back" style="position:absolute;left:var(--space-12);top:var(--space-12);z-index:3"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="m15 18-6-6 6-6" /></svg></div>
+        </div>
+        <div class="phdr">
+          <div class="pimg" style="background:linear-gradient(140deg,var(--ink-6),var(--beam-7))"></div>
+          <div class="pbd">
             <h3 class="tt">Denis Villeneuve</h3>
             <div class="twik">Canadian filmmaker (born 1967)</div>
-            <div class="tmeta" style="color:var(--text);font-size:var(--text-caption);margin-top:var(--space-4)">Directed <b>Dune</b>, <b>Arrival</b></div>
-            <span class="wlink" style="font-size:9px">Wikipedia <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></svg></span>
           </div></div>
-        <div class="pfilt">
-          <button class="on">All <em>57</em></button><button>Directed <em>25</em></button>
-          <button>Wrote <em>9</em></button><button class="seen">Not seen</button>
-        </div>
         <div class="tsec" style="margin-top:var(--space-12)">
-          <p style="font-size:var(--text-caption)"><b style="color:var(--text)">6 of 26 directed</b></p>
-          <div class="pgbar"><i style="width:23%;background:var(--st-done-9)"></i></div>
-          <div class="lgrid" style="margin-top:var(--space-12)">
+          <p style="font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--text)">Directed <b>Dune</b>, <b>Arrival</b>, <b>Blade Runner 2049</b></p>
+          <span class="wlink" style="font-size:9px">Wikipedia <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></svg></span>
+        </div>
+        <dl class="pstrip"><div><dt>Credits</dt><dd>57</dd></div><div><dt>You have seen</dt><dd>8</dd></div><div><dt>Active</dt><dd>1998&ndash;24</dd></div></dl>
+        <div class="pfilt"><button class="on">All</button><button>Directed <em>25</em></button><button>Wrote <em>9</em></button><button class="seen">Not seen</button></div>
+        <div class="tsec" style="margin-top:var(--space-16)">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-8)">
+            <h4 style="margin:0">Directed</h4><span class="waiting">6 of 26 seen</span></div>
+          <div class="pgbar" style="margin-bottom:var(--space-12)"><i style="width:23%;background:var(--st-done-9)"></i></div>
+          <div class="lgrid">
             <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"><span class="st" style="background:var(--st-done-9)"></span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
             <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"><span class="st" style="background:var(--st-done-9)"></span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
             <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"></div><div class="nm">Enemy</div><div class="yr">2013</div></div>
@@ -987,28 +1037,41 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </div>
 
     <div class="phone">
-      <div class="phone-cap"><b>TP4</b> person &middot; two bodies of work</div>
+      <div class="phone-cap"><b>TP4</b> person · two bodies of work</div>
       <div class="screen"><div class="scroll">
-        <div class="tbd" style="aspect-ratio:16/7;background:linear-gradient(140deg,var(--mar-7),var(--ink-5))">
-          <div class="sc2"></div><div class="back"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="m15 18-6-6 6-6" /></svg></div></div>
-        <div class="phdr" style="margin-top:calc(var(--space-24) * -1);position:relative;z-index:2">
+        <div class="phero">
+          <div class="bg" style="background:linear-gradient(140deg,var(--mar-7),var(--ink-5))"></div><div class="sc2"></div>
+          <div class="back" style="position:absolute;left:var(--space-12);top:var(--space-12);z-index:3"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="m15 18-6-6 6-6" /></svg></div>
+        </div>
+        <div class="phdr">
           <div class="pimg" style="background:linear-gradient(140deg,var(--mar-7),var(--ink-5))"></div>
-          <div class="pbd" style="padding-top:var(--space-24)">
+          <div class="pbd">
             <h3 class="tt">Greta Gerwig</h3>
             <div class="twik">American filmmaker and actress</div>
-            <div class="tmeta" style="color:var(--text);font-size:var(--text-caption);margin-top:var(--space-4)">Directed <b>Barbie</b> &middot; Acted in <b>Frances Ha</b></div>
-            <span class="wlink" style="font-size:9px">Wikipedia <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></svg></span>
           </div></div>
-        <div class="pfilt">
-          <button class="on">All <em>80</em></button><button>Acted <em>63</em></button>
-          <button>Directed <em>6</em></button><button class="seen">Not seen</button>
+        <div class="tsec" style="margin-top:var(--space-12)">
+          <p style="font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--text)">Directed <b>Barbie</b>, <b>Lady Bird</b> &middot; Acted in <b>Frances Ha</b></p>
+          <span class="wlink" style="font-size:9px">Wikipedia <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></svg></span>
         </div>
-        <div class="tsec" style="margin-top:var(--space-12)"><h4>Directed</h4>
-          <p style="font-size:var(--text-caption)"><b style="color:var(--text)">2 of 6 seen</b></p>
-          <div class="pgbar"><i style="width:33%;background:var(--st-done-9)"></i></div></div>
-        <div class="tsec"><h4>Acted in <span style="font-family:var(--f-m);font-size:9px;color:var(--faint);font-weight:400">63</span></h4>
-          <p class="waiting">A list, not a bar &mdash; an actor&rsquo;s filmography is not a canon.</p></div>
-        <div class="tsec"><p class="waiting" style="line-height:1.6">64 acting against 58 directing once talk shows are excluded. <b style="color:var(--text)">A tie.</b> Neither section is demoted, and the page never says which she &ldquo;is&rdquo;.</p></div>
+        <dl class="pstrip"><div><dt>Credits</dt><dd>80</dd></div><div><dt>You have seen</dt><dd>5</dd></div><div><dt>Active</dt><dd>2006&ndash;24</dd></div></dl>
+        <div class="pfilt"><button class="on">All</button><button>Acted <em>63</em></button><button>Directed <em>6</em></button><button class="seen">Not seen</button></div>
+        <div class="tsec" style="margin-top:var(--space-16)">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-8)">
+            <h4 style="margin:0">Directed</h4><span class="waiting">2 of 6 seen</span></div>
+          <div class="pgbar" style="margin-bottom:var(--space-12)"><i style="width:33%;background:var(--st-done-9)"></i></div>
+          <div class="lgrid">
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"><span class="st" style="background:var(--st-done-9)"></span></div><div class="nm">Barbie</div><div class="yr">2023</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Lady Bird</div><div class="yr">2017</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"></div><div class="nm">Little Women</div><div class="yr">2019</div></div>
+          </div></div>
+        <div class="tsec">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:var(--space-8)">
+            <h4 style="margin:0">Acted in</h4><span class="waiting">63 &middot; no bar</span></div>
+          <div class="lgrid">
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"></div><div class="nm">Frances Ha</div><div class="yr">2012</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"></div><div class="nm">20th Century Women</div><div class="yr">2016</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--ink-5),var(--ink-3))"></div><div class="nm">Jackie</div><div class="yr">2016</div></div>
+          </div></div>
       </div></div>
     </div>
 

@@ -22,6 +22,15 @@ const FILTERS = ['watching', 'want_to_watch', 'watched', 'on_hold', 'rewatching'
    an apology. */
 const FILM_LESS = new Set(['watching', 'on_hold', 'rewatching']);
 
+/* L5 — a reason, not an apology, and written for each status rather than
+   assembled from its label. "Films don't have a "On hold" state" is what a
+   template produces; "a film is never on hold" is what a person would say. */
+const NO_FILMS = {
+    watching: 'A film is never “watching”. It is two hours, so it is either watched, wanted, or dropped.',
+    on_hold: 'A film is never on hold. It is two hours, so it is either watched, wanted, or dropped.',
+    rewatching: 'A film you are rewatching is simply watched again — the count is on its own page.',
+};
+
 /**
  * Series as rows, films as a grid, inside one filter.
  *
@@ -285,8 +294,8 @@ export default function Library() {
                 empty={finding ? null : FILM_LESS.has(active)
                     ? (
                         <>
-                            Films don’t have a “{label}” state.<br />
-                            <button type="button" className="linkish" onClick={() => setFilter('want_to_watch')}>
+                            {NO_FILMS[active]}<br />
+                            <button type="button" className="linkish" onClick={() => pick('want_to_watch')}>
                                 See your saved films
                             </button>
                         </>

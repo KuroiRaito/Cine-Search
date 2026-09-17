@@ -368,10 +368,10 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
 
 <nav class="toc"><div class="wrap">
   <a href="#research">01 What the data says</a>
-  <a href="#cohorts">02 The cohorts</a>
+  <a href="#cohorts">02 Variations</a>
   <a href="#spine">03 The spine</a>
   <a href="#wiki">04 Wikipedia</a>
-  <a href="#person">05 The person contrast</a>
+  <a href="#person">05 Person page</a>
   <a href="#screens">06 Screens</a>
   <a href="#states">07 States</a>
   <a href="#open">08 Decisions</a>
@@ -406,60 +406,94 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   <p>A film's shape turns on two independent things: <b>has it come out</b>, and <b>is it part of something</b>. Those are not cohorts of each other &mdash; an unreleased film can belong to a collection &mdash; so one is the cohort and the other is a module that appears when present.</p>
 
   <div class="note warn"><b>Two things I got wrong on the first pass, corrected here rather than quietly.</b>
-  <br><br><b>1.</b> I read <code>person/4313</code> as Roger Deakins and reported that TMDB classified a famous cinematographer as &ldquo;Costume &amp; Make-Up&rdquo;. It is <b>a different Roger Deakins</b>, a makeup artist. The real one is <code>151</code>, correctly <code>Camera</code>, <i>Director of Photography &times; 74</i>. The claim was false; the <b>name collision is real</b> and is now state T-P4.
+  <br><br><b>1.</b> I read <code>person/4313</code> as Roger Deakins and reported that TMDB classified a famous cinematographer as &ldquo;Costume &amp; Make-Up&rdquo;. It is <b>a different Roger Deakins</b>, a makeup artist. The real one is <code>151</code>, correctly <code>Camera</code>, <i>Director of Photography &times; 74</i>. The claim was false; the <b>name collision is real</b> and is now state TP5.
   <br><br><b>2.</b> I assumed the Wikipedia link would need building. It does not &mdash; &sect;04.</div>
 </div></section>
 
 <section id="cohorts"><div class="wrap">
-  <div class="shead"><span class="snum">02</span><h2>The cohorts</h2></div>
-  <p><b>Five, plus one that does not exist.</b> Each is a different answer to the same question — <i>what is the one thing this page should help me do</i> — and that answer is what changes, not the field list.</p>
+  <div class="shead"><span class="snum">02</span><h2>Variations and cohorts</h2></div>
+  <p>Two levels, not one. The module holds <b>three variations</b> — three genuinely different pages — and each variation has <b>cohorts</b> inside it, which are the states that page can be in.</p>
 
+<pre>Title module
+ ├─ <b>Movie page</b>   <b>TM</b>   ├─ released
+ │                      └─ upcoming
+ ├─ <b>Series page</b>  <b>TV</b>   ├─ running, scheduled
+ │                      ├─ running, unscheduled
+ │                      └─ finished
+ └─ <b>Person page</b>  <b>TP</b>   ├─ authored      <i>(director, writer)</i>
+                        ├─ performed    <i>(actor)</i>
+                        ├─ crafted      <i>(camera, sound, editing)</i>
+                        └─ plural       <i>(more than one of the above)</i></pre>
+
+  <div class="note law"><b>The distinction is what each level is allowed to change.</b> A <b>variation</b> may change the furniture — a person page has no providers and no episodes, a series page has an episode list a film never will. A <b>cohort</b> may only change <b>the primary action and what progress means</b>. Nothing else moves, which is why a released film and an upcoming one are the same page and a film and a person are not.</div>
+
+  <h3>Movie page &mdash; <code>TM</code></h3>
   <div class="coh">
-    <div class="cohc"><div class="tag">cohort 1 &middot; film</div><h5>A film, released</h5>
-      <p><code>media_type=movie</code>, <code>status=Released</code></p>
-      <p><b>The job:</b> decide whether to watch it, then where.</p>
-      <ul><li>One runtime, one date, one decision</li><li>No progress — you have seen it or you have not</li><li>Three statuses, not six</li><li>Where to watch is the most valuable block on the page</li></ul></div>
-
-    <div class="cohc"><div class="tag">cohort 2 &middot; film</div><h5>A film, not out yet</h5>
+    <div class="cohc"><div class="tag">cohort &middot; released</div><h5>It is out</h5>
+      <p><code>status = Released</code></p>
+      <p><b>Primary:</b> Watched / Want to watch</p>
+      <ul><li>One runtime, one date, one decision</li><li>No progress — seen or not</li><li>Three statuses, not six</li><li>Where to watch is the most valuable block</li></ul></div>
+    <div class="cohc"><div class="tag">cohort &middot; upcoming</div><h5>It is not</h5>
       <p><code>status</code> &ne; Released</p>
-      <p><b>The job:</b> remember it exists.</p>
-      <ul><li>No runtime, no score, no providers, often no overview</li><li><b>Want to watch is the only status</b> that means anything</li><li>The date is the headline, not a footnote</li><li>Half the page is legitimately absent — say so, do not draw empty boxes</li></ul></div>
-
-    <div class="cohc"><div class="tag">cohort 3 &middot; series</div><h5>Running, and scheduled</h5>
-      <p><code>status=Returning</code> + <code>next_episode_to_air</code></p>
-      <p><b>The job:</b> get back to where you were.</p>
-      <ul><li>Continue is the primary action, above everything</li><li>Next episode has a date — say it plainly</li><li>Progress is against aired episodes, not ordered ones</li></ul></div>
-
-    <div class="cohc"><div class="tag">cohort 4 &middot; series</div><h5>Running, unscheduled</h5>
-      <p><code>status=Returning</code>, <code>in_production</code>, <b>no</b> next episode</p>
-      <p><b>The job:</b> the same, minus a promise we cannot keep.</p>
-      <ul><li>Severance is exactly this, today</li><li>&ldquo;Renewed &mdash; no date announced&rdquo;, never a blank or a guess</li><li>Caught up is a <i>state</i> here, not an end</li></ul></div>
-
-    <div class="cohc"><div class="tag">cohort 5 &middot; series</div><h5>Finished</h5>
-      <p><code>status=Ended</code> or <code>Canceled</code>; includes <code>type=Miniseries</code></p>
-      <p><b>The job:</b> finish it, or decide to start something with a known length.</p>
-      <ul><li>The total is fixed, so <b>a percentage is honest</b> — the only cohort where it is</li><li>Cancelled must say cancelled; an unfinished story is a reason not to start</li><li>A miniseries is this cohort with one season — no picker</li></ul></div>
-
-    <div class="cohc no"><div class="tag">not a cohort</div><h5>Anthology</h5>
-      <p>Fargo carries no <code>anthology</code> keyword. Two of three is not a discriminator.</p>
-      <p><b>Handled by not assuming:</b></p>
-      <ul><li>Never &ldquo;continue&rdquo; across a season boundary</li><li>Season picker carries each season's own year</li><li>Progress is stated per season first, whole-run second</li></ul></div>
+      <p><b>Primary:</b> Want to watch, alone</p>
+      <ul><li>No runtime, score, providers, often no synopsis</li><li>The date is the headline, not a footnote</li><li>Half the page legitimately absent — say nothing, draw nothing</li></ul></div>
   </div>
 
-  <div class="note law"><b>The cohort decides one thing: what the primary action is.</b> Everything else on the page is the same furniture in the same order. A page that reshuffles its sections by kind makes somebody re-learn it every time they arrive from Search, and the whole value of a title page is that it is the same place twice.</div>
+  <h3>Series page &mdash; <code>TV</code></h3>
+  <div class="coh">
+    <div class="cohc"><div class="tag">cohort &middot; scheduled</div><h5>Running, with a date</h5>
+      <p><code>Returning</code> + <code>next_episode_to_air</code></p>
+      <p><b>Primary:</b> Continue &mdash; S4 E3</p>
+      <ul><li>Progress against <i>aired</i>, never ordered</li><li>Next date stated plainly</li></ul></div>
+    <div class="cohc"><div class="tag">cohort &middot; unscheduled</div><h5>Running, no date</h5>
+      <p><code>Returning</code> + <code>in_production</code>, no next episode</p>
+      <p><b>Primary:</b> Continue, or <i>Caught up</i></p>
+      <ul><li>Severance, today</li><li>&ldquo;Renewed — no date announced&rdquo;</li><li>Caught up is a state, never 100%</li></ul></div>
+    <div class="cohc"><div class="tag">cohort &middot; finished</div><h5>Ended, cancelled, or a miniseries</h5>
+      <p><code>Ended</code> / <code>Canceled</code> / <code>type=Miniseries</code></p>
+      <p><b>Primary:</b> Continue, or Start</p>
+      <ul><li>The only cohort where a <b>percentage</b> is honest</li><li>Cancelled must say cancelled</li><li>A miniseries is this, with no season picker</li></ul></div>
+  </div>
+
+  <h3>Person page &mdash; <code>TP</code></h3>
+  <p>The cohort is decided by <b>which bodies of work clear the threshold</b>, counted from the credits — never from <code>known_for_department</code>, for the reason in §05.</p>
+  <div class="coh">
+    <div class="cohc"><div class="tag">cohort &middot; authored</div><h5>Director, writer</h5>
+      <p>Villeneuve &mdash; <i>Director &times; 25</i></p>
+      <p><b>Primary:</b> the filmography, with progress</p>
+      <ul><li><b>&ldquo;6 of 26 directed&rdquo;</b> — a canon somebody works through</li><li>Acting, if any, is a list below</li></ul></div>
+    <div class="cohc"><div class="tag">cohort &middot; performed</div><h5>Actor</h5>
+      <p>Cillian Murphy &mdash; 87 cast credits</p>
+      <p><b>Primary:</b> roles, newest first</p>
+      <ul><li>Each row carries the <b>character</b>, from the same field the profile's favourites use</li><li><b>No progress bar</b> — an actor's filmography is not a canon</li></ul></div>
+    <div class="cohc"><div class="tag">cohort &middot; crafted</div><h5>Camera, sound, editing</h5>
+      <p>Zimmer &mdash; <i>Composer &times; 202</i></p>
+      <p><b>Primary:</b> one list, by weight of job</p>
+      <ul><li>No cast section at all</li><li>No progress — &ldquo;6 of 202 scored&rdquo; is not a claim anybody makes</li></ul></div>
+    <div class="cohc"><div class="tag">cohort &middot; plural</div><h5>More than one</h5>
+      <p>Gerwig &mdash; 63 acting, 11 writing, 6 directing</p>
+      <p><b>Primary:</b> stacked sections, heaviest first</p>
+      <ul><li>Each section keeps its own cohort's rules</li><li>So Gerwig gets a list for acting <i>and</i> a progress bar for directing</li></ul></div>
+  </div>
 
   <div class="tbl-wrap"><table>
-    <thead><tr><th>Cohort</th><th>Primary action</th><th>Progress reads</th><th>Statuses offered</th></tr></thead>
+    <thead><tr><th>Variation</th><th>Cohort</th><th>Primary action</th><th>Progress reads</th><th>Statuses</th></tr></thead>
     <tbody>
-      <tr><td class="num">Film, released</td><td class="use"><b>Watched</b> / Want to watch</td><td class="use">&mdash;</td><td class="num">3</td></tr>
-      <tr><td class="num">Film, upcoming</td><td class="use"><b>Want to watch</b>, alone</td><td class="use">&mdash;</td><td class="num">1</td></tr>
-      <tr><td class="num">Series, scheduled</td><td class="use"><b>Continue &mdash; S2 E7</b></td><td class="use">16 of 19 aired</td><td class="num">6</td></tr>
-      <tr><td class="num">Series, unscheduled</td><td class="use"><b>Continue</b>, or <i>Caught up</i></td><td class="use">16 of 16 aired &middot; 3 more ordered</td><td class="num">6</td></tr>
-      <tr><td class="num">Series, finished</td><td class="use"><b>Continue</b>, or <i>Start</i></td><td class="use">11 of 62 &middot; 18%</td><td class="num">6</td></tr>
+      <tr><td class="tok">TM</td><td class="num">released</td><td class="use"><b>Watched</b> / Want to watch</td><td class="use">&mdash;</td><td class="num">3</td></tr>
+      <tr><td class="tok">TM</td><td class="num">upcoming</td><td class="use"><b>Want to watch</b>, alone</td><td class="use">&mdash;</td><td class="num">1</td></tr>
+      <tr><td class="tok">TV</td><td class="num">scheduled</td><td class="use"><b>Continue &mdash; S4 E3</b></td><td class="use">28 of 46 aired</td><td class="num">6</td></tr>
+      <tr><td class="tok">TV</td><td class="num">unscheduled</td><td class="use"><b>Caught up</b></td><td class="use">19 of 19 aired</td><td class="num">6</td></tr>
+      <tr><td class="tok">TV</td><td class="num">finished</td><td class="use"><b>Continue</b></td><td class="use">11 of 62 &middot; 18%</td><td class="num">6</td></tr>
+      <tr><td class="tok">TP</td><td class="num">authored</td><td class="use">filmography</td><td class="use"><b>6 of 26 directed</b></td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">TP</td><td class="num">performed</td><td class="use">roles</td><td class="use">&mdash;</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">TP</td><td class="num">crafted</td><td class="use">one list</td><td class="use">&mdash;</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">TP</td><td class="num">plural</td><td class="use">stacked sections</td><td class="use">per section</td><td class="use">&mdash;</td></tr>
     </tbody>
   </table></div>
 
-  <div class="note warn"><b>&ldquo;Aired&rdquo; and &ldquo;ordered&rdquo; are different denominators, and using the wrong one is a bug people notice.</b> A running series with 19 ordered episodes and 16 aired must not tell somebody who has watched all 16 that they are at <b>84%</b> — they are caught up, which is a nicer thing to be told and also the truth. Percentages are for cohort 5 only, where the total cannot move.</div>
+  <div class="note warn"><b>Anthology is not a cohort of the series page, because it cannot be detected.</b> Black Mirror and True Detective carry an <code>anthology</code> keyword; <b>Fargo does not</b>. Two of three is a coin toss with extra steps. So the series page instead never assumes continuity across a season boundary: no &ldquo;continue&rdquo; spanning seasons, and the season picker carries each season's own year. An anthology then renders correctly by accident, which is the only way it can.</div>
+
+  <div class="note ok"><b>Nine cohorts, three variations, one spine.</b> §03 is the band order every variation follows — a person page simply has fewer bands, in the same sequence.</div>
 </div></section>
 
 <section id="spine"><div class="wrap">
@@ -535,8 +569,8 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
 </div></section>
 
 <section id="person"><div class="wrap">
-  <div class="shead"><span class="snum">05</span><h2>The person contrast</h2></div>
-  <p>A person page is a different module, but you raised it to make the cohort point and it is the right comparison: <b>a director's page and a film's page answer different questions, and a director's page and an actor's page are not the same page either.</b></p>
+  <div class="shead"><span class="snum">05</span><h2>Variation 3 &middot; the person page</h2></div>
+  <p>The third variation, and the one that is least like the other two. It shares the spine and drops half of it — no providers, no episodes, no status, no rating. What it has instead is a body of work, and the question that comes with one.</p>
 
   <div class="tbl-wrap"><table>
     <thead><tr><th></th><th>A title page asks</th><th>A person page asks</th></tr></thead>
@@ -548,12 +582,12 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </tbody>
   </table></div>
 
-  <div class="note law"><b>The person cohort must be read from the credits, not from the label.</b> <code>known_for_department</code> is the obvious discriminator and it is not sufficient. <b>Greta Gerwig is <code>Acting</code></b> — with 63 cast credits, and also <i>Writer &times; 11, Director &times; 6</i>. Building a &ldquo;director page&rdquo; and an &ldquo;actor page&rdquo; off that label gives one of the most significant directors working an actor's page.
+  <div class="note law"><b>Which of the four cohorts a person page is must be read from the credits, not from the label.</b> <code>known_for_department</code> is the obvious discriminator and it is not sufficient. <b>Greta Gerwig is <code>Acting</code></b> — with 63 cast credits, and also <i>Writer &times; 11, Director &times; 6</i>. Building a &ldquo;director page&rdquo; and an &ldquo;actor page&rdquo; off that label gives one of the most significant directors working an actor's page.
   <br><br>So: the page counts what the person actually has, and <b>draws a section per body of work above a threshold</b>, heaviest first. Gerwig gets an acting section and a directing section, in that order, because that is what the data says. Villeneuve (Directing, 25 directed, 32 cast) gets directing first and a small acting section. Hans Zimmer (<i>Original Music Composer &times; 202</i>) gets one section and no cast list.</div>
 
   <div class="note warn"><b>Collection progress only means something for authored work.</b> &ldquo;6 of 26 directed&rdquo; is a real achievement to track. &ldquo;6 of 202 scored&rdquo; is not the same claim — a composer's filmography is not a canon somebody works through. Progress is shown for <b>Director and Writer</b>, and the other sections are lists.</div>
 
-  <div class="note"><b>Name collisions are real and were found by making one.</b> Searching <i>Roger Deakins</i> returns two people: the cinematographer (<code>151</code>, Camera, <i>Director of Photography &times; 74</i>) and a makeup artist (<code>4313</code>). A person page must therefore always carry enough identity — department, era, a known title — that arriving at the wrong one is obvious immediately. State T-P4.</div>
+  <div class="note"><b>Name collisions are real and were found by making one.</b> Searching <i>Roger Deakins</i> returns two people: the cinematographer (<code>151</code>, Camera, <i>Director of Photography &times; 74</i>) and a makeup artist (<code>4313</code>). A person page must therefore always carry enough identity — department, era, a known title — that arriving at the wrong one is obvious immediately. State TP5.</div>
 </div></section>
 
 <style>
@@ -630,7 +664,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
   <h3>The five cohorts</h3>
   <div class="phones">
     <div class="phone">
-      <div class="phone-cap"><b>T1</b> film &middot; released</div>
+      <div class="phone-cap"><b>TM1</b> film &middot; released</div>
       <div class="screen"><div class="scroll">
         <div class="tbd"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
         <div class="thead"><div class="po" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div>
@@ -653,7 +687,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </div>
 
     <div class="phone">
-      <div class="phone-cap"><b>T2</b> film &middot; not out yet</div>
+      <div class="phone-cap"><b>TM2</b> film &middot; not out yet</div>
       <div class="screen"><div class="scroll">
         <div class="tbd" style="background:linear-gradient(140deg,var(--ink-6),var(--ink-3))"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
         <div class="thead"><div class="po"></div>
@@ -671,7 +705,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </div>
 
     <div class="phone">
-      <div class="phone-cap"><b>T3</b> series &middot; running, scheduled</div>
+      <div class="phone-cap"><b>TV1</b> series &middot; running, scheduled</div>
       <div class="screen"><div class="scroll">
         <div class="tbd" style="background:linear-gradient(140deg,var(--beam-7),var(--ink-4))"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
         <div class="thead"><div class="po" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div>
@@ -698,7 +732,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
 
   <div class="phones">
     <div class="phone">
-      <div class="phone-cap"><b>T4</b> series &middot; running, no date</div>
+      <div class="phone-cap"><b>TV2</b> series &middot; running, no date</div>
       <div class="screen"><div class="scroll">
         <div class="tbd" style="background:linear-gradient(140deg,var(--ink-7),var(--beam-7))"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
         <div class="thead"><div class="po" style="background:linear-gradient(150deg,var(--ink-6),var(--beam-7))"></div>
@@ -723,7 +757,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </div>
 
     <div class="phone">
-      <div class="phone-cap"><b>T5</b> series &middot; finished</div>
+      <div class="phone-cap"><b>TV3</b> series &middot; finished</div>
       <div class="screen"><div class="scroll">
         <div class="tbd" style="background:linear-gradient(140deg,var(--mar-7),var(--ink-5))"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
         <div class="thead"><div class="po" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div>
@@ -748,7 +782,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </div>
 
     <div class="phone">
-      <div class="phone-cap"><b>T6</b> the Wikipedia band</div>
+      <div class="phone-cap"><b>TS1</b> the Wikipedia band</div>
       <div class="screen"><div class="scroll" style="padding-top:var(--space-16)">
         <div class="tsec" style="margin-top:0"><h4>Overview</h4>
           <p>Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family.</p>
@@ -766,14 +800,14 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
       </div></div>
     </div>
   </div>
-  <div class="note ok"><b>Compare the primary buttons across T1&ndash;T5 and nothing else.</b> Watched &middot; Want to watch &middot; Continue S4 E3 &middot; Caught up &middot; Continue S2 E5. Same position, same size, five different jobs. Everything below that line is the same furniture in the same order, which is what lets somebody arrive from Search or from their library and not have to read the page to use it.</div>
+  <div class="note ok"><b>Compare the primary buttons across the five, and nothing else.</b> Watched &middot; Want to watch &middot; Continue S4 E3 &middot; Caught up &middot; Continue S2 E5. Same position, same size, five different jobs. Everything below that line is the same furniture in the same order, which is what lets somebody arrive from Search or from their library and not have to read the page to use it.</div>
 </div>
 
 <div class="wrap">
   <h3>The person contrast, drawn</h3>
   <div class="phones">
     <div class="phone">
-      <div class="phone-cap"><b>T-P1</b> a director</div>
+      <div class="phone-cap"><b>TP1</b> a director</div>
       <div class="screen"><div class="scroll">
         <div style="display:flex;gap:var(--space-12);padding:var(--space-16) var(--gutter) 0;align-items:center">
           <div style="width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);flex:0 0 auto;
@@ -795,7 +829,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </div>
 
     <div class="phone">
-      <div class="phone-cap"><b>T-P2</b> two bodies of work</div>
+      <div class="phone-cap"><b>TP4</b> two bodies of work</div>
       <div class="screen"><div class="scroll">
         <div style="display:flex;gap:var(--space-12);padding:var(--space-16) var(--gutter) 0;align-items:center">
           <div style="width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);flex:0 0 auto;
@@ -820,7 +854,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </div>
 
     <div class="phone">
-      <div class="phone-cap"><b>T-P4</b> two people, one name</div>
+      <div class="phone-cap"><b>TP5</b> two people, one name</div>
       <div class="screen"><div class="scroll" style="padding-top:var(--space-16)">
         <div class="tsec" style="margin-top:0"><h4>Search &middot; &ldquo;Roger Deakins&rdquo;</h4></div>
         <div class="srow" style="align-items:flex-start">
@@ -845,39 +879,43 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
 
 <section id="states"><div class="wrap">
   <div class="shead"><span class="snum">07</span><h2>States</h2></div>
-  <p><b>These ids are test names.</b> <code>T</code> for a title, <code>T-P</code> for the person contrast — colliding with nothing: entry owns <code>I/U/C/S</code>, profile <code>P/T/F/E/K/N/X/G/R</code>… <b>except <code>T</code></b>, which profile used for its stats tab. Profile's are <code>T1&ndash;T2</code> and scoped to that document; if the two ever share a test runner, this module's prefix becomes <code>TT</code>. Flagged rather than silently overlapped.</p>
+  <p><b>These ids are test names, and they carry the variation.</b> <code>TM</code> movie, <code>TV</code> series, <code>TP</code> person, <code>TS</code> shared across all three. Reading <code>TV2</code> tells you which page and which state before you open anything.</p>
+  <div class="note ok"><b>TD4 settled: two-letter prefixes, and the profile document is not touched.</b> The single letter <code>T</code> would have collided with profile's stats tab. <code>TV</code> is also just the right abbreviation for the series page, which is the kind of luck worth taking.</div>
   <div class="tbl-wrap"><table>
-    <thead><tr><th>#</th><th>State</th><th>What is on screen</th><th>Drawn</th></tr></thead>
+    <thead><tr><th>#</th><th>Variation</th><th>Cohort / state</th><th>What is on screen</th><th>Drawn</th></tr></thead>
     <tbody>
-        <tr><td class="tok">T1</td><td class="num">Film, released</td><td class="use">Watched / Want to watch. Providers, both scores, overview, collection.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T2</td><td class="num">Film, upcoming</td><td class="use"><b>Want to watch alone.</b> No runtime, score, providers or synopsis — bands absent, not empty. The date is the headline.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T3</td><td class="num">Series, running + scheduled</td><td class="use"><b>Continue — S4 E3</b> with the episode named. Progress against <i>aired</i>. Next date stated.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T4</td><td class="num">Series, running, no date</td><td class="use"><b>Caught up</b>, and <i>Renewed — no date announced</i>. Never 100%, never "finished".</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T5</td><td class="num">Series, finished</td><td class="use">Continue, and the only cohort where a <b>percentage</b> is honest.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T6</td><td class="num">Wikipedia band</td><td class="use">Background under the synopsis, attributed, lead extract only, with the canonical link.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T7</td><td class="num">No Wikipedia article</td><td class="use">The band is <b>absent</b>. Nothing says "no article". Two series in three.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T8</td><td class="num">No TMDB overview, but a Wikipedia one</td><td class="use">Background carries the band alone. This is where the two sources least overlap.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T9</td><td class="num">Cancelled series</td><td class="use">Says <b>cancelled</b>, not just ended. An unfinished story is a reason not to start.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T10</td><td class="num">Miniseries</td><td class="use">Cohort 5 with one season and no season picker.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T11</td><td class="num">Anthology, undetected</td><td class="use">Handled by not assuming: no "continue" across a season boundary, season picker carries each year.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T12</td><td class="num">Guest</td><td class="use">Every tracking control raises the sign-in sheet, verb matched. The page itself is never gated.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T13</td><td class="num">Session restoring</td><td class="use">No status pill, no sign-in prompt — we do not know who this is yet.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T14</td><td class="num">Loading</td><td class="use">Backdrop and poster skeleton; the title and metadata line arrive first from the list you came from.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T15</td><td class="num">Title not found</td><td class="use">A 404 that offers Search, not a blank page.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T16</td><td class="num">No backdrop</td><td class="use">Poster-derived gradient. Never a grey rectangle.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T17</td><td class="num">No poster either</td><td class="use">Initial-and-gradient, same recipe as the profile avatar.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T18</td><td class="num">Very long title</td><td class="use">Two lines then clamp. The primary action never moves.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T19</td><td class="num">Episode with no name</td><td class="use">"Episode 7" — TMDB leaves these blank for unaired runs.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T20</td><td class="num">Specials (season 0)</td><td class="use">Recorded, and excluded from the denominator. 63 of 62 is the bug this prevents.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T21</td><td class="num">Certification absent</td><td class="use">Common outside the US. The slot closes up; no "NR".</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T22</td><td class="num">No providers in region</td><td class="use">"Not streaming in India" — a fact, not an error.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T23</td><td class="num">Write rolled back</td><td class="use">Same rule as the library: names what failed and what it went back to.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T-P1</td><td class="num">Person, one body of work</td><td class="use">Directed, with progress. Acting as a list below.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T-P2</td><td class="num">Person, two bodies of work</td><td class="use">Sections by credit count, heaviest first. <code>known_for_department</code> says Acting; the page does not.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T-P3</td><td class="num">Person, crew only</td><td class="use">One section, no cast list, <b>no progress bar</b> — 202 scores is not a canon.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T-P4</td><td class="num">Two people, one name</td><td class="use">Department, top job and a known title on every row.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
-        <tr><td class="tok">T-P5</td><td class="num">Person with no photo</td><td class="use">Initials. Same recipe as everywhere else.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
-        <tr><td class="tok">T-D1</td><td class="num">expanded / wide</td><td class="use">Two columns: the sticky action rail left, the long content right.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TM1</td><td class="use">Movie</td><td class="num">released</td><td class="use">Watched / Want to watch. Providers, both scores, overview, collection.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TM2</td><td class="use">Movie</td><td class="num">upcoming</td><td class="use"><b>Want to watch alone.</b> No runtime, score, providers or synopsis — bands absent, not empty. The date is the headline.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TM3</td><td class="use">Movie</td><td class="num">in a collection</td><td class="use"><i>2 of 3 seen</i>, with a bar. Independent of released/upcoming.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TM4</td><td class="use">Movie</td><td class="num">no collection</td><td class="use">The band is absent. Most films.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TV1</td><td class="use">Series</td><td class="num">scheduled</td><td class="use"><b>Continue — S4 E3</b>, named. Progress against <i>aired</i>. Next date stated.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TV2</td><td class="use">Series</td><td class="num">unscheduled</td><td class="use"><b>Caught up</b> and <i>Renewed — no date announced</i>. Never 100%, never "finished".</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TV3</td><td class="use">Series</td><td class="num">finished</td><td class="use">Continue, and the only cohort where a <b>percentage</b> is honest.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TV4</td><td class="use">Series</td><td class="num">cancelled</td><td class="use">Says <b>cancelled</b>, not just ended. An unfinished story is a reason not to start.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TV5</td><td class="use">Series</td><td class="num">miniseries</td><td class="use">The finished cohort with one season and no season picker.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TV6</td><td class="use">Series</td><td class="num">anthology, undetected</td><td class="use">No "continue" across a season boundary; the picker carries each season's year.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TV7</td><td class="use">Series</td><td class="num">episode with no name</td><td class="use">"Episode 7" — TMDB leaves these blank for unaired runs.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TV8</td><td class="use">Series</td><td class="num">specials, season 0</td><td class="use">Recorded, and excluded from the denominator. <i>63 of 62</i> is the bug this prevents.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TP1</td><td class="use">Person</td><td class="num">authored</td><td class="use">Directed, with progress. Acting below as a list.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TP2</td><td class="use">Person</td><td class="num">performed</td><td class="use">Roles newest first, each carrying its character. No progress bar.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TP3</td><td class="use">Person</td><td class="num">crafted</td><td class="use">One list by weight of job. No cast section, no progress.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TP4</td><td class="use">Person</td><td class="num">plural</td><td class="use">Sections by credit count, heaviest first. Each keeps its own cohort's rules.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TP5</td><td class="use">Person</td><td class="num">two people, one name</td><td class="use">Department, top job and a known title on every row.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TP6</td><td class="use">Person</td><td class="num">no photo</td><td class="use">Initials on a gradient. Same recipe as the profile avatar.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS1</td><td class="use">all</td><td class="num">Wikipedia band</td><td class="use">Background under the synopsis, attributed, lead extract only, canonical link.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">TS2</td><td class="use">all</td><td class="num">no Wikipedia article</td><td class="use">The band is <b>absent</b>. Nothing says "no article". Two series in three.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS3</td><td class="use">all</td><td class="num">no TMDB overview</td><td class="use">Background carries the band alone — where the two sources least overlap.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS4</td><td class="use">all</td><td class="num">guest</td><td class="use">Every tracking control raises the sign-in sheet. The page itself is never gated.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS5</td><td class="use">all</td><td class="num">session restoring</td><td class="use">No status pill, no sign-in prompt — we do not know who this is yet.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS6</td><td class="use">all</td><td class="num">loading</td><td class="use">Backdrop and poster skeleton; title and metadata arrive first from the list you came from.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS7</td><td class="use">all</td><td class="num">not found</td><td class="use">A 404 that offers Search, not a blank page.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS8</td><td class="use">all</td><td class="num">no backdrop</td><td class="use">Poster-derived gradient. Never a grey rectangle.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS9</td><td class="use">all</td><td class="num">no artwork at all</td><td class="use">Initial and gradient.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS10</td><td class="use">all</td><td class="num">very long title</td><td class="use">Two lines then clamp. The primary action never moves.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS11</td><td class="use">TM / TV</td><td class="num">no certification</td><td class="use">Common outside the US. The slot closes up; no "NR".</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS12</td><td class="use">TM / TV</td><td class="num">no providers in region</td><td class="use">"Not streaming in India" — a fact, not an error.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS13</td><td class="use">all</td><td class="num">write rolled back</td><td class="use">Names what failed and what it went back to. Same rule as the library.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">TS14</td><td class="use">all</td><td class="num">expanded / wide</td><td class="use">Two columns: sticky action rail left, long content right.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
     </tbody>
   </table></div>
 </div></section>
@@ -888,7 +926,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     <thead><tr><th>#</th><th>Decision</th><th>Recommendation</th></tr></thead>
     <tbody>
       <tr><td class="tok">TD1</td><td class="use"><b>Does Wikipedia ship?</b> It is two public calls, no key, and gives a one-line description, a lead extract and a canonical URL.</td><td class="use"><b>Yes — the description line first, the Background block second.</b> The line under the title is the highest value per pixel in this document and works for films, series <i>and</i> people. The Background block is worth having but is absent for two series in three, so ship the line alone if only one lands.</td></tr>
-      <tr><td class="tok">TD2</td><td class="use"><b>Is &ldquo;caught up&rdquo; a status, or a state?</b> T4 shows it as a computed state, not one of the six.</td><td class="use"><b>A state.</b> The six statuses are what a person declares; caught-up is arithmetic the app does. Making it a seventh status would mean it going stale the moment an episode airs — and somebody would have to un-declare it.</td></tr>
+      <tr><td class="tok">TD2</td><td class="use"><b>Is &ldquo;caught up&rdquo; a status, or a state?</b> TV2 shows it as a computed state, not one of the six.</td><td class="use"><b>A state.</b> The six statuses are what a person declares; caught-up is arithmetic the app does. Making it a seventh status would mean it going stale the moment an episode airs — and somebody would have to un-declare it.</td></tr>
       <tr><td class="tok">TD3</td><td class="use"><b>Percentages.</b> Shown on finished series only, in this design.</td><td class="use"><b>Keep it that way.</b> On a running series the denominator moves, so a percentage is a number that goes <i>down</i> when a new episode airs. That is the kind of detail people notice once and never trust again.</td></tr>
       <tr><td class="tok">TD4</td><td class="use"><b>Prefix collision.</b> This module wants <code>T</code>; the profile document already uses <code>T1&ndash;T2</code> for its stats tab.</td><td class="use"><b>Rename the profile's two to <code>ST1&ndash;ST2</code>,</b> which is a two-line edit in a document nobody has written tests against yet — cheaper than <code>TT</code> on the largest module in the product.</td></tr>
     </tbody>

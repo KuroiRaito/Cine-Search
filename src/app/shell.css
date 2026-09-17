@@ -183,7 +183,7 @@ img { max-width: 100%; display: block; }
    enough to hit; artwork keeps growing, because artwork is the product. */
 
 @media (min-width: 600px) {
-  :root { --gutter: var(--space-24); }
+  :root { --gutter: var(--space-24); --rail-tile: 168px; --grid-min: 170px; }
 
   /* Four targets spread over a landscape window strand each icon in its own
      quarter. Hold them together in the middle, thumb-width apart. */
@@ -194,7 +194,7 @@ img { max-width: 100%; display: block; }
 /* ---------------- expanded: 1120+ ---------------- */
 
 @media (min-width: 1120px) {
-  :root { --gutter: var(--space-40); --shell-max: 1200px; }
+  :root { --gutter: var(--space-40); --shell-max: 1200px; --rail-tile: 190px; --grid-min: 180px; }
 
   .tabs { display: none; }
   .topbar {
@@ -229,15 +229,16 @@ img { max-width: 100%; display: block; }
 /* Said by the app about the app, not about anything the person typed:
    a session that ended on its own. */
 .session-note {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: var(--space-12); flex-wrap: wrap;
   background: var(--st-hold-3); color: var(--st-hold-11);
-  border-radius: 9px; padding: 9px 12px; font-size: 12.5px;
-  margin: 10px var(--gutter) 0;
+  border-radius: var(--radius-8); padding: var(--space-8) var(--space-12);
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  margin: var(--space-12) var(--gutter) 0;
 }
 .session-note a { color: inherit; font-weight: 700; text-decoration: underline; }
 .session-note button {
-  margin-left: auto; background: none; border: 0; color: inherit;
-  font-size: 15px; line-height: 1; padding: 2px 4px; cursor: pointer; opacity: .7;
+  margin-left: auto; background: none; border: 0; color: inherit; line-height: 1;
+  min-height: var(--control-h); padding: var(--space-4) var(--space-8); cursor: pointer; opacity: .7;
 }
 .session-note button:hover { opacity: 1; }
 
@@ -245,7 +246,7 @@ img { max-width: 100%; display: block; }
    question has an answer. Holding the space is the difference between a bar
    that is thinking and a bar that jumps. */
 .btn.quiet.is-waiting {
-  display: inline-block; min-width: 68px; height: 30px;
+  display: inline-block; min-width: var(--space-64); height: var(--control-sm);
   background: var(--surface); box-shadow: none; pointer-events: none;
 }
 
@@ -270,5 +271,5 @@ img { max-width: 100%; display: block; }
    ------------------------------------------------------------------ */
 
 @media (min-width: 1440px) {
-  :root { --shell-max: 1600px; }
+  :root { --shell-max: 1600px; --grid-min: 220px; }
 }

@@ -212,7 +212,7 @@
    growing, because artwork is what is being browsed.
    ------------------------------------------------------------------ */
 
-@media (min-width: 700px) and (max-width: 1119.98px) {
+@media (min-width: 600px) and (max-width: 1119.98px) {
   /* A 16:9 backdrop in a 190px-tall band is a letterbox slot at this width.
      Give it back enough height to read as an image. */
   .hero { height: 260px; }

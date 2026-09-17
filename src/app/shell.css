@@ -268,8 +268,20 @@ img { max-width: 100%; display: block; }
 
    Neither is whole, and both are provable. --gutter does not step here:
    40px is already as far as an inset should go.
+
+   --grid-min is 208 and not 220 because the band is 160px wide before the
+   container caps, and auto-fill has to land on six across all of it. The
+   window is narrower than it looks:
+
+       six at the narrow end   6 x min + 5 x 16 <= 1360  ->  min <= 213.33
+       seven at the wide end   7 x min + 6 x 16 >  1520  ->  min >  203.43
+
+   220 satisfies only the second, so 1440-1519 fell back to FIVE columns at
+   259px — a tile at the very top of the 180-260 range, in the one band §08
+   says should step to six. 208 satisfies both, and has room either side:
+   six tiles at 213px on a 1440 screen, six at 240px once the container caps.
    ------------------------------------------------------------------ */
 
 @media (min-width: 1440px) {
-  :root { --shell-max: 1600px; --grid-min: 220px; }
+  :root { --shell-max: 1600px; --grid-min: 208px; }
 }

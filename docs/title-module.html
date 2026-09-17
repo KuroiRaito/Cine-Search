@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Title Module</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Projector — the profile module. Built on the tokens in docs/foundations.html;
+   no loose numbers here either. */
+:root{
+  color-scheme:dark;
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-3:#0A2530;--beam-7:#155A72;--beam-9:#25BADF;--beam-11:#6FDCF5;
+  --mar-3:#2B210B;--mar-7:#6B5316;--mar-9:#F5C45C;--mar-11:#F0C468;
+  --st-done-3:#07241F;--st-done-9:#2ABFA0;--st-done-11:#6FE0C8;
+  --st-drop-3:#26100C;--st-drop-9:#B5594A;--st-drop-11:#DC8E7F;
+  --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
+  --on-beam-9:#06333F;
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);
+  --grid-line:rgba(111,220,245,.13);
+  --space-0:0px;--space-2:2px;--space-4:4px;--space-8:8px;--space-12:12px;
+  --space-16:16px;--space-20:20px;--space-24:24px;--space-32:32px;--space-40:40px;
+  --space-48:48px;--space-64:64px;--space-80:80px;
+  --radius-4:4px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-full:999px;
+  --border-hair:1px;--border-focus:2px;
+  --control-sm:36px;--control-md:44px;--control-lg:52px;
+  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+  --f-d:'Archivo',system-ui,sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',ui-monospace,monospace;
+  --dur-fast:120ms;--dur-base:200ms;--ease-out:cubic-bezier(.2,0,0,1);
+  --shadow-raised:0 6px 16px -4px rgba(0,0,0,.6);--scrim-wash:rgba(4,6,12,.62);
+  --z-nav:40;--z-scrim:60;
+  --gutter:var(--space-16);--control-h:var(--control-md);--radius-control:var(--radius-12);
+  --field-gap:var(--space-8);--field-stack:var(--space-16);--section-gap:var(--space-24);
+  --form-max:420px;--measure:65ch;--shell-max:none;
+  --text-micro:11px;--lh-micro:16px;--text-caption:12px;--lh-caption:16px;
+  --text-body-sm:13px;--lh-body-sm:20px;--text-label:13px;--lh-label:16px;
+  --text-body:15px;--lh-body:24px;--text-title-sm:17px;--lh-title-sm:24px;
+  --text-title:21px;--lh-title:28px;--text-display-sm:27px;--lh-display-sm:32px;
+  --text-display:40px;--lh-display:44px;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-s);font-size:var(--text-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:var(--border-focus) solid var(--acc);outline-offset:3px;border-radius:var(--radius-4)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 var(--space-24)}
+.mast{border-bottom:var(--border-hair) solid var(--bd-sub);padding:var(--space-64) 0 var(--space-40);position:relative;overflow:hidden}
+.mast::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to right,var(--grid-line) 0 1px,transparent 1px var(--space-4)),
+             repeating-linear-gradient(to bottom,var(--grid-line) 0 1px,transparent 1px var(--space-4));
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%);
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%)}
+.mast .wrap{position:relative}
+.eyebrow{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t);display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-16)}
+.eyebrow i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal;flex:0 0 auto}
+h1{font-family:var(--f-d);font-size:var(--text-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.04em;margin:0 0 var(--space-16);text-wrap:balance}
+.lede{font-size:var(--text-body);line-height:var(--lh-body);color:var(--muted);max-width:62ch;margin:0}
+.lede b{color:var(--text);font-weight:600}
+nav.toc{border-bottom:var(--border-hair) solid var(--bd-sub);position:sticky;top:0;z-index:var(--z-nav);
+  background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px)}
+nav.toc .wrap{display:flex;gap:var(--space-4);overflow-x:auto;padding-top:var(--space-8);padding-bottom:var(--space-8)}
+nav.toc a{flex:0 0 auto;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);
+  letter-spacing:.04em;color:var(--muted);text-decoration:none;padding:var(--space-8) var(--space-12);border-radius:var(--radius-8)}
+nav.toc a:hover{background:var(--surface);color:var(--text)}
+section{padding:var(--space-64) 0;border-bottom:var(--border-hair) solid var(--bd-sub)}
+.shead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
+.snum{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc);flex:0 0 auto}
+h2{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+h3{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;margin:var(--space-40) 0 var(--space-12)}
+h4{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:var(--space-24) 0 var(--space-12)}
+section > .wrap > p,.prose{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0 0 var(--space-12)}
+section > .wrap > p b,.prose b{color:var(--text);font-weight:600}
+code{font-family:var(--f-m);font-size:.92em;background:var(--surface);padding:var(--space-2) var(--space-4);border-radius:var(--radius-4);color:var(--acc-t)}
+.tbl-wrap{overflow-x:auto;margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12)}
+table{width:100%;border-collapse:collapse;font-size:var(--text-body-sm);line-height:var(--lh-body-sm)}
+th{text-align:left;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd);background:var(--bg-sub);white-space:nowrap}
+td{padding:var(--space-12) var(--space-16);border-bottom:var(--border-hair) solid var(--bd-sub);vertical-align:top;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.tok,td.num{font-family:var(--f-m);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.tok{color:var(--acc-t)}td.num{color:var(--text)}
+tbody tr:hover td{background:color-mix(in srgb,var(--surface) 55%,transparent)}
+.note{border-left:var(--border-focus) solid var(--acc-bd);background:var(--acc-bg);padding:var(--space-12) var(--space-16);
+  border-radius:0 var(--radius-8) var(--radius-8) 0;margin:var(--space-16) 0;font-size:var(--text-body-sm);
+  line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure)}
+.note b{color:var(--acc-t);font-weight:600}
+.note.warn{border-left-color:var(--rate-bd);background:var(--rate-bg)}
+.note.warn b{color:var(--rate-t)}
+.note.law{border-left-color:var(--st-drop-9);background:var(--st-drop-3)}
+.note.law b{color:var(--st-drop-11)}
+.note.ok{border-left-color:var(--st-done-9);background:var(--st-done-3)}
+.note.ok b{color:var(--st-done-11)}
+pre{background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);
+  padding:var(--space-16);overflow-x:auto;margin:var(--space-16) 0;font-family:var(--f-m);
+  font-size:var(--text-caption);line-height:var(--lh-body-sm);color:var(--muted)}
+pre b{color:var(--acc-t);font-weight:500}pre i{color:var(--faint);font-style:normal}
+pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11);text-decoration:none}
+</style>
+<style>
+.phones{display:flex;flex-wrap:wrap;gap:var(--space-24);margin-top:var(--space-16);align-items:flex-start}
+.phone{flex:0 0 auto;width:320px;max-width:100%}
+.phone-cap{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:var(--space-8);display:flex;gap:var(--space-8)}
+.phone-cap b{color:var(--acc-t);font-weight:600}
+.screen{width:320px;max-width:100%;height:600px;overflow:hidden;position:relative;background:var(--bg);
+  border:var(--border-hair) solid var(--bd);border-radius:var(--radius-16);--gutter:var(--space-16)}
+.screen *{box-sizing:border-box}
+.scroll{height:100%;overflow:hidden}
+
+/* --- banner + avatar --- */
+.pbanner{position:relative;aspect-ratio:3/1;background:linear-gradient(115deg,var(--ink-5),var(--beam-7) 55%,var(--mar-7));overflow:hidden}
+.pbanner.empty{background:repeating-linear-gradient(45deg,var(--ink-3) 0 6px,var(--ink-2) 6px 12px);display:grid;place-items:center}
+.pbanner .ecap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.pbanner .bscrim{position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 62%)}
+.pbanner .bedit{position:absolute;right:var(--space-8);top:var(--space-8);height:var(--control-sm);min-width:var(--control-sm);
+  padding:0 var(--space-12);border-radius:var(--radius-full);border:0;cursor:pointer;
+  background:rgba(4,6,12,.6);backdrop-filter:blur(6px);color:#fff;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.phead{padding:0 var(--gutter);margin-top:calc(var(--space-32) * -1);position:relative}
+.pav{width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:3px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title);font-weight:800;color:#fff}
+.pav.empty{background:var(--surface-hv);color:var(--faint)}
+.pname-row{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:var(--space-8)}
+.pname{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+.phandle{font-family:var(--f-m);font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted)}
+.pbio{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:var(--space-12) 0 0;max-width:var(--measure)}
+.pbio.ph{color:var(--faint);font-style:italic}
+.pbtn{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--surface-hv);color:var(--text);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;
+  display:inline-flex;align-items:center;gap:var(--space-4);flex:0 0 auto}
+
+/* --- stat strip --- */
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--border-hair);margin:var(--space-20) var(--gutter) 0;
+  background:var(--bd-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.pstat{background:var(--bg-sub);padding:var(--space-8) var(--space-4);text-align:center}
+.pstat dt{font-family:var(--f-m);font-size:9px;line-height:var(--lh-micro);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.pstat dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.pstat dd small{font-size:var(--text-micro);color:var(--muted);font-weight:400}
+
+/* --- shelves --- */
+.shelf{margin-top:var(--section-gap)}
+.shelf-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-8);padding:0 var(--gutter);margin-bottom:var(--space-8)}
+.shelf-h h4{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;
+  letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none}
+.shelf-n{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);font-variant-numeric:tabular-nums}
+.rail{display:flex;gap:var(--space-8);overflow:hidden;padding:0 var(--gutter) var(--space-4)}
+.fti{flex:0 0 auto;width:78px}
+.fti .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden;position:relative}
+.fti .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fti .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.fpe{flex:0 0 auto;width:72px;text-align:center}
+.fpe .face{width:72px;height:72px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-6),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden}
+.fpe .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text)}
+.fpe .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+/* a character card is a face plus the two things that disambiguate it */
+.fch{flex:0 0 auto;width:96px}
+.fch .face{width:96px;aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(140deg,var(--mar-7),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fch .face .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;
+  font-family:var(--f-m);font-size:9px;line-height:1.3}
+.fch .nm{font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fch .sub{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.addcard{flex:0 0 auto;width:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-4);
+  aspect-ratio:2/3;border-radius:var(--radius-8);border:var(--border-hair) dashed var(--bd-str);background:none;
+  color:var(--muted);cursor:pointer;font-family:var(--f-s);font-size:var(--text-micro)}
+.addcard .plus{font-size:var(--text-title-sm);line-height:1;color:var(--acc-t)}
+.empty-shelf{margin:0 var(--gutter);padding:var(--space-16);border:var(--border-hair) dashed var(--bd-str);
+  border-radius:var(--radius-12);text-align:center}
+.empty-shelf p{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-8)}
+.empty-shelf button{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.callout{display:flex;gap:var(--space-8);margin-top:var(--space-8);padding:0 var(--gutter)}
+
+/* ---- components the benchmark added ---- */
+.ptabs{display:flex;gap:0;overflow:hidden;border-bottom:var(--border-hair) solid var(--bd-sub);padding:0 var(--gutter);margin-top:var(--space-12)}
+.ptabs button{flex:0 0 auto;background:none;border:0;cursor:pointer;padding:var(--space-8) var(--space-12) var(--space-8);
+  font-family:var(--f-s);font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--muted);
+  border-bottom:var(--border-focus) solid transparent;min-height:var(--control-h)}
+.ptabs button.on{color:var(--acc-t);border-bottom-color:var(--acc)}
+.pname-on-banner{position:absolute;left:var(--gutter);bottom:var(--space-12);z-index:2;
+  font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;color:#fff}
+.pbanner.tall{aspect-ratio:2/1}
+.pav-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--gutter) 0}
+.pav-sm{width:var(--space-48);height:var(--space-48);border-radius:var(--radius-full);flex:0 0 auto;
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:2px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:800;color:#fff}
+.pav-sm.empty{background:var(--surface-hv);color:var(--faint)}
+/* split stat block, one per medium */
+.sblock{margin:var(--space-16) var(--gutter) 0;background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);
+  border-radius:var(--radius-12);padding:var(--space-12)}
+.sblock-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
+.sblock-h b{font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text)}
+.sblock-h span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.snums{display:flex;gap:var(--space-16);margin-bottom:var(--space-8)}
+.snum-i{min-width:0}
+.snum-i dt{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.snum-i dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.snum-i dd.rate{color:var(--rate-t)}
+/* the distribution bar — six watch-state hues, already in the foundations */
+.dbar{display:flex;height:var(--space-8);border-radius:var(--radius-full);overflow:hidden;background:var(--surface-hv)}
+.dbar i{display:block;height:100%;font-style:normal}
+.dlegend{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-8)}
+.dlegend span{display:flex;align-items:center;gap:var(--space-4);font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.dlegend i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);font-style:normal;flex:0 0 auto}
+/* a ranked dimension card: count AND mean */
+.dimcard{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8);border-radius:var(--radius-8);
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub)}
+.dimcard .lbl{min-width:0;flex:1}
+.dimcard .lbl b{display:block;font-size:var(--text-caption);font-weight:600;color:var(--text)}
+.dimcard .lbl span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.dimcard .mean{font-family:var(--f-m);font-size:var(--text-body-sm);font-weight:600;color:var(--rate-t);
+  font-variant-numeric:tabular-nums;flex:0 0 auto}
+.dimgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);padding:0 var(--gutter);margin-top:var(--space-8)}
+/* chip row — the fix for 24 screens of scroll */
+.chips{display:flex;gap:var(--space-8);overflow:hidden;padding:var(--space-12) var(--gutter)}
+.chip{flex:0 0 auto;height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-full);
+  border:var(--border-hair) solid var(--bd);background:none;color:var(--muted);cursor:pointer;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.chip.on{background:var(--acc-bg);border-color:var(--acc-bd);color:var(--acc-t)}
+.chip em{font-family:var(--f-m);font-style:normal;font-size:9px;opacity:.8}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);padding:0 var(--gutter)}
+.fgrid .cell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fgrid .cell .art .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px;line-height:1.3}
+.fgrid .cell .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fgrid .cell .sub{font-family:var(--f-m);font-size:8px;color:var(--faint)}
+/* sheets */
+.sheetwrap{position:absolute;inset:0;background:var(--scrim-wash);display:flex;align-items:flex-end}
+.sheet{width:100%;background:var(--bg-sub);border-top:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16) var(--radius-16) 0 0;padding:var(--space-12) var(--space-20) var(--space-20)}
+.grab{width:var(--space-32);height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto var(--space-16)}
+.sh-t{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;letter-spacing:-.02em;margin:0 0 var(--space-4);color:var(--text)}
+.sh-b{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-12)}
+.fld{display:flex;flex-direction:column;gap:var(--field-gap);margin-bottom:var(--field-stack)}
+.fld>span{font-size:var(--text-label);font-weight:600;color:var(--muted)}
+.inp{height:var(--control-h);border-radius:var(--radius-control);background:var(--bg);color:var(--text);
+  border:0;box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);padding:0 var(--space-16);
+  font-family:var(--f-s);font-size:var(--text-body);display:flex;align-items:center}
+.inp.ta{height:auto;min-height:var(--space-64);padding:var(--space-12) var(--space-16);align-items:flex-start;line-height:var(--lh-body-sm);font-size:var(--text-body-sm)}
+.cnt{font-family:var(--f-m);font-size:9px;color:var(--faint);text-align:right}
+.btn{height:var(--control-h);border-radius:var(--radius-control);border:0;cursor:pointer;width:100%;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-label);font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center}
+.btn.q{background:var(--surface-hv);color:var(--text)}
+.skel{background:var(--surface-hv);border-radius:var(--radius-4);animation:none}
+/* desktop frames, drawn at true width then scaled to fit this page */
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px;height:700px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;height:700px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px;display:flex;flex-direction:column}
+.dtop{display:flex;align-items:center;gap:var(--space-24);padding:var(--space-12) var(--gutter);
+  border-bottom:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:var(--space-8);font-family:var(--f-d);font-weight:800;font-size:var(--text-title-sm);letter-spacing:-.03em}
+.dwm i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:var(--space-4)}
+.dnav a{padding:0 var(--space-12);height:var(--control-h);display:inline-flex;align-items:center;border-radius:var(--radius-8);
+  font-size:var(--text-body-sm);color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+.dbody{flex:1;overflow:hidden}
+.dcols{display:grid;grid-template-columns:320px 1fr;gap:var(--space-32);padding:var(--space-24) var(--gutter)}
+
+.invite{margin:var(--space-16) var(--gutter) 0;padding:var(--space-16);border-radius:var(--radius-12);
+  border:var(--border-hair) dashed var(--bd-str);background:var(--bg-sub)}
+.invite b{display:block;font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.invite p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-12)}
+.invite .go{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.waiting{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.ladder{margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.lrow{display:grid;grid-template-columns:96px 1fr;gap:var(--space-16);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd-sub);align-items:baseline}
+.lrow:last-child{border-bottom:0}
+.lrow .at{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc-t);font-variant-numeric:tabular-nums}
+.lrow .what{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted)}
+.lrow .what b{color:var(--text);font-weight:600}
+
+/* Icons in the mock screens are the shipped Lucide set, drawn inline. Sized
+   in em so each mock keeps its own scale, with the baseline nudge that puts
+   an inline SVG where the glyph used to sit — minus the glyph's drift. */
+.di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+<style>
+.lh{padding:var(--space-16) var(--gutter) 0}
+.lh h3{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;
+  letter-spacing:-.03em;margin:0;color:var(--text)}
+.ico-s{width:16px;height:16px;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+<style>
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px}
+.dtop{display:flex;align-items:center;gap:24px;padding:12px 40px;border-bottom:1px solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-weight:800;font-size:17px;letter-spacing:-.03em}
+.dwm i{width:8px;height:8px;border-radius:999px;background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:4px}
+.dnav a{padding:0 12px;height:44px;display:inline-flex;align-items:center;border-radius:8px;font-size:13px;color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+</style>
+
+<style>
+.coh{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--space-12);margin-top:var(--space-16)}
+.cohc{background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);padding:var(--space-16)}
+.cohc.no{border-style:dashed;opacity:.72}
+.cohc h5{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;margin:0 0 var(--space-4);color:var(--text)}
+.cohc .tag{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc-t);margin-bottom:var(--space-8)}
+.cohc.no .tag{color:var(--st-drop-11)}
+.cohc p{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-8)}
+.cohc code{font-size:9px}
+.cohc ul{margin:0;padding-left:var(--space-16);font-size:var(--text-caption);line-height:18px;color:var(--muted)}
+</style>
+
+<header class="mast"><div class="wrap">
+  <div class="eyebrow"><i></i>Projector &middot; module 4 &middot; the biggest one</div>
+  <h1>Title</h1>
+  <p class="lede">A film and a series are not one screen with a few fields hidden. Nor are they two &mdash; the data says <b>five shapes</b>, and it says one shape people assume exists cannot be detected at all. Everything below was checked against live TMDB before it was drawn, including two things I got wrong on the first pass.</p>
+</div></header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#research">01 What the data says</a>
+  <a href="#cohorts">02 The cohorts</a>
+  <a href="#spine">03 The spine</a>
+  <a href="#wiki">04 Wikipedia</a>
+  <a href="#person">05 The person contrast</a>
+  <a href="#screens">06 Screens</a>
+  <a href="#states">07 States</a>
+  <a href="#open">08 Decisions</a>
+</div></nav>
+
+<section id="research"><div class="wrap">
+  <div class="shead"><span class="snum">01</span><h2>What the data says</h2></div>
+  <p>A cohort is only real if the app can tell which one it is looking at. So the first question is not &ldquo;what kinds of title are there&rdquo; &mdash; it is <b>what does TMDB let us distinguish</b>. Sampled live:</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Series</th><th><code>type</code></th><th><code>status</code></th><th>Seasons</th><th>Eps</th><th><code>next_episode<wbr>_to_air</code></th><th><code>in_production</code></th></tr></thead>
+    <tbody>
+      <tr><td class="num">Severance</td><td class="use">Scripted</td><td class="use">Returning Series</td><td class="num">3</td><td class="num">19</td><td class="use">&mdash;</td><td class="use">yes</td></tr>
+      <tr><td class="num">Black Mirror</td><td class="use">Scripted</td><td class="use">Returning Series</td><td class="num">7</td><td class="num">33</td><td class="use">&mdash;</td><td class="use">yes</td></tr>
+      <tr><td class="num">Breaking Bad</td><td class="use">Scripted</td><td class="use">Ended</td><td class="num">5</td><td class="num">62</td><td class="use">&mdash;</td><td class="use">no</td></tr>
+      <tr><td class="num">Chernobyl</td><td class="use"><b>Miniseries</b></td><td class="use">Ended</td><td class="num">1</td><td class="num">5</td><td class="use">&mdash;</td><td class="use">no</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note ok"><b>Three usable discriminators, and one surprise.</b> <code>type</code> singles out a <b>Miniseries</b>. <code>status</code> separates returning from ended. <code>in_production</code> and <code>next_episode_to_air</code> together separate <i>renewed and scheduled</i> from <i>renewed and not scheduled</i> &mdash; and the surprise is that <b>Severance is returning, in production, and has no next episode</b>. &ldquo;Coming back, nobody knows when&rdquo; is a real and common state, and it is not the same screen as &ldquo;next Friday&rdquo;.</div>
+
+  <div class="note law"><b>An anthology cannot be detected, so it cannot be a cohort.</b> Black Mirror and True Detective carry an <code>anthology</code> keyword; <b>Fargo does not</b> &mdash; its keywords are <i>detective, minnesota, winter, deputy, north dakota</i>. Two out of three is not a discriminator, it is a coin toss with extra steps. So there is no anthology cohort, and the series design must instead <b>degrade gracefully when seasons are unrelated</b>: never imply that season 4 continues season 3, never say &ldquo;continue watching&rdquo; across a season boundary, and let the season picker carry its own year.</div>
+
+  <h4>Films</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Film</th><th><code>status</code></th><th>Runtime</th><th><code>belongs_to_collection</code></th></tr></thead>
+    <tbody>
+      <tr><td class="num">Dune: Part Two</td><td class="use">Released</td><td class="num">167</td><td class="use">Dune Collection</td></tr>
+      <tr><td class="num">Oppenheimer</td><td class="use">Released</td><td class="num">181</td><td class="use">&mdash;</td></tr>
+    </tbody>
+  </table></div>
+  <p>A film's shape turns on two independent things: <b>has it come out</b>, and <b>is it part of something</b>. Those are not cohorts of each other &mdash; an unreleased film can belong to a collection &mdash; so one is the cohort and the other is a module that appears when present.</p>
+
+  <div class="note warn"><b>Two things I got wrong on the first pass, corrected here rather than quietly.</b>
+  <br><br><b>1.</b> I read <code>person/4313</code> as Roger Deakins and reported that TMDB classified a famous cinematographer as &ldquo;Costume &amp; Make-Up&rdquo;. It is <b>a different Roger Deakins</b>, a makeup artist. The real one is <code>151</code>, correctly <code>Camera</code>, <i>Director of Photography &times; 74</i>. The claim was false; the <b>name collision is real</b> and is now state T-P4.
+  <br><br><b>2.</b> I assumed the Wikipedia link would need building. It does not &mdash; &sect;04.</div>
+</div></section>
+
+<section id="cohorts"><div class="wrap">
+  <div class="shead"><span class="snum">02</span><h2>The cohorts</h2></div>
+  <p><b>Five, plus one that does not exist.</b> Each is a different answer to the same question — <i>what is the one thing this page should help me do</i> — and that answer is what changes, not the field list.</p>
+
+  <div class="coh">
+    <div class="cohc"><div class="tag">cohort 1 &middot; film</div><h5>A film, released</h5>
+      <p><code>media_type=movie</code>, <code>status=Released</code></p>
+      <p><b>The job:</b> decide whether to watch it, then where.</p>
+      <ul><li>One runtime, one date, one decision</li><li>No progress — you have seen it or you have not</li><li>Three statuses, not six</li><li>Where to watch is the most valuable block on the page</li></ul></div>
+
+    <div class="cohc"><div class="tag">cohort 2 &middot; film</div><h5>A film, not out yet</h5>
+      <p><code>status</code> &ne; Released</p>
+      <p><b>The job:</b> remember it exists.</p>
+      <ul><li>No runtime, no score, no providers, often no overview</li><li><b>Want to watch is the only status</b> that means anything</li><li>The date is the headline, not a footnote</li><li>Half the page is legitimately absent — say so, do not draw empty boxes</li></ul></div>
+
+    <div class="cohc"><div class="tag">cohort 3 &middot; series</div><h5>Running, and scheduled</h5>
+      <p><code>status=Returning</code> + <code>next_episode_to_air</code></p>
+      <p><b>The job:</b> get back to where you were.</p>
+      <ul><li>Continue is the primary action, above everything</li><li>Next episode has a date — say it plainly</li><li>Progress is against aired episodes, not ordered ones</li></ul></div>
+
+    <div class="cohc"><div class="tag">cohort 4 &middot; series</div><h5>Running, unscheduled</h5>
+      <p><code>status=Returning</code>, <code>in_production</code>, <b>no</b> next episode</p>
+      <p><b>The job:</b> the same, minus a promise we cannot keep.</p>
+      <ul><li>Severance is exactly this, today</li><li>&ldquo;Renewed &mdash; no date announced&rdquo;, never a blank or a guess</li><li>Caught up is a <i>state</i> here, not an end</li></ul></div>
+
+    <div class="cohc"><div class="tag">cohort 5 &middot; series</div><h5>Finished</h5>
+      <p><code>status=Ended</code> or <code>Canceled</code>; includes <code>type=Miniseries</code></p>
+      <p><b>The job:</b> finish it, or decide to start something with a known length.</p>
+      <ul><li>The total is fixed, so <b>a percentage is honest</b> — the only cohort where it is</li><li>Cancelled must say cancelled; an unfinished story is a reason not to start</li><li>A miniseries is this cohort with one season — no picker</li></ul></div>
+
+    <div class="cohc no"><div class="tag">not a cohort</div><h5>Anthology</h5>
+      <p>Fargo carries no <code>anthology</code> keyword. Two of three is not a discriminator.</p>
+      <p><b>Handled by not assuming:</b></p>
+      <ul><li>Never &ldquo;continue&rdquo; across a season boundary</li><li>Season picker carries each season's own year</li><li>Progress is stated per season first, whole-run second</li></ul></div>
+  </div>
+
+  <div class="note law"><b>The cohort decides one thing: what the primary action is.</b> Everything else on the page is the same furniture in the same order. A page that reshuffles its sections by kind makes somebody re-learn it every time they arrive from Search, and the whole value of a title page is that it is the same place twice.</div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Cohort</th><th>Primary action</th><th>Progress reads</th><th>Statuses offered</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Film, released</td><td class="use"><b>Watched</b> / Want to watch</td><td class="use">&mdash;</td><td class="num">3</td></tr>
+      <tr><td class="num">Film, upcoming</td><td class="use"><b>Want to watch</b>, alone</td><td class="use">&mdash;</td><td class="num">1</td></tr>
+      <tr><td class="num">Series, scheduled</td><td class="use"><b>Continue &mdash; S2 E7</b></td><td class="use">16 of 19 aired</td><td class="num">6</td></tr>
+      <tr><td class="num">Series, unscheduled</td><td class="use"><b>Continue</b>, or <i>Caught up</i></td><td class="use">16 of 16 aired &middot; 3 more ordered</td><td class="num">6</td></tr>
+      <tr><td class="num">Series, finished</td><td class="use"><b>Continue</b>, or <i>Start</i></td><td class="use">11 of 62 &middot; 18%</td><td class="num">6</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note warn"><b>&ldquo;Aired&rdquo; and &ldquo;ordered&rdquo; are different denominators, and using the wrong one is a bug people notice.</b> A running series with 19 ordered episodes and 16 aired must not tell somebody who has watched all 16 that they are at <b>84%</b> — they are caught up, which is a nicer thing to be told and also the truth. Percentages are for cohort 5 only, where the total cannot move.</div>
+</div></section>
+
+<section id="spine"><div class="wrap">
+  <div class="shead"><span class="snum">03</span><h2>The spine</h2></div>
+  <p>The order every cohort follows. Sections that have nothing to say are <b>absent</b>, never empty — and the order never changes, so the page is the same place twice.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Band</th><th>Always?</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="num">Backdrop + poster + title</td><td class="use">Always</td><td class="use">Year, runtime or season count, certification, genres. One line, mono, separated by middots.</td></tr>
+      <tr><td class="num">2</td><td class="num"><b>The primary action</b></td><td class="use">Always</td><td class="use">The cohort's whole expression. Full width, <code>--control-lg</code>, above the fold at 320.</td></tr>
+      <tr><td class="num">3</td><td class="num">Secondary actions</td><td class="use">Always</td><td class="use">Like, rate, edit. Icon buttons, 44px, beside the primary.</td></tr>
+      <tr><td class="num">4</td><td class="num">Where to watch</td><td class="use">Released only</td><td class="use">Region-aware. Absent — not "unavailable" — when the title is not out.</td></tr>
+      <tr><td class="num">5</td><td class="num">Scores</td><td class="use">If any</td><td class="use">TMDB and yours side by side, <b>never merged</b>. The disagreement is the interesting part.</td></tr>
+      <tr><td class="num">6</td><td class="num">Overview</td><td class="use">If present</td><td class="use">Clamped, with more. §04 adds a second source.</td></tr>
+      <tr><td class="num">7</td><td class="num"><b>Episodes</b></td><td class="use">Series only</td><td class="use">The biggest block on a series page and the reason the page exists.</td></tr>
+      <tr><td class="num">8</td><td class="num">Cast &amp; crew</td><td class="use">If any</td><td class="use">Collapsed previews. Character names come from the same field the profile's favourites use.</td></tr>
+      <tr><td class="num">9</td><td class="num">Collection</td><td class="use">If in one</td><td class="use"><i>2 of 3 seen</i>. Films only.</td></tr>
+      <tr><td class="num">10</td><td class="num">More like this</td><td class="use">If any</td><td class="use">Last, always. It is the exit.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>Band 2 is the entire cohort system.</b> Five cohorts, five different buttons, one position. Somebody who arrives at a series from Search and a film from their library finds the thing they came to do in the same place on both, and never has to read the page to locate it.</div>
+</div></section>
+
+<section id="wiki"><div class="wrap">
+  <div class="shead"><span class="snum">04</span><h2>Wikipedia</h2></div>
+  <div class="note ok"><b>You do not need to find a way to link them. TMDB already hands us the key.</b> <code>external_ids</code> returns a <code>wikidata_id</code> for films, series <i>and</i> people, and Wikidata resolves it to every Wikipedia article about that thing, in every language. The whole chain is two public calls and no key.</div>
+
+<pre>TMDB   <b>/movie/693134/external_ids</b>        &rarr; wikidata_id: <b>Q109228991</b>
+Wikidata  <b>wbgetentities?ids=Q109228991</b>   &rarr; sitelinks in <b>54 languages</b>, enwiki: "Dune: Part Two"
+Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, canonical URL</pre>
+
+  <p>Verified end to end for all three entity types. What comes back is more useful than a link:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Field</th><th>Dune: Part Two</th><th>Worth</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">description</td><td class="use"><b>&ldquo;2024 film by Denis Villeneuve&rdquo;</b></td><td class="use"><b>The prize.</b> One human-written line that says what a thing <i>is</i>. TMDB has no equivalent — it has genres and a marketing synopsis.</td></tr>
+      <tr><td class="tok">extract</td><td class="use">The lead paragraph, encyclopedic in tone</td><td class="use">A second voice for the overview. Reads completely unlike TMDB's copy.</td></tr>
+      <tr><td class="tok">content_urls</td><td class="use">The canonical article URL</td><td class="use">The link, correctly escaped.</td></tr>
+      <tr><td class="tok">sitelinks</td><td class="use">54 languages (film) &middot; 32 (series) &middot; 61 (person)</td><td class="use">Localisation for free, when it is wanted.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Coverage, measured — and it decides the design</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Sample</th><th>Has a wikidata id</th><th>Has an <b>English</b> article</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Popular films</td><td class="num">11 / 12</td><td class="num"><b>7 / 12</b></td></tr>
+      <tr><td class="num">Popular series</td><td class="num">10 / 12</td><td class="num"><b>4 / 12</b></td></tr>
+      <tr><td class="num">Obscure films (&lt;15 votes)</td><td class="num">4 / 12</td><td class="num">4 / 12</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>A Wikipedia article is absent more often than it is present — for series, two times in three.</b> So this is an <b>enhancement and never a dependency</b>. Every band in §03 must be complete without it, the block simply is not drawn when there is nothing, and nothing anywhere says &ldquo;no Wikipedia article&rdquo;. A hole where an enhancement would have been is worse than no enhancement.</div>
+
+  <h4>How to show it</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Where</th><th>What</th><th>Why there</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Under the title</b></td><td class="use">The <code>description</code> line — <i>2024 film by Denis Villeneuve</i></td><td class="use">The single best thing here. It answers &ldquo;what is this&rdquo; before any metadata line does, in words a person wrote. One line, <code>--text-body-sm</code>, muted.</td></tr>
+      <tr><td class="num">In the overview band</td><td class="use">A <b>Background</b> block holding the <code>extract</code>, under TMDB's synopsis, attributed</td><td class="use">Two voices, not one merged one. TMDB sells the film; Wikipedia describes it. Somebody who has read the synopsis and still does not know what the thing <i>is</i> gets an answer.</td></tr>
+      <tr><td class="num">End of that block</td><td class="use">&ldquo;Read on Wikipedia&rdquo; with the canonical URL</td><td class="use">Attribution and the exit, in one control.</td></tr>
+      <tr><td class="num">Nowhere else</td><td class="use">&mdash;</td><td class="use">No badge, no tab, no second poster, no infobox scraping.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note law"><b>Never the plot section. Only the lead extract.</b> <code>/page/summary/</code> returns the article's lead paragraph, which is safe by convention. The article body contains a full plot summary with every twist in it, and a film tracker that spoils the film is worse than one with no background at all. If the extract ever needs extending, extend it by <i>more of the lead</i> and never by another section.</div>
+
+  <div class="note warn"><b>Three more constraints the source brings with it.</b>
+  <br><b>Licence.</b> Wikipedia text is CC BY-SA. Quoting the extract requires visible attribution and a link — which the design has anyway, but it is now a requirement rather than a courtesy.
+  <br><b>It is user-edited.</b> Same lesson as the character favourites: an article can be wrong, stale, or vandalised for an hour. It is labelled as Wikipedia's words, never presented as ours.
+  <br><b>It is a third-party request.</b> The page must render before it arrives and reflow without jumping — so the block appears below the fold, and its absence is indistinguishable from its never having been attempted.</div>
+
+  <div class="note"><b>One thing it quietly fixes.</b> TMDB overviews are sometimes empty, and on an obscure or foreign-language title they often are. Today that band is just missing. With this, a title with no TMDB synopsis but a Wikipedia article now has something to say — and the measured numbers suggest that is exactly where the two sources least overlap.</div>
+</div></section>
+
+<section id="person"><div class="wrap">
+  <div class="shead"><span class="snum">05</span><h2>The person contrast</h2></div>
+  <p>A person page is a different module, but you raised it to make the cohort point and it is the right comparison: <b>a director's page and a film's page answer different questions, and a director's page and an actor's page are not the same page either.</b></p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th></th><th>A title page asks</th><th>A person page asks</th></tr></thead>
+    <tbody>
+      <tr><td class="num">The question</td><td class="use">Should I watch <i>this</i>?</td><td class="use">What of <i>theirs</i> have I not seen?</td></tr>
+      <tr><td class="num">The verb</td><td class="use">Watch, track, rate</td><td class="use">Explore, and complete</td></tr>
+      <tr><td class="num">Progress means</td><td class="use">Episodes ticked</td><td class="use"><b>Titles seen out of a body of work</b></td></tr>
+      <tr><td class="num">The payoff</td><td class="use">Where to watch it tonight</td><td class="use">&ldquo;6 of 26 directed&rdquo;</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note law"><b>The person cohort must be read from the credits, not from the label.</b> <code>known_for_department</code> is the obvious discriminator and it is not sufficient. <b>Greta Gerwig is <code>Acting</code></b> — with 63 cast credits, and also <i>Writer &times; 11, Director &times; 6</i>. Building a &ldquo;director page&rdquo; and an &ldquo;actor page&rdquo; off that label gives one of the most significant directors working an actor's page.
+  <br><br>So: the page counts what the person actually has, and <b>draws a section per body of work above a threshold</b>, heaviest first. Gerwig gets an acting section and a directing section, in that order, because that is what the data says. Villeneuve (Directing, 25 directed, 32 cast) gets directing first and a small acting section. Hans Zimmer (<i>Original Music Composer &times; 202</i>) gets one section and no cast list.</div>
+
+  <div class="note warn"><b>Collection progress only means something for authored work.</b> &ldquo;6 of 26 directed&rdquo; is a real achievement to track. &ldquo;6 of 202 scored&rdquo; is not the same claim — a composer's filmography is not a canon somebody works through. Progress is shown for <b>Director and Writer</b>, and the other sections are lists.</div>
+
+  <div class="note"><b>Name collisions are real and were found by making one.</b> Searching <i>Roger Deakins</i> returns two people: the cinematographer (<code>151</code>, Camera, <i>Director of Photography &times; 74</i>) and a makeup artist (<code>4313</code>). A person page must therefore always carry enough identity — department, era, a known title — that arriving at the wrong one is obvious immediately. State T-P4.</div>
+</div></section>
+
+<style>
+.tbd{position:relative;aspect-ratio:16/9;background:linear-gradient(140deg,var(--ink-5),var(--beam-7) 60%,var(--mar-7));overflow:hidden}
+.tbd .sc2{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 8%,transparent 70%)}
+.tbd .back{position:absolute;left:var(--space-12);top:var(--space-12);width:var(--space-32);height:var(--space-32);
+  border-radius:var(--radius-full);background:rgba(4,6,12,.6);color:#fff;display:grid;place-items:center;z-index:2}
+.thead{display:flex;gap:var(--space-12);padding:0 var(--gutter);margin-top:calc(var(--space-24) * -1);position:relative;z-index:2}
+.thead .po{width:var(--space-64);flex:0 0 auto;aspect-ratio:2/3;border-radius:var(--radius-8);
+  background:linear-gradient(150deg,var(--ink-5),var(--ink-3));border:var(--border-hair) solid var(--bd)}
+.thead .tx{min-width:0;padding-top:var(--space-24)}
+.tt{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:800;
+  letter-spacing:-.03em;color:var(--text);margin:0}
+.twik{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--acc-t);margin-top:2px}
+.tmeta{font-family:var(--f-m);font-size:9px;color:var(--faint);margin-top:var(--space-4);line-height:1.5}
+.tprim{display:flex;gap:var(--space-8);padding:var(--space-16) var(--gutter) 0;align-items:center}
+.tbig{flex:1;min-width:0;height:var(--control-lg);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-body);font-weight:600;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
+.tbig small{font-family:var(--f-m);font-size:9px;font-weight:400;opacity:.8}
+.tbig.state{background:var(--mar-9);color:var(--on-mar-9,#3D2D06)}
+.tbig.quiet{background:var(--surface-hv);color:var(--text)}
+.tib{width:var(--control-h);height:var(--control-h);flex:0 0 auto;border-radius:var(--radius-control);
+  background:var(--surface);border:0;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.tib.on{background:var(--like-3);color:var(--like-11)}
+.tsec{margin-top:var(--section-gap);padding:0 var(--gutter)}
+.tsec h4{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;letter-spacing:-.02em;color:var(--text);
+  margin:0 0 var(--space-8);text-transform:none}
+.tsec p{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:0}
+.wik{border-left:var(--border-focus) solid var(--bd-str);padding-left:var(--space-12);margin-top:var(--space-12)}
+.wik .lbl{font-family:var(--f-m);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:var(--space-4)}
+.wik a{color:var(--acc-t);font-size:var(--text-caption);font-weight:600;text-decoration:none;display:inline-block;margin-top:var(--space-8)}
+.prov{display:flex;gap:var(--space-8);margin-top:var(--space-8);flex-wrap:wrap}
+.pchip{display:inline-flex;align-items:center;gap:var(--space-4);height:var(--space-32);padding:0 var(--space-8);
+  border-radius:var(--radius-8);background:var(--surface);font-size:var(--text-caption);color:var(--text)}
+.pchip i{width:var(--space-16);height:var(--space-16);border-radius:var(--radius-4);background:var(--ink-8);font-style:normal;flex:0 0 auto}
+.tscores{display:flex;gap:0;margin-top:var(--space-12);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.tscores div{flex:1;padding:var(--space-8);text-align:center;background:var(--bg-sub);border-right:var(--border-hair) solid var(--bd-sub)}
+.tscores div:last-child{border-right:0}
+.tscores b{display:block;font-family:var(--f-m);font-size:var(--text-title-sm);font-weight:600;color:var(--text)}
+.tscores b.r{color:var(--rate-t)}
+.tscores span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.eprow{display:flex;gap:var(--space-8);align-items:center;padding:var(--space-4) 0}
+.eprow .n{font-family:var(--f-m);font-size:9px;color:var(--faint);width:var(--space-24);flex:0 0 auto}
+.eprow .t{flex:1;min-width:0;font-size:var(--text-caption);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eprow .ck{width:var(--space-24);height:var(--space-24);flex:0 0 auto;border-radius:var(--radius-full);
+  display:grid;place-items:center;box-shadow:inset 0 0 0 var(--border-focus) var(--bd-str);color:var(--st-done-9)}
+.eprow .ck.on{background:var(--st-done-3);box-shadow:inset 0 0 0 var(--border-focus) var(--st-done-9)}
+.pgbar{height:var(--space-4);border-radius:var(--radius-full);background:var(--surface-hv);overflow:hidden;margin-top:var(--space-8)}
+.pgbar i{display:block;height:100%;background:var(--st-ing-9,#2ABFA0);font-style:normal}
+
+/* poster grid + row, carried over from the library document's vocabulary so the
+   two read as one system rather than two drawings of the same thing */
+.lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8)}
+.lcell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);position:relative;overflow:hidden;margin-bottom:var(--space-4)}
+.lcell .st{position:absolute;right:var(--space-4);top:var(--space-4);width:var(--space-12);height:var(--space-12);
+  border-radius:var(--radius-full)}
+.lcell .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lcell .yr{font-family:var(--f-m);font-size:8px;color:var(--faint)}
+.srow{display:flex;gap:var(--space-12);align-items:center;padding:var(--space-8) var(--gutter)}
+.srow .art{width:var(--space-40);flex:0 0 auto;aspect-ratio:2/3;border-radius:var(--radius-4);
+  background:linear-gradient(150deg,var(--ink-5),var(--ink-3))}
+.srow .bd{min-width:0;flex:1}
+.srow .nm{font-size:var(--text-caption);font-weight:600;color:var(--text)}
+.srow .mt{font-family:var(--f-m);font-size:9px;color:var(--faint);margin-top:2px}
+</style>
+
+<section id="screens"><div class="wrap">
+  <div class="shead"><span class="snum">06</span><h2>Screens</h2></div>
+  <p>Every frame at <b>320&times;600</b>. Band 2 — the primary action — is the only thing that differs between the first five.</p>
+
+  <h3>The five cohorts</h3>
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>T1</b> film &middot; released</div>
+      <div class="screen"><div class="scroll">
+        <div class="tbd"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
+        <div class="thead"><div class="po" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div>
+          <div class="tx"><h3 class="tt">Dune: Part Two</h3>
+            <div class="twik">2024 film by Denis Villeneuve</div>
+            <div class="tmeta">2024 &middot; 2h 47m &middot; UA 16+ &middot; Sci-Fi, Adventure</div></div></div>
+        <div class="tprim">
+          <button class="tbig state">&#10003; Watched</button>
+          <button class="tib on">&#9829;</button><button class="tib">&#9998;</button>
+        </div>
+        <div class="tsec"><h4>Where to watch &middot; India</h4>
+          <div class="prov"><span class="pchip"><i style="background:var(--like-9)"></i>Netflix</span>
+            <span class="pchip"><i></i>Rent &middot; 4</span></div></div>
+        <div class="tsec"><div class="tscores">
+          <div><b>8.1</b><span>TMDB</span></div><div><b class="r">9.0</b><span>You</span></div><div><b>1</b><span>Rewatches</span></div>
+        </div></div>
+        <div class="tsec"><h4>Overview</h4>
+          <p>Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. <span style="color:var(--acc-t)">more</span></p></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>T2</b> film &middot; not out yet</div>
+      <div class="screen"><div class="scroll">
+        <div class="tbd" style="background:linear-gradient(140deg,var(--ink-6),var(--ink-3))"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
+        <div class="thead"><div class="po"></div>
+          <div class="tx"><h3 class="tt">Dune: Part Three</h3>
+            <div class="tmeta" style="color:var(--rate-t);font-size:var(--text-caption)">In cinemas 18 December 2026</div>
+            <div class="tmeta">Sci-Fi, Adventure</div></div></div>
+        <div class="tprim"><button class="tbig">Want to watch</button></div>
+        <div class="tsec"><p class="waiting" style="font-size:9px;color:var(--faint);line-height:1.5">
+          No runtime, no score, no providers and no synopsis yet. Those bands are absent rather than empty &mdash;
+          nothing here is broken, the film simply has not come out.</p></div>
+        <div class="tsec"><h4>Collection</h4>
+          <p style="font-size:var(--text-caption)">Dune Collection &middot; <b style="color:var(--text)">2 of 3 seen</b></p>
+          <div class="pgbar"><i style="width:66%;background:var(--st-done-9)"></i></div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>T3</b> series &middot; running, scheduled</div>
+      <div class="screen"><div class="scroll">
+        <div class="tbd" style="background:linear-gradient(140deg,var(--beam-7),var(--ink-4))"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
+        <div class="thead"><div class="po" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div>
+          <div class="tx"><h3 class="tt">The Bear</h3>
+            <div class="twik">American television series</div>
+            <div class="tmeta">2022&ndash; &middot; 5 seasons &middot; 46 episodes</div></div></div>
+        <div class="tprim">
+          <button class="tbig">Continue<small>S4 E3 &middot; Worms</small></button>
+          <button class="tib">&#9829;</button>
+        </div>
+        <div class="tsec"><p style="font-size:var(--text-caption);color:var(--muted);margin-bottom:var(--space-4)">
+          <b style="color:var(--text)">28 of 46 aired</b></p>
+          <div class="pgbar"><i style="width:61%"></i></div>
+          <p class="tmeta" style="color:var(--st-ing-11,#6FE0C8)">Next episode Thursday 24 September</p></div>
+        <div class="tsec"><h4>Episodes &middot; Season 4</h4>
+          <div class="eprow"><span class="n">1</span><span class="t">Groundhogs</span><span class="ck on">&#10003;</span></div>
+          <div class="eprow"><span class="n">2</span><span class="t">Soubise</span><span class="ck on">&#10003;</span></div>
+          <div class="eprow"><span class="n">3</span><span class="t">Worms</span><span class="ck"></span></div>
+          <div class="eprow"><span class="n">4</span><span class="t">Bears</span><span class="ck"></span></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>T4</b> series &middot; running, no date</div>
+      <div class="screen"><div class="scroll">
+        <div class="tbd" style="background:linear-gradient(140deg,var(--ink-7),var(--beam-7))"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
+        <div class="thead"><div class="po" style="background:linear-gradient(150deg,var(--ink-6),var(--beam-7))"></div>
+          <div class="tx"><h3 class="tt">Severance</h3>
+            <div class="twik">American television series (2022&ndash;present)</div>
+            <div class="tmeta">2022&ndash; &middot; 3 seasons &middot; 19 episodes</div></div></div>
+        <div class="tprim">
+          <button class="tbig quiet">Caught up<small>19 of 19 aired</small></button>
+          <button class="tib">&#9829;</button>
+        </div>
+        <div class="tsec">
+          <div class="pgbar"><i style="width:100%"></i></div>
+          <p class="tmeta" style="color:var(--rate-t)">Renewed &mdash; no date announced</p>
+          <p class="waiting" style="font-size:9px;color:var(--faint);margin-top:var(--space-8);line-height:1.5">
+            Not 100%, and not &ldquo;finished&rdquo;. The total can still move, so the page says what is true today.</p></div>
+        <div class="tsec"><h4>Episodes &middot; Season 3</h4>
+          <div class="eprow"><span class="n">8</span><span class="t">Sweet Vitriol</span><span class="ck on">&#10003;</span></div>
+          <div class="eprow"><span class="n">9</span><span class="t">The After Hours</span><span class="ck on">&#10003;</span></div>
+          <div class="eprow"><span class="n">10</span><span class="t">Cold Harbor</span><span class="ck on">&#10003;</span></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>T5</b> series &middot; finished</div>
+      <div class="screen"><div class="scroll">
+        <div class="tbd" style="background:linear-gradient(140deg,var(--mar-7),var(--ink-5))"><div class="sc2"></div><div class="back">&lsaquo;</div></div>
+        <div class="thead"><div class="po" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div>
+          <div class="tx"><h3 class="tt">Breaking Bad</h3>
+            <div class="twik">American crime drama television series</div>
+            <div class="tmeta">2008&ndash;2013 &middot; 5 seasons &middot; 62 episodes &middot; Ended</div></div></div>
+        <div class="tprim">
+          <button class="tbig">Continue<small>S2 E5 &middot; Breakage</small></button>
+          <button class="tib">&#9829;</button>
+        </div>
+        <div class="tsec"><p style="font-size:var(--text-caption);color:var(--muted);margin-bottom:var(--space-4)">
+          <b style="color:var(--text)">11 of 62</b> &middot; 18%</p>
+          <div class="pgbar"><i style="width:18%"></i></div>
+          <p class="waiting" style="font-size:9px;color:var(--faint);margin-top:var(--space-8);line-height:1.5">
+            The only cohort where a percentage is honest &mdash; the total cannot move.</p></div>
+        <div class="tsec"><h4>Episodes &middot; Season 2</h4>
+          <div class="eprow"><span class="n">4</span><span class="t">Down</span><span class="ck on">&#10003;</span></div>
+          <div class="eprow"><span class="n">5</span><span class="t">Breakage</span><span class="ck"></span></div>
+          <div class="eprow"><span class="n">6</span><span class="t">Peekaboo</span><span class="ck"></span></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>T6</b> the Wikipedia band</div>
+      <div class="screen"><div class="scroll" style="padding-top:var(--space-16)">
+        <div class="tsec" style="margin-top:0"><h4>Overview</h4>
+          <p>Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family.</p>
+          <div class="wik">
+            <div class="lbl">Background &middot; from Wikipedia</div>
+            <p style="font-size:var(--text-caption);line-height:var(--lh-caption)">Dune: Part Two is a 2024 American epic space opera film directed by Denis Villeneuve, from a screenplay he wrote with Jon Spaihts. It is a sequel to <i>Dune</i> (2021)&hellip;</p>
+            <a href="#wiki">Read on Wikipedia &rarr;</a>
+          </div>
+        </div>
+        <div class="tsec"><p class="waiting" style="font-size:9px;color:var(--faint);line-height:1.6">
+          Two voices, never merged. TMDB sells the film; Wikipedia describes it.<br><br>
+          <b style="color:var(--st-drop-11)">Only ever the lead extract.</b> The article body carries a full plot
+          summary with every twist in it, and a tracker that spoils the film is worse than one with no background.
+          <br><br>Absent entirely for two series in three &mdash; and nothing says so.</p></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="note ok"><b>Compare the primary buttons across T1&ndash;T5 and nothing else.</b> Watched &middot; Want to watch &middot; Continue S4 E3 &middot; Caught up &middot; Continue S2 E5. Same position, same size, five different jobs. Everything below that line is the same furniture in the same order, which is what lets somebody arrive from Search or from their library and not have to read the page to use it.</div>
+</div>
+
+<div class="wrap">
+  <h3>The person contrast, drawn</h3>
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>T-P1</b> a director</div>
+      <div class="screen"><div class="scroll">
+        <div style="display:flex;gap:var(--space-12);padding:var(--space-16) var(--gutter) 0;align-items:center">
+          <div style="width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);flex:0 0 auto;
+               background:linear-gradient(140deg,var(--ink-6),var(--ink-4))"></div>
+          <div><h3 class="tt">Denis Villeneuve</h3>
+            <div class="twik">Canadian filmmaker (born 1967)</div>
+            <div class="tmeta">Directing &middot; 25 directed &middot; 32 acting credits</div></div></div>
+        <div class="tsec"><h4>Directed</h4>
+          <p style="font-size:var(--text-caption)"><b style="color:var(--text)">6 of 26 seen</b></p>
+          <div class="pgbar"><i style="width:23%;background:var(--st-done-9)"></i></div>
+          <div class="lgrid" style="margin-top:var(--space-12);padding:0">
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"><span class="st" style="background:var(--st-done-9)"></span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"><span class="st" style="background:var(--st-done-9)"></span></div><div class="nm">Arrival</div><div class="yr">2016</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"></div><div class="nm">Enemy</div><div class="yr">2013</div></div>
+          </div></div>
+        <div class="tsec"><h4>Also acted in</h4>
+          <p class="waiting" style="font-size:9px">A list, not a progress bar &mdash; nobody works through a director&rsquo;s bit parts.</p></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>T-P2</b> two bodies of work</div>
+      <div class="screen"><div class="scroll">
+        <div style="display:flex;gap:var(--space-12);padding:var(--space-16) var(--gutter) 0;align-items:center">
+          <div style="width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);flex:0 0 auto;
+               background:linear-gradient(140deg,var(--mar-7),var(--ink-5))"></div>
+          <div><h3 class="tt">Greta Gerwig</h3>
+            <div class="twik">American filmmaker and actress</div>
+            <div class="tmeta">63 acting &middot; 11 writing &middot; 6 directing</div></div></div>
+        <div class="tsec"><h4>Acted in <span style="font-family:var(--f-m);font-size:9px;color:var(--faint);font-weight:400">63</span></h4>
+          <div class="lgrid" style="padding:0">
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Frances Ha</div><div class="yr">2012</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"></div><div class="nm">20th Century Women</div><div class="yr">2016</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"></div><div class="nm">Mistress America</div><div class="yr">2015</div></div>
+          </div></div>
+        <div class="tsec"><h4>Directed</h4>
+          <p style="font-size:var(--text-caption)"><b style="color:var(--text)">2 of 6 seen</b></p>
+          <div class="pgbar"><i style="width:33%;background:var(--st-done-9)"></i></div></div>
+        <div class="tsec"><p class="waiting" style="font-size:9px;line-height:1.6">
+          <code>known_for_department</code> says <b style="color:var(--st-drop-11)">Acting</b>. Building the page on that
+          label alone would give one of the significant directors working an actor&rsquo;s page. The sections come from
+          the credit counts instead, heaviest first &mdash; and only authored work gets a progress bar.</p></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>T-P4</b> two people, one name</div>
+      <div class="screen"><div class="scroll" style="padding-top:var(--space-16)">
+        <div class="tsec" style="margin-top:0"><h4>Search &middot; &ldquo;Roger Deakins&rdquo;</h4></div>
+        <div class="srow" style="align-items:flex-start">
+          <div class="art" style="width:var(--space-40);aspect-ratio:1;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-6),var(--ink-4))"></div>
+          <div class="bd"><div class="nm">Roger Deakins</div>
+            <div class="mt">Camera &middot; Director of Photography &times; 74</div>
+            <div class="mt" style="color:var(--acc-t)">Blade Runner 2049, 1917, Skyfall</div></div></div>
+        <div class="srow" style="align-items:flex-start">
+          <div class="art" style="width:var(--space-40);aspect-ratio:1;border-radius:var(--radius-full);background:var(--surface-hv)"></div>
+          <div class="bd"><div class="nm">Roger Deakins</div>
+            <div class="mt">Costume &amp; Make-Up &middot; Makeup Supervisor &times; 101</div>
+            <div class="mt" style="color:var(--faint)">no well-known titles</div></div></div>
+        <div class="tsec"><p class="waiting" style="font-size:9px;line-height:1.6">
+          Two real people, found by fetching the wrong one. A person row always carries <b>department, top job
+          and a known title</b> &mdash; enough that arriving at the wrong Roger Deakins is obvious in under a second.</p></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="note law"><b>The rule the person page runs on: count first, label second.</b> Sections are the bodies of work the person actually has, ordered by weight, with a progress bar only on <b>Director</b> and <b>Writer</b>. &ldquo;6 of 26 directed&rdquo; is a canon somebody works through. &ldquo;6 of 202 scored&rdquo; is not the same claim, and a bar would be inventing an ambition nobody has.</div>
+</div>
+</section>
+
+<section id="states"><div class="wrap">
+  <div class="shead"><span class="snum">07</span><h2>States</h2></div>
+  <p><b>These ids are test names.</b> <code>T</code> for a title, <code>T-P</code> for the person contrast — colliding with nothing: entry owns <code>I/U/C/S</code>, profile <code>P/T/F/E/K/N/X/G/R</code>… <b>except <code>T</code></b>, which profile used for its stats tab. Profile's are <code>T1&ndash;T2</code> and scoped to that document; if the two ever share a test runner, this module's prefix becomes <code>TT</code>. Flagged rather than silently overlapped.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>State</th><th>What is on screen</th><th>Drawn</th></tr></thead>
+    <tbody>
+        <tr><td class="tok">T1</td><td class="num">Film, released</td><td class="use">Watched / Want to watch. Providers, both scores, overview, collection.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T2</td><td class="num">Film, upcoming</td><td class="use"><b>Want to watch alone.</b> No runtime, score, providers or synopsis — bands absent, not empty. The date is the headline.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T3</td><td class="num">Series, running + scheduled</td><td class="use"><b>Continue — S4 E3</b> with the episode named. Progress against <i>aired</i>. Next date stated.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T4</td><td class="num">Series, running, no date</td><td class="use"><b>Caught up</b>, and <i>Renewed — no date announced</i>. Never 100%, never "finished".</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T5</td><td class="num">Series, finished</td><td class="use">Continue, and the only cohort where a <b>percentage</b> is honest.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T6</td><td class="num">Wikipedia band</td><td class="use">Background under the synopsis, attributed, lead extract only, with the canonical link.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T7</td><td class="num">No Wikipedia article</td><td class="use">The band is <b>absent</b>. Nothing says "no article". Two series in three.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T8</td><td class="num">No TMDB overview, but a Wikipedia one</td><td class="use">Background carries the band alone. This is where the two sources least overlap.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T9</td><td class="num">Cancelled series</td><td class="use">Says <b>cancelled</b>, not just ended. An unfinished story is a reason not to start.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T10</td><td class="num">Miniseries</td><td class="use">Cohort 5 with one season and no season picker.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T11</td><td class="num">Anthology, undetected</td><td class="use">Handled by not assuming: no "continue" across a season boundary, season picker carries each year.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T12</td><td class="num">Guest</td><td class="use">Every tracking control raises the sign-in sheet, verb matched. The page itself is never gated.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T13</td><td class="num">Session restoring</td><td class="use">No status pill, no sign-in prompt — we do not know who this is yet.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T14</td><td class="num">Loading</td><td class="use">Backdrop and poster skeleton; the title and metadata line arrive first from the list you came from.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T15</td><td class="num">Title not found</td><td class="use">A 404 that offers Search, not a blank page.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T16</td><td class="num">No backdrop</td><td class="use">Poster-derived gradient. Never a grey rectangle.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T17</td><td class="num">No poster either</td><td class="use">Initial-and-gradient, same recipe as the profile avatar.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T18</td><td class="num">Very long title</td><td class="use">Two lines then clamp. The primary action never moves.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T19</td><td class="num">Episode with no name</td><td class="use">"Episode 7" — TMDB leaves these blank for unaired runs.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T20</td><td class="num">Specials (season 0)</td><td class="use">Recorded, and excluded from the denominator. 63 of 62 is the bug this prevents.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T21</td><td class="num">Certification absent</td><td class="use">Common outside the US. The slot closes up; no "NR".</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T22</td><td class="num">No providers in region</td><td class="use">"Not streaming in India" — a fact, not an error.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T23</td><td class="num">Write rolled back</td><td class="use">Same rule as the library: names what failed and what it went back to.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T-P1</td><td class="num">Person, one body of work</td><td class="use">Directed, with progress. Acting as a list below.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T-P2</td><td class="num">Person, two bodies of work</td><td class="use">Sections by credit count, heaviest first. <code>known_for_department</code> says Acting; the page does not.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T-P3</td><td class="num">Person, crew only</td><td class="use">One section, no cast list, <b>no progress bar</b> — 202 scores is not a canon.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T-P4</td><td class="num">Two people, one name</td><td class="use">Department, top job and a known title on every row.</td><td class="use"><b style="color:var(--st-done-11)">&sect;06</b></td></tr>
+        <tr><td class="tok">T-P5</td><td class="num">Person with no photo</td><td class="use">Initials. Same recipe as everywhere else.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">T-D1</td><td class="num">expanded / wide</td><td class="use">Two columns: the sticky action rail left, the long content right.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section id="open"><div class="wrap">
+  <div class="shead"><span class="snum">08</span><h2>Decisions</h2></div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Decision</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">TD1</td><td class="use"><b>Does Wikipedia ship?</b> It is two public calls, no key, and gives a one-line description, a lead extract and a canonical URL.</td><td class="use"><b>Yes — the description line first, the Background block second.</b> The line under the title is the highest value per pixel in this document and works for films, series <i>and</i> people. The Background block is worth having but is absent for two series in three, so ship the line alone if only one lands.</td></tr>
+      <tr><td class="tok">TD2</td><td class="use"><b>Is &ldquo;caught up&rdquo; a status, or a state?</b> T4 shows it as a computed state, not one of the six.</td><td class="use"><b>A state.</b> The six statuses are what a person declares; caught-up is arithmetic the app does. Making it a seventh status would mean it going stale the moment an episode airs — and somebody would have to un-declare it.</td></tr>
+      <tr><td class="tok">TD3</td><td class="use"><b>Percentages.</b> Shown on finished series only, in this design.</td><td class="use"><b>Keep it that way.</b> On a running series the denominator moves, so a percentage is a number that goes <i>down</i> when a new episode airs. That is the kind of detail people notice once and never trust again.</td></tr>
+      <tr><td class="tok">TD4</td><td class="use"><b>Prefix collision.</b> This module wants <code>T</code>; the profile document already uses <code>T1&ndash;T2</code> for its stats tab.</td><td class="use"><b>Rename the profile's two to <code>ST1&ndash;ST2</code>,</b> which is a two-line edit in a document nobody has written tests against yet — cheaper than <code>TT</code> on the largest module in the product.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law" style="margin-bottom:0"><b>Nothing here is built.</b> Design only — §01 is a reading of the live API, not of the code.</div>
+</div></section>
+
+<footer style="padding:var(--space-48) 0 var(--space-64)"><div class="wrap">
+  <p style="font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 var(--space-8)">Projector &middot; title &middot; five cohorts</p>
+  <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0">
+    Every claim in &sect;01 and &sect;04 was checked against live TMDB, Wikidata and Wikipedia. Coverage figures are counted, not estimated. Two first-pass findings were wrong and are corrected in place rather than removed &mdash; the Roger Deakins classification, and the assumption that Wikipedia linking needed building. No new atoms were required; every measurement comes from <code>foundations.html</code>.</p>
+</div></footer>
+
+</body>
+</html>

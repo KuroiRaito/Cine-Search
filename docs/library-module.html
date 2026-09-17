@@ -394,9 +394,11 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   <a href="#controls">03 Find, sort, density</a>
   <a href="#screens">04 Screens</a>
   <a href="#desktop">04b Desktop</a>
+  <a href="#actions">04c Actions</a>
   <a href="#states">05 Every state</a>
   <a href="#needs">06 What it needs</a>
   <a href="#open">07 Decisions</a>
+  <a href="#ideas">08 Ideas</a>
 </div></nav>
 
 <section id="ships"><div class="wrap">
@@ -837,6 +839,62 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   <div class="note warn"><b>The series column is fixed at 420px and the films column fills.</b> A series row is a fixed composition — poster, two lines, a track, a button — and stretching it to 900px leaves the title stranded from its <code>+</code>. Posters have no such problem, so the grid takes the slack.</div>
 </div></section>
 
+<section id="actions"><div class="wrap">
+  <div class="shead"><span class="snum">04c</span><h2>Actions</h2></div>
+  <p>A shape without a behaviour is half a design. Every element on this screen, every gesture it answers, and where it goes.</p>
+
+  <div class="note law"><b>The governing rule: density changes the shape, never the destination.</b> Tapping a title in compact goes exactly where tapping a poster in comfortable goes &mdash; the title page. A person who switches density to fit more on screen has not asked for different behaviour, and an app whose links move when you change a view setting is one you stop trusting.</div>
+
+  <h4>Comfortable</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Element</th><th>Tap</th><th>Long press</th><th>Keyboard</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Series row &mdash; poster or title</td><td class="use">Title page</td><td class="use">Editor sheet</td><td class="use">Enter &rarr; title page</td></tr>
+      <tr><td class="num">Series row &mdash; the <code>+</code></td><td class="use"><b>Marks the next unwatched episode</b> and names it in a toast with six seconds of undo. Never opens anything.</td><td class="use">Editor sheet, opened on progress</td><td class="use">Tab reaches it separately from the row</td></tr>
+      <tr><td class="num">Series row &mdash; the track</td><td class="use">Nothing. It is a readout, not a scrubber.</td><td class="use">&mdash;</td><td class="use">Not focusable</td></tr>
+      <tr><td class="num">Film cell</td><td class="use">Title page</td><td class="use">Editor sheet</td><td class="use">Enter &rarr; title page</td></tr>
+      <tr><td class="num">Film cell &mdash; score badge</td><td class="use">Nothing separately. The whole cell is one target.</td><td class="use">&mdash;</td><td class="use">&mdash;</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>The <code>+</code> is a 44&times;44 target inside a 56px row, and it must never be reachable by accident.</b> It writes to the record on a single tap. It sits at the far edge with the row's own tap area stopping short of it &mdash; two neighbouring targets, not one target with a hotspot.</div>
+
+  <h4>Compact &mdash; and the one thing that changes</h4>
+  <p>The compact row has four slots: status stripe, title, a middle figure, and a trailing slot. The trailing slot is the interesting one.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Row is</th><th>Middle</th><th>Trailing slot</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="num">A series in progress</td><td class="num">11/62</td><td class="use"><b>The <code>+</code></b></td><td class="use">The module's best affordance does not disappear because you asked for more rows. Compact is where you are most likely to be ticking through a backlog.</td></tr>
+      <tr><td class="num">Anything finished</td><td class="num">year</td><td class="use">Your score</td><td class="use">There is no next episode, so the slot carries the thing you would otherwise open the row to see.</td></tr>
+      <tr><td class="num">Finished, unrated</td><td class="num">year</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td><td class="use">An empty slot, not a hidden one. The column stays a column.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>One slot, two jobs, decided by whether a next episode exists.</b> That is the whole difference between the densities' behaviour &mdash; everything else is identical, including every destination.</div>
+
+  <h4>The controls</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Control</th><th>Does</th><th>Remembered?</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Status chip</td><td class="use">Selects one shelf. Tapping the selected chip clears to All.</td><td class="use">No &mdash; the library opens on All every time.</td></tr>
+      <tr><td class="num">Find</td><td class="use">Filters as you type, across all statuses. Clearing it restores the shelf you were on.</td><td class="use">No. Never persisted across visits.</td></tr>
+      <tr><td class="num">Sort</td><td class="use">Opens the sheet. Options depend on the shelf.</td><td class="use"><b>Yes, per shelf.</b> Not across sign-out.</td></tr>
+      <tr><td class="num">Density</td><td class="use">Toggles. No sheet, no menu &mdash; two states do not need one.</td><td class="use"><b>Yes, globally.</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Find clears the status filter visibly, and putting it back is one tap.</b> Searching your library for a title you cannot place should not silently exclude four fifths of it because a chip was set twenty minutes ago. L20.</div>
+
+  <h4>Everything that writes</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Write</th><th>Confirms?</th><th>Undo</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Tick an episode (the <code>+</code>)</td><td class="use">No</td><td class="use">Toast, six seconds, names the episode</td></tr>
+      <tr><td class="num">Change status</td><td class="use">No</td><td class="use">Toast</td></tr>
+      <tr><td class="num">Rate</td><td class="use">No</td><td class="use">Re-rate; it is one tap either way</td></tr>
+      <tr><td class="num"><b>Remove from library</b></td><td class="use"><b>Yes</b></td><td class="use">None after confirming. It is the only destructive act here and the only one that asks.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>Confirmation is reserved for the one thing that cannot be undone.</b> Everything else is reversible in a tap, so a dialog would be the app asking permission to do what it was just told. Remove destroys a record &mdash; ratings, progress, notes, who recommended it &mdash; and that is why it asks and why it sits alone in the sheet's footer.</div>
+</div></section>
+
 <section id="states"><div class="wrap">
   <div class="shead"><span class="snum">05</span><h2>Every state</h2></div>
   <p><b>These ids are test names.</b> Everything here is <code>L</code>-prefixed, which collides with nothing: entry owns <code>I</code>, <code>U</code>, <code>C</code>, <code>S</code>; profile owns <code>P</code>, <code>T</code>, <code>F</code>, <code>E</code>, <code>K</code>, <code>N</code>, <code>X</code>, <code>G</code>, <code>R</code>.</p>
@@ -900,6 +958,40 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
     </tbody>
   </table></div>
   <div class="note law" style="margin-bottom:0"><b>Nothing here is built.</b> This is design, for grooming — except the audit in §01, which is what already ships and was read from the code.</div>
+</div></section>
+
+<section id="ideas"><div class="wrap">
+  <div class="shead"><span class="snum">08</span><h2>Three ideas, for review</h2></div>
+  <p><b>Not designed, not decided.</b> Three things a library could be that this one is not, each grounded in data the project already stores &mdash; I checked the schema for all three rather than proposing from imagination. Reject any of them cheaply.</p>
+
+  <h3>1 &middot; Tonight &mdash; the library answers &ldquo;what now&rdquo;</h3>
+  <p>The library answers <i>what have I recorded</i>. The question a person actually has at nine in the evening is <b>what do I watch now</b>, and that is a different question with a different answer.</p>
+  <p>We know the runtime of everything &mdash; <code>catalog_titles.runtime</code> is cached, so this is a local query, not an API call. We know which series have a next episode and how long it is. So the library could take one input, <b>how long have you got</b>, and answer it:</p>
+  <pre><b>45 minutes</b>   &rarr;  next episode of Severance (38m) &middot; next of Shogun (54m, over)
+<b>2 hours</b>      &rarr;  11 films from Want to watch that fit
+<b>a whole evening</b> &rarr;  the three-episode run that finishes season 2</pre>
+  <div class="note ok"><b>Why this one is my favourite.</b> It costs nothing new &mdash; every number is already in the database &mdash; and it changes what the screen is <i>for</i>. A tracker that only records is a filing cabinet; one that can answer &ldquo;I have forty minutes&rdquo; is a thing you open on purpose.</div>
+  <div class="note warn"><b>The obvious second half does not work yet.</b> &ldquo;&hellip; and it is on a service I have&rdquo; would be the natural pairing, and <b>providers are not cached</b> &mdash; there is no provider column in <code>catalog_titles</code>, they are fetched per title. Filtering 200 titles by service would be 200 requests. That is a caching job before it is a design one, and I would ship the time half alone first.</div>
+
+  <h3>2 &middot; Recommended by &mdash; the field that writes to nowhere</h3>
+  <p>The Editor already asks <b>who recommended this</b>. <code>user_library.recommended_by</code> and <code>recommended_at</code> have been in the schema since the first migration, and <code>DATA_MODEL.md</code> calls it <i>&ldquo;the differentiator nobody else stores&rdquo;</i>.</p>
+  <div class="note law"><b>It is captured and never read back.</b> I grepped every use in <code>src/</code>: the Editor writes it, the provider carries it, the query selects it &mdash; and <b>no screen displays it</b>. Someone has been typing names into a field that shows them nothing since the day it shipped.</div>
+  <p>A single filter fixes that, and it is the one thing here no competitor has:</p>
+  <pre><b>Recommended by Priya</b>    9 titles &middot; you have watched 3
+<b>Recommended by Dad</b>      4 titles &middot; you have watched 4
+<b>Recommended by a podcast</b> 12 titles &middot; you have watched 1</pre>
+  <div class="note ok"><b>This is a social feature with no social layer.</b> Layers 3 and 4 are parked because a feed needs other people. This needs nobody &mdash; the other person is a string you typed &mdash; and it answers a question every film enthusiast actually has: <i>what did Priya tell me to watch, and have I done it yet.</i> It also gives &ldquo;I watched it, you were right&rdquo; a place to come from.</div>
+
+  <h3>3 &middot; Negative space &mdash; a library that shows its own gaps</h3>
+  <p>A library is a list of what you have seen. Turned around, the same data is a map of what you have <b>not</b> &mdash; and for the people you clearly love, that is more interesting.</p>
+  <p><code>catalog_credits</code> is indexed by person, role and job, which is what makes collection progress a local query rather than an API call. The person page already says <i>&ldquo;6 of 26 directed&rdquo;</i>. The library could invert it:</p>
+  <pre>You have watched <b>6 of Villeneuve's 26</b>.
+  Here are the twenty you have not &mdash; and three are on your watchlist already.</pre>
+  <div class="note"><b>It earns its place by being uncomfortable in a useful way.</b> Everything else on this screen tells you what you have done. This is the only thing in the product that would tell you what you have missed &mdash; and for somebody working through a director, that is the actual task.</div>
+  <div class="note warn"><b>The obvious failure mode is nagging, and the rule against it is already written.</b> No streaks, no nudges, nothing that decays. So this can never arrive uninvited, never count down, and never appear on the shelf itself &mdash; it is somewhere you go, not something that finds you. If it cannot be built that way it should not be built.</div>
+
+  <h4>If only one</h4>
+  <div class="note ok" style="margin-bottom:0"><b>Number 2.</b> It is the smallest of the three, it needs no new data at all, and it closes a hole that is embarrassing once you see it &mdash; a field the data model calls the differentiator, which the interface has never once shown anybody. Number 1 is the one that would change how often the app gets opened. Number 3 is the one I would want but would most easily get wrong.</div>
 </div></section>
 
 <footer style="padding:var(--space-48) 0 var(--space-64)"><div class="wrap">

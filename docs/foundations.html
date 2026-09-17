@@ -540,17 +540,19 @@ pre u{color:var(--st-done-11);text-decoration:none}
     <div class="tbl-wrap"><table>
       <thead><tr><th>Monitor</th><th>Container</th><th>Content</th><th>Margin each side</th><th>Grid</th><th>Rail peek</th></tr></thead>
       <tbody>
-        <tr><td class="num">1280</td><td class="num">1200</td><td class="num">1120</td><td class="num">40</td><td class="num">5 × 213</td><td class="num">5.66 tiles</td></tr>
-        <tr><td class="num">1440</td><td class="num">1440</td><td class="num">1360</td><td class="num">0</td><td class="num">6 × 215</td><td class="num">6.87 tiles</td></tr>
-        <tr><td class="num">1600</td><td class="num">1600</td><td class="num">1520</td><td class="num">0</td><td class="num">6 × 242</td><td class="num">7.68 tiles</td></tr>
-        <tr><td class="num">1920</td><td class="num">1600</td><td class="num">1520</td><td class="num">160</td><td class="num">6 × 242</td><td class="num">7.68 tiles</td></tr>
-        <tr><td class="num">2560</td><td class="num">1600</td><td class="num">1520</td><td class="num">480</td><td class="num">6 × 242</td><td class="num">7.68 tiles</td></tr>
+        <tr><td class="num">1280</td><td class="num">1200</td><td class="num">1120</td><td class="num">40</td><td class="num">5 × 211</td><td class="num">5.66 tiles</td></tr>
+        <tr><td class="num">1440</td><td class="num">1440</td><td class="num">1360</td><td class="num">0</td><td class="num">6 × 213</td><td class="num">6.87 tiles</td></tr>
+        <tr><td class="num">1600</td><td class="num">1600</td><td class="num">1520</td><td class="num">0</td><td class="num">6 × 240</td><td class="num">7.68 tiles</td></tr>
+        <tr><td class="num">1920</td><td class="num">1600</td><td class="num">1520</td><td class="num">160</td><td class="num">6 × 240</td><td class="num">7.68 tiles</td></tr>
+        <tr><td class="num">2560</td><td class="num">1600</td><td class="num">1520</td><td class="num">480</td><td class="num">6 × 240</td><td class="num">7.68 tiles</td></tr>
       </tbody>
     </table></div>
 
+    <div class="note"><b>These are measured, not derived.</b> Every number in the Grid column comes from reading <code>grid-template-columns</code> back out of the browser at that viewport, because the arithmetic has a term that is easy to drop: <code>.grid</code> has <code>gap: var(--space-16)</code>, so <i>n</i> columns spend <i>(n&nbsp;&minus;&nbsp;1)&nbsp;&times;&nbsp;16px</i> on gaps before any tile gets a pixel. An earlier version of this table was computed at a 14px gap and ran about 2px high on every row.</div>
+
     <div class="note law"><b>The container steps; it does not flow.</b> The obvious design is to let content grow continuously from 1120 to the cap, using every pixel. It was built that way first, and it was wrong. <code>.rail</code> hides its scrollbar — <code>scrollbar-width: none</code>, <code>::-webkit-scrollbar { height: 0 }</code> — and has no arrows, so <b>the partial tile at the edge is the only thing that says a row scrolls</b>, on a mouse exactly as much as on a thumb. A container that flows sweeps the visible tile count through whole numbers: at a 1280px window it landed on <b>6.06</b> — six tiles and a twelve-pixel sliver, which reads as a complete set. Two fixed content widths can be checked. A continuum cannot.</div>
 
-    <div class="note warn"><b>Why the grid steps at 1440 and the gutter does not.</b> Six columns is a <i>content</i> ladder, not a band: five columns held to the 1600 cap would put poster tiles at 293px, where a row reads as a gallery wall rather than a set you can compare. A tile stays roughly 180–260px. The gutter, meanwhile, is done growing at 40 — an inset wider than that stops reading as breathing room and starts reading as a missing sidebar.</div>
+    <div class="note warn"><b>Why the grid steps at 1440 and the gutter does not.</b> Six columns is a <i>content</i> ladder, not a band: five columns held to the 1600 cap would put poster tiles at 291px, where a row reads as a gallery wall rather than a set you can compare. A tile stays roughly 180–260px. The gutter, meanwhile, is done growing at 40 — an inset wider than that stops reading as breathing room and starts reading as a missing sidebar.</div>
 
     <div class="note warn"><b>Breakpoints cannot be custom properties.</b> CSS does not permit <code>var()</code> inside a media query, so 600 and 1120 are written literally. This is the one place raw numbers are legal — and the one place <code>verify</code> checks hardest, because nothing in the language can stop a fourth breakpoint appearing.</div>
 
@@ -1286,7 +1288,7 @@ pre u{color:var(--st-done-11);text-decoration:none}
       <tbody>
         <tr><td class="num">Navigation</td><td class="use">bottom tabs</td><td class="use">top bar</td><td class="use">top bar</td><td class="use">Tabs are a thumb idiom. A mouse has no thumb reach to respect.</td></tr>
         <tr><td class="num">Container</td><td class="use">viewport</td><td class="num">1200</td><td class="num">1600</td><td class="use">Shared by the page and the top bar, so they hold one edge.</td></tr>
-        <tr><td class="num">Grid</td><td class="num">2 cols</td><td class="num">5 cols</td><td class="num">6 cols</td><td class="use">A poster tile stays 180&ndash;260px. Five columns at the cap would be 293.</td></tr>
+        <tr><td class="num">Grid</td><td class="num">2 cols</td><td class="num">5 cols</td><td class="num">6 cols</td><td class="use">A poster tile stays 180&ndash;260px. Five columns at the cap would be 291.</td></tr>
         <tr><td class="num">Rail tile</td><td class="num">128px</td><td class="num">190px</td><td class="num">190px</td><td class="use">Artwork is what is being browsed, but a rail tile has a legible ceiling too.</td></tr>
         <tr><td class="num">Control height</td><td class="num">44px</td><td class="num">44px</td><td class="num">44px</td><td class="use"><b>Unchanged.</b> A pointer is more precise than a finger, but the same person uses a touchscreen laptop at this width.</td></tr>
         <tr><td class="num">Body type</td><td class="num">15/24</td><td class="num">15/24</td><td class="num">15/24</td><td class="use"><b>Unchanged.</b> Reading distance grows with the screen, so apparent size is already roughly constant. Scaling type by viewport is a fourth set of values buying nothing.</td></tr>

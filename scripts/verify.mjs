@@ -239,6 +239,17 @@ for (const f of jsx) {
    --------------------------------------------------------------- */
 const CONVERTED = ['entry', 'profile'];
 
+/* Three raw lengths are legal, and each is legal for a stated reason rather
+   than because it was hard to convert:
+
+   320px   the viewport floor. §08 names it — the iPhone SE and Android Go
+           report it — and it is the same kind of value as a breakpoint, which
+           CSS already forces to be literal.
+   1px     the visually-hidden idiom (.vh). A 1×1 box with a -1px margin is the
+           clipping rectangle every screen-reader utility uses; snapping it to
+           the 4px grid would make it a 4px box, which is visible. */
+const LEGAL_RAW = new Set(['320px', '1px', '-1px']);
+
 // Properties where a raw length is drift. Container caps (max-width) and
 // optical values with no scale (blur radii) are deliberately not here.
 const SCALED_PROPS = /^(padding|padding-[a-z]+|margin|margin-[a-z]+|gap|row-gap|column-gap|font-size|line-height|border-radius|height|min-height|width|min-width|top|right|bottom|left|inset)$/;
@@ -247,8 +258,13 @@ const stripComments = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '');
 
 for (const f of cssFiles) {
     const rel = relative(ROOT, f);
-    const mod = rel.match(/src\/modules\/([^/]+)\//)?.[1];
-    if (!mod || !CONVERTED.includes(mod)) continue;
+    /* The shared layer is always checked, and that is the point.
+       .btn, .searchbox, .tile and .chip live in src/shared/ui — every module
+       draws with them — so a module can be fully on the scale and still not
+       line up. When this was first switched on, shared/ui and app/shell held
+       154 off-scale lengths between them. */
+    const mod = rel.match(/src\/modules\/([^/]+)\//)?.[1] ?? 'shared';
+    if (mod !== 'shared' && !CONVERTED.includes(mod)) continue;
 
     const body = stripComments(readFileSync(f, 'utf8'));
     // Blank out media preludes: breakpoints are the one place a raw number is legal.
@@ -260,6 +276,7 @@ for (const f of cssFiles) {
         // `width: 100%`, `height: auto`, `min-height: 100dvh` are all fine.
         for (const px of value.matchAll(/(-?\d*\.?\d+)px/g)) {
             if (px[1] === '0') continue;
+            if (LEGAL_RAW.has(px[0])) continue;
             fail('token-scale', `${rel}: ${prop}: ${value.trim()} — ${px[0]} is not on the scale`);
         }
     }

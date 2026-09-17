@@ -29,7 +29,7 @@
    growing, because artwork is what is being browsed.
    ------------------------------------------------------------------ */
 
-@media (min-width: 700px) and (max-width: 1119.98px) {
+@media (min-width: 600px) and (max-width: 1119.98px) {
 
   /* The sign-in nudge is an aside, not a billboard. */
   .card.signup { max-width: 480px; margin-inline: auto; }

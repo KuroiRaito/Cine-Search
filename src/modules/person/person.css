@@ -76,7 +76,7 @@
    growing, because artwork is what is being browsed.
    ------------------------------------------------------------------ */
 
-@media (min-width: 700px) and (max-width: 1119.98px) {
+@media (min-width: 600px) and (max-width: 1119.98px) {
 
   /* The person header carries a face — at this width it can be seen. */
   .phead .avatar { width: 92px; height: 92px; }

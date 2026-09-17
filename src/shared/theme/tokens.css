@@ -96,6 +96,20 @@
   --field-stack:var(--space-16);
   --section-gap:var(--space-24);
   --sheet-pad:var(--space-20);
+  /* A poster tile stays roughly 180–260px: below that the title and year stop
+     being readable, above it a row reads as a gallery wall rather than a set
+     you can compare. A width, not a column count, because a rail scrolls — and
+     it is a role so the ladder steps at the four bands and nowhere else. It
+     used to step at 400, 600, 700 and 1120, two of which are not bands. */
+  /* The grid asks for a minimum tile, not a column count.
+     A count declared per band cannot hold the 180–260px principle across
+     medium, which spans 600–1119: three columns reach 346px at the top and
+     four fall to 126px at the bottom. A minimum lets the count follow the
+     width, so the tile stays in range and the two stray breakpoints at 480
+     and 760 are not needed. It steps at the bands like --gutter does. */
+  --grid-min:136px;
+  --tile-w:108px;
+  --rail-tile:128px;
   --form-max:420px;
   --measure:65ch;
   /* The browse container. Below expanded the viewport is the container; above

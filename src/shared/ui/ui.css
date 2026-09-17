@@ -6,86 +6,89 @@
 
 /* ---------------- rails and tiles ---------------- */
 
-.rail { display: flex; gap: 8px; overflow-x: auto; padding: 0 var(--gutter) 6px; scrollbar-width: none; }
+.rail { display: flex; gap: var(--space-8); overflow-x: auto; padding: 0 var(--gutter) var(--space-8); scrollbar-width: none; }
 .rail::-webkit-scrollbar { height: 0; }
 .rail > * { flex: 0 0 auto; }
 
-.tile { width: 108px; }
+.tile { width: var(--tile-w); }
 
 /* Rails show about two and a half posters. The artwork is the thing being
    browsed, so it has to be big enough to actually recognise — and the half
    tile at the edge is what tells you the row scrolls. */
-.rail .tile { width: 128px; }
+.rail .tile { width: var(--rail-tile); }
 .rail .tile .name {
   /* Reserve both lines so the year sits on the same baseline along the row,
      whether the title wrapped or not. */
   min-height: calc(2 * 1.3em);
 }
-@media (min-width: 400px) { .rail .tile { width: 148px; } }
-@media (min-width: 600px) { .rail .tile { width: 168px; } }
 .tile .art {
-  aspect-ratio: 2/3; border-radius: 8px; overflow: hidden; position: relative;
-  background: var(--ink-4); border: 1px solid var(--bd-sub); margin-bottom: 5px;
+  aspect-ratio: 2/3; border-radius: var(--radius-8); overflow: hidden; position: relative;
+  background: var(--ink-4); border: var(--border-hair) solid var(--bd-sub); margin-bottom: var(--space-4);
 }
 .tile .art img { width: 100%; height: 100%; object-fit: cover; }
 .tile .name {
-  font-size: 12px; line-height: 1.3; color: var(--text);
+  font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--text);
   display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.tile .meta { font-family: var(--f-m); font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tile .meta { font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); font-variant-numeric: tabular-nums; }
 
 /* A poster we have no artwork for still has to say which title it is. */
 .noart {
-  width: 100%; height: 100%; display: grid; place-items: center; padding: 8px; text-align: center;
+  width: 100%; height: 100%; display: grid; place-items: center; padding: var(--space-8); text-align: center;
   background: linear-gradient(150deg, var(--ink-5), var(--ink-3));
-  font-family: var(--f-d); font-size: 11px; font-weight: 700; color: var(--muted); line-height: 1.25;
+  font-family: var(--f-d); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 700; color: var(--muted);
 }
 
 .quickadd {
-  position: absolute; top: 6px; right: 6px; width: 26px; height: 26px;
-  border-radius: 99px; border: 0; cursor: pointer;
-  display: grid; place-items: center; font-size: 14px; line-height: 1; font-weight: 500;
+  position: absolute; top: var(--space-8); right: var(--space-8);
+  width: var(--icon-24); height: var(--icon-24);
+  border-radius: var(--radius-full); border: 0; cursor: pointer;
+  display: grid; place-items: center; line-height: 1; font-weight: 500;
   color: #fff; background: rgba(8, 12, 20, .62); backdrop-filter: blur(6px);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
   transition: background .13s, color .13s, box-shadow .13s;
 }
 .quickadd:hover { background: var(--acc); color: var(--on-acc); box-shadow: none; }
-.quickadd::after { content: ""; position: absolute; inset: -9px; }
+/* §06: a control drawn smaller than 44 expands its hit area with a
+   pseudo-element rather than by growing the visible box. 24 + 2×10 = 44. */
+.quickadd::after { content: ""; position: absolute; inset: calc(var(--space-8) * -1 - var(--space-2)); }
 
 .score-badge {
-  position: absolute; left: 4px; bottom: 4px;
-  font-family: var(--f-m); font-size: 9px; font-weight: 600; color: var(--mar-9);
-  background: rgba(4,6,12,.68); padding: 1px 5px; border-radius: 4px;
+  position: absolute; left: var(--space-4); bottom: var(--space-4);
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600; color: var(--mar-9);
+  background: rgba(4,6,12,.68); padding: var(--space-2) var(--space-4); border-radius: var(--radius-4);
   font-variant-numeric: tabular-nums;
 }
 
 .grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding-inline: var(--gutter);
+  display: grid; gap: var(--space-16); padding-inline: var(--gutter);
+  /* The count follows the width rather than being declared per band — see
+     --grid-min. At 320 this is two tiles, and it reaches five before the
+     desktop band starts, without a breakpoint of its own. */
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-min), 1fr));
 }
-@media (min-width: 480px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 760px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .grid .tile { width: auto; }
 /* Inside a block that already carries the gutter, the grid must not add it again. */
 .grid.flush { padding-inline: 0; }
 
 
 .prow {
-  display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 11px;
+  display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8) var(--space-12); border-radius: var(--radius-12);
   background: var(--surface); transition: background .12s; width: 100%; text-align: left;
 }
-.prow + .prow { margin-top: 6px; }
+.prow + .prow { margin-top: var(--space-8); }
 .prow:hover { background: var(--surface-hv); }
 .prow .pf {
-  width: 38px; height: 38px; flex: 0 0 auto; border-radius: 99px; overflow: hidden;
+  width: var(--space-40); height: var(--space-40); flex: 0 0 auto; border-radius: var(--radius-full); overflow: hidden;
   background: var(--ink-5); display: grid; place-items: center;
-  font-family: var(--f-d); font-size: 13px; font-weight: 700; color: var(--ink-11);
+  font-family: var(--f-d); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 700; color: var(--ink-11);
 }
 .prow .pf img { width: 100%; height: 100%; object-fit: cover; }
 .prow .pf.noimg { background: var(--ink-5); }
 .prow .pb { flex: 1; min-width: 0; }
-.prow .pb b { display: block; font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--text); }
-.prow .pb span { display: block; font-size: 11px; color: var(--muted); }
-.prow .go { color: var(--ink-9); font-size: 14px; flex: 0 0 auto; }
+.prow .pb b { display: block; font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 600; color: var(--text); }
+.prow .pb span { display: block; font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); }
+.prow .go { color: var(--ink-9); flex: 0 0 auto; }
 
 /* ---------------- card ---------------- */
 
@@ -97,41 +100,41 @@
    exist; only the base was absent. */
 .card {
   background: var(--ink-3);
-  padding: 14px;
-  border-radius: 12px;
+  padding: var(--space-16);
+  border-radius: var(--radius-12);
   margin: var(--section-gap) var(--gutter);
   border: 0;
 }
 
 .card-label {
-  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 8px;
+  font-size: var(--text-micro); line-height: var(--lh-micro); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: var(--space-8);
 }
 
 
-.skel { border-radius: 6px; }
+.skel { border-radius: var(--radius-4); }
 /* Skeletons mirror the layout that's coming: the same radii and rhythm as the
    real thing, so nothing shifts on arrival. Height and width stay props on the
    component — those are the one inline style the contract allows. */
 .skel-flat { border-radius: 0; }
-.skel-art { border-radius: 8px; }
-.skel-poster { border-radius: 8px; margin-bottom: 5px; }
-.skel-round { border-radius: 99px; }
-.skel-row { border-radius: 10px; margin-top: 7px; }
-.skel-lines { flex: 1; display: grid; gap: 8px; }
-.skel-lines.tight { padding-bottom: 6px; }
+.skel-art { border-radius: var(--radius-8); }
+.skel-poster { border-radius: var(--radius-8); margin-bottom: var(--space-4); }
+.skel-round { border-radius: var(--radius-full); }
+.skel-row { border-radius: var(--radius-8); margin-top: var(--space-8); }
+.skel-lines { flex: 1; display: grid; gap: var(--space-8); }
+.skel-lines.tight { padding-bottom: var(--space-8); }
 
 .empty {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding: 40px var(--gutter); max-width: 34ch;
+  text-align: center; padding: var(--space-40) var(--gutter); max-width: 34ch;
   margin: var(--section-gap) auto 0; min-height: 40vh;
 }
-.empty h2 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-.empty p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+.empty h2 { font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 700; margin-bottom: var(--space-8); }
+.empty p { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); margin-bottom: var(--space-16); }
 
-.errbox { margin: var(--section-gap) var(--gutter); border: 1px solid var(--st-drop-9); background: var(--st-drop-3); border-radius: 11px; padding: 14px; }
-.errbox b { display: block; font-size: 13px; color: var(--st-drop-11); margin-bottom: 4px; }
-.errbox p { font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+.errbox { margin: var(--section-gap) var(--gutter); border: var(--border-hair) solid var(--st-drop-9); background: var(--st-drop-3); border-radius: var(--radius-12); padding: var(--space-16); }
+.errbox b { display: block; font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--st-drop-11); margin-bottom: var(--space-4); }
+.errbox p { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); margin-bottom: var(--space-12); }
 
 /* ---------------- toast ---------------- */
 
@@ -140,21 +143,21 @@
 .toast {
   position: fixed; left: 50%; transform: translateX(-50%);
   bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); z-index: var(--z-toast);
-  width: calc(100% - (var(--gutter) * 2)); max-width: 420px;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  background: var(--ink-5); border-radius: 10px; padding: 10px 13px;
-  font-size: 12px; color: var(--text); box-shadow: var(--sh);
+  width: calc(100% - (var(--gutter) * 2)); max-width: var(--form-max);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
+  background: var(--ink-5); border-radius: var(--radius-12); padding: var(--space-12);
+  font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--text); box-shadow: var(--sh);
 }
 .toast button {
-  background: none; border: 0; cursor: pointer; padding: 4px 2px;
-  font-family: var(--f-s); font-size: 11.5px; font-weight: 600; color: var(--acc-t);
+  background: none; border: 0; cursor: pointer; padding: var(--space-4) var(--space-2);
+  font-family: var(--f-s); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600; color: var(--acc-t);
 }
 .toast span { min-width: 0; }
 
 /* The season header is a second heading inside one section — same type, but it
    carries an action, so it needs its own rhythm above the list. */
-.sect-h.markrow { margin-top: 14px; font-family: var(--f-m); font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 400; }
-.sect-note { font-family: var(--f-m); font-size: 10px; color: var(--muted); font-weight: 400; }
+.sect-h.markrow { margin-top: var(--space-16); font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 400; }
+.sect-note { font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); font-weight: 400; }
 
 /* A saved tile reports its state where the invitation used to be. Same spot,
    same size — only a poster that is already yours says so. */
@@ -169,32 +172,38 @@
    to link to. */
 .linkish {
   background: none; border: 0; padding: 0; cursor: pointer;
-  font-family: var(--f-s); font-size: 12px; font-weight: 600; color: var(--acc-t);
+  font-family: var(--f-s); font-weight: 600; color: var(--acc-t);
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  /* Text and its chevron are one label. Inline, the icon is a replaced element
+     the line box can break before — which is how "Score ⌄" ended up on two
+     lines in the taste heading. */
+  display: inline-flex; align-items: center; gap: var(--space-4); white-space: nowrap;
 }
 
 /* Notes are the one field that takes more than a line, so it is the one input
    that grows. Resizing stays vertical — a sheet has a fixed width. */
-.inp.notes { min-height: 62px; line-height: 1.55; resize: vertical; }
+.inp.notes { min-height: var(--space-64); line-height: var(--lh-body-sm); resize: vertical; }
 
 /* ---- Controls and state tones used on more than one screen. The six
         watch-state hues carry a tone into whatever they are applied to:
         a pill, a segment, a chip, a library row. ---- */
 
 .ibtn {
-  width: 44px; min-height: 44px; border: 0; background: var(--ink-4); color: var(--muted);
-  border-radius: 10px; cursor: pointer; display: grid; place-items: center; font-size: 15px;
+  width: var(--control-h); min-height: var(--control-h); border: 0; background: var(--ink-4); color: var(--muted);
+  border-radius: var(--radius-12); cursor: pointer; display: grid; place-items: center;
   transition: background .12s, color .12s;
 }
 .ibtn:hover { background: var(--ink-5); color: var(--text); }
 .ibtn.like:hover { color: var(--like-9); }
 .sw {
   flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
-  font-family: var(--f-s); font-size: 12.5px; font-weight: 500; padding: 0 13px;
-  min-height: 38px; display: inline-flex; align-items: center;
-  border-radius: 8px; white-space: nowrap; font-variant-numeric: tabular-nums;
+  font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
+  font-weight: 500; padding: 0 var(--space-12);
+  min-height: var(--control-sm); display: inline-flex; align-items: center;
+  border-radius: var(--radius-8); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
-.sw em { font-style: normal; opacity: .55; margin-left: 4px; font-size: 11px; }
-.sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 1px var(--acc-bd); }
+.sw em { font-style: normal; opacity: .55; margin-left: var(--space-4); font-size: var(--text-micro); line-height: var(--lh-micro); }
+.sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--acc-bd); }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
 /* ---------------- status colour ----------------
@@ -309,41 +318,42 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 
 /* All six visible at once: one tap, rather than open, scan, tap. Films render
    three of the six — "watching" is meaningless for a two-hour film. */
-.segs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.segs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
 .seg {
-  background: var(--ink-3); border: 0; border-radius: 9px; padding: 8px 3px; cursor: pointer;
-  color: var(--muted); font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: var(--ink-3); border: 0; border-radius: var(--radius-8); padding: var(--space-8) var(--space-4); cursor: pointer;
+  color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: var(--space-4);
+  min-height: var(--control-h);
   font-family: var(--f-s); transition: background .12s, color .12s, box-shadow .12s;
 }
 .seg:hover { background: var(--ink-4); color: var(--text); }
-.seg i { font-style: normal; font-size: 9.5px; font-family: var(--f-s); }
-.seg.on { background: var(--stb); color: var(--stc); font-weight: 600; box-shadow: inset 0 0 0 1px var(--stc); }
+.seg i { font-style: normal; font-size: var(--text-micro); line-height: var(--lh-micro); font-family: var(--f-s); }
+.seg.on { background: var(--stb); color: var(--stc); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--stc); }
 
 .prog {
-  display: flex; align-items: center; gap: 9px; background: var(--bg-sub);
-  box-shadow: inset 0 0 0 1px var(--bd-sub); border-radius: 10px; padding: 7px 9px;
+  display: flex; align-items: center; gap: var(--space-8); background: var(--bg-sub);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--bd-sub); border-radius: var(--radius-12); padding: var(--space-8);
 }
-.prog.compact { width: 150px; }
+.prog.compact { width: var(--space-64); min-width: max-content; }
 .stp {
-  width: 32px; height: 32px; flex: 0 0 auto; border-radius: 8px; border: 0; background: var(--ink-4);
-  color: var(--text); font-size: 17px; cursor: pointer; display: grid; place-items: center; transition: background .12s;
+  width: var(--space-32); height: var(--space-32); flex: 0 0 auto; border-radius: var(--radius-8); border: 0; background: var(--ink-4);
+  color: var(--text); cursor: pointer; display: grid; place-items: center; transition: background .12s; position: relative;
 }
 .stp:hover { background: var(--ink-5); }
 .stp:disabled { opacity: .35; cursor: default; }
 .prog-v { flex: 1; text-align: center; }
-.prog-v b { display: block; font-family: var(--f-d); font-size: 18px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-.prog-v span { display: block; font-family: var(--f-m); font-size: 9px; color: var(--muted); margin-top: 2px; }
-.jump { margin-top: 7px; font-size: 11px; color: var(--muted); }
+.prog-v b { display: block; font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 800; font-variant-numeric: tabular-nums; }
+.prog-v span { display: block; font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-2); }
+.jump { margin-top: var(--space-8); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); }
 .jump b { color: var(--text); font-family: var(--f-m); font-weight: 400; }
 
 /* Half stars, 1–10, matching TMDB's scale so the two scores are comparable. */
 .stars {
-  display: flex; align-items: center; gap: 4px; background: var(--bg-sub);
-  box-shadow: inset 0 0 0 1px var(--bd-sub); border-radius: 10px; padding: 9px 11px;
+  display: flex; align-items: center; gap: var(--space-4); background: var(--bg-sub);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--bd-sub); border-radius: var(--radius-12); padding: var(--space-8) var(--space-12);
 }
 .stars button {
   background: none; border: 0; padding: 0; cursor: pointer; position: relative;
-  font-size: 19px; color: var(--ink-7); line-height: 1; width: 19px; height: 22px;
+  font-size: var(--text-title-sm); color: var(--ink-7); line-height: 1; width: var(--icon-20); height: var(--icon-24);
 }
 .stars button.on { color: var(--rate); }
 /* A half star is the full glyph clipped down the middle, over a dim one. */
@@ -351,22 +361,22 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   content: "★"; position: absolute; inset: 0; color: var(--rate);
   clip-path: inset(0 50% 0 0);
 }
-.stars .sv { margin-left: auto; font-family: var(--f-m); font-size: 11.5px; color: var(--rate-t); font-weight: 600; }
+.stars .sv { margin-left: auto; font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--rate-t); font-weight: 600; }
 .stars .clear {
-  margin-left: 8px; width: auto; height: auto; font-family: var(--f-s); font-size: 11px;
+  margin-left: var(--space-8); width: auto; height: auto; font-family: var(--f-s); font-size: var(--text-micro); line-height: var(--lh-micro);
   font-weight: 600; color: var(--muted);
 }
 .stars .clear:hover { color: var(--text); }
 
 .inp {
-  width: 100%; background: var(--bg-sub); border: 0; box-shadow: inset 0 0 0 1px var(--bd-sub);
-  border-radius: 9px; padding: 10px 11px; font-size: 12.5px; color: var(--text);
+  width: 100%; background: var(--bg-sub); border: 0; box-shadow: inset 0 0 0 var(--border-hair) var(--bd-sub);
+  border-radius: var(--radius-8); padding: var(--space-12); font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--text);
   font-family: var(--f-s); transition: box-shadow .12s;
 }
-.inp:hover { box-shadow: inset 0 0 0 1px var(--bd); }
-.inp:focus { outline: none; box-shadow: inset 0 0 0 1px var(--acc); }
+.inp:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
+.inp:focus { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .inp.dim { color: var(--muted); }
-.hint { font-size: 10.5px; color: var(--muted); margin-top: 5px; }
+.hint { font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-4); }
 /* ---------------- settings blocks ----------------
    A labelled block and its rows. Shared, because a settings screen is assembled
    from whichever modules own the settings: appearance and region belong to
@@ -374,11 +384,12 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
    visible. */
 
 .setblock { margin: var(--section-gap) var(--gutter) 0; max-width: 440px; }
-.setlabel { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+.setlabel { display: block; font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600; color: var(--muted); margin-bottom: var(--space-8); }
 
 .setrow {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-  padding: 10px 0; border-top: 1px solid var(--bd-sub); font-size: 13px;
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-12);
+  padding: var(--space-12) 0; border-top: var(--border-hair) solid var(--bd-sub);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
 }
 .setrow:first-of-type { border-top: 0; }
 .setrow span { color: var(--muted); }
@@ -386,18 +397,19 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 
 .del {
   width: 100%; background: var(--st-drop-3); border: 0; color: var(--st-drop-11);
-  border-radius: 9px; padding: 10px; font-family: var(--f-s); font-size: 12.5px;
+  border-radius: var(--radius-8); padding: var(--space-12); font-family: var(--f-s);
+  font-size: var(--text-caption); line-height: var(--lh-caption); min-height: var(--control-h);
   font-weight: 600; cursor: pointer; transition: filter .12s;
 }
 .del:hover { filter: brightness(1.1); }
-.del-confirm { font-size: 12px; color: var(--muted); margin-bottom: 9px; line-height: 1.5; }
-.del-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.del-confirm { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); margin-bottom: var(--space-8); }
+.del-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
 
 /* An empty filter explains itself. "Films don't have a watching state" is a
    real answer; an empty grid is not. */
 .whynot {
-  padding: 16px 12px; border: 1px dashed var(--bd); border-radius: 10px;
-  text-align: center; font-size: 12px; color: var(--muted); line-height: 1.6;
+  padding: var(--space-16) var(--space-12); border: var(--border-hair) dashed var(--bd); border-radius: var(--radius-12);
+  text-align: center; font-size: var(--text-caption); line-height: var(--lh-body-sm); color: var(--muted);
   /* It is a sentence, not a container. A dashed box running the width of a
      desktop window to hold eight words looks like a failure, not an answer. */
   max-width: var(--measure);
@@ -415,15 +427,12 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
    growing, because artwork is what is being browsed.
    ------------------------------------------------------------------ */
 
-@media (min-width: 700px) and (max-width: 1119.98px) {
+@media (min-width: 600px) and (max-width: 1119.98px) {
 
   /* A card whose text stops at the measure but whose box runs to the window
      is a half-empty box. The container follows the content. */
   .card { max-width: calc(var(--measure) + 28px); }
 
-  /* Artwork keeps growing with the window; the rail still shows a half tile at
-     the edge, which is the only thing telling anyone the row scrolls. */
-  .rail .tile { width: 182px; }
 }
 
 
@@ -432,16 +441,8 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 @media (min-width: 1120px) {
   /* Reading columns never go full width, however wide the screen. */
 
-  .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .rail .tile { width: 190px; }
 }
 
-/* A content ladder, not a layout band, so it steps on its own widths.
-   Principle: a poster tile stays roughly 180-260px wide. Below that the year
-   and title stop being readable; above it a row reads as a gallery wall
-   rather than a set you can compare. Five columns held all the way to the
-   1600px cap would put tiles at 293px. */
-@media (min-width: 1440px) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 
 
 @media (min-width: 600px) {

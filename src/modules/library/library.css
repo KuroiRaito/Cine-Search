@@ -116,3 +116,26 @@
   font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro);
   color: var(--faint); font-variant-numeric: tabular-nums;
 }
+
+/* ---------------- sort ----------------
+   L4. Two across, because six options in one column is a list to read and two
+   columns is a set to glance at. */
+
+.sortgrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+.sortopt {
+  display: flex; flex-direction: column; gap: var(--space-2);
+  min-height: var(--control-h); padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-8); cursor: pointer; text-align: left;
+  background: var(--surface); border: var(--border-hair) solid transparent;
+  color: var(--muted); font-family: var(--f-s);
+}
+.sortopt:hover { background: var(--surface-hv); }
+.sortopt.on { background: var(--acc-bg); border-color: var(--acc-bd); color: var(--acc-t); }
+.sortopt b {
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  font-weight: 600; color: var(--text);
+}
+.sortopt.on b { color: var(--acc-t); }
+/* What the sort answers, not what it is called. "what did I love" is why
+   somebody picks a rating sort; "Your rating" is only its name. */
+.sortopt span { font-size: var(--text-micro); line-height: var(--lh-micro); }

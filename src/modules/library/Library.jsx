@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Poster, Tile, Skeleton, Empty, Toast, Icon } from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
@@ -9,6 +9,7 @@ import {
 } from './library.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { matches, isFinding } from './find.js';
+import { applySort, availableSorts, defaultSortFor, sortNote } from './sort.js';
 import './library.css';
 
 /* Which statuses get a chip. "All" is last and has no count of its own — the
@@ -32,6 +33,12 @@ export default function Library() {
     const [filter, setFilter] = useState(null);
     const [toast, setToast] = useState(null);
     const [term, setTerm] = useState('');
+    /* Remembered per shelf, not globally: sorting Watched by rating must not
+       reorder Watching the next time it is opened. Six shelves, six memories —
+       and in state rather than storage, because a sort is a preference for this
+       session, not a record. */
+    const [sorts, setSorts] = useState({});
+    const [sorting, setSorting] = useState(false);
 
     // The catalogue half — titles and posters — is joined server-side rather
     // than held in the provider, which only ever tracks a person's own state.
@@ -140,8 +147,19 @@ export default function Library() {
     const shown = finding
         ? rows.filter((r) => matches(r.title, term))
         : (active === 'all' ? rows : rows.filter((r) => r.status === active));
-    const series = shown.filter((r) => r.mediaType === 'tv');
-    const films = shown.filter((r) => r.mediaType === 'movie');
+    /* Find has no shelf, so it has no remembered sort — the answer to "where
+       did I put it" is the title you typed, in the order the shelf already
+       had. */
+    const sortKey = sorts[active] || defaultSortFor(active);
+    const options = availableSorts(shown);
+    // A remembered sort can stop being offered when the shelf's contents change
+    // — rating on a shelf whose last rated title was removed. Fall back rather
+    // than sort by something that is no longer there.
+    const effective = options.some((o) => o.key === sortKey) ? sortKey : defaultSortFor(active);
+
+    const ordered = applySort(shown, effective);
+    const series = ordered.filter((r) => r.mediaType === 'tv');
+    const films = ordered.filter((r) => r.mediaType === 'movie');
     const label = statusMeta(active)?.label ?? 'Everything';
 
     /* "The + marks the next unwatched episode — never add one to a number — so
@@ -231,7 +249,8 @@ export default function Library() {
             <Group
                 title="Series"
                 count={series.length}
-                note={finding ? 'found' : (active === 'watching' ? 'in progress' : label.toLowerCase())}
+                note={finding ? 'found' : sortNote(effective)}
+                onSort={finding ? null : () => setSorting(true)}
                 empty={finding ? null : <>Nothing here is marked “{label}”.</>}
             >
                 {series.map((r) => <SeriesRow key={r.key} row={r} onBump={() => bump(r)} />)}
@@ -240,7 +259,8 @@ export default function Library() {
             <Group
                 title="Films"
                 count={films.length}
-                note={finding ? 'found' : label.toLowerCase()}
+                note={finding ? 'found' : sortNote(effective)}
+                onSort={finding ? null : () => setSorting(true)}
                 empty={finding ? null : FILM_LESS.has(active)
                     ? (
                         <>
@@ -258,6 +278,16 @@ export default function Library() {
             </Group>
             </>}
 
+            {sorting && (
+                <SortSheet
+                    shelf={label}
+                    current={effective}
+                    options={options}
+                    onPick={(key) => { setSorts((m) => ({ ...m, [active]: key })); setSorting(false); }}
+                    onClose={() => setSorting(false)}
+                />
+            )}
+
             <Toast
                 message={toast?.message}
                 actionLabel={toast?.undo ? 'Undo' : undefined}
@@ -268,8 +298,53 @@ export default function Library() {
     );
 }
 
+/**
+ * L4 — the options change with the shelf, and the choice is remembered for it.
+ *
+ * Said on the sheet rather than left to be discovered: somebody who sorts
+ * Watched by rating and then opens Watching should not wonder why it did not
+ * follow them, and somebody who wanted it to follow should find out here
+ * rather than by being surprised later.
+ */
+function SortSheet({ shelf, current, options, onPick, onClose }) {
+    const box = useRef(null);
+    useEffect(() => {
+        const opener = document.activeElement;
+        const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            if (opener instanceof HTMLElement && document.contains(opener)) opener.focus();
+        };
+    }, [onClose]);
+
+    return (
+        <div className="scrim" role="dialog" aria-modal="true" aria-label={`Sort ${shelf}`} onClick={onClose}>
+            <div className="sheet" ref={box} onClick={(e) => e.stopPropagation()}>
+                <div className="grab" />
+                <h2 className="sheet-title">Sort {shelf}</h2>
+                <p className="sheet-body">Remembered for this shelf only.</p>
+                <div className="sortgrid">
+                    {options.map((o) => (
+                        <button
+                            key={o.key}
+                            type="button"
+                            className={o.key === current ? 'sortopt on' : 'sortopt'}
+                            aria-pressed={o.key === current}
+                            onClick={() => onPick(o.key)}
+                        >
+                            <b>{o.label}</b>
+                            <span>{o.answers}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 /** One titled block. Holds its place in the order whether it has rows or not. */
-function Group({ title, count, note, empty, children }) {
+function Group({ title, count, note, empty, onSort, children }) {
     // An empty section explains itself — "a film is never on hold" is a real
     // answer where an empty grid is not. But while finding there is no shelf to
     // explain, so `empty` is null and the box goes rather than sitting there
@@ -277,7 +352,19 @@ function Group({ title, count, note, empty, children }) {
     if (!count && empty == null) return null;
     return (
         <div className="grp">
-            <div className="grp-h"><b>{title}</b><span>{count ? `${count} ${note}` : 'none'}</span></div>
+            <div className="grp-h">
+                <b>{title}</b>
+                {/* The note already says what the order is, so it is also the
+                    way to change it. A separate Sort button would be a second
+                    control saying the same thing. */}
+                {count && onSort
+                    ? (
+                        <button type="button" className="linkish" onClick={onSort}>
+                            {count} {note}<Icon name="down" size={16} />
+                        </button>
+                    )
+                    : <span>{count ? `${count} ${note}` : 'none'}</span>}
+            </div>
             {count ? children : <p className="whynot">{empty}</p>}
         </div>
     );
@@ -331,6 +418,8 @@ function shape(r, entry) {
         voteAverage: null,
         status: entry.status,
         rating: entry.rating,
+        updatedAt: r.updated_at,
+        addedAt: r.added_at,
         watched,
         seen: episodesWatched(watched),
         total,

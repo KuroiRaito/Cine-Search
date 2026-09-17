@@ -75,3 +75,44 @@
 .plus:disabled { opacity: .4; cursor: default; }
 .track { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--ink-5); }
 .track i { display: block; height: 100%; background: var(--acc); transition: width .18s; }
+
+/* ---------------- find ----------------
+   Not search. A filter over rows already in memory, matching as you type.
+   docs/library-module.html §03. */
+
+.lfind {
+  display: flex; align-items: center; gap: var(--space-8);
+  margin: var(--space-12) var(--gutter) 0; padding: 0 var(--space-12);
+  min-height: var(--control-h); border-radius: var(--radius-control);
+  background: var(--bg-sub); color: var(--faint);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--bd-sub);
+  transition: box-shadow var(--dur-fast) var(--ease-out);
+}
+.lfind:focus-within { box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
+/* Once it holds something it is doing work, and the icon stops being decoration. */
+.lfind.on { color: var(--acc-t); }
+
+.lfind-in {
+  flex: 1; min-width: 0; background: none; border: 0; outline: none;
+  color: var(--text); font-family: var(--f-s);
+  font-size: var(--text-body); line-height: var(--lh-body);
+}
+.lfind-in::placeholder { color: var(--faint); }
+/* The UA's own clear button is a second, differently-shaped affordance beside
+   ours, at a size the 44-pixel law would not allow. */
+.lfind-in::-webkit-search-cancel-button { display: none; }
+
+.lfind-x {
+  flex: 0 0 auto; background: none; border: 0; cursor: pointer;
+  display: grid; place-items: center; color: var(--muted);
+  width: var(--control-sm); height: var(--control-sm); margin-right: calc(var(--space-8) * -1);
+}
+.lfind-x:hover { color: var(--text); }
+
+/* "3 of 203 · searching your library, not the catalogue" — the second half is
+   the important half. A count with no scope reads as a catalogue result. */
+.lfind-n {
+  margin: var(--space-8) var(--gutter) 0;
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro);
+  color: var(--faint); font-variant-numeric: tabular-nums;
+}

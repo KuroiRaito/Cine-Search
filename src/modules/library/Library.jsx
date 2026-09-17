@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Poster, Tile, Skeleton, Empty, Toast } from '../../shared/ui/index.js';
+import { Poster, Tile, Skeleton, Empty, Toast, Icon } from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from './LibraryProvider.jsx';
 import { posterUrl, yearOf } from '../../shared/tmdb/view.js';
@@ -8,6 +8,7 @@ import {
     statusMeta, episodesWatched, runningOrder, nextUnwatched, epLabel, loadEntries, keyOf,
 } from './library.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
+import { matches, isFinding } from './find.js';
 import './library.css';
 
 /* Which statuses get a chip. "All" is last and has no count of its own — the
@@ -30,6 +31,7 @@ export default function Library() {
     const lib = useLibrary();
     const [filter, setFilter] = useState(null);
     const [toast, setToast] = useState(null);
+    const [term, setTerm] = useState('');
 
     // The catalogue half — titles and posters — is joined server-side rather
     // than held in the provider, which only ever tracks a person's own state.
@@ -130,7 +132,14 @@ export default function Library() {
         );
     }
 
-    const shown = active === 'all' ? rows : rows.filter((r) => r.status === active);
+    /* Find ignores the status filter on purpose: you are looking for a title,
+       not a shelf. Somebody who types "dune" while Watching is selected wants
+       the film, and being told it is not on this shelf is a worse answer than
+       the film. */
+    const finding = isFinding(term);
+    const shown = finding
+        ? rows.filter((r) => matches(r.title, term))
+        : (active === 'all' ? rows : rows.filter((r) => r.status === active));
     const series = shown.filter((r) => r.mediaType === 'tv');
     const films = shown.filter((r) => r.mediaType === 'movie');
     const label = statusMeta(active)?.label ?? 'Everything';
@@ -154,6 +163,33 @@ export default function Library() {
         <div className="page">
             <div className="page-head"><h1>Library</h1></div>
 
+            {/* One line in the header, not a screen of its own. The reason
+                somebody opens a five-hundred-title library is usually one
+                title, and four characters gets them there. */}
+            <div className={finding ? 'lfind on' : 'lfind'}>
+                <Icon name="search" size={16} />
+                <input
+                    type="search" value={term} className="lfind-in"
+                    placeholder="Find in your library"
+                    aria-label="Find in your library"
+                    onChange={(e) => setTerm(e.target.value)}
+                />
+                {finding && (
+                    <button type="button" className="lfind-x" aria-label="Clear" onClick={() => setTerm('')}>
+                        <Icon name="close" size={16} />
+                    </button>
+                )}
+            </div>
+
+            {finding && shown.length > 0 && (
+                <p className="lfind-n">
+                    {shown.length} of {rows.length} · searching your library, not the catalogue
+                </p>
+            )}
+
+            {/* The chips are about shelves and find is not, so they go while
+                it is in use rather than sitting there contradicting it. */}
+            {!finding && (
             <div className="chips" role="tablist" aria-label="Filter by status">
                 {FILTERS.filter((k) => counts[k]).map((k) => (
                     <button
@@ -171,15 +207,32 @@ export default function Library() {
                     All<em>{rows.length}</em>
                 </button>
             </div>
+            )}
+
+            {/* L6 — find failed, so the honest next step is Search, carrying
+                the typed text rather than making somebody type it twice. This
+                is the one place the two are allowed to know about each other. */}
+            {finding && shown.length === 0 && (
+                <Empty
+                    title={`Nothing in your library matches “${term.trim()}”.`}
+                    body="It may still be out there."
+                    action={
+                        <Link className="btn" to={`/search?q=${encodeURIComponent(term.trim())}`}>
+                            Search the catalogue
+                        </Link>
+                    }
+                />
+            )}
 
             {/* Series always sits above Films, whether or not either has
                 anything in it. A section that jumps above another because it
                 happens to be empty makes the screen feel unstable. */}
+            {!(finding && shown.length === 0) && <>
             <Group
                 title="Series"
                 count={series.length}
-                note={active === 'watching' ? 'in progress' : label.toLowerCase()}
-                empty={<>Nothing here is marked “{label}”.</>}
+                note={finding ? 'found' : (active === 'watching' ? 'in progress' : label.toLowerCase())}
+                empty={finding ? null : <>Nothing here is marked “{label}”.</>}
             >
                 {series.map((r) => <SeriesRow key={r.key} row={r} onBump={() => bump(r)} />)}
             </Group>
@@ -187,8 +240,8 @@ export default function Library() {
             <Group
                 title="Films"
                 count={films.length}
-                note={label.toLowerCase()}
-                empty={FILM_LESS.has(active)
+                note={finding ? 'found' : label.toLowerCase()}
+                empty={finding ? null : FILM_LESS.has(active)
                     ? (
                         <>
                             Films don’t have a “{label}” state.<br />
@@ -203,6 +256,7 @@ export default function Library() {
                     {films.map((r) => <Tile key={r.key} item={r} />)}
                 </div>
             </Group>
+            </>}
 
             <Toast
                 message={toast?.message}
@@ -216,6 +270,11 @@ export default function Library() {
 
 /** One titled block. Holds its place in the order whether it has rows or not. */
 function Group({ title, count, note, empty, children }) {
+    // An empty section explains itself — "a film is never on hold" is a real
+    // answer where an empty grid is not. But while finding there is no shelf to
+    // explain, so `empty` is null and the box goes rather than sitting there
+    // blank.
+    if (!count && empty == null) return null;
     return (
         <div className="grp">
             <div className="grp-h"><b>{title}</b><span>{count ? `${count} ${note}` : 'none'}</span></div>

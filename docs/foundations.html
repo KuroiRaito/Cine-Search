@@ -3,12 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-/* Icons: Lucide (lucide.dev), ISC licence.
-   Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022
-   as part of Feather (MIT). All other copyright (c) for Lucide are held
-   by Lucide Contributors 2022. */
-*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
 <title>Projector Foundations</title>
@@ -507,6 +502,23 @@ pre u{color:var(--st-done-11);text-decoration:none}
     <div class="note"><b>The box is square and fixed; the drawing inside it is not.</b> Optical sizing still differs by shape — a circle at 20px reads slightly smaller than a square at 20px. Size the <i>box</i> from the token so layout stays predictable, and let the artwork sit where it sits.</div>
 
     <div class="note warn"><b>A 2px stroke does not survive being scaled down.</b> On a 24 grid it becomes 1.33px at 16, which lands between pixels and goes soft. <code>Icon</code> lifts the stroke to <b>2.25</b> at 16px rather than shipping a second icon set.</div>
+    <div class="note law"><b>The rating star is filled. The rating <i>control</i> is filled only as far as it is filled.</b>
+    <br><br>Lucide's <code>star</code> is a stroke icon, so it draws hollow by default &mdash; and a hollow star is the <b>empty</b> half of a rating. Using it to display a score says the opposite of what is meant: it is the difference between <i>rated 9</i> and <i>rate this</i>.
+    <br><br>Two different jobs, two different rules:
+    <br>&bull; <b>Displaying a score</b> &mdash; always <code>fill="currentColor"</code>, stroke lifted to 1.5. Star and number side by side, never stacked.
+    <br>&bull; <b>The rating control</b> &mdash; a chosen star is <b>filled</b>, an unchosen one is <b>hollow</b>. That is the whole affordance, and it is what makes the outline mean something.</div>
+
+    <div class="note warn"><b>FOR THE DEVELOPMENT SIDE &mdash; three call sites, and one of them is a real bug.</b>
+    <div class="tbl-wrap" style="margin-top:var(--space-12)"><table>
+      <thead><tr><th>Where</th><th>Is</th><th>Should be</th></tr></thead>
+      <tbody>
+        <tr><td class="tok">shared/ui/Tile.jsx:39</td><td class="use"><code>&lt;Icon name="star" size={16} /&gt;</code> beside a score &mdash; hollow</td><td class="use"><b>Filled.</b> It displays a score.</td></tr>
+        <tr><td class="tok">modules/title/Title.jsx:494</td><td class="use">Same, on an episode row &mdash; hollow</td><td class="use"><b>Filled.</b> Same reason.</td></tr>
+        <tr><td class="tok">modules/library/Editor.jsx:188</td><td class="use">The rating control. <b>Every star is hollow</b>; <code>.stars button.on</code> in <code>ui.css:358</code> distinguishes a chosen one <b>by colour alone</b>.</td><td class="use"><b>The bug.</b> A gold hollow star still reads as empty. Chosen stars fill; unchosen stay hollow. The existing <code>.half</code> <code>::after</code> overlay needs the same treatment.</td></tr>
+      </tbody>
+    </table></div>
+    <b>Suggested shape:</b> a <code>filled</code> prop on <code>Icon</code> that swaps <code>fill</code> to <code>currentColor</code> and drops the stroke weight to 1.5 &mdash; useful beyond the star, since <code>heart</code> has exactly the same on/off problem on the favourite control.</div>
+
     <div class="note warn"><b>An icon alone is never a control.</b> Every icon-only button carries <code>aria-label</code>, and the label is the sentence a person would say — <code>aria-label="Back"</code>, not <code>aria-label="chevron-left"</code>.</div>
   </div>
 </section>

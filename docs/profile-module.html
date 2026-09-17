@@ -408,6 +408,20 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
    in em so each mock keeps its own scale, with the baseline nudge that puts
    an inline SVG where the glyph used to sit — minus the glyph's drift. */
 .di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+
+/* A rating is a filled star and a number, side by side. An outlined star is the
+   EMPTY half of a rating control, so using it to show a score says the opposite
+   of what is meant. See title-module.html §03d. */
+.di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+.sc,.rate{display:inline-flex;align-items:center;gap:var(--space-4)}
+.sc .di,.rate .di{width:.85em;height:.85em}
+
+/* A rating is a filled star and a number, side by side (title-module.html §03d).
+   The star rides the headline mean; the ranked dimension cards keep bare numerals,
+   because a column of twenty identical stars is a texture, not information. */
+.di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+.snum-i dd.rate{display:inline-flex;align-items:center;gap:var(--space-4)}
+.snum-i dd.rate .di{width:.8em;height:.8em}
 </style>
 
 <!-- ============================== 02 ANATOMY ============================== -->
@@ -440,7 +454,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
           <div class="snums">
             <div class="snum-i"><dt>Watched</dt><dd>112</dd></div>
             <div class="snum-i"><dt>Days</dt><dd>11.3</dd></div>
-            <div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd class="rate"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 7.8</dd></div>
           </div>
           <div class="dbar">
             <i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:var(--st-want-9,#7C8AA8)"></i>
@@ -459,7 +473,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
           <div class="snums">
             <div class="snum-i"><dt>Watched</dt><dd>56</dd></div>
             <div class="snum-i"><dt>Episodes</dt><dd>1.2<span style="font-size:var(--text-micro)">k</span></dd></div>
-            <div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div>
+            <div class="snum-i"><dt>Mean</dt><dd class="rate"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 8.1</dd></div>
           </div>
           <div class="dbar">
             <i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i>
@@ -1042,12 +1056,12 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
           <div>
             <div class="sblock" style="margin:0 0 12px">
               <div class="sblock-h"><b>Films</b><span>at least</span></div>
-              <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>112</dd></div><div class="snum-i"><dt>Days</dt><dd>11.3</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div></div>
+              <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>112</dd></div><div class="snum-i"><dt>Days</dt><dd>11.3</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 7.8</dd></div></div>
               <div class="dbar"><i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:#7C8AA8"></i><i style="width:9%;background:#9B7BD4"></i><i style="width:5%;background:#C87A3C"></i><i style="width:3%;background:var(--st-drop-9)"></i></div>
             </div>
             <div class="sblock" style="margin:0">
               <div class="sblock-h"><b>Series</b><span></span></div>
-              <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>56</dd></div><div class="snum-i"><dt>Episodes</dt><dd>1.2k</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div></div>
+              <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>56</dd></div><div class="snum-i"><dt>Episodes</dt><dd>1.2k</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 8.1</dd></div></div>
               <div class="dbar"><i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i><i style="width:18%;background:#7C8AA8"></i><i style="width:9%;background:#C87A3C"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
             </div>
           </div>
@@ -1100,13 +1114,13 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
           <div class="sblock" style="margin:0">
             <div class="sblock-h"><b>Films</b><span>at least</span></div>
-            <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>112</dd></div><div class="snum-i"><dt>Days</dt><dd>11.3</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">7.8</dd></div></div>
+            <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>112</dd></div><div class="snum-i"><dt>Days</dt><dd>11.3</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 7.8</dd></div></div>
             <div class="dbar"><i style="width:64%;background:var(--st-done-9)"></i><i style="width:19%;background:#7C8AA8"></i><i style="width:9%;background:#9B7BD4"></i><i style="width:5%;background:#C87A3C"></i><i style="width:3%;background:var(--st-drop-9)"></i></div>
             <div class="dlegend"><span><i style="background:var(--st-done-9)"></i>Watched 72</span><span><i style="background:#7C8AA8"></i>Want 21</span><span><i style="background:#9B7BD4"></i>Rewatched 10</span><span><i style="background:#C87A3C"></i>On hold 6</span><span><i style="background:var(--st-drop-9)"></i>Dropped 3</span></div>
           </div>
           <div class="sblock" style="margin:0">
             <div class="sblock-h"><b>Series</b><span></span></div>
-            <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>56</dd></div><div class="snum-i"><dt>Episodes</dt><dd>1.2k</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate">8.1</dd></div></div>
+            <div class="snums"><div class="snum-i"><dt>Watched</dt><dd>56</dd></div><div class="snum-i"><dt>Episodes</dt><dd>1.2k</dd></div><div class="snum-i"><dt>Mean</dt><dd class="rate"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 8.1</dd></div></div>
             <div class="dbar"><i style="width:41%;background:var(--st-done-9)"></i><i style="width:27%;background:#2ABFA0"></i><i style="width:18%;background:#7C8AA8"></i><i style="width:9%;background:#C87A3C"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
             <div class="dlegend"><span><i style="background:var(--st-done-9)"></i>Watched 23</span><span><i style="background:#2ABFA0"></i>Watching 15</span><span><i style="background:#7C8AA8"></i>Want 10</span><span><i style="background:#C87A3C"></i>On hold 5</span><span><i style="background:var(--st-drop-9)"></i>Dropped 3</span></div>
           </div>
@@ -1264,7 +1278,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
             <div class="snums">
               <div class="snum-i"><dt>Watched</dt><dd>6</dd></div>
               <div class="snum-i"><dt>Days</dt><dd>0.6</dd></div>
-              <div class="snum-i"><dt>Mean</dt><dd class="rate">8.2</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd class="rate"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 8.2</dd></div>
             </div>
             <div class="dbar">
               <i style="width:67%;background:var(--st-done-9)"></i><i style="width:33%;background:#7C8AA8"></i>
@@ -1326,7 +1340,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
             <div class="snums">
               <div class="snum-i"><dt>Watched</dt><dd>41</dd></div>
               <div class="snum-i"><dt>Days</dt><dd>4.1</dd></div>
-              <div class="snum-i"><dt>Mean</dt><dd class="rate">7.9</dd></div>
+              <div class="snum-i"><dt>Mean</dt><dd class="rate"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><!-- @license lucide-static v1.46.0 - ISC --> <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg> 7.9</dd></div>
             </div>
             <div class="dbar"><i style="width:78%;background:var(--st-done-9)"></i><i style="width:17%;background:#7C8AA8"></i><i style="width:5%;background:var(--st-drop-9)"></i></div>
           </div>

@@ -139,3 +139,82 @@
 /* What the sort answers, not what it is called. "what did I love" is why
    somebody picks a rating sort; "Your rating" is only its name. */
 .sortopt span { font-size: var(--text-micro); line-height: var(--lh-micro); }
+
+/* ---------------- the control bar ----------------
+   Find, sort and density on one line. §04c. */
+
+.lbar { display: flex; align-items: center; gap: var(--space-8); margin: var(--space-12) var(--gutter) 0; }
+.lbar .lfind { flex: 1; min-width: 0; margin: 0; }
+
+.lbtn {
+  flex: 0 0 auto; width: var(--control-h); height: var(--control-h);
+  border-radius: var(--radius-control); border: 0; cursor: pointer;
+  background: var(--bg-sub); color: var(--muted);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--bd-sub);
+  display: grid; place-items: center;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.lbtn:hover:not(:disabled) { background: var(--surface-hv); color: var(--text); }
+.lbtn.on { background: var(--acc-bg); color: var(--acc-t); box-shadow: inset 0 0 0 var(--border-hair) var(--acc-bd); }
+/* Sorting a find result would be sorting something that is not a shelf. */
+.lbtn:disabled { opacity: .4; cursor: default; }
+
+/* L20 — the filter is set aside while find is in use, not removed. It stays
+   legible, stays tappable, and one tap is the way back. */
+.chips.aside { opacity: .5; }
+
+/* ---------------- compact density ----------------
+   Four slots: status stripe, title, a middle figure, a trailing slot. §04c. */
+
+.crow {
+  display: flex; align-items: center; gap: var(--space-8);
+  min-height: var(--control-h); padding-right: var(--space-4);
+  border-bottom: var(--border-hair) solid var(--bd-sub);
+}
+.crow:last-child { border-bottom: 0; }
+
+/* The status, kept as colour rather than dropped with the artwork. */
+.cstripe {
+  flex: 0 0 auto; width: var(--space-2); align-self: stretch;
+  margin: var(--space-8) 0; border-radius: var(--radius-full); background: var(--bd-str);
+}
+.cstripe.st-want { background: var(--st-want-9); }
+.cstripe.st-ing { background: var(--st-ing-9); }
+.cstripe.st-hold { background: var(--st-hold-9); }
+.cstripe.st-done { background: var(--st-done-9); }
+.cstripe.st-re { background: var(--st-re-9); }
+.cstripe.st-drop { background: var(--st-drop-9); }
+
+.cbody {
+  flex: 1; min-width: 0; display: flex; align-items: baseline; gap: var(--space-8);
+  min-height: var(--control-h); text-decoration: none;
+}
+/* One line with an ellipsis — L16. The trailing slot never moves. */
+.cnm {
+  flex: 1; min-width: 0; color: var(--text);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cmid {
+  flex: 0 0 auto; font-family: var(--f-m); color: var(--faint);
+  font-size: var(--text-micro); line-height: var(--lh-micro); font-variant-numeric: tabular-nums;
+}
+
+/* An empty slot, not a hidden one: the column stays a column. */
+.csc {
+  flex: 0 0 auto; width: var(--space-32); text-align: right;
+  font-family: var(--f-m); font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  color: var(--rate-t); font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.csc.blank { color: transparent; }
+
+.cadd {
+  flex: 0 0 auto; width: var(--space-32); height: var(--space-32);
+  border-radius: var(--radius-8); border: 0; cursor: pointer;
+  background: var(--surface); color: var(--acc-t);
+  display: grid; place-items: center; position: relative;
+}
+.cadd:hover { background: var(--acc-bg); }
+/* §06: 32 + 2×6 clears the 44-pixel law without growing the visible box, and
+   the row's own target stops short of it — two neighbours, not a hotspot. */
+.cadd::after { content: ""; position: absolute; inset: calc(var(--space-4) * -1 - var(--space-2)); }

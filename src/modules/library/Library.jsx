@@ -10,6 +10,7 @@ import {
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { matches, isFinding } from './find.js';
 import { applySort, availableSorts, defaultSortFor, sortNote } from './sort.js';
+import { readDensity, writeDensity, compactSlots } from './density.js';
 import './library.css';
 
 /* Which statuses get a chip. "All" is last and has no count of its own — the
@@ -39,6 +40,12 @@ export default function Library() {
        session, not a record. */
     const [sorts, setSorts] = useState({});
     const [sorting, setSorting] = useState(false);
+    const [density, setDensityState] = useState(readDensity);
+    const setDensity = (d) => { setDensityState(d); writeDensity(d); };
+    const compact = density === 'compact';
+    /* Choosing a shelf is the way back from find: the chip you set is one tap
+       away the whole time it is set aside. */
+    const pick = (key) => { setTerm(''); setFilter(key); };
 
     // The catalogue half — titles and posters — is joined server-side rather
     // than held in the provider, which only ever tracks a person's own state.
@@ -184,19 +191,33 @@ export default function Library() {
             {/* One line in the header, not a screen of its own. The reason
                 somebody opens a five-hundred-title library is usually one
                 title, and four characters gets them there. */}
-            <div className={finding ? 'lfind on' : 'lfind'}>
-                <Icon name="search" size={16} />
-                <input
-                    type="search" value={term} className="lfind-in"
-                    placeholder="Find in your library"
-                    aria-label="Find in your library"
-                    onChange={(e) => setTerm(e.target.value)}
-                />
-                {finding && (
-                    <button type="button" className="lfind-x" aria-label="Clear" onClick={() => setTerm('')}>
-                        <Icon name="close" size={16} />
-                    </button>
-                )}
+            <div className="lbar">
+                <div className={finding ? 'lfind on' : 'lfind'}>
+                    <Icon name="search" size={16} />
+                    <input
+                        type="search" value={term} className="lfind-in"
+                        placeholder="Find in your library"
+                        aria-label="Find in your library"
+                        onChange={(e) => setTerm(e.target.value)}
+                    />
+                    {finding && (
+                        <button type="button" className="lfind-x" aria-label="Clear" onClick={() => setTerm('')}>
+                            <Icon name="close" size={16} />
+                        </button>
+                    )}
+                </div>
+                {/* Sort has a sheet because six options need one. Density
+                    toggles, because two states do not. */}
+                <button
+                    type="button" className="lbtn" aria-label={`Sort ${label}`}
+                    disabled={finding} onClick={() => setSorting(true)}
+                ><Icon name="reorder" size={20} /></button>
+                <button
+                    type="button" className={compact ? 'lbtn on' : 'lbtn'}
+                    aria-pressed={compact}
+                    aria-label={compact ? 'Comfortable rows' : 'Compact rows'}
+                    onClick={() => setDensity(compact ? 'comfortable' : 'compact')}
+                ><Icon name="library" size={20} /></button>
             </div>
 
             {finding && shown.length > 0 && (
@@ -205,27 +226,27 @@ export default function Library() {
                 </p>
             )}
 
-            {/* The chips are about shelves and find is not, so they go while
-                it is in use rather than sitting there contradicting it. */}
-            {!finding && (
-            <div className="chips" role="tablist" aria-label="Filter by status">
+            {/* L20 — find wins, and the filter is visibly set aside rather than
+                hidden. Searching for a title you cannot place should not
+                silently exclude four fifths of your library because a chip was
+                set twenty minutes ago — and tapping any chip is the way back. */}
+            <div className={finding ? 'chips aside' : 'chips'} role="tablist" aria-label="Filter by status">
                 {FILTERS.filter((k) => counts[k]).map((k) => (
                     <button
                         key={k}
                         type="button"
                         role="tab"
                         className="chip"
-                        aria-pressed={active === k}
-                        onClick={() => setFilter(k)}
+                        aria-pressed={!finding && active === k}
+                        onClick={() => pick(k)}
                     >
                         {statusMeta(k).label}<em>{counts[k]}</em>
                     </button>
                 ))}
-                <button type="button" role="tab" className="chip" aria-pressed={active === 'all'} onClick={() => setFilter('all')}>
+                <button type="button" role="tab" className="chip" aria-pressed={!finding && active === 'all'} onClick={() => pick('all')}>
                     All<em>{rows.length}</em>
                 </button>
             </div>
-            )}
 
             {/* L6 — find failed, so the honest next step is Search, carrying
                 the typed text rather than making somebody type it twice. This
@@ -250,17 +271,17 @@ export default function Library() {
                 title="Series"
                 count={series.length}
                 note={finding ? 'found' : sortNote(effective)}
-                onSort={finding ? null : () => setSorting(true)}
                 empty={finding ? null : <>Nothing here is marked “{label}”.</>}
             >
-                {series.map((r) => <SeriesRow key={r.key} row={r} onBump={() => bump(r)} />)}
+                {compact
+                    ? series.map((r) => <CompactRow key={r.key} row={r} onBump={() => bump(r)} />)
+                    : series.map((r) => <SeriesRow key={r.key} row={r} onBump={() => bump(r)} />)}
             </Group>
 
             <Group
                 title="Films"
                 count={films.length}
                 note={finding ? 'found' : sortNote(effective)}
-                onSort={finding ? null : () => setSorting(true)}
                 empty={finding ? null : FILM_LESS.has(active)
                     ? (
                         <>
@@ -272,9 +293,13 @@ export default function Library() {
                     )
                     : <>Nothing here is marked “{label}”.</>}
             >
-                <div className="grid flush">
-                    {films.map((r) => <Tile key={r.key} item={r} />)}
-                </div>
+                {compact
+                    ? films.map((r) => <CompactRow key={r.key} row={r} />)
+                    : (
+                        <div className="grid flush">
+                            {films.map((r) => <Tile key={r.key} item={r} />)}
+                        </div>
+                    )}
             </Group>
             </>}
 
@@ -344,7 +369,7 @@ function SortSheet({ shelf, current, options, onPick, onClose }) {
 }
 
 /** One titled block. Holds its place in the order whether it has rows or not. */
-function Group({ title, count, note, empty, onSort, children }) {
+function Group({ title, count, note, empty, children }) {
     // An empty section explains itself — "a film is never on hold" is a real
     // answer where an empty grid is not. But while finding there is no shelf to
     // explain, so `empty` is null and the box goes rather than sitting there
@@ -352,20 +377,52 @@ function Group({ title, count, note, empty, onSort, children }) {
     if (!count && empty == null) return null;
     return (
         <div className="grp">
-            <div className="grp-h">
-                <b>{title}</b>
-                {/* The note already says what the order is, so it is also the
-                    way to change it. A separate Sort button would be a second
-                    control saying the same thing. */}
-                {count && onSort
-                    ? (
-                        <button type="button" className="linkish" onClick={onSort}>
-                            {count} {note}<Icon name="down" size={16} />
-                        </button>
-                    )
-                    : <span>{count ? `${count} ${note}` : 'none'}</span>}
-            </div>
+            {/* A readout, not a control: §04c puts sort on the bar, and two
+                controls saying the same thing is one too many. */}
+            <div className="grp-h"><b>{title}</b><span>{count ? `${count} ${note}` : 'none'}</span></div>
             {count ? children : <p className="whynot">{empty}</p>}
+        </div>
+    );
+}
+
+/**
+ * One line, four slots: status stripe, title, a middle figure, a trailing slot.
+ *
+ * The trailing slot is the interesting one, and it carries the whole
+ * behavioural difference between the densities. A series you are part-way
+ * through keeps the + — the module's best affordance does not disappear
+ * because somebody asked for more rows, and compact is exactly where a backlog
+ * gets ticked through. Anything finished has no next episode, so the slot
+ * carries the score you would otherwise open the row to see. Unrated leaves the
+ * slot empty rather than removing it, so the column stays a column.
+ *
+ * Density changes the shape, never the destination: this goes to the title
+ * page, exactly where a poster goes in comfortable.
+ */
+function CompactRow({ row, onBump }) {
+    const { middle, trailing } = compactSlots(row);
+    const tone = statusMeta(row.status)?.tone;
+    return (
+        <div className="crow">
+            <span className={tone ? `cstripe ${tone}` : 'cstripe'} aria-hidden="true" />
+            <Link to={`/title/${row.mediaType}/${row.id}`} className="cbody">
+                <span className="cnm">{row.title}</span>
+                <span className="cmid">{middle}</span>
+            </Link>
+            {/* A neighbouring target, never a hotspot inside the row's: it
+                writes to the record on a single tap. */}
+            {trailing === 'bump' && onBump && (
+                <button
+                    type="button" className="cadd"
+                    aria-label={`Mark ${epLabel(row.next)} of ${row.title} watched`}
+                    onClick={onBump}
+                ><Icon name="add" size={16} /></button>
+            )}
+            {trailing === 'score' && <span className="csc">{row.rating}</span>}
+            {/* `empty` would be the shared Empty-state class, which carries a
+                40vh minimum — a blank slot inheriting it made the row 360px
+                tall. A generic name in a shared layer is a landmine. */}
+            {trailing === 'empty' && <span className="csc blank" aria-hidden="true" />}
         </div>
     );
 }

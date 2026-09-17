@@ -1,0 +1,1099 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Library Module</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Projector — the profile module. Built on the tokens in docs/foundations.html;
+   no loose numbers here either. */
+:root{
+  color-scheme:dark;
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-3:#0A2530;--beam-7:#155A72;--beam-9:#25BADF;--beam-11:#6FDCF5;
+  --mar-3:#2B210B;--mar-7:#6B5316;--mar-9:#F5C45C;--mar-11:#F0C468;
+  --st-done-3:#07241F;--st-done-9:#2ABFA0;--st-done-11:#6FE0C8;
+  --st-drop-3:#26100C;--st-drop-9:#B5594A;--st-drop-11:#DC8E7F;
+  --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
+  --on-beam-9:#06333F;
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);
+  --grid-line:rgba(111,220,245,.13);
+  --space-0:0px;--space-2:2px;--space-4:4px;--space-8:8px;--space-12:12px;
+  --space-16:16px;--space-20:20px;--space-24:24px;--space-32:32px;--space-40:40px;
+  --space-48:48px;--space-64:64px;--space-80:80px;
+  --radius-4:4px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-full:999px;
+  --border-hair:1px;--border-focus:2px;
+  --control-sm:36px;--control-md:44px;--control-lg:52px;
+  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+  --f-d:'Archivo',system-ui,sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',ui-monospace,monospace;
+  --dur-fast:120ms;--dur-base:200ms;--ease-out:cubic-bezier(.2,0,0,1);
+  --shadow-raised:0 6px 16px -4px rgba(0,0,0,.6);--scrim-wash:rgba(4,6,12,.62);
+  --z-nav:40;--z-scrim:60;
+  --gutter:var(--space-16);--control-h:var(--control-md);--radius-control:var(--radius-12);
+  --field-gap:var(--space-8);--field-stack:var(--space-16);--section-gap:var(--space-24);
+  --form-max:420px;--measure:65ch;--shell-max:none;
+  --text-micro:11px;--lh-micro:16px;--text-caption:12px;--lh-caption:16px;
+  --text-body-sm:13px;--lh-body-sm:20px;--text-label:13px;--lh-label:16px;
+  --text-body:15px;--lh-body:24px;--text-title-sm:17px;--lh-title-sm:24px;
+  --text-title:21px;--lh-title:28px;--text-display-sm:27px;--lh-display-sm:32px;
+  --text-display:40px;--lh-display:44px;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-s);font-size:var(--text-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:var(--border-focus) solid var(--acc);outline-offset:3px;border-radius:var(--radius-4)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 var(--space-24)}
+.mast{border-bottom:var(--border-hair) solid var(--bd-sub);padding:var(--space-64) 0 var(--space-40);position:relative;overflow:hidden}
+.mast::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to right,var(--grid-line) 0 1px,transparent 1px var(--space-4)),
+             repeating-linear-gradient(to bottom,var(--grid-line) 0 1px,transparent 1px var(--space-4));
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%);
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%)}
+.mast .wrap{position:relative}
+.eyebrow{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t);display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-16)}
+.eyebrow i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal;flex:0 0 auto}
+h1{font-family:var(--f-d);font-size:var(--text-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.04em;margin:0 0 var(--space-16);text-wrap:balance}
+.lede{font-size:var(--text-body);line-height:var(--lh-body);color:var(--muted);max-width:62ch;margin:0}
+.lede b{color:var(--text);font-weight:600}
+nav.toc{border-bottom:var(--border-hair) solid var(--bd-sub);position:sticky;top:0;z-index:var(--z-nav);
+  background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px)}
+nav.toc .wrap{display:flex;gap:var(--space-4);overflow-x:auto;padding-top:var(--space-8);padding-bottom:var(--space-8)}
+nav.toc a{flex:0 0 auto;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);
+  letter-spacing:.04em;color:var(--muted);text-decoration:none;padding:var(--space-8) var(--space-12);border-radius:var(--radius-8)}
+nav.toc a:hover{background:var(--surface);color:var(--text)}
+section{padding:var(--space-64) 0;border-bottom:var(--border-hair) solid var(--bd-sub)}
+.shead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
+.snum{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc);flex:0 0 auto}
+h2{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+h3{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;margin:var(--space-40) 0 var(--space-12)}
+h4{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:var(--space-24) 0 var(--space-12)}
+section > .wrap > p,.prose{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0 0 var(--space-12)}
+section > .wrap > p b,.prose b{color:var(--text);font-weight:600}
+code{font-family:var(--f-m);font-size:.92em;background:var(--surface);padding:var(--space-2) var(--space-4);border-radius:var(--radius-4);color:var(--acc-t)}
+.tbl-wrap{overflow-x:auto;margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12)}
+table{width:100%;border-collapse:collapse;font-size:var(--text-body-sm);line-height:var(--lh-body-sm)}
+th{text-align:left;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd);background:var(--bg-sub);white-space:nowrap}
+td{padding:var(--space-12) var(--space-16);border-bottom:var(--border-hair) solid var(--bd-sub);vertical-align:top;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.tok,td.num{font-family:var(--f-m);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.tok{color:var(--acc-t)}td.num{color:var(--text)}
+tbody tr:hover td{background:color-mix(in srgb,var(--surface) 55%,transparent)}
+.note{border-left:var(--border-focus) solid var(--acc-bd);background:var(--acc-bg);padding:var(--space-12) var(--space-16);
+  border-radius:0 var(--radius-8) var(--radius-8) 0;margin:var(--space-16) 0;font-size:var(--text-body-sm);
+  line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure)}
+.note b{color:var(--acc-t);font-weight:600}
+.note.warn{border-left-color:var(--rate-bd);background:var(--rate-bg)}
+.note.warn b{color:var(--rate-t)}
+.note.law{border-left-color:var(--st-drop-9);background:var(--st-drop-3)}
+.note.law b{color:var(--st-drop-11)}
+.note.ok{border-left-color:var(--st-done-9);background:var(--st-done-3)}
+.note.ok b{color:var(--st-done-11)}
+pre{background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);
+  padding:var(--space-16);overflow-x:auto;margin:var(--space-16) 0;font-family:var(--f-m);
+  font-size:var(--text-caption);line-height:var(--lh-body-sm);color:var(--muted)}
+pre b{color:var(--acc-t);font-weight:500}pre i{color:var(--faint);font-style:normal}
+pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11);text-decoration:none}
+</style>
+<style>
+.phones{display:flex;flex-wrap:wrap;gap:var(--space-24);margin-top:var(--space-16);align-items:flex-start}
+.phone{flex:0 0 auto;width:320px;max-width:100%}
+.phone-cap{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:var(--space-8);display:flex;gap:var(--space-8)}
+.phone-cap b{color:var(--acc-t);font-weight:600}
+.screen{width:320px;max-width:100%;height:600px;overflow:hidden;position:relative;background:var(--bg);
+  border:var(--border-hair) solid var(--bd);border-radius:var(--radius-16);--gutter:var(--space-16)}
+.screen *{box-sizing:border-box}
+.scroll{height:100%;overflow:hidden}
+
+/* --- banner + avatar --- */
+.pbanner{position:relative;aspect-ratio:3/1;background:linear-gradient(115deg,var(--ink-5),var(--beam-7) 55%,var(--mar-7));overflow:hidden}
+.pbanner.empty{background:repeating-linear-gradient(45deg,var(--ink-3) 0 6px,var(--ink-2) 6px 12px);display:grid;place-items:center}
+.pbanner .ecap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.pbanner .bscrim{position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 62%)}
+.pbanner .bedit{position:absolute;right:var(--space-8);top:var(--space-8);height:var(--control-sm);min-width:var(--control-sm);
+  padding:0 var(--space-12);border-radius:var(--radius-full);border:0;cursor:pointer;
+  background:rgba(4,6,12,.6);backdrop-filter:blur(6px);color:#fff;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.phead{padding:0 var(--gutter);margin-top:calc(var(--space-32) * -1);position:relative}
+.pav{width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:3px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title);font-weight:800;color:#fff}
+.pav.empty{background:var(--surface-hv);color:var(--faint)}
+.pname-row{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:var(--space-8)}
+.pname{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+.phandle{font-family:var(--f-m);font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted)}
+.pbio{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:var(--space-12) 0 0;max-width:var(--measure)}
+.pbio.ph{color:var(--faint);font-style:italic}
+.pbtn{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--surface-hv);color:var(--text);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;
+  display:inline-flex;align-items:center;gap:var(--space-4);flex:0 0 auto}
+
+/* --- stat strip --- */
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--border-hair);margin:var(--space-20) var(--gutter) 0;
+  background:var(--bd-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.pstat{background:var(--bg-sub);padding:var(--space-8) var(--space-4);text-align:center}
+.pstat dt{font-family:var(--f-m);font-size:9px;line-height:var(--lh-micro);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.pstat dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.pstat dd small{font-size:var(--text-micro);color:var(--muted);font-weight:400}
+
+/* --- shelves --- */
+.shelf{margin-top:var(--section-gap)}
+.shelf-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-8);padding:0 var(--gutter);margin-bottom:var(--space-8)}
+.shelf-h h4{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;
+  letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none}
+.shelf-n{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);font-variant-numeric:tabular-nums}
+.rail{display:flex;gap:var(--space-8);overflow:hidden;padding:0 var(--gutter) var(--space-4)}
+.fti{flex:0 0 auto;width:78px}
+.fti .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden;position:relative}
+.fti .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fti .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.fpe{flex:0 0 auto;width:72px;text-align:center}
+.fpe .face{width:72px;height:72px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-6),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden}
+.fpe .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text)}
+.fpe .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+/* a character card is a face plus the two things that disambiguate it */
+.fch{flex:0 0 auto;width:96px}
+.fch .face{width:96px;aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(140deg,var(--mar-7),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fch .face .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;
+  font-family:var(--f-m);font-size:9px;line-height:1.3}
+.fch .nm{font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fch .sub{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.addcard{flex:0 0 auto;width:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-4);
+  aspect-ratio:2/3;border-radius:var(--radius-8);border:var(--border-hair) dashed var(--bd-str);background:none;
+  color:var(--muted);cursor:pointer;font-family:var(--f-s);font-size:var(--text-micro)}
+.addcard .plus{font-size:var(--text-title-sm);line-height:1;color:var(--acc-t)}
+.empty-shelf{margin:0 var(--gutter);padding:var(--space-16);border:var(--border-hair) dashed var(--bd-str);
+  border-radius:var(--radius-12);text-align:center}
+.empty-shelf p{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-8)}
+.empty-shelf button{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.callout{display:flex;gap:var(--space-8);margin-top:var(--space-8);padding:0 var(--gutter)}
+
+/* ---- components the benchmark added ---- */
+.ptabs{display:flex;gap:0;overflow:hidden;border-bottom:var(--border-hair) solid var(--bd-sub);padding:0 var(--gutter);margin-top:var(--space-12)}
+.ptabs button{flex:0 0 auto;background:none;border:0;cursor:pointer;padding:var(--space-8) var(--space-12) var(--space-8);
+  font-family:var(--f-s);font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--muted);
+  border-bottom:var(--border-focus) solid transparent;min-height:var(--control-h)}
+.ptabs button.on{color:var(--acc-t);border-bottom-color:var(--acc)}
+.pname-on-banner{position:absolute;left:var(--gutter);bottom:var(--space-12);z-index:2;
+  font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;color:#fff}
+.pbanner.tall{aspect-ratio:2/1}
+.pav-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--gutter) 0}
+.pav-sm{width:var(--space-48);height:var(--space-48);border-radius:var(--radius-full);flex:0 0 auto;
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:2px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:800;color:#fff}
+.pav-sm.empty{background:var(--surface-hv);color:var(--faint)}
+/* split stat block, one per medium */
+.sblock{margin:var(--space-16) var(--gutter) 0;background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);
+  border-radius:var(--radius-12);padding:var(--space-12)}
+.sblock-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
+.sblock-h b{font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text)}
+.sblock-h span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.snums{display:flex;gap:var(--space-16);margin-bottom:var(--space-8)}
+.snum-i{min-width:0}
+.snum-i dt{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.snum-i dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.snum-i dd.rate{color:var(--rate-t)}
+/* the distribution bar — six watch-state hues, already in the foundations */
+.dbar{display:flex;height:var(--space-8);border-radius:var(--radius-full);overflow:hidden;background:var(--surface-hv)}
+.dbar i{display:block;height:100%;font-style:normal}
+.dlegend{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-8)}
+.dlegend span{display:flex;align-items:center;gap:var(--space-4);font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.dlegend i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);font-style:normal;flex:0 0 auto}
+/* a ranked dimension card: count AND mean */
+.dimcard{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8);border-radius:var(--radius-8);
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub)}
+.dimcard .lbl{min-width:0;flex:1}
+.dimcard .lbl b{display:block;font-size:var(--text-caption);font-weight:600;color:var(--text)}
+.dimcard .lbl span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.dimcard .mean{font-family:var(--f-m);font-size:var(--text-body-sm);font-weight:600;color:var(--rate-t);
+  font-variant-numeric:tabular-nums;flex:0 0 auto}
+.dimgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);padding:0 var(--gutter);margin-top:var(--space-8)}
+/* chip row — the fix for 24 screens of scroll */
+.chips{display:flex;gap:var(--space-8);overflow:hidden;padding:var(--space-12) var(--gutter)}
+.chip{flex:0 0 auto;height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-full);
+  border:var(--border-hair) solid var(--bd);background:none;color:var(--muted);cursor:pointer;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.chip.on{background:var(--acc-bg);border-color:var(--acc-bd);color:var(--acc-t)}
+.chip em{font-family:var(--f-m);font-style:normal;font-size:9px;opacity:.8}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);padding:0 var(--gutter)}
+.fgrid .cell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fgrid .cell .art .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px;line-height:1.3}
+.fgrid .cell .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fgrid .cell .sub{font-family:var(--f-m);font-size:8px;color:var(--faint)}
+/* sheets */
+.sheetwrap{position:absolute;inset:0;background:var(--scrim-wash);display:flex;align-items:flex-end}
+.sheet{width:100%;background:var(--bg-sub);border-top:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16) var(--radius-16) 0 0;padding:var(--space-12) var(--space-20) var(--space-20)}
+.grab{width:var(--space-32);height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto var(--space-16)}
+.sh-t{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;letter-spacing:-.02em;margin:0 0 var(--space-4);color:var(--text)}
+.sh-b{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-12)}
+.fld{display:flex;flex-direction:column;gap:var(--field-gap);margin-bottom:var(--field-stack)}
+.fld>span{font-size:var(--text-label);font-weight:600;color:var(--muted)}
+.inp{height:var(--control-h);border-radius:var(--radius-control);background:var(--bg);color:var(--text);
+  border:0;box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);padding:0 var(--space-16);
+  font-family:var(--f-s);font-size:var(--text-body);display:flex;align-items:center}
+.inp.ta{height:auto;min-height:var(--space-64);padding:var(--space-12) var(--space-16);align-items:flex-start;line-height:var(--lh-body-sm);font-size:var(--text-body-sm)}
+.cnt{font-family:var(--f-m);font-size:9px;color:var(--faint);text-align:right}
+.btn{height:var(--control-h);border-radius:var(--radius-control);border:0;cursor:pointer;width:100%;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-label);font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center}
+.btn.q{background:var(--surface-hv);color:var(--text)}
+.skel{background:var(--surface-hv);border-radius:var(--radius-4);animation:none}
+/* desktop frames, drawn at true width then scaled to fit this page */
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px;height:700px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;height:700px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px;display:flex;flex-direction:column}
+.dtop{display:flex;align-items:center;gap:var(--space-24);padding:var(--space-12) var(--gutter);
+  border-bottom:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:var(--space-8);font-family:var(--f-d);font-weight:800;font-size:var(--text-title-sm);letter-spacing:-.03em}
+.dwm i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:var(--space-4)}
+.dnav a{padding:0 var(--space-12);height:var(--control-h);display:inline-flex;align-items:center;border-radius:var(--radius-8);
+  font-size:var(--text-body-sm);color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+.dbody{flex:1;overflow:hidden}
+.dcols{display:grid;grid-template-columns:320px 1fr;gap:var(--space-32);padding:var(--space-24) var(--gutter)}
+
+.invite{margin:var(--space-16) var(--gutter) 0;padding:var(--space-16);border-radius:var(--radius-12);
+  border:var(--border-hair) dashed var(--bd-str);background:var(--bg-sub)}
+.invite b{display:block;font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.invite p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-12)}
+.invite .go{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.waiting{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.ladder{margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.lrow{display:grid;grid-template-columns:96px 1fr;gap:var(--space-16);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd-sub);align-items:baseline}
+.lrow:last-child{border-bottom:0}
+.lrow .at{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc-t);font-variant-numeric:tabular-nums}
+.lrow .what{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted)}
+.lrow .what b{color:var(--text);font-weight:600}
+
+/* Icons in the mock screens are the shipped Lucide set, drawn inline. Sized
+   in em so each mock keeps its own scale, with the baseline nudge that puts
+   an inline SVG where the glyph used to sit — minus the glyph's drift. */
+.di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+
+<style>
+.lchips{display:flex;gap:var(--space-8);overflow:hidden;padding:var(--space-12) var(--gutter)}
+.lchip{flex:0 0 auto;height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-full);
+  border:var(--border-hair) solid var(--bd);background:none;color:var(--muted);cursor:pointer;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.lchip.on{background:var(--acc-bg);border-color:var(--acc-bd);color:var(--acc-t)}
+.lchip em{font-family:var(--f-m);font-style:normal;font-size:9px;opacity:.75}
+.lbar{display:flex;gap:var(--space-8);padding:var(--space-12) var(--gutter) 0;align-items:center}
+.lfind{flex:1;min-width:0;height:var(--control-h);border-radius:var(--radius-control);background:var(--bg-sub);
+  box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);display:flex;align-items:center;gap:var(--space-8);
+  padding:0 var(--space-12);color:var(--faint);font-size:var(--text-body-sm)}
+.lfind.on{box-shadow:inset 0 0 0 var(--border-focus) var(--acc);color:var(--text)}
+.lbtn{height:var(--control-h);width:var(--control-h);flex:0 0 auto;border-radius:var(--radius-control);
+  background:var(--surface);border:0;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.lbtn.on{background:var(--acc-bg);color:var(--acc-t)}
+.grp{margin-top:var(--section-gap)}
+.grp-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-8);
+  padding:0 var(--gutter);margin-bottom:var(--space-8)}
+.grp-h h4{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;
+  letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none}
+.grp-h span{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);font-variant-numeric:tabular-nums}
+/* a series row: the shape that carries progress */
+.srow{display:flex;gap:var(--space-12);align-items:center;padding:var(--space-8) var(--gutter);position:relative}
+.srow .art{width:var(--space-40);flex:0 0 auto;aspect-ratio:2/3;border-radius:var(--radius-4);
+  background:linear-gradient(150deg,var(--ink-5),var(--ink-3));border:var(--border-hair) solid var(--bd-sub)}
+.srow .bd{min-width:0;flex:1}
+.srow .nm{font-size:var(--text-caption);font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow .mt{font-family:var(--f-m);font-size:9px;color:var(--faint);margin-top:2px}
+.srow .track{height:3px;border-radius:var(--radius-full);background:var(--surface-hv);margin-top:var(--space-8);overflow:hidden}
+.srow .track i{display:block;height:100%;background:var(--st-ing-9,#2ABFA0);font-style:normal}
+.srow .plus{width:var(--space-32);height:var(--space-32);flex:0 0 auto;border-radius:var(--radius-full);
+  background:var(--acc);color:var(--on-beam-9);border:0;display:grid;place-items:center;cursor:pointer;font-weight:700}
+.lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);padding:0 var(--gutter)}
+.lcell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);position:relative;overflow:hidden;margin-bottom:var(--space-4)}
+.lcell .sc{position:absolute;left:var(--space-4);bottom:var(--space-4);font-family:var(--f-m);font-size:9px;
+  background:rgba(4,6,12,.75);color:var(--rate-t);padding:1px var(--space-4);border-radius:var(--radius-4)}
+.lcell .st{position:absolute;right:var(--space-4);top:var(--space-4);width:var(--space-16);height:var(--space-16);
+  border-radius:var(--radius-full);display:grid;place-items:center}
+.lcell .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lcell .yr{font-family:var(--f-m);font-size:8px;color:var(--faint)}
+/* the compact density */
+.crow{display:flex;gap:var(--space-8);align-items:center;padding:var(--space-4) var(--gutter);min-height:var(--space-32)}
+.crow .sw{width:var(--space-4);align-self:stretch;border-radius:var(--radius-full);flex:0 0 auto}
+.crow .nm{flex:1;min-width:0;font-size:var(--text-caption);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .pg{font-family:var(--f-m);font-size:9px;color:var(--faint);font-variant-numeric:tabular-nums}
+.crow .sc{font-family:var(--f-m);font-size:9px;color:var(--rate-t);font-variant-numeric:tabular-nums;width:var(--space-24);text-align:right}
+.sortsheet div{display:flex;align-items:center;justify-content:space-between;min-height:var(--control-h);
+  padding:0 var(--space-8);font-size:var(--text-body-sm);color:var(--muted);border-radius:var(--radius-8)}
+.sortsheet div.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+.waiting{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.5}
+.di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+
+<header class="mast"><div class="wrap">
+  <div class="eyebrow"><i></i>Projector &middot; module 5</div>
+  <h1>Library</h1>
+  <p class="lede">The one module here that already ships &mdash; 1,307 lines of it. So this is an audit before it is a design. It holds up well at twenty titles and <b>has no answer at two thousand</b>, and the three controls that would fix that are all missing.</p>
+</div></header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#ships">01 What ships</a>
+  <a href="#scale">02 The scale problem</a>
+  <a href="#controls">03 Find, sort, density</a>
+  <a href="#screens">04 Screens</a>
+  <a href="#desktop">04b Desktop</a>
+  <a href="#actions">04c Actions</a>
+  <a href="#states">05 Every state</a>
+  <a href="#needs">06 What it needs</a>
+  <a href="#open">07 Decisions</a>
+  <a href="#ideas">08 Ideas</a>
+</div></nav>
+
+<section id="ships"><div class="wrap">
+  <div class="shead"><span class="snum">01</span><h2>What ships today</h2></div>
+  <p>Read from the code, not from a description of it.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Piece</th><th>Does</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Status chips</td><td class="use">Six statuses plus All, each with a live count. A chip with a zero count is not drawn.</td><td class="use"><b style="color:var(--st-done-11)">Good.</b> Hiding empty chips is right — a row of zeroes is a list of things you have not done.</td></tr>
+      <tr><td class="num">Series as rows</td><td class="use">Poster, title, <code>S2 E4 &middot; 11 of 62</code>, a progress track, and a <code>+</code> that marks the next unwatched episode by name.</td><td class="use"><b style="color:var(--st-done-11)">The best thing in the module.</b> A series carries progress; a poster cannot show it and a row can.</td></tr>
+      <tr><td class="num">Films as a grid</td><td class="use">Posters, three across.</td><td class="use"><b style="color:var(--st-done-11)">Right.</b> A film carries nothing a poster does not already say.</td></tr>
+      <tr><td class="num">Editor sheet</td><td class="use">Status, rating, progress stepper, rewatches, notes, favourite, remove.</td><td class="use"><b style="color:var(--st-done-11)">Complete.</b></td></tr>
+      <tr><td class="num">Optimistic writes</td><td class="use">Every change lands immediately and rolls back out loud on failure.</td><td class="use"><b style="color:var(--st-done-11)">Right, and rare.</b></td></tr>
+      <tr><td class="num"><b>Find</b></td><td class="use">&mdash;</td><td class="use"><b style="color:var(--st-drop-11)">Missing.</b> No way to find a title you know is in there.</td></tr>
+      <tr><td class="num"><b>Sort</b></td><td class="use">Fixed: most recently updated, always.</td><td class="use"><b style="color:var(--st-drop-11)">Missing.</b> Not a choice, a hard-coded <code>.order()</code>.</td></tr>
+      <tr><td class="num"><b>Density</b></td><td class="use">One shape per media type, fixed.</td><td class="use"><b style="color:var(--rate-t)">Missing.</b> Fine at twenty rows, not at five hundred.</td></tr>
+      <tr><td class="num"><b>Any limit at all</b></td><td class="use"><code>loadEntries()</code> selects the whole library in one query. The screen renders every row.</td><td class="use"><b style="color:var(--st-drop-11)">The real problem.</b> &sect;02.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>R7 is already decided in code, and still open in grooming.</b> <code>statusesFor()</code> gives a film three statuses and a series six &mdash; &ldquo;Watching&rdquo;, &ldquo;On hold&rdquo; and &ldquo;Rewatching&rdquo; are withheld from films. The database still permits all six for either kind, deliberately, so an imported film with a status we no longer offer still renders. <b>The shipped answer is the right one</b>, and the ruling should be recorded rather than left open, because the next person will read the open question and not the code.</div>
+</div></section>
+
+<section id="scale"><div class="wrap">
+  <div class="shead"><span class="snum">02</span><h2>The scale problem</h2></div>
+  <p>A library is the one screen that only grows. Everything else in this product shows a slice of the catalogue; this shows everything you have ever recorded, and it is the screen most likely to still be in use in five years.</p>
+
+  <h4>What the reference does at scale</h4>
+  <p>The AL-chan account benchmarked for the profile has <b>1,497 titles</b>. Its list page, measured on a 430&times;900 phone:</p>
+  <pre>document height  <b>141,660px</b>  =  <b>157 screens</b> of scroll
+14 sections, grouped by status &times; format:
+    Completed TV       <b>772</b> entries
+    Completed Movie     156
+    Completed OVA       136
+    Completed Special    63
+    Completed Music       4
+    Chinese               <b>1</b>     <i>(a custom list)</i></pre>
+  <div class="note law"><b>Two failures, and they pull in opposite directions.</b> One section holds <b>772</b> entries, which is not a section, it is the whole problem wearing a heading. Another holds <b>one</b>, which is a heading wearing nothing. Grouping does not rescue a list this size — it only decides where the scroll happens.</div>
+
+  <h4>What ours does</h4>
+  <p>Better in one way and worse in another. Filtering to a single status is already the thing AL-chan will not do, so our longest page is one status rather than all of them. But:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>At</th><th>Rows rendered on &ldquo;All&rdquo;</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td class="num">20 titles</td><td class="num">20</td><td class="use">Works. This is what the module was designed against.</td></tr>
+      <tr><td class="num">200 titles</td><td class="num">200</td><td class="use">One query, 200 rows in the DOM, a long scroll with no way to jump.</td></tr>
+      <tr><td class="num">500 titles</td><td class="num">500</td><td class="use">Every poster requested at once. Finding a known title means scrolling for it.</td></tr>
+      <tr><td class="num"><b>1,000+</b></td><td class="num"><b>silently truncated</b></td><td class="use">PostgREST applies a server-side row ceiling and Supabase's default is 1,000. <code>loadEntries()</code> sets no range, so past that the library quietly stops being complete.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>The truncation is the one to fix first, and it is not a design problem.</b> A library that silently drops your oldest thousandth title is worse than one that is slow: slow is visible. Flagged for the architecture agent — the fix is a range and a count, not a screen. <b>Worth confirming the actual ceiling on this project</b> rather than taking the default on trust.</div>
+  <div class="note"><b>Two thousand is not hypothetical for this product.</b> A Letterboxd export is the obvious way someone arrives with a history, and a decade of watching is four figures. The profile document already names the imported library as state X1 for the same reason.</div>
+</div></section>
+
+<section id="controls"><div class="wrap">
+  <div class="shead"><span class="snum">03</span><h2>Find, sort, density</h2></div>
+  <p>Three controls, in the order they earn their place. Each is one line in the header; none of them is a new screen.</p>
+
+  <h3>Find — the one that matters most</h3>
+  <p>Not search. <b>Find</b>: a filter over what is already loaded, matching as you type, no request. Search goes to the catalogue and answers &ldquo;does this exist&rdquo;; find stays home and answers <b>&ldquo;where did I put it&rdquo;</b>. Confusing them is why some apps make you leave your own library to get back to it.</p>
+  <div class="note ok"><b>Find collapses the scale problem for the commonest task.</b> The reason somebody opens a 500-title library is usually one title. Four characters gets them there, and the 157-screen question never arises. It is also the cheapest of the three to build — the rows are already in memory.</div>
+  <div class="note warn"><b>It matches the title only, and it matches loosely.</b> Not notes, not people, not genre &mdash; those are searches and they belong to Search. Diacritic-insensitive and word-prefix, so <code>poor</code> finds <i>Poor Things</i> and <code>ame</code> finds <i>Am&eacute;lie</i>. A find that misses because of an accent is worse than no find.</div>
+
+  <h3>Sort</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Sort</th><th>Answers</th><th>Default for</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Recently updated</td><td class="use">&ldquo;what was I doing&rdquo;</td><td class="use"><b>Watching</b>, and the current hard-coded behaviour</td></tr>
+      <tr><td class="num">Recently added</td><td class="use">&ldquo;what did I just save&rdquo;</td><td class="use"><b>Want to watch</b></td></tr>
+      <tr><td class="num">Title A&ndash;Z</td><td class="use">&ldquo;where is the one I am thinking of&rdquo;</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num">Your rating</td><td class="use">&ldquo;what did I love&rdquo;</td><td class="use"><b>Watched</b></td></tr>
+      <tr><td class="num">Release year</td><td class="use">&ldquo;what era is this shelf&rdquo;</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num">Progress</td><td class="use">&ldquo;what is nearly finished&rdquo;</td><td class="use">&mdash; series only</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>The default changes with the filter, and that is the point.</b> &ldquo;Recently updated&rdquo; is right for <i>Watching</i> and wrong for <i>Watched</i>, where nobody is asking what they touched last &mdash; they are asking what was good. A sort that is correct on one shelf and pointless on the next should not be one global setting.</div>
+  <div class="note warn"><b>Remembered per filter, not globally.</b> Sorting <i>Watched</i> by rating should not reorder <i>Watching</i> the next time it is opened. Six shelves, six remembered sorts &mdash; and none of them survive a sign-out, because they are a preference, not a record.</div>
+
+  <h3>Density</h3>
+  <p>AL-chan offers three. Ours needs <b>two</b>, because the films-grid / series-rows split already does half the work a density control does elsewhere.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Mode</th><th>Series</th><th>Films</th><th>Rows per screen at 320&times;600</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Comfortable <i>(today)</i></td><td class="use">Row with poster, progress track and <code>+</code></td><td class="use">3-up poster grid</td><td class="num">~7 series, ~9 films</td></tr>
+      <tr><td class="num"><b>Compact</b> <i>(new)</i></td><td class="use">One line: status stripe, title, <code>11/62</code>, score</td><td class="use">One line, same shape</td><td class="num"><b>~16</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>Compact is the same list, not a lesser one.</b> It keeps the status colour as a stripe, the progress as a fraction and the score as a number &mdash; everything the comfortable row says except the artwork. Somebody scanning 200 completed films does not need 200 posters; somebody browsing what to watch next does.</div>
+  <div class="note law"><b>Density is a preference and never a default that changes itself.</b> No &ldquo;we switched you to compact because your library got big&rdquo;. The one thing a record must be is predictable.</div>
+</div></section>
+
+<style>
+.lh{padding:var(--space-16) var(--gutter) 0}
+.lh h3{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;
+  letter-spacing:-.03em;margin:0;color:var(--text)}
+.ico-s{width:16px;height:16px;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+
+<section id="screens"><div class="wrap">
+  <div class="shead"><span class="snum">04</span><h2>Screens</h2></div>
+  <p>Every frame at <b>320&times;600</b>, the supported floor. Icons are the shipped Lucide set.</p>
+
+  <h3>The shelf, three ways</h3>
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>L1</b> watching &middot; comfortable</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lbar">
+          <div class="lfind"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>Find in library</div>
+          <button class="lbtn"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg></button>
+          <button class="lbtn"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
+        </div>
+        <div class="lchips">
+          <button class="lchip on">Watching <em>4</em></button>
+          <button class="lchip">Want <em>31</em></button>
+          <button class="lchip">Watched <em>168</em></button>
+        </div>
+        <div class="grp" style="margin-top:var(--space-8)">
+          <div class="grp-h"><h4>Series</h4><span>4</span></div>
+          <div class="srow"><div class="art"></div><div class="bd">
+            <div class="nm">Severance</div><div class="mt">S2 E7 &middot; 16 of 19</div>
+            <div class="track"><i style="width:84%"></i></div></div>
+            <button class="plus">+</button></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="bd">
+            <div class="nm">Shogun</div><div class="mt">S1 E4 &middot; 4 of 10</div>
+            <div class="track"><i style="width:40%"></i></div></div>
+            <button class="plus">+</button></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div><div class="bd">
+            <div class="nm">Breaking Bad</div><div class="mt">S2 E4 &middot; 11 of 62</div>
+            <div class="track"><i style="width:18%"></i></div></div>
+            <button class="plus">+</button></div>
+        </div>
+        <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+          No films here &mdash; a two-hour film is never &ldquo;watching&rdquo;.</p>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L2</b> find &middot; four characters</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lbar">
+          <div class="lfind on"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>duna</div>
+          <button class="lbtn"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+          3 of 203 &middot; searching your library, not the catalogue</p>
+        <div class="grp" style="margin-top:var(--space-8)">
+          <div class="grp-h"><h4>Films</h4><span>3</span></div>
+          <div class="lgrid">
+            <div class="lcell"><div class="art"><span class="sc">9.0</span></div><div class="nm">Dune: Part Two</div><div class="yr">2024</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"><span class="sc">8.0</span></div><div class="nm">Dune</div><div class="yr">2021</div></div>
+            <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"></div><div class="nm">Dune</div><div class="yr">1984</div></div>
+          </div>
+        </div>
+        <p class="waiting" style="padding:var(--space-16) var(--gutter) 0">
+          Find ignores the status filter on purpose &mdash; you are looking for a title, not a shelf.</p>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L3</b> compact density</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lbar">
+          <div class="lfind"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>Find in library</div>
+          <button class="lbtn"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg></button>
+          <button class="lbtn on"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
+        </div>
+        <div class="lchips"><button class="lchip on">Watched <em>168</em></button><button class="lchip">Want <em>31</em></button></div>
+        <div class="grp" style="margin-top:var(--space-4)">
+          <div class="grp-h"><h4>Films</h4><span>142 &middot; by your rating</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">Blade Runner 2049</span><span class="pg">2017</span><span class="sc">10</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">Arrival</span><span class="pg">2016</span><span class="sc">10</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">Sicario</span><span class="pg">2015</span><span class="sc">9</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">Prisoners</span><span class="pg">2013</span><span class="sc">9</span></div>
+          <div class="crow"><span class="sw" style="background:#9B7BD4"></span><span class="nm">Dune: Part Two</span><span class="pg">2024</span><span class="sc">9</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">Enemy</span><span class="pg">2013</span><span class="sc">8</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">Oppenheimer</span><span class="pg">2023</span><span class="sc">8</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">Past Lives</span><span class="pg">2023</span><span class="sc">8</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-drop-9)"></span><span class="nm">Babylon</span><span class="pg">2022</span><span class="sc">5</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">The Zone of Interest</span><span class="pg">2023</span><span class="sc">8</span></div>
+          <div class="crow"><span class="sw" style="background:var(--st-done-9)"></span><span class="nm">Anatomy of a Fall</span><span class="pg">2023</span><span class="sc">8</span></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+  <div class="note ok"><b>L3 is the same list, denser.</b> Eleven rows where L1 fits three, and it still carries the status as a stripe, the year, and the score. The artwork is the only thing it drops &mdash; which is the right thing to drop when the task is scanning two hundred finished films rather than choosing what to watch tonight.</div>
+
+  <h3>Sorting, and the shelves that are empty for a reason</h3>
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>L4</b> sort sheet</div>
+      <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lchips"><button class="lchip on">Watched <em>168</em></button></div>
+      </div>
+      <div class="sheetwrap"><div class="sheet">
+        <div class="grab"></div>
+        <h3 class="sh-t">Sort Watched</h3>
+        <p class="sh-b">Remembered for this shelf only.</p>
+        <div class="sortsheet">
+          <div class="on">Your rating <svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <div>Recently updated</div><div>Recently added</div>
+          <div>Title A&ndash;Z</div><div>Release year</div>
+        </div>
+      </div></div>
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L5</b> a shelf with no films</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lchips"><button class="lchip on">On hold <em>2</em></button><button class="lchip">Watching <em>4</em></button></div>
+        <div class="grp" style="margin-top:var(--space-8)">
+          <div class="grp-h"><h4>Series</h4><span>2</span></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,#C87A3C,var(--ink-4))"></div><div class="bd">
+            <div class="nm">The Wire</div><div class="mt">S3 E2 &middot; 27 of 60</div>
+            <div class="track"><i style="width:45%;background:#C87A3C"></i></div></div><button class="plus">+</button></div>
+        </div>
+        <div class="grp">
+          <div class="grp-h"><h4>Films</h4><span>0</span></div>
+          <div class="empty-shelf" style="margin-inline:var(--gutter)">
+            <p>A film is never on hold. It is two hours, so it is either watched, wanted, or dropped.</p>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L6</b> find with no match</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lbar">
+          <div class="lfind on"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>tenet</div>
+          <button class="lbtn"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <div class="empty-shelf" style="margin:var(--space-24) var(--gutter) 0">
+          <p><b style="color:var(--text)">Nothing in your library matches &ldquo;tenet&rdquo;.</b><br>
+             It may still be out there.</p>
+          <button>Search the catalogue</button>
+        </div>
+      </div></div>
+    </div>
+  </div>
+  <div class="note warn"><b>L6 is the handover, and it has to be exact.</b> Find failed, so the honest next step is Search &mdash; and it should carry the typed text across rather than making somebody type it twice. This is the one place the two are allowed to know about each other.</div>
+
+  <h3>Nothing yet, nothing loaded, nothing known</h3>
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>L7</b> empty library</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="empty-shelf" style="margin:var(--space-32) var(--gutter) 0">
+          <p><b style="color:var(--text)">Nothing recorded yet.</b><br>
+             Everything you mark lands here, and stays.</p>
+          <button>Find something to watch</button>
+        </div>
+        <p class="waiting" style="padding:var(--space-16) var(--gutter) 0">
+          No chips, no find, no sort &mdash; there is nothing to filter, and drawing the controls
+          over an empty list makes it look broken rather than new.</p>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L8</b> loading</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lchips">
+          <span class="skel" style="display:block;height:var(--control-sm);width:88px;border-radius:var(--radius-full);background:var(--surface-hv)"></span>
+          <span class="skel" style="display:block;height:var(--control-sm);width:72px;border-radius:var(--radius-full);background:var(--surface-hv)"></span>
+        </div>
+        <div class="grp" style="margin-top:var(--space-8)">
+          <div class="grp-h"><h4>Series</h4><span></span></div>
+          <div class="srow"><div class="art" style="background:var(--surface-hv)"></div><div class="bd">
+            <div style="height:var(--space-12);width:60%;background:var(--surface-hv);border-radius:var(--radius-4)"></div>
+            <div style="height:var(--space-8);width:40%;background:var(--surface-hv);border-radius:var(--radius-4);margin-top:var(--space-8)"></div></div></div>
+          <div class="srow"><div class="art" style="background:var(--surface-hv)"></div><div class="bd">
+            <div style="height:var(--space-12);width:45%;background:var(--surface-hv);border-radius:var(--radius-4)"></div>
+            <div style="height:var(--space-8);width:55%;background:var(--surface-hv);border-radius:var(--radius-4);margin-top:var(--space-8)"></div></div></div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L9</b> session restoring</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="grp" style="margin-top:var(--space-16)">
+          <div class="srow"><div class="art" style="background:var(--surface-hv)"></div><div class="bd">
+            <div style="height:var(--space-12);width:55%;background:var(--surface-hv);border-radius:var(--radius-4)"></div></div></div>
+          <div class="srow"><div class="art" style="background:var(--surface-hv)"></div><div class="bd">
+            <div style="height:var(--space-12);width:70%;background:var(--surface-hv);border-radius:var(--radius-4)"></div></div></div>
+        </div>
+        <p class="waiting" style="padding:var(--space-16) var(--gutter) 0">
+          Not &ldquo;sign in to keep a library&rdquo;. We do not yet know whether this person has one.</p>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L10</b> couldn't load</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="empty-shelf" style="margin:var(--space-24) var(--gutter) 0;border-style:solid;border-color:var(--st-drop-9);background:var(--st-drop-3)">
+          <p><b style="color:var(--st-drop-11)">Couldn&rsquo;t load your library.</b><br>
+             Nothing has been lost &mdash; this is a reading problem.</p>
+          <button>Try again</button>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L11</b> a write rolled back</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lchips"><button class="lchip on">Watching <em>4</em></button></div>
+        <div class="grp" style="margin-top:var(--space-8)">
+          <div class="grp-h"><h4>Series</h4><span>4</span></div>
+          <div class="srow"><div class="art"></div><div class="bd">
+            <div class="nm">Severance</div><div class="mt">S2 E6 &middot; 15 of 19</div>
+            <div class="track"><i style="width:79%"></i></div></div><button class="plus">+</button></div>
+        </div>
+        <div style="position:absolute;left:var(--gutter);right:var(--gutter);bottom:var(--space-16);
+             display:flex;align-items:center;gap:var(--space-8);background:var(--ink-5);
+             border-radius:var(--radius-8);padding:var(--space-12);box-shadow:var(--shadow-raised)">
+          <span style="flex:0 0 auto;width:var(--icon-20);height:var(--icon-20);border-radius:var(--radius-full);
+                background:var(--st-drop-9);color:#fff;display:grid;place-items:center;font-size:var(--text-caption);font-weight:700">!</span>
+          <span style="font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--text);flex:1">
+            Couldn&rsquo;t save E7. Put back to E6.</span>
+          <button style="background:none;border:0;color:var(--acc-t);font-family:var(--f-s);
+                  font-size:var(--text-caption);font-weight:600;cursor:pointer">Retry</button>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L12</b> the editor</div>
+      <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+        <div class="lh"><h3>Library</h3></div>
+      </div>
+      <div class="sheetwrap"><div class="sheet">
+        <div class="grab"></div>
+        <div style="display:flex;gap:var(--space-12);align-items:center;margin-bottom:var(--space-16)">
+          <div style="width:var(--space-40);aspect-ratio:2/3;border-radius:var(--radius-4);flex:0 0 auto;
+               background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div>
+          <div><div style="font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;color:var(--text)">Severance</div>
+          <div class="waiting">2022 &middot; 19 episodes</div></div>
+        </div>
+        <div class="lchips" style="padding:0 0 var(--space-12);flex-wrap:wrap">
+          <button class="lchip on">Watching</button><button class="lchip">On hold</button><button class="lchip">Watched</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-12)">
+          <span class="waiting" style="width:var(--space-64)">Progress</span>
+          <button class="lbtn" style="width:var(--space-32);height:var(--space-32)">&minus;</button>
+          <b style="font-family:var(--f-m);color:var(--text);font-variant-numeric:tabular-nums">16</b>
+          <span class="waiting">of 19</span>
+          <button class="lbtn" style="width:var(--space-32);height:var(--space-32)">+</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-16)">
+          <span class="waiting" style="width:var(--space-64)">Rating</span>
+          <span style="color:var(--rate-t);font-family:var(--f-m);font-weight:600">9 / 10</span>
+        </div>
+        <button class="btn">Save</button>
+        <button class="btn q" style="margin-top:var(--space-8);background:none;color:var(--st-drop-11)">Remove from library</button>
+      </div></div>
+      </div>
+    </div>
+  </div>
+  <h3>Recommended by, once somebody has used it</h3>
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>L26</b> a row that has one</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lchips"><button class="lchip on">Want <em>31</em></button><button class="lchip">Watched <em>168</em></button></div>
+        <div class="grp" style="margin-top:var(--space-8)">
+          <div class="grp-h"><h4>Films</h4><span>31</span></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div>
+            <div class="bd"><div class="nm">Past Lives</div><div class="mt">2023 &middot; 1h 45m</div>
+            <div class="mt" style="color:var(--acc-t)">From Priya</div></div></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div>
+            <div class="bd"><div class="nm">Aftersun</div><div class="mt">2022 &middot; 1h 42m</div>
+            <div class="mt" style="color:var(--acc-t)">From Priya</div></div></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,var(--ink-6),var(--ink-3))"></div>
+            <div class="bd"><div class="nm">The Zone of Interest</div><div class="mt">2023 &middot; 1h 45m</div></div></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,#9B7BD4,var(--ink-4))"></div>
+            <div class="bd"><div class="nm">Anatomy of a Fall</div><div class="mt">2023 &middot; 2h 31m</div></div></div>
+        </div>
+        <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+          Two rows carry a name. The other two do not, and nothing marks their absence.</p>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L27</b> find matches a name</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lbar">
+          <div class="lfind on"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>priya</div>
+          <button class="lbtn"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
+        <p class="waiting" style="padding:var(--space-12) var(--gutter) 0">
+          9 recommended by Priya &middot; 3 watched</p>
+        <div class="grp" style="margin-top:var(--space-8)">
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div>
+            <div class="bd"><div class="nm">Past Lives</div><div class="mt" style="color:var(--acc-t)">From Priya</div></div></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,var(--st-done-9),var(--ink-4))"></div>
+            <div class="bd"><div class="nm">Portrait of a Lady on Fire</div><div class="mt" style="color:var(--acc-t)">From Priya</div></div>
+            <span class="sc" style="font-family:var(--f-m);font-size:var(--text-caption);color:var(--rate-t)">9</span></div>
+          <div class="srow"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div>
+            <div class="bd"><div class="nm">Aftersun</div><div class="mt" style="color:var(--acc-t)">From Priya</div></div></div>
+        </div>
+        <p class="waiting" style="padding:var(--space-16) var(--gutter) 0">
+          No new control was added to make this work. Find already existed.</p>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>L28</b> the From section</div>
+      <div class="screen"><div class="scroll" style="filter:brightness(.5)">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="lchips"><button class="lchip on">Want <em>31</em></button></div>
+      </div>
+      <div class="sheetwrap"><div class="sheet">
+        <div class="grab"></div>
+        <h3 class="sh-t">Sort Want to watch</h3>
+        <div class="sortsheet">
+          <div class="on">Recently added <svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <div>Title A&ndash;Z</div><div>Release year</div>
+        </div>
+        <div class="waiting" style="margin:var(--space-16) 0 var(--space-8);letter-spacing:.1em;text-transform:uppercase">From</div>
+        <div class="sortsheet">
+          <div>Priya <span class="waiting">9 &middot; 3 watched</span></div>
+          <div>Dad <span class="waiting">4 &middot; 4 watched</span></div>
+          <div>Blank Check <span class="waiting">12 &middot; 1 watched</span></div>
+        </div>
+      </div></div>
+      </div>
+    </div>
+  </div>
+  <div class="note ok"><b>L28&rsquo;s From section does not exist on a library where nobody has typed a name.</b> Not empty, not greyed, not there &mdash; the sheet ends after Release year. That is the scoping decision in one frame: the majority who add their own titles never learn the feature is available, and lose nothing by not knowing.</div>
+  <div class="note warn"><b>The count is the payoff.</b> &ldquo;Priya &middot; 9 &middot; 3 watched&rdquo; answers the question somebody actually has &mdash; not <i>what did she recommend</i> but <b>am I behind on what she recommended</b>. It is also the number that would justify promoting this later, if the social layer ever arrives.</div>
+
+
+  <div class="note law"><b>L11 is the module's best existing rule, drawn.</b> The tick landed, the write failed, the row went back to E6 and <b>said so by name</b> — &ldquo;Couldn't save E7&rdquo;, not &ldquo;something went wrong&rdquo;. A silent rollback is the worst outcome available: the person believes they are one episode further along than the record says, and they find out months later.</div>
+  <div class="note warn"><b>L12's remove is footer-isolated and confirms.</b> Every other control in the sheet is reversible in one tap; remove is the only one that destroys a record, so it sits apart from the others, below Save, in <code>--st-drop-11</code>, and asks. That is already how it ships.</div>
+</div>
+</section>
+
+<style>
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px}
+.dtop{display:flex;align-items:center;gap:24px;padding:12px 40px;border-bottom:1px solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-weight:800;font-size:17px;letter-spacing:-.03em}
+.dwm i{width:8px;height:8px;border-radius:999px;background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:4px}
+.dnav a{padding:0 12px;height:44px;display:inline-flex;align-items:center;border-radius:8px;font-size:13px;color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+</style>
+
+<section id="desktop"><div class="wrap">
+  <div class="shead"><span class="snum">04b</span><h2>Desktop</h2></div>
+  <p>Drawn at <b>1120</b> and scaled to fit. The container caps at 1600 in the wide band; nothing below reflows, the columns get wider.</p>
+
+  <div class="deskcap"><b>D1</b> library &middot; expanded &middot; comfortable</div>
+  <div class="deskwrap"><div style="height:400px"><div class="deskscale"><div class="desk" style="height:640px">
+    <div class="dtop">
+      <div class="dwm"><i></i>Cine Search</div>
+      <div class="dnav"><a href="#x">Discover</a><a href="#x">Search</a><a class="on" href="#x">Library</a><a href="#x">You</a></div>
+    </div>
+    <div style="padding:24px 40px">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+        <h3 style="font-family:var(--f-d);font-size:27px;font-weight:800;letter-spacing:-.035em;margin:0;color:var(--text)">Library</h3>
+        <div style="flex:1;max-width:420px;height:44px;border-radius:12px;background:var(--bg-sub);
+             box-shadow:inset 0 0 0 1px var(--bd-sub);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--faint);font-size:13px">
+          <svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>Find in library</div>
+        <span style="flex:1"></span>
+        <span style="font-family:var(--f-m);font-size:11px;color:var(--faint)">203 titles</span>
+        <button class="lbtn"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg></button>
+        <button class="lbtn"><svg class="ico-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg></button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <button class="lchip on">Watching <em>4</em></button><button class="lchip">Want <em>31</em></button>
+        <button class="lchip">Watched <em>168</em></button><button class="lchip">On hold <em>2</em></button>
+        <button class="lchip">Dropped <em>7</em></button>
+      </div>
+      <div style="display:grid;grid-template-columns:420px 1fr;gap:32px">
+        <div>
+          <div style="font-family:var(--f-d);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px">Series &middot; 4</div>
+          <div class="srow" style="padding-inline:0"><div class="art"></div><div class="bd">
+            <div class="nm">Severance</div><div class="mt">S2 E7 &middot; 16 of 19</div><div class="track"><i style="width:84%"></i></div></div><button class="plus">+</button></div>
+          <div class="srow" style="padding-inline:0"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="bd">
+            <div class="nm">Shogun</div><div class="mt">S1 E4 &middot; 4 of 10</div><div class="track"><i style="width:40%"></i></div></div><button class="plus">+</button></div>
+          <div class="srow" style="padding-inline:0"><div class="art" style="background:linear-gradient(150deg,var(--mar-7),var(--ink-4))"></div><div class="bd">
+            <div class="nm">Breaking Bad</div><div class="mt">S2 E4 &middot; 11 of 62</div><div class="track"><i style="width:18%"></i></div></div><button class="plus">+</button></div>
+        </div>
+        <div>
+          <div style="font-family:var(--f-d);font-size:17px;font-weight:700;color:var(--text);margin-bottom:8px">Films &middot; 0</div>
+          <div style="padding:16px;border:1px dashed var(--bd-str);border-radius:12px;text-align:center">
+            <p style="font-size:12px;color:var(--muted);margin:0">A two-hour film is never &ldquo;watching&rdquo;.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div></div></div>
+
+  <div class="note"><b>Series left, films right &mdash; not stacked.</b> On a phone they are two sections you scroll past in order. Here they are two columns, because the whole point of one filter holding both is that you can see the shape of a shelf at once: three series in progress and no films is a fact about how somebody watches, and stacking hides it.</div>
+  <div class="note warn"><b>The series column is fixed at 420px and the films column fills.</b> A series row is a fixed composition — poster, two lines, a track, a button — and stretching it to 900px leaves the title stranded from its <code>+</code>. Posters have no such problem, so the grid takes the slack.</div>
+</div></section>
+
+<section id="actions"><div class="wrap">
+  <div class="shead"><span class="snum">04c</span><h2>Actions</h2></div>
+  <p>A shape without a behaviour is half a design. Every element on this screen, every gesture it answers, and where it goes.</p>
+
+  <div class="note law"><b>The governing rule: density changes the shape, never the destination.</b> Tapping a title in compact goes exactly where tapping a poster in comfortable goes &mdash; the title page. A person who switches density to fit more on screen has not asked for different behaviour, and an app whose links move when you change a view setting is one you stop trusting.</div>
+
+  <h4>Comfortable</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Element</th><th>Tap</th><th>Long press</th><th>Keyboard</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Series row &mdash; poster or title</td><td class="use">Title page</td><td class="use">Editor sheet</td><td class="use">Enter &rarr; title page</td></tr>
+      <tr><td class="num">Series row &mdash; the <code>+</code></td><td class="use"><b>Marks the next unwatched episode</b> and names it in a toast with six seconds of undo. Never opens anything.</td><td class="use">Editor sheet, opened on progress</td><td class="use">Tab reaches it separately from the row</td></tr>
+      <tr><td class="num">Series row &mdash; the track</td><td class="use">Nothing. It is a readout, not a scrubber.</td><td class="use">&mdash;</td><td class="use">Not focusable</td></tr>
+      <tr><td class="num">Film cell</td><td class="use">Title page</td><td class="use">Editor sheet</td><td class="use">Enter &rarr; title page</td></tr>
+      <tr><td class="num">Film cell &mdash; score badge</td><td class="use">Nothing separately. The whole cell is one target.</td><td class="use">&mdash;</td><td class="use">&mdash;</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>The <code>+</code> is a 44&times;44 target inside a 56px row, and it must never be reachable by accident.</b> It writes to the record on a single tap. It sits at the far edge with the row's own tap area stopping short of it &mdash; two neighbouring targets, not one target with a hotspot.</div>
+
+  <h4>Compact &mdash; and the one thing that changes</h4>
+  <p>The compact row has four slots: status stripe, title, a middle figure, and a trailing slot. The trailing slot is the interesting one.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Row is</th><th>Middle</th><th>Trailing slot</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="num">A series in progress</td><td class="num">11/62</td><td class="use"><b>The <code>+</code></b></td><td class="use">The module's best affordance does not disappear because you asked for more rows. Compact is where you are most likely to be ticking through a backlog.</td></tr>
+      <tr><td class="num">Anything finished</td><td class="num">year</td><td class="use">Your score</td><td class="use">There is no next episode, so the slot carries the thing you would otherwise open the row to see.</td></tr>
+      <tr><td class="num">Finished, unrated</td><td class="num">year</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td><td class="use">An empty slot, not a hidden one. The column stays a column.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>One slot, two jobs, decided by whether a next episode exists.</b> That is the whole difference between the densities' behaviour &mdash; everything else is identical, including every destination.</div>
+
+  <h4>The controls</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Control</th><th>Does</th><th>Remembered?</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Status chip</td><td class="use">Selects one shelf. Tapping the selected chip clears to All.</td><td class="use">No &mdash; the library opens on All every time.</td></tr>
+      <tr><td class="num">Find</td><td class="use">Filters as you type, across all statuses. Clearing it restores the shelf you were on.</td><td class="use">No. Never persisted across visits.</td></tr>
+      <tr><td class="num">Sort</td><td class="use">Opens the sheet. Options depend on the shelf.</td><td class="use"><b>Yes, per shelf.</b> Not across sign-out.</td></tr>
+      <tr><td class="num">Density</td><td class="use">Toggles. No sheet, no menu &mdash; two states do not need one.</td><td class="use"><b>Yes, globally.</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Find clears the status filter visibly, and putting it back is one tap.</b> Searching your library for a title you cannot place should not silently exclude four fifths of it because a chip was set twenty minutes ago. L20.</div>
+
+  <h4>Everything that writes</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Write</th><th>Confirms?</th><th>Undo</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Tick an episode (the <code>+</code>)</td><td class="use">No</td><td class="use">Toast, six seconds, names the episode</td></tr>
+      <tr><td class="num">Change status</td><td class="use">No</td><td class="use">Toast</td></tr>
+      <tr><td class="num">Rate</td><td class="use">No</td><td class="use">Re-rate; it is one tap either way</td></tr>
+      <tr><td class="num"><b>Remove from library</b></td><td class="use"><b>Yes</b></td><td class="use">None after confirming. It is the only destructive act here and the only one that asks.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>Confirmation is reserved for the one thing that cannot be undone.</b> Everything else is reversible in a tap, so a dialog would be the app asking permission to do what it was just told. Remove destroys a record &mdash; ratings, progress, notes, who recommended it &mdash; and that is why it asks and why it sits alone in the sheet's footer.</div>
+</div></section>
+
+<section id="states"><div class="wrap">
+  <div class="shead"><span class="snum">05</span><h2>Every state</h2></div>
+  <p><b>These ids are test names.</b> Everything here is <code>L</code>-prefixed, which collides with nothing: entry owns <code>I</code>, <code>U</code>, <code>C</code>, <code>S</code>; profile owns <code>P</code>, <code>T</code>, <code>F</code>, <code>E</code>, <code>K</code>, <code>N</code>, <code>X</code>, <code>G</code>, <code>R</code>.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>State</th><th>What is on screen</th><th>Drawn</th></tr></thead>
+    <tbody>
+        <tr><td class="tok">L1</td><td class="num">Watching, comfortable</td><td class="use">Series rows with progress; a line saying why there are no films.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L2</td><td class="num">Find, matching</td><td class="use">Ignores the status filter — you are looking for a title, not a shelf. Count shown as <code>3 of 203</code>.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L3</td><td class="num">Compact density</td><td class="use">Status stripe, title, year, score. Eleven rows where comfortable fits three.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L4</td><td class="num">Sort sheet</td><td class="use">Options change with the shelf; the choice is remembered per shelf.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L5</td><td class="num">Shelf with no films</td><td class="use">&ldquo;A film is never on hold.&rdquo; A reason, not an apology.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L6</td><td class="num">Find with no match</td><td class="use">Hands over to Search, carrying the typed text.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L7</td><td class="num">Empty library</td><td class="use">No chips, no find, no sort — controls over an empty list look broken rather than new.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L8</td><td class="num">Loading</td><td class="use">Chips and rows skeleton; the heading does not.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L9</td><td class="num"><b>Session restoring</b></td><td class="use">Not &ldquo;sign in to keep a library&rdquo;. We do not know yet whether this person has one.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L10</td><td class="num">Could not load</td><td class="use">Says nothing is lost. A read failure is not a data failure.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L11</td><td class="num"><b>A write rolled back</b></td><td class="use">Names the episode — &ldquo;Couldn&rsquo;t save E7. Put back to E6.&rdquo; Never a silent revert.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L12</td><td class="num">Editor sheet</td><td class="use">Status, progress, rating, notes. Remove is footer-isolated and confirms.</td><td class="use"><b style="color:var(--st-done-11)">§04</b></td></tr>
+        <tr><td class="tok">L26</td><td class="num"><b>A row with a recommender</b></td><td class="use">A third line in the accent: <b>From Priya</b>. Rows without one show nothing, and nothing marks the absence.</td><td class="use"><b style="color:var(--st-done-11)">&sect;04</b></td></tr>
+        <tr><td class="tok">L27</td><td class="num"><b>Find matches a name</b></td><td class="use">Returns their titles with a count and how many are watched. No new control &mdash; find already existed.</td><td class="use"><b style="color:var(--st-done-11)">&sect;04</b></td></tr>
+        <tr><td class="tok">L28</td><td class="num"><b>The From section</b></td><td class="use">Appears in the sort sheet only once a name exists. On a library with none, the sheet ends earlier.</td><td class="use"><b style="color:var(--st-done-11)">&sect;04</b></td></tr>
+        <tr><td class="tok">L29</td><td class="num">Last recommender cleared</td><td class="use">Back to L1 exactly. The From section disappears with the last name &mdash; a section for zero people is worse than none.</td><td class="use"><span style="color:var(--faint)">&mdash;</span></td></tr>
+        <tr><td class="tok">L13</td><td class="num">Guest</td><td class="use">The existing sign-in sheet, verb matched. The catalogue is never gated; a library is.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L14</td><td class="num"><b>Past the row ceiling</b></td><td class="use">PostgREST caps the query. The screen must say the list is partial rather than present a truncated library as complete. §02.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L15</td><td class="num">Sort remembered per shelf</td><td class="use">Rating on Watched must not reorder Watching. Six shelves, six memories, none surviving sign-out.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L16</td><td class="num">Very long title</td><td class="use">One line with ellipsis in a row; two lines clamped in a grid cell. The <code>+</code> never moves.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L17</td><td class="num">Series with no episode data</td><td class="use">TMDB has the series but no season list. No track, no <code>+</code>, and a line saying progress is unavailable — not a 0 of 0 bar.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L18</td><td class="num"><b>Film holding a series-only status</b></td><td class="use">An import can carry &ldquo;Watching&rdquo; on a film. The database permits it deliberately. It renders with that status and is not silently rewritten.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L19</td><td class="num">Only one status has anything</td><td class="use">Five chips are absent, one is selected. Not a row of zeroes.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L20</td><td class="num">Find while a filter is active</td><td class="use">Find wins and the filter is visibly set aside, with a way back.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L21</td><td class="num"><b>All episodes ticked, still &ldquo;Watching&rdquo;</b></td><td class="use">Offer &ldquo;Mark watched?&rdquo; once, inline. Never change the status on someone&rsquo;s behalf — the record is theirs.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L22</td><td class="num">Removed while you are looking at it</td><td class="use">The row goes immediately, because the provider no longer holds it. Undo is the toast, not the row.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L23</td><td class="num">320px</td><td class="use">Compact fits 16 rows; comfortable fits 7. Both are usable; neither scrolls sideways.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+        <tr><td class="tok">L24</td><td class="num">expanded</td><td class="use">Series left at 420px, films right and filling.</td><td class="use"><b style="color:var(--st-done-11)">§04b</b></td></tr>
+        <tr><td class="tok">L25</td><td class="num">wide</td><td class="use">Container caps at 1600, margin takes the rest. Columns widen; nothing reflows.</td><td class="use"><span style="color:var(--faint)">—</span></td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section id="needs"><div class="wrap">
+  <div class="shead"><span class="snum">06</span><h2>What the design needs to exist</h2></div>
+  <p>Requirements, not a schema — how any of it is stored is the architecture agent's call.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Needs</th><th>Shape</th><th>Because</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>A bounded read</b></td><td class="use">A range and a total count</td><td class="use">The only item here that is a defect rather than a feature. Today the whole library is one unbounded query and the server caps it silently. L14 cannot even be drawn honestly until the screen knows the list is partial.</td></tr>
+      <tr><td class="num">Find</td><td class="use">Client-side over loaded rows; diacritic-insensitive, word-prefix</td><td class="use">No request. The rows are already in memory, which is what makes this the cheapest of the three controls.</td></tr>
+      <tr><td class="num">Sort</td><td class="use">Six orders; the chosen one remembered per shelf</td><td class="use">A preference, not a record — it does not survive sign-out and does not sync.</td></tr>
+      <tr><td class="num">Density</td><td class="use">Two modes, remembered</td><td class="use">Same: a preference. Never changes itself.</td></tr>
+      <tr><td class="num">Progress for a series</td><td class="use">Watched count and total, both excluding specials</td><td class="use">Already correct in <code>episodesWatched()</code> — counting specials on one side of the fraction reads &ldquo;63 of 62&rdquo; and draws a bar past its own end.</td></tr>
+      <tr><td class="num">The next unwatched episode</td><td class="use">Its season, number and name</td><td class="use">The <code>+</code> names what it will mark. &ldquo;Add one to a number&rdquo; is not the same feature.</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section id="open"><div class="wrap">
+  <div class="shead"><span class="snum">07</span><h2>Decisions</h2></div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Decision</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">LD1</td><td class="use"><b>R7, still formally open.</b> Films get three statuses and series get six. The code already does this; grooming still lists it as undecided.</td><td class="use"><b>Ratify what ships.</b> &ldquo;Watching&rdquo; on a two-hour film is noise, and the database still permits all six so an import is never rewritten. This needs recording, not deciding — the risk is somebody reading the open question and 'fixing' the code.</td></tr>
+      <tr><td class="tok">LD2</td><td class="use"><b>Find, sort, density — all three, or start with one?</b></td><td class="use"><b>Find first, alone.</b> It is the cheapest, it solves the commonest task, and it makes the scale problem stop hurting while the bounded read is built. Sort second. Density last — it is the one people ask for and the one they use least.</td></tr>
+      <tr><td class="tok">LD3</td><td class="use"><b>Custom lists.</b> AL-chan has them — the benchmarked account keeps &ldquo;Summer Holiday 2019&rdquo; and &ldquo;Chinese&rdquo; alongside the six statuses.</td><td class="use"><b>Not now, and possibly never.</b> Two of that account's fourteen sections are custom lists holding one and sixteen entries. They are a filing system for people who file. Six statuses plus find plus sort answers the same questions without asking anybody to maintain a taxonomy.</td></tr>
+      <tr><td class="tok">LD5</td><td class="use"><b>How far does &ldquo;recommended by&rdquo; go?</b> The field exists and shows nobody anything.</td><td class="use"><b>Settled 2026-09-17: the quiet version now, the browsable version with the social layer.</b> A row line, a find match and a From section in the sort sheet &mdash; all of which appear only once a name has been typed. People as a first-class dimension waits for a layer that does not exist in the concept yet.</td></tr>
+      <tr><td class="tok">LD4</td><td class="use"><b>What happens at the row ceiling?</b> Truncate silently is today's answer.</td><td class="use"><b>Page it, and say the count.</b> &ldquo;203 titles&rdquo; in the header is cheap and it is the only thing that makes a truncation visible. A library that quietly stops being complete is the worst failure this module can have.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law" style="margin-bottom:0"><b>Nothing here is built.</b> This is design, for grooming — except the audit in §01, which is what already ships and was read from the code.</div>
+</div></section>
+
+<section id="ideas"><div class="wrap">
+  <div class="shead"><span class="snum">08</span><h2>Three ideas, for review</h2></div>
+  <p><b>Not designed, not decided.</b> Three things a library could be that this one is not, each grounded in data the project already stores &mdash; I checked the schema for all three rather than proposing from imagination. Reject any of them cheaply.</p>
+
+  <h3>1 &middot; Tonight &mdash; the library answers &ldquo;what now&rdquo;</h3>
+  <p>The library answers <i>what have I recorded</i>. The question a person actually has at nine in the evening is <b>what do I watch now</b>, and that is a different question with a different answer.</p>
+  <p>We know the runtime of everything &mdash; <code>catalog_titles.runtime</code> is cached, so this is a local query, not an API call. We know which series have a next episode and how long it is. So the library could take one input, <b>how long have you got</b>, and answer it:</p>
+  <pre><b>45 minutes</b>   &rarr;  next episode of Severance (38m) &middot; next of Shogun (54m, over)
+<b>2 hours</b>      &rarr;  11 films from Want to watch that fit
+<b>a whole evening</b> &rarr;  the three-episode run that finishes season 2</pre>
+  <div class="note ok"><b>Why this one is my favourite.</b> It costs nothing new &mdash; every number is already in the database &mdash; and it changes what the screen is <i>for</i>. A tracker that only records is a filing cabinet; one that can answer &ldquo;I have forty minutes&rdquo; is a thing you open on purpose.</div>
+  <div class="note warn"><b>The obvious second half does not work yet.</b> &ldquo;&hellip; and it is on a service I have&rdquo; would be the natural pairing, and <b>providers are not cached</b> &mdash; there is no provider column in <code>catalog_titles</code>, they are fetched per title. Filtering 200 titles by service would be 200 requests. That is a caching job before it is a design one, and I would ship the time half alone first.</div>
+
+  <h3>2 &middot; Recommended by &mdash; <span style="color:var(--st-done-11)">taken, and scoped down</span></h3>
+  <p>The Editor already asks <b>who recommended this</b>. <code>user_library.recommended_by</code> and <code>recommended_at</code> have been in the schema since the first migration, and <code>DATA_MODEL.md</code> calls it <i>&ldquo;the differentiator nobody else stores&rdquo;</i>.</p>
+  <div class="note law"><b>It is captured and never read back.</b> Every use in <code>src/</code>: the Editor writes it, the provider carries it, the query selects it &mdash; and <b>no screen displays it</b>. Somebody has been typing names into a field that shows them nothing since the day it shipped.</div>
+
+  <div class="note ok"><b>Ruled 2026-09-17: build it, but never make it primary.</b> Most people add their own titles, so a recommender is a minority case and must not cost anything to the majority who never use it. The browsable version &mdash; people as a first-class dimension, &ldquo;what did Priya tell me to watch&rdquo; as a place you go &mdash; <b>defers to the social layer</b>, which is not in the concept yet. See §07 LD5.</div>
+
+  <h4>The rule that makes it free</h4>
+  <div class="note law"><b>Nothing about this feature exists in the interface until the person creates it.</b> No chip, no empty state, no &ldquo;add who recommended this&rdquo; prompt, no section header waiting to be filled. Somebody who never types a name never sees that the field is there. The moment one entry has a recommender, three things quietly become true &mdash; and not before.</div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Where</th><th>With none set</th><th>With one or more set</th></tr></thead>
+    <tbody>
+      <tr><td class="num">The row</td><td class="use">Unchanged.</td><td class="use">A third line, <code>--text-micro</code> in <code>--faint</code>: <b>From Priya</b>. Only on rows that have one.</td></tr>
+      <tr><td class="num">Find</td><td class="use">Matches titles.</td><td class="use">Also matches recommenders. Typing <code>priya</code> returns her nine, and each says why it matched.</td></tr>
+      <tr><td class="num">The sort sheet</td><td class="use">No such section.</td><td class="use">A <b>From</b> section appears, listing the names you have used with counts. Tap one to filter.</td></tr>
+      <tr><td class="num">Everywhere else</td><td class="use">&mdash;</td><td class="use"><b>Nothing.</b> No tab, no dashboard, no card on the profile.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note warn"><b>This refines the find rule from &sect;03, and the reason matters.</b> That rule said find matches <i>the title only</i> &mdash; not notes, not people. A recommender is the exception because it is <b>not catalogue metadata, it is your own annotation</b>, and finding your own annotation in your own library is exactly what find is for. Notes stay excluded: prose is a bad match target and would return half the library on a common word. A name is a good one.</div>
+
+  <div class="note"><b>It pays off at exactly the moment it costs something.</b> The first time you type a name, nothing visible happens &mdash; that entry gains a line. By the fourth, the From section exists and you can see that Priya has given you nine and you have watched three. That is the whole feature, and it never asked anybody for anything.</div>
+
+  <h3>3 &middot; Negative space &mdash; a library that shows its own gaps</h3>
+  <p>A library is a list of what you have seen. Turned around, the same data is a map of what you have <b>not</b> &mdash; and for the people you clearly love, that is more interesting.</p>
+  <p><code>catalog_credits</code> is indexed by person, role and job, which is what makes collection progress a local query rather than an API call. The person page already says <i>&ldquo;6 of 26 directed&rdquo;</i>. The library could invert it:</p>
+  <pre>You have watched <b>6 of Villeneuve's 26</b>.
+  Here are the twenty you have not &mdash; and three are on your watchlist already.</pre>
+  <div class="note"><b>It earns its place by being uncomfortable in a useful way.</b> Everything else on this screen tells you what you have done. This is the only thing in the product that would tell you what you have missed &mdash; and for somebody working through a director, that is the actual task.</div>
+  <div class="note warn"><b>The obvious failure mode is nagging, and the rule against it is already written.</b> No streaks, no nudges, nothing that decays. So this can never arrive uninvited, never count down, and never appear on the shelf itself &mdash; it is somewhere you go, not something that finds you. If it cannot be built that way it should not be built.</div>
+
+  <h4>If only one</h4>
+  <div class="note ok" style="margin-bottom:0"><b>Number 2.</b> It is the smallest of the three, it needs no new data at all, and it closes a hole that is embarrassing once you see it &mdash; a field the data model calls the differentiator, which the interface has never once shown anybody. Number 1 is the one that would change how often the app gets opened. Number 3 is the one I would want but would most easily get wrong.</div>
+</div></section>
+
+<footer style="padding:var(--space-48) 0 var(--space-64)"><div class="wrap">
+  <p style="font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 var(--space-8)">Projector &middot; library &middot; audit and design</p>
+  <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0">
+    Measurements in &sect;02 were taken on a live AL-chan account of 1,497 titles at 430&times;900. Everything in &sect;01 was read from <code>src/modules/library/</code> rather than described from memory. No new atoms were needed — every measurement comes from <code>foundations.html</code>.</p>
+</div></footer>
+
+</body>
+</html>

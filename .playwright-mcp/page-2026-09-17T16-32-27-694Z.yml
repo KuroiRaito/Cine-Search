@@ -1,0 +1,67 @@
+- generic [ref=e2]:
+  - generic [ref=e4] [cursor=pointer]:
+    - generic:
+      - link "home":
+        - /url: /
+      - link "anime list":
+        - /url: /user/kuroiraito24/animelist
+      - link "manga list":
+        - /url: /user/kuroiraito24/mangalist
+      - link "forum":
+        - /url: /forum/overview
+      - link "profile":
+        - /url: /user/kuroiraito24/
+      - link "notifications":
+        - /url: /notifications
+      - link "settings":
+        - /url: /settings
+      - link "search":
+        - /url: /search/anime
+  - generic [ref=e11]:
+    - generic [ref=e12]:
+      - heading "Site Theme" [level=2] [ref=e13]
+      - generic [ref=e14] [cursor=pointer]: A
+      - generic [ref=e15] [cursor=pointer]: A
+      - generic [ref=e16] [cursor=pointer]: A
+      - generic [ref=e17] [cursor=pointer]: A
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - link "Logout" [ref=e20] [cursor=pointer]:
+          - /url: "#"
+        - link "Donate" [ref=e21] [cursor=pointer]:
+          - /url: /forum/thread/2340
+        - link "AniList.co" [ref=e22] [cursor=pointer]:
+          - /url: https://anilist.co
+        - link "AniChart.net" [ref=e23] [cursor=pointer]:
+          - /url: http://anichart.net
+      - generic [ref=e24]:
+        - link "Apps" [ref=e25] [cursor=pointer]:
+          - /url: /apps
+        - link "Site Stats" [ref=e26] [cursor=pointer]:
+          - /url: /site-stats
+        - link "Recommendations" [ref=e27] [cursor=pointer]:
+          - /url: /recommendations
+        - link "API" [ref=e28] [cursor=pointer]:
+          - /url: https://docs.anilist.co
+      - generic [ref=e29]:
+        - link "Discord" [ref=e30] [cursor=pointer]:
+          - /url: https://discord.gg/anilist
+        - link "Twitter" [ref=e31] [cursor=pointer]:
+          - /url: https://twitter.com/AniListco
+        - link "Bluesky" [ref=e32] [cursor=pointer]:
+          - /url: https://bsky.app/profile/anilist.co
+        - link "Facebook" [ref=e33] [cursor=pointer]:
+          - /url: https://www.facebook.com/AniListco
+        - link "GitHub" [ref=e34] [cursor=pointer]:
+          - /url: https://github.com/AniList
+      - generic [ref=e35]:
+        - link "Add Data" [ref=e36] [cursor=pointer]:
+          - /url: https://submission-manual.anilist.co/
+        - link "Moderators" [ref=e37] [cursor=pointer]:
+          - /url: /moderators
+        - link "Contact" [ref=e38] [cursor=pointer]:
+          - /url: mailto:contact@anilist.co
+        - link "Terms & Privacy" [ref=e39] [cursor=pointer]:
+          - /url: /terms
+        - link "Site Map" [ref=e40] [cursor=pointer]:
+          - /url: /sitemap/index.xml

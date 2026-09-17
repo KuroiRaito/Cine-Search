@@ -126,14 +126,13 @@ export async function upsert({
  * render eight tiles.
  */
 export async function loadFavourites() {
-    return supabase
+    return pageThrough(() => supabase
         .from('user_library')
         .select(`
             tmdb_id, media_type, favourite_order, added_at,
             catalog_titles!inner ( title, release_date, poster_path )
         `)
-        .eq('is_favourite', true)
-        .then(unwrap);
+        .eq('is_favourite', true));
 }
 
 /**
@@ -168,29 +167,59 @@ export async function setEpisodes({ id, season, episodes, catalog }) {
 }
 
 /**
- * The whole library in one request. A person's library is hundreds of rows, not
- * millions, and every poster tile in the app needs to know whether it is in
- * there — so one read beats a lookup per tile by a wide margin.
+ * PostgREST stops at a row ceiling, and it does it silently.
+ *
+ * Measured on this project rather than taken from the documentation: a view of
+ * 5,000 rows returns 1,000, with `Content-Range: 0-999/5000`. The server knows
+ * the real total and sends a page anyway. Neither read below set a range, so a
+ * library past a thousand titles quietly stopped being complete — no error, no
+ * warning, just an older thousandth title that is no longer there.
+ *
+ * A library that silently drops rows is worse than one that is slow, because
+ * slow is visible. This pages until the server says it has sent everything.
+ *
+ * A decade of watching is four figures, and a Letterboxd export is the obvious
+ * way somebody arrives with one, so this is not hypothetical.
  */
-export async function loadAll() {
-    return supabase
-        .from('user_library')
-        .select('tmdb_id, media_type, status, rating, is_favourite, favourite_order, watched_episodes, rewatch_count, recommended_by, recommended_at, notes, added_at, started_at, completed_at, updated_at')
-        .order('updated_at', { ascending: false })
-        .then(unwrap);
+const PAGE = 1000;
+const MAX_PAGES = 20;   // 20,000 titles. Past that, something else is wrong.
+
+async function pageThrough(build) {
+    const out = [];
+    for (let page = 0; page < MAX_PAGES; page += 1) {
+        const from = page * PAGE;
+        const batch = await build().range(from, from + PAGE - 1).then(unwrap);
+        out.push(...(batch || []));
+        // A short page is the last page. Asking again would cost a round trip
+        // to be told the same thing.
+        if (!batch || batch.length < PAGE) return out;
+    }
+    return out;
 }
 
-/** The saved rows joined to the catalogue, for the Library screen itself. */
+/**
+ * The whole library. Every poster tile in the app needs to know whether a title
+ * is in there, so one read beats a lookup per tile by a wide margin — but "one
+ * read" now means "as many as it takes", which is usually still one.
+ */
+export async function loadAll() {
+    return pageThrough(() => supabase
+        .from('user_library')
+        .select('tmdb_id, media_type, status, rating, is_favourite, favourite_order, watched_episodes, rewatch_count, recommended_by, recommended_at, notes, added_at, started_at, completed_at, updated_at')
+        .order('updated_at', { ascending: false }));
+}
+
+/** The saved rows joined to the catalogue, for the Library screen itself.
+ *  Paged for the same reason as loadAll: this is the screen that only grows. */
 export async function loadEntries() {
-    return supabase
+    return pageThrough(() => supabase
         .from('user_library')
         .select(`
             tmdb_id, media_type, status, rating, is_favourite, favourite_order,
             watched_episodes, added_at, updated_at, completed_at,
             catalog_titles!inner ( title, release_date, poster_path, number_of_episodes, seasons )
         `)
-        .order('updated_at', { ascending: false })
-        .then(unwrap);
+        .order('updated_at', { ascending: false }));
 }
 
 /**

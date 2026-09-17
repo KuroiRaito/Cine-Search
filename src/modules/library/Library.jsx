@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Poster, Tile, Skeleton, Empty, Toast } from '../../shared/ui/index.js';
+import { Poster, Tile, Skeleton, Empty, Toast, Icon } from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from './LibraryProvider.jsx';
 import { posterUrl, yearOf } from '../../shared/tmdb/view.js';
@@ -8,6 +8,9 @@ import {
     statusMeta, episodesWatched, runningOrder, nextUnwatched, epLabel, loadEntries, keyOf,
 } from './library.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
+import { matches, isFinding } from './find.js';
+import { applySort, availableSorts, defaultSortFor, sortNote } from './sort.js';
+import { readDensity, writeDensity, compactSlots } from './density.js';
 import './library.css';
 
 /* Which statuses get a chip. "All" is last and has no count of its own — the
@@ -18,6 +21,15 @@ const FILTERS = ['watching', 'want_to_watch', 'watched', 'on_hold', 'rewatching'
    so an empty Films section under those filters has a real answer rather than
    an apology. */
 const FILM_LESS = new Set(['watching', 'on_hold', 'rewatching']);
+
+/* L5 — a reason, not an apology, and written for each status rather than
+   assembled from its label. "Films don't have a "On hold" state" is what a
+   template produces; "a film is never on hold" is what a person would say. */
+const NO_FILMS = {
+    watching: 'A film is never “watching”. It is two hours, so it is either watched, wanted, or dropped.',
+    on_hold: 'A film is never on hold. It is two hours, so it is either watched, wanted, or dropped.',
+    rewatching: 'A film you are rewatching is simply watched again — the count is on its own page.',
+};
 
 /**
  * Series as rows, films as a grid, inside one filter.
@@ -30,6 +42,19 @@ export default function Library() {
     const lib = useLibrary();
     const [filter, setFilter] = useState(null);
     const [toast, setToast] = useState(null);
+    const [term, setTerm] = useState('');
+    /* Remembered per shelf, not globally: sorting Watched by rating must not
+       reorder Watching the next time it is opened. Six shelves, six memories —
+       and in state rather than storage, because a sort is a preference for this
+       session, not a record. */
+    const [sorts, setSorts] = useState({});
+    const [sorting, setSorting] = useState(false);
+    const [density, setDensityState] = useState(readDensity);
+    const setDensity = (d) => { setDensityState(d); writeDensity(d); };
+    const compact = density === 'compact';
+    /* Choosing a shelf is the way back from find: the chip you set is one tap
+       away the whole time it is set aside. */
+    const pick = (key) => { setTerm(''); setFilter(key); };
 
     // The catalogue half — titles and posters — is joined server-side rather
     // than held in the provider, which only ever tracks a person's own state.
@@ -130,9 +155,27 @@ export default function Library() {
         );
     }
 
-    const shown = active === 'all' ? rows : rows.filter((r) => r.status === active);
-    const series = shown.filter((r) => r.mediaType === 'tv');
-    const films = shown.filter((r) => r.mediaType === 'movie');
+    /* Find ignores the status filter on purpose: you are looking for a title,
+       not a shelf. Somebody who types "dune" while Watching is selected wants
+       the film, and being told it is not on this shelf is a worse answer than
+       the film. */
+    const finding = isFinding(term);
+    const shown = finding
+        ? rows.filter((r) => matches(r.title, term))
+        : (active === 'all' ? rows : rows.filter((r) => r.status === active));
+    /* Find has no shelf, so it has no remembered sort — the answer to "where
+       did I put it" is the title you typed, in the order the shelf already
+       had. */
+    const sortKey = sorts[active] || defaultSortFor(active);
+    const options = availableSorts(shown);
+    // A remembered sort can stop being offered when the shelf's contents change
+    // — rating on a shelf whose last rated title was removed. Fall back rather
+    // than sort by something that is no longer there.
+    const effective = options.some((o) => o.key === sortKey) ? sortKey : defaultSortFor(active);
+
+    const ordered = applySort(shown, effective);
+    const series = ordered.filter((r) => r.mediaType === 'tv');
+    const films = ordered.filter((r) => r.mediaType === 'movie');
     const label = statusMeta(active)?.label ?? 'Everything';
 
     /* "The + marks the next unwatched episode — never add one to a number — so
@@ -154,55 +197,130 @@ export default function Library() {
         <div className="page">
             <div className="page-head"><h1>Library</h1></div>
 
-            <div className="chips" role="tablist" aria-label="Filter by status">
+            {/* One line in the header, not a screen of its own. The reason
+                somebody opens a five-hundred-title library is usually one
+                title, and four characters gets them there. */}
+            <div className="lbar">
+                <div className={finding ? 'lfind on' : 'lfind'}>
+                    <Icon name="search" size={16} />
+                    <input
+                        type="search" value={term} className="lfind-in"
+                        placeholder="Find in your library"
+                        aria-label="Find in your library"
+                        onChange={(e) => setTerm(e.target.value)}
+                    />
+                    {finding && (
+                        <button type="button" className="lfind-x" aria-label="Clear" onClick={() => setTerm('')}>
+                            <Icon name="close" size={16} />
+                        </button>
+                    )}
+                </div>
+                {/* Sort has a sheet because six options need one. Density
+                    toggles, because two states do not. */}
+                <button
+                    type="button" className="lbtn" aria-label={`Sort ${label}`}
+                    disabled={finding} onClick={() => setSorting(true)}
+                ><Icon name="reorder" size={20} /></button>
+                <button
+                    type="button" className={compact ? 'lbtn on' : 'lbtn'}
+                    aria-pressed={compact}
+                    aria-label={compact ? 'Comfortable rows' : 'Compact rows'}
+                    onClick={() => setDensity(compact ? 'comfortable' : 'compact')}
+                ><Icon name="library" size={20} /></button>
+            </div>
+
+            {finding && shown.length > 0 && (
+                <p className="lfind-n">
+                    {shown.length} of {rows.length} · searching your library, not the catalogue
+                </p>
+            )}
+
+            {/* L20 — find wins, and the filter is visibly set aside rather than
+                hidden. Searching for a title you cannot place should not
+                silently exclude four fifths of your library because a chip was
+                set twenty minutes ago — and tapping any chip is the way back. */}
+            <div className={finding ? 'chips aside' : 'chips'} role="tablist" aria-label="Filter by status">
                 {FILTERS.filter((k) => counts[k]).map((k) => (
                     <button
                         key={k}
                         type="button"
                         role="tab"
                         className="chip"
-                        aria-pressed={active === k}
-                        onClick={() => setFilter(k)}
+                        aria-pressed={!finding && active === k}
+                        onClick={() => pick(k)}
                     >
                         {statusMeta(k).label}<em>{counts[k]}</em>
                     </button>
                 ))}
-                <button type="button" role="tab" className="chip" aria-pressed={active === 'all'} onClick={() => setFilter('all')}>
+                <button type="button" role="tab" className="chip" aria-pressed={!finding && active === 'all'} onClick={() => pick('all')}>
                     All<em>{rows.length}</em>
                 </button>
             </div>
 
+            {/* L6 — find failed, so the honest next step is Search, carrying
+                the typed text rather than making somebody type it twice. This
+                is the one place the two are allowed to know about each other. */}
+            {finding && shown.length === 0 && (
+                <Empty
+                    title={`Nothing in your library matches “${term.trim()}”.`}
+                    body="It may still be out there."
+                    action={
+                        <Link className="btn" to={`/search?q=${encodeURIComponent(term.trim())}`}>
+                            Search the catalogue
+                        </Link>
+                    }
+                />
+            )}
+
             {/* Series always sits above Films, whether or not either has
                 anything in it. A section that jumps above another because it
                 happens to be empty makes the screen feel unstable. */}
+            {!(finding && shown.length === 0) && <>
             <Group
                 title="Series"
                 count={series.length}
-                note={active === 'watching' ? 'in progress' : label.toLowerCase()}
-                empty={<>Nothing here is marked “{label}”.</>}
+                note={finding ? 'found' : sortNote(effective)}
+                empty={finding ? null : <>Nothing here is marked “{label}”.</>}
             >
-                {series.map((r) => <SeriesRow key={r.key} row={r} onBump={() => bump(r)} />)}
+                {compact
+                    ? series.map((r) => <CompactRow key={r.key} row={r} onBump={() => bump(r)} />)
+                    : series.map((r) => <SeriesRow key={r.key} row={r} onBump={() => bump(r)} />)}
             </Group>
 
             <Group
                 title="Films"
                 count={films.length}
-                note={label.toLowerCase()}
-                empty={FILM_LESS.has(active)
+                note={finding ? 'found' : sortNote(effective)}
+                empty={finding ? null : FILM_LESS.has(active)
                     ? (
                         <>
-                            Films don’t have a “{label}” state.<br />
-                            <button type="button" className="linkish" onClick={() => setFilter('want_to_watch')}>
+                            {NO_FILMS[active]}<br />
+                            <button type="button" className="linkish" onClick={() => pick('want_to_watch')}>
                                 See your saved films
                             </button>
                         </>
                     )
                     : <>Nothing here is marked “{label}”.</>}
             >
-                <div className="grid flush">
-                    {films.map((r) => <Tile key={r.key} item={r} />)}
-                </div>
+                {compact
+                    ? films.map((r) => <CompactRow key={r.key} row={r} />)
+                    : (
+                        <div className="grid flush">
+                            {films.map((r) => <Tile key={r.key} item={r} />)}
+                        </div>
+                    )}
             </Group>
+            </>}
+
+            {sorting && (
+                <SortSheet
+                    shelf={label}
+                    current={effective}
+                    options={options}
+                    onPick={(key) => { setSorts((m) => ({ ...m, [active]: key })); setSorting(false); }}
+                    onClose={() => setSorting(false)}
+                />
+            )}
 
             <Toast
                 message={toast?.message}
@@ -214,12 +332,106 @@ export default function Library() {
     );
 }
 
+/**
+ * L4 — the options change with the shelf, and the choice is remembered for it.
+ *
+ * Said on the sheet rather than left to be discovered: somebody who sorts
+ * Watched by rating and then opens Watching should not wonder why it did not
+ * follow them, and somebody who wanted it to follow should find out here
+ * rather than by being surprised later.
+ */
+function SortSheet({ shelf, current, options, onPick, onClose }) {
+    const box = useRef(null);
+    useEffect(() => {
+        const opener = document.activeElement;
+        const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            if (opener instanceof HTMLElement && document.contains(opener)) opener.focus();
+        };
+    }, [onClose]);
+
+    return (
+        <div className="scrim" role="dialog" aria-modal="true" aria-label={`Sort ${shelf}`} onClick={onClose}>
+            <div className="sheet" ref={box} onClick={(e) => e.stopPropagation()}>
+                <div className="grab" />
+                <h2 className="sheet-title">Sort {shelf}</h2>
+                <p className="sheet-body">Remembered for this shelf only.</p>
+                <div className="sortgrid">
+                    {options.map((o) => (
+                        <button
+                            key={o.key}
+                            type="button"
+                            className={o.key === current ? 'sortopt on' : 'sortopt'}
+                            aria-pressed={o.key === current}
+                            onClick={() => onPick(o.key)}
+                        >
+                            <b>{o.label}</b>
+                            <span>{o.answers}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 /** One titled block. Holds its place in the order whether it has rows or not. */
 function Group({ title, count, note, empty, children }) {
+    // An empty section explains itself — "a film is never on hold" is a real
+    // answer where an empty grid is not. But while finding there is no shelf to
+    // explain, so `empty` is null and the box goes rather than sitting there
+    // blank.
+    if (!count && empty == null) return null;
     return (
         <div className="grp">
+            {/* A readout, not a control: §04c puts sort on the bar, and two
+                controls saying the same thing is one too many. */}
             <div className="grp-h"><b>{title}</b><span>{count ? `${count} ${note}` : 'none'}</span></div>
             {count ? children : <p className="whynot">{empty}</p>}
+        </div>
+    );
+}
+
+/**
+ * One line, four slots: status stripe, title, a middle figure, a trailing slot.
+ *
+ * The trailing slot is the interesting one, and it carries the whole
+ * behavioural difference between the densities. A series you are part-way
+ * through keeps the + — the module's best affordance does not disappear
+ * because somebody asked for more rows, and compact is exactly where a backlog
+ * gets ticked through. Anything finished has no next episode, so the slot
+ * carries the score you would otherwise open the row to see. Unrated leaves the
+ * slot empty rather than removing it, so the column stays a column.
+ *
+ * Density changes the shape, never the destination: this goes to the title
+ * page, exactly where a poster goes in comfortable.
+ */
+function CompactRow({ row, onBump }) {
+    const { middle, trailing } = compactSlots(row);
+    const tone = statusMeta(row.status)?.tone;
+    return (
+        <div className="crow">
+            <span className={tone ? `cstripe ${tone}` : 'cstripe'} aria-hidden="true" />
+            <Link to={`/title/${row.mediaType}/${row.id}`} className="cbody">
+                <span className="cnm">{row.title}</span>
+                <span className="cmid">{middle}</span>
+            </Link>
+            {/* A neighbouring target, never a hotspot inside the row's: it
+                writes to the record on a single tap. */}
+            {trailing === 'bump' && onBump && (
+                <button
+                    type="button" className="cadd"
+                    aria-label={`Mark ${epLabel(row.next)} of ${row.title} watched`}
+                    onClick={onBump}
+                ><Icon name="add" size={16} /></button>
+            )}
+            {trailing === 'score' && <span className="csc">{row.rating}</span>}
+            {/* `empty` would be the shared Empty-state class, which carries a
+                40vh minimum — a blank slot inheriting it made the row 360px
+                tall. A generic name in a shared layer is a landmine. */}
+            {trailing === 'empty' && <span className="csc blank" aria-hidden="true" />}
         </div>
     );
 }
@@ -272,6 +484,8 @@ function shape(r, entry) {
         voteAverage: null,
         status: entry.status,
         rating: entry.rating,
+        updatedAt: r.updated_at,
+        addedAt: r.added_at,
         watched,
         seen: episodesWatched(watched),
         total,

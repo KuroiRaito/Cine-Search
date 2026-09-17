@@ -183,7 +183,7 @@ img { max-width: 100%; display: block; }
    enough to hit; artwork keeps growing, because artwork is the product. */
 
 @media (min-width: 600px) {
-  :root { --gutter: var(--space-24); --rail-tile: 168px; }
+  :root { --gutter: var(--space-24); --rail-tile: 168px; --grid-min: 170px; }
 
   /* Four targets spread over a landscape window strand each icon in its own
      quarter. Hold them together in the middle, thumb-width apart. */
@@ -194,7 +194,7 @@ img { max-width: 100%; display: block; }
 /* ---------------- expanded: 1120+ ---------------- */
 
 @media (min-width: 1120px) {
-  :root { --gutter: var(--space-40); --shell-max: 1200px; --rail-tile: 190px; }
+  :root { --gutter: var(--space-40); --shell-max: 1200px; --rail-tile: 190px; --grid-min: 180px; }
 
   .tabs { display: none; }
   .topbar {
@@ -271,5 +271,5 @@ img { max-width: 100%; display: block; }
    ------------------------------------------------------------------ */
 
 @media (min-width: 1440px) {
-  :root { --shell-max: 1600px; }
+  :root { --shell-max: 1600px; --grid-min: 220px; }
 }

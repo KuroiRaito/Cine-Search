@@ -61,10 +61,12 @@
 }
 
 .grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-16); padding-inline: var(--gutter);
+  display: grid; gap: var(--space-16); padding-inline: var(--gutter);
+  /* The count follows the width rather than being declared per band — see
+     --grid-min. At 320 this is two tiles, and it reaches five before the
+     desktop band starts, without a breakpoint of its own. */
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-min), 1fr));
 }
-@media (min-width: 480px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 760px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .grid .tile { width: auto; }
 /* Inside a block that already carries the gutter, the grid must not add it again. */
 .grid.flush { padding-inline: 0; }
@@ -439,15 +441,8 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 @media (min-width: 1120px) {
   /* Reading columns never go full width, however wide the screen. */
 
-  .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 
-/* A content ladder, not a layout band, so it steps on its own widths.
-   Principle: a poster tile stays roughly 180-260px wide. Below that the year
-   and title stop being readable; above it a row reads as a gallery wall
-   rather than a set you can compare. Five columns held all the way to the
-   1600px cap would put tiles at 293px. */
-@media (min-width: 1440px) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 
 
 @media (min-width: 600px) {

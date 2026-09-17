@@ -371,6 +371,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   <a href="#cohorts">02 Variations</a>
   <a href="#spine">03 The spine</a>
   <a href="#scope">03b Seasons &amp; episodes</a>
+  <a href="#watch">03c Where to watch</a>
   <a href="#wiki">04 Wikipedia</a>
   <a href="#person">05 Person page</a>
   <a href="#screens">06 Screens</a>
@@ -517,7 +518,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
       <tr><td class="num">2</td><td class="num"><b>The primary action</b></td><td class="use">Always</td><td class="use">The cohort's whole expression. Full width, <code>--control-lg</code>, above the fold at 320.</td></tr>
       <tr><td class="num">3</td><td class="num">Secondary actions</td><td class="use">Always</td><td class="use">Like, rate, edit. Icon buttons, 44px, beside the primary.</td></tr>
       <tr><td class="num">4</td><td class="num"><b>Trailer</b></td><td class="use">If any</td><td class="use"><b>Added after review.</b> The biggest single omission in the first draft &mdash; the main decision aid for &ldquo;should I watch this&rdquo;, and it was nowhere. <b>Verified:</b> 3 official YouTube trailers for <i>Dune: Part Two</i>, 1 for <i>Severance</i>. A 16:9 still with a play control, never an autoplaying embed.</td></tr>
-      <tr><td class="num">5</td><td class="num">Where to watch</td><td class="use">Released only</td><td class="use">Region-aware. Absent — not "unavailable" — when the title is not out.</td></tr>
+      <tr><td class="num">5</td><td class="num">Where to watch</td><td class="use">Released only</td><td class="use"><b>Three cost tiers, not a row of logos</b> — on your services / also included / rent or buy. Region-aware. §03c.</td></tr>
       <tr><td class="num">6</td><td class="num">Scores</td><td class="use">If any</td><td class="use">TMDB and yours side by side, <b>never merged</b>. The disagreement is the interesting part.</td></tr>
       <tr><td class="num">7</td><td class="num"><b>Your note</b></td><td class="use">If set</td><td class="use"><b>Added after review.</b> <code>user_library.notes</code> and <code>recommended_by</code> are both stored and shown on no screen &mdash; the same hole the library document found. Present only when set: the note in your own words, and <i>From Priya</i> beneath it. Absent otherwise, with nothing marking the absence.</td></tr>
       <tr><td class="num">8</td><td class="num">Overview</td><td class="use">If present</td><td class="use">Clamped, with more. §04 adds a second source.</td></tr>
@@ -534,11 +535,21 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   <div class="shead"><span class="snum">03b</span><h2>Seasons and episodes</h2></div>
   <p>Both looked like candidate variations. Neither is &mdash; but the reason each is not is different, and in both cases something real was being thrown away.</p>
 
-  <h3>A season is a <span style="color:var(--acc-t)">scope</span>, not a page</h3>
-  <p>The thing a season page would buy is <b>identity</b>: a season has its own poster, its own overview, its own air dates, sometimes its own cast. The picker in the current design discards all of it and keeps only a number.</p>
-  <div class="note ok"><b>So the episode band takes the season's identity instead of a new page taking it.</b> When a season is selected the band header becomes that season &mdash; its own thumbnail, its year, its episode count, and its overview when that differs from the series. You get everything a season page would show, minus the 80% it would have duplicated from its parent.</div>
-  <div class="note"><b>And it is addressable.</b> <code>/title/tv/1396?season=2</code> deep-links to a season with the band already open on it. A link you can send somebody is most of what a page actually buys, and this costs a query parameter rather than a route, a layout and a back-stack entry.</div>
-  <div class="note warn"><b>This is also what makes the undetectable anthology safe.</b> A season carrying its own year, poster and overview reads correctly whether or not it continues the last one &mdash; which is exactly the graceful degradation &sect;02 asks for, arriving as a side effect rather than a special case.</div>
+  <h3>Seasons are tabs</h3>
+  <p>A row of tabs across the top of the episode band &mdash; <b>S1 S2 S3</b> &mdash; and the list below switches. The tab carries the season's identity, which is what a season page would have been for: its own name, its year, its count, and its progress against <i>that season</i> rather than the whole run.</p>
+  <p>Four things the row has to survive, all found by looking:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Found</th><th>What it forces</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Grey's Anatomy has 24 seasons</b></td><td class="use">The row scrolls horizontally and <b>the selected tab is scrolled into view on arrival</b> &mdash; landing on season 21 of 24 with the row showing S1&ndash;S4 is the failure this prevents. Never a dropdown: a dropdown hides how long the show is, and how long it is happens to be the most useful fact on the page.</td></tr>
+      <tr><td class="num"><b>Season 0 exists, and holds 68 episodes on Grey's</b></td><td class="use">Specials get a tab, and it is <b>last, never first</b> &mdash; it is excluded from the denominator, so leading with it would put an unticked 68 in front of somebody's real progress. Labelled <i>Specials</i>, never <i>Season 0</i>.</td></tr>
+      <tr><td class="num"><b>Chernobyl's one season is called &ldquo;Miniseries&rdquo;</b></td><td class="use">Tabs use <code>season.name</code>, never a composed &ldquo;Season N&rdquo;. And with one season there is <b>no tab row at all</b> &mdash; a single tab is a label pretending to be a control.</td></tr>
+      <tr><td class="num">Seasons exist with no poster and no air date</td><td class="use">The tab is a name and a count. Artwork is decoration here and its absence changes nothing.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>Per-season progress is the thing the tabs unlock.</b> &ldquo;11 of 62&rdquo; across five seasons tells you almost nothing; <b>&ldquo;S2 &middot; 4 of 13&rdquo;</b> tells you where you are. Each tab carries its own fraction, and the whole-run number stays in the band above &mdash; both true, at the scale each is useful.</div>
+  <div class="note"><b>And it is addressable.</b> <code>?season=2</code> deep-links with that tab selected, which is most of what a season page would have bought &mdash; for a query parameter rather than a route, a layout and a back-stack entry.</div>
+  <div class="note warn"><b>This is also what makes the undetectable anthology safe.</b> A tab carrying its own name and year reads correctly whether or not it continues the last one, and per-season progress never implies a run. The graceful degradation &sect;02 asks for arrives as a side effect rather than a special case.</div>
 
   <h3>An episode is a <span style="color:var(--acc-t)">sheet</span>, not a page</h3>
   <p><b>You never arrive at an episode cold.</b> You are always inside a list of sixty-two, and a page would take you out of it &mdash; costing your scroll position to show you a still and a paragraph.</p>
@@ -551,6 +562,36 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
     </tbody>
   </table></div>
   <div class="note law"><b>The sheet is where per-episode rating would go, and that is the point of choosing a sheet.</b> We do not support it &mdash; rating is per title today &mdash; and it is a real product question rather than a layout one. A sheet leaves the room for it without committing to it, and without a route that would have to be un-built if the answer is no.</div>
+</div></section>
+
+<section id="watch"><div class="wrap">
+  <div class="shead"><span class="snum">03c</span><h2>Where to watch</h2></div>
+  <p>The first draft drew this as a row of logos, which is not a design &mdash; it is a list. TMDB separates the buckets and the separation is the whole value.</p>
+
+<pre><i>/movie/872585/watch/providers  &rarr;  Oppenheimer, region IN</i>
+flatrate   <b>JioHotstar</b>
+rent       Apple TV Store, Zee5, Google Play Movies, YouTube, Amazon Video
+buy        Apple TV Store, Google Play Movies, YouTube
+<i>&hellip;and in US the same call adds a fourth bucket</i>
+ads        Fandango at Home Free</pre>
+
+  <div class="note ok"><b>Five buckets, and they answer a question the logos do not: what will this cost me?</b> <code>flatrate</code> is included with a subscription. <code>free</code> is free. <code>ads</code> is free with advertising. <code>rent</code> and <code>buy</code> are money. Grouping by provider hides that; grouping by cost is the point.</div>
+
+  <h4>Three tiers, in this order</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Tier</th><th>Buckets</th><th>Reads</th><th>Why first</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>On your services</b></td><td class="use"><code>flatrate</code> &cap; <code>profiles.services</code></td><td class="use"><b>JioHotstar</b> &mdash; full logo, full size</td><td class="use">The only tier that means <i>you can watch this right now at no cost</i>. <code>profiles.services</code> already stores what somebody subscribes to and nothing has ever used it.</td></tr>
+      <tr><td class="num">Also included on</td><td class="use">remaining <code>flatrate</code>, <code>free</code>, <code>ads</code></td><td class="use">Smaller, muted. <code>ads</code> carries a <i>with ads</i> note.</td><td class="use">Included for somebody &mdash; just not you yet. Honest, and it is how you learn a subscription would pay off.</td></tr>
+      <tr><td class="num">Rent or buy</td><td class="use"><code>rent</code> + <code>buy</code></td><td class="use">Collapsed: <b>Rent or buy &middot; 5 places</b></td><td class="use">Seven storefronts for Oppenheimer in the US, and they are the same seven for everything. A list adds nothing; a count plus a tap does.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note warn"><b>The same provider appears in more than one bucket, and it must not appear twice.</b> Apple TV Store is in both <code>rent</code> and <code>buy</code> for Oppenheimer. The tiers are deduplicated <b>upward</b> &mdash; a provider shown as included is never repeated under rent &mdash; and inside the collapsed tier a provider offering both reads <i>Rent or buy</i> once, not twice.</div>
+
+  <div class="note law"><b>Nothing here shows a price, because TMDB does not carry one.</b> No &ldquo;from &pound;3.49&rdquo;, no cheapest-first ordering, no implication that we know. Inventing a price on a page somebody might act on is the one failure in this band that would actually cost them money.</div>
+
+  <div class="note"><b>And when there is nothing:</b> &ldquo;Not streaming in India&rdquo; &mdash; a fact with the region named, so somebody who travels understands why the answer changed. Never an empty band, never &ldquo;unavailable&rdquo; without saying where.</div>
 </div></section>
 
 <section id="wiki"><div class="wrap">
@@ -620,10 +661,37 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
     </tbody>
   </table></div>
 
-  <div class="note law"><b>Which of the four cohorts a person page is must be read from the credits, not from the label.</b> <code>known_for_department</code> is the obvious discriminator and it is not sufficient. <b>Greta Gerwig is <code>Acting</code></b> — with 63 cast credits, and also <i>Writer &times; 11, Director &times; 6</i>. Building a &ldquo;director page&rdquo; and an &ldquo;actor page&rdquo; off that label gives one of the most significant directors working an actor's page.
-  <br><br>So: the page counts what the person actually has, and <b>draws a section per body of work above a threshold</b>, heaviest first. Gerwig gets an acting section and a directing section, in that order, because that is what the data says. Villeneuve (Directing, 25 directed, 32 cast) gets directing first and a small acting section. Hans Zimmer (<i>Original Music Composer &times; 202</i>) gets one section and no cast list.</div>
+  <h4>Two experiments, both failed, and the answer is in the failures</h4>
+  <p>The question is not academic: <b>how do you tell somebody who does not already know that Villeneuve is a director and Cillian Murphy is an actor?</b> Three signals exist. I tested all three.</p>
 
-  <div class="note warn"><b>Collection progress only means something for authored work.</b> &ldquo;6 of 26 directed&rdquo; is a real achievement to track. &ldquo;6 of 202 scored&rdquo; is not the same claim — a composer's filmography is not a canon somebody works through. Progress is shown for <b>Director and Writer</b>, and the other sections are lists.</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Signal</th><th>Result</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><code>known_for_department</code></td><td class="use">Gerwig &rarr; <b>Acting</b>, despite <i>Director &times; 6</i> including Barbie and Lady Bird</td><td class="use"><b>Not sufficient.</b> Right often, badly wrong sometimes.</td></tr>
+      <tr><td class="num">Popularity of credits</td><td class="use">Every single person came out an <b>actor</b> &mdash; because their most popular credit is <i>The Tonight Show</i>, <i>The Late Show</i>, <i>Watch What Happens Live</i>. A one-off guest slot on a two-thousand-episode series outranks a career.</td><td class="use"><b>Broken,</b> until talk, news and reality genres are excluded. Then: Villeneuve &rarr; Directing, Murphy &rarr; Acting, both correct.</td></tr>
+      <tr><td class="num">TMDB's own <code>known_for</code></td><td class="use">Gerwig &rarr; <i>Frances Ha, No Strings Attached, Jackie</i>. All acting roles. <b>Neither Barbie nor Lady Bird.</b></td><td class="use"><b>Stale.</b> It is popularity-shaped and lags a career turning.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note law"><b>So the page never labels the person. It shows the evidence, and lets the reader do what the data cannot.</b>
+  <br><br>Under the name, a line of <b>verbs and titles</b> rather than a job title:
+  <br><br><code>Directed Barbie, Lady Bird &middot; Acted in Frances Ha, Jackie</code>
+  <br><br>Somebody who has never heard of Greta Gerwig learns more from <i>&ldquo;Directed Barbie&rdquo;</i> than from the word <i>Director</i> &mdash; and it is the one formulation that cannot be wrong, because it is not a claim, it is a list.</div>
+
+  <h4>Three sources, each doing the one thing it is good at</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Source</th><th>Does</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Wikipedia</b> <code>description</code></td><td class="use"><b>The label</b> &mdash; because a human wrote it, and no computed one beats that</td><td class="use"><i>&ldquo;American filmmaker and actress&rdquo;</i> &middot; <i>&ldquo;Canadian filmmaker (born 1967)&rdquo;</i></td></tr>
+      <tr><td class="num">The credits</td><td class="use"><b>The evidence</b> &mdash; verbs and recognisable titles</td><td class="use"><i>Directed Barbie, Lady Bird</i></td></tr>
+      <tr><td class="num">Filtered popularity</td><td class="use"><b>The order</b> of the sections below</td><td class="use">Directing above Acting, or neither above the other</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>This is what the Wikipedia work in &sect;04 was actually for.</b> &ldquo;American filmmaker and actress&rdquo; answers in five words what two algorithms could not, and it is available for people at the same rate as for films. When it is missing the evidence line stands alone &mdash; which still works, because the evidence line was never leaning on it.</div>
+
+  <div class="note warn"><b>When the top two are close, neither wins &mdash; and that is a result, not a fallback.</b> Gerwig comes out <b>64 acting against 58 directing</b> with talk shows excluded. Inside 25% the page shows both sections at equal weight, in that order, with no &ldquo;primarily an actor&rdquo; anywhere. She is both, the numbers say so, and a page that picked one would be asserting something the data explicitly refuses to.</div>
+
+  <div class="note law"><b>The talk-show exclusion is a rule, not a tweak.</b> Genres 10767 (Talk), 10763 (News) and 10764 (Reality) are removed from the ranking signal &mdash; never from the filmography, where they are real credits somebody earned. They are excluded from <i>deciding what a person is</i>, because appearing on Fallon is not a body of work.</div>
 
   <div class="note"><b>Name collisions are real and were found by making one.</b> Searching <i>Roger Deakins</i> returns two people: the cinematographer (<code>151</code>, Camera, <i>Director of Photography &times; 74</i>) and a makeup artist (<code>4313</code>). A person page must therefore always carry enough identity — department, era, a known title — that arriving at the wrong one is obvious immediately. State TP5.</div>
 </div></section>
@@ -714,8 +782,12 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
           <button class="tib on">&#9829;</button><button class="tib">&#9998;</button>
         </div>
         <div class="tsec"><h4>Where to watch &middot; India</h4>
-          <div class="prov"><span class="pchip"><i style="background:var(--like-9)"></i>Netflix</span>
-            <span class="pchip"><i></i>Rent &middot; 4</span></div></div>
+          <div class="waiting" style="margin-bottom:var(--space-4)">ON YOUR SERVICES</div>
+          <div class="prov"><span class="pchip" style="height:var(--space-40);font-weight:600"><i style="background:var(--like-9);width:var(--space-24);height:var(--space-24)"></i>Netflix</span></div>
+          <div class="waiting" style="margin:var(--space-12) 0 var(--space-4)">ALSO INCLUDED ON</div>
+          <div class="prov"><span class="pchip" style="opacity:.7"><i style="background:var(--beam-7)"></i>JioHotstar</span></div>
+          <div class="waiting" style="margin:var(--space-12) 0 var(--space-4)">RENT OR BUY</div>
+          <div class="prov"><span class="pchip" style="opacity:.7">5 places &nbsp;&rsaquo;</span></div></div>
         <div class="tsec"><div class="tscores">
           <div><b>8.1</b><span>TMDB</span></div><div><b class="r">9.0</b><span>You</span></div><div><b>1</b><span>Rewatches</span></div>
         </div></div>
@@ -811,7 +883,12 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
           <div class="pgbar"><i style="width:18%"></i></div>
           <p class="waiting" style="font-size:9px;color:var(--faint);margin-top:var(--space-8);line-height:1.5">
             The only cohort where a percentage is honest &mdash; the total cannot move.</p></div>
-        <div class="tsec"><h4>Episodes &middot; Season 2</h4>
+        <div class="tsec"><h4>Episodes</h4>
+          <div class="lchips" style="padding:0 0 var(--space-8)">
+            <button class="lchip">S1 <em>7</em></button><button class="lchip on">S2 <em>13</em></button>
+            <button class="lchip">S3 <em>13</em></button><button class="lchip">S4</button><button class="lchip">Specials</button>
+          </div>
+          <p class="waiting" style="margin-bottom:var(--space-8)">Season 2 &middot; <b style="color:var(--text)">4 of 13</b> &middot; 2009</p>
           <div class="eprow"><span class="n">4</span><span class="t">Down</span><span class="ck on">&#10003;</span></div>
           <div class="eprow"><span class="n">5</span><span class="t">Breakage</span><span class="ck"></span></div>
           <div class="eprow"><span class="n">6</span><span class="t">Peekaboo</span><span class="ck"></span></div>
@@ -852,7 +929,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
                background:linear-gradient(140deg,var(--ink-6),var(--ink-4))"></div>
           <div><h3 class="tt">Denis Villeneuve</h3>
             <div class="twik">Canadian filmmaker (born 1967)</div>
-            <div class="tmeta">Directing &middot; 25 directed &middot; 32 acting credits</div></div></div>
+            <div class="tmeta" style="color:var(--text);font-size:var(--text-caption)">Directed <b>Dune</b>, <b>Arrival</b> &middot; Wrote <b>Sicario</b></div></div></div>
         <div class="tsec"><h4>Directed</h4>
           <p style="font-size:var(--text-caption)"><b style="color:var(--text)">6 of 26 seen</b></p>
           <div class="pgbar"><i style="width:23%;background:var(--st-done-9)"></i></div>
@@ -874,7 +951,7 @@ Wikipedia <b>/page/summary/Dune:_Part_Two</b>   &rarr; description, extract, can
                background:linear-gradient(140deg,var(--mar-7),var(--ink-5))"></div>
           <div><h3 class="tt">Greta Gerwig</h3>
             <div class="twik">American filmmaker and actress</div>
-            <div class="tmeta">63 acting &middot; 11 writing &middot; 6 directing</div></div></div>
+            <div class="tmeta" style="color:var(--text);font-size:var(--text-caption)">Directed <b>Barbie</b>, <b>Lady Bird</b> &middot; Acted in <b>Frances Ha</b></div></div></div>
         <div class="tsec"><h4>Acted in <span style="font-family:var(--f-m);font-size:9px;color:var(--faint);font-weight:400">63</span></h4>
           <div class="lgrid" style="padding:0">
             <div class="lcell"><div class="art" style="background:linear-gradient(150deg,var(--beam-7),var(--ink-3))"></div><div class="nm">Frances Ha</div><div class="yr">2012</div></div>

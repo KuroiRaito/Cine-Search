@@ -50,8 +50,8 @@ function Row({ label, options, value, onPick }) {
                         key={String(o.value)}
                         type="button"
                         className="chip"
-                        aria-pressed={value === o.value}
-                        onClick={() => onPick(value === o.value ? null : o.value)}
+                        aria-pressed={Array.isArray(value) ? value.includes(o.value) : value === o.value}
+                        onClick={() => onPick(o.value)}
                     >{o.label}</button>
                 ))}
             </div>
@@ -158,13 +158,13 @@ export default function FilterPanel({ facets, vocab, onChange, canHide }) {
                 label="Genre"
                 options={genres.map((g) => ({ value: g.id, label: g.name }))}
                 value={facets.genre}
-                onPick={(v) => set({ genre: v })}
+                onPick={(v) => set({ genre: facets.genre.includes(v) ? facets.genre.filter((x) => x !== v) : [v] })}
             />
             <Row
                 label="Language"
                 options={LANGS.map((l) => ({ value: l.code, label: l.label }))}
                 value={facets.language}
-                onPick={(v) => set({ language: v })}
+                onPick={(v) => set({ language: facets.language === v ? null : v })}
             />
 
             {more && (
@@ -174,7 +174,7 @@ export default function FilterPanel({ facets, vocab, onChange, canHide }) {
                         label="Decade"
                         options={DECADES.map((d) => ({ value: d, label: `${d}s` }))}
                         value={facets.decade}
-                        onPick={(v) => set({ decade: v })}
+                        onPick={(v) => set({ decade: facets.decade === v ? null : v })}
                     />
                     {/* Two rungs, not a slider: a slider implies a precision
                         nobody has about a runtime. */}
@@ -182,7 +182,7 @@ export default function FilterPanel({ facets, vocab, onChange, canHide }) {
                         label="Length"
                         options={LENGTHS.map((l) => ({ value: l.value, label: l.label }))}
                         value={facets.length}
-                        onPick={(v) => set({ length: v })}
+                        onPick={(v) => set({ length: facets.length === v ? null : v })}
                     />
                     {/* A band, never a sort — and two rungs, because the
                         difference between 7.4 and 7.6 is not a decision
@@ -191,7 +191,7 @@ export default function FilterPanel({ facets, vocab, onChange, canHide }) {
                         label="Rating"
                         options={RATINGS.map((r) => ({ value: r.value, label: r.label }))}
                         value={facets.rating}
-                        onPick={(v) => set({ rating: v })}
+                        onPick={(v) => set({ rating: facets.rating === v ? null : v })}
                     />
                 </>
             )}

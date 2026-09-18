@@ -5,3 +5,5 @@
 // query. Which variant answers is this module's business.
 export { default } from './SearchPage.jsx';
 export { search, DEFAULT_SEARCH_OPTS } from './lib/index.js';
+export { PRESETS, presetsFor, facetsFor } from './presets.js';
+export { toParams, readRegion } from './browse.js';

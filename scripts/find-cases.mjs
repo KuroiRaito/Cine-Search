@@ -228,31 +228,36 @@ is('query   a language is one parameter',
 is('query   and a group of them is still one',
     toQuery({ ...EMPTY, language: ['ta', 'te', 'ml', 'kn'] }, 'movie').with_original_language, 'ta|te|ml|kn');
 
-const url = toParams({ ...EMPTY, kind: 'movie', genre: 35, language: 'hi', rating: 7 });
+const url = toParams({ ...EMPTY, kind: 'movie', genre: [35], language: 'hi', rating: 7 });
 is('FB11    a browse is entirely in the URL',
     url.toString(), 'kind=movie&genre=35&lang=hi&rated=7');
+/* Key order is not part of the contract — comparing stringified objects made
+   it part of the test. */
+const same = (o) => JSON.stringify(Object.fromEntries(Object.entries(o).sort()));
 is('FB11    and comes back out of it',
-    JSON.stringify(fromParams(new URLSearchParams(url))),
-    JSON.stringify({ ...EMPTY, kind: 'movie', genre: 35, language: 'hi', rating: 7 }));
+    same(fromParams(new URLSearchParams(url))),
+    same({ ...EMPTY, kind: 'movie', genre: [35], language: 'hi', rating: 7 }));
 is('FB11    nothing set is a bare URL, not a list of defaults',
     toParams(EMPTY).toString(), '');
 is('FB11    a nonsense value falls back rather than failing',
     fromParams(new URLSearchParams('kind=banana&sort=alphabetical')).kind + '/' 
         + fromParams(new URLSearchParams('kind=banana&sort=alphabetical')).sort, 'all/popular');
 is('panel   the filter button carries the active count',
-    activeCount({ ...EMPTY, kind: 'movie', genre: 35, unseen: true }), 3);
+    activeCount({ ...EMPTY, kind: 'movie', genre: [35], unseen: true }), 3);
 is('panel   and nothing set counts nothing',
     activeCount(EMPTY), 0);
 
-const switched = reconcile({ ...EMPTY, kind: 'tv', genre: 53 }, VOCAB);
+const switched = reconcile({ ...EMPTY, kind: 'tv', genre: [53] }, VOCAB);
 is('FB6     a film-only genre is dropped when the medium changes',
-    switched.facets.genre, null);
+    switched.facets.genre.length, 0);
+is('FB6     and a bundle keeps the half that survives',
+    reconcile({ ...EMPTY, kind: 'tv', genre: [53, 9648] }, VOCAB).facets.genre.join(','), '9648');
 is('FB6     and named, because a silent substitution invents an answer',
     switched.dropped[0].why, 'Thriller is not a genre series have');
 is('FB3     the same rule arriving by URL — horror series is not a thin result',
-    reconcile({ ...EMPTY, kind: 'tv', genre: 27 }, VOCAB).dropped.length, 1);
+    reconcile({ ...EMPTY, kind: 'tv', genre: [27] }, VOCAB).dropped.length, 1);
 is('FB6     a shared genre survives the switch',
-    reconcile({ ...EMPTY, kind: 'tv', genre: 35 }, VOCAB).dropped.length, 0);
+    reconcile({ ...EMPTY, kind: 'tv', genre: [35] }, VOCAB).dropped.length, 0);
 
 is('FB8     a provider id travels with the region it was chosen in',
     toParams({ ...EMPTY, provider: 8, region: 'IN' }).toString(), 'on=8&in=IN');
@@ -266,9 +271,9 @@ is('FB8     and a locale already on the list does not appear twice',
     regionChoices('en-IN').filter((r) => r === 'IN').length, 1);
 
 is('FB2     one chip is nobody to blame — the browse is simply empty',
-    blameTrials({ ...EMPTY, genre: 35 }, {}).length, 0);
+    blameTrials({ ...EMPTY, genre: [35] }, {}).length, 0);
 is('FB2     three chips are three count-only requests',
-    blameTrials({ ...EMPTY, kind: 'movie', genre: 16, language: 'ta' }, {}).length, 3);
+    blameTrials({ ...EMPTY, kind: 'movie', genre: [16], language: 'ta' }, {}).length, 3);
 is('FB2     the chip whose removal rescues the fewest is the culprit',
     blame([
         { chip: 'Tamil', count: 41 }, { chip: 'Animation', count: 120 }, { chip: 'Netflix', count: 9 },

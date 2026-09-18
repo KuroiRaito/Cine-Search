@@ -44,3 +44,15 @@
      the page heading is noise. */
   .head-actions { display: none; }
 }
+
+/* L6 — a rail header is a link, and the link is a browse. Quiet, because the
+   rail is the offer and this is only the way past the twentieth tile. */
+.railmore {
+  font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
+  font-weight: 600; color: var(--acc-t); text-decoration: none;
+}
+
+/* A chip row, not a rail. Position 2 for everybody today — the library-aware
+   reorder is the rails work, not this. */
+.chips.presets { padding-top: var(--space-16); }
+.chips.presets .chip { text-decoration: none; }

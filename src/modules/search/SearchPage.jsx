@@ -11,7 +11,7 @@ import FilterPanel from './FilterPanel.jsx';
 import {
     fromParams, toParams, activeCount, toQuery, readCount, canLoadMore,
     reconcile, SORTS, KINDS, LENGTHS, RATINGS, genresFor, blame, blameTrials,
-    providerName, rememberProviders,
+    providerName, rememberProviders, isBrowseUrl,
 } from './browse.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from '../library';
@@ -38,7 +38,7 @@ export default function SearchPage() {
        two that swap, and with text in the box the panel is not offered at all.
        Browse is /search with facets and no query. */
     const facets = fromParams(params);
-    const browsing = !q.trim() && activeCount(facets) > 0;
+    const browsing = !q.trim() && isBrowseUrl(params);
     /* What was taken off, and why. Held in state rather than derived, because
        the URL is corrected the moment a drop happens — so the fact of it would
        otherwise live for exactly one render, which is not long enough to read. */
@@ -287,16 +287,38 @@ export default function SearchPage() {
     );
 }
 
+/* The few keywords a preset may carry, named so the chip can be read and
+   removed. Not a vocabulary anybody picks from — §05 keeps keywords out of the
+   facet set entirely. */
+const KEYWORDS = { 156924: 'Tearjerker' };
+
+const monthLabel = (f) => {
+    if (!f.from || !f.to) return f.from ? `From ${f.from}` : `Until ${f.to}`;
+    const d = new Date(`${f.from}T00:00:00`);
+    return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+};
+
 /** Everything currently constraining the list, each removable. */
 function ChipRow({ facets, vocab, notice, onChange }) {
     const all = genresFor(facets.kind, vocab);
     const chips = [
         facets.kind !== 'all' && { key: 'kind', label: KINDS.find((k) => k.key === facets.kind)?.label, off: { kind: 'all' } },
-        facets.genre && { key: 'genre', label: all.find((g) => g.id === facets.genre)?.name, off: { genre: null } },
+        ...facets.genre.map((id) => ({
+            key: `genre-${id}`,
+            label: all.find((g) => g.id === id)?.name,
+            off: { genre: facets.genre.filter((x) => x !== id) },
+        })),
         facets.language && { key: 'lang', label: facets.language.toUpperCase(), off: { language: null } },
         facets.decade && { key: 'decade', label: `${facets.decade}s`, off: { decade: null } },
-        facets.length && { key: 'len', label: LENGTHS.find((l) => l.value === facets.length)?.label, off: { length: null } },
-        facets.rating && { key: 'rated', label: RATINGS.find((r) => r.value === facets.rating)?.label, off: { rating: null } },
+        /* A preset arrives with values the panel does not offer — 110 minutes,
+           rated 6.5 — and every one of them still has to be a chip somebody can
+           take off. That is the whole difference between a curated shelf and a
+           starting point. */
+        facets.length && { key: 'len', label: LENGTHS.find((l) => l.value === facets.length)?.label || `Under ${facets.length} min`, off: { length: null } },
+        facets.rating && { key: 'rated', label: RATINGS.find((r) => r.value === facets.rating)?.label || `${facets.rating}+`, off: { rating: null } },
+        facets.keyword && { key: 'kw', label: KEYWORDS[facets.keyword] || 'Tagged', off: { keyword: null } },
+        facets.cert && { key: 'cert', label: 'Family-friendly', off: { cert: null } },
+        (facets.from || facets.to) && { key: 'when', label: monthLabel(facets), off: { from: null, to: null } },
         facets.provider && { key: 'on', label: providerName(facets.provider), off: { provider: null } },
         facets.unseen && { key: 'unseen', label: 'Not seen', off: { unseen: false } },
     ].filter((c) => c && c.label);
@@ -341,7 +363,7 @@ function ChipRow({ facets, vocab, notice, onChange }) {
 function WhyEmpty({ facets, vocab }) {
     const labels = {
         kind: KINDS.find((k) => k.key === facets.kind)?.label,
-        genre: genresFor(facets.kind, vocab).find((g) => g.id === facets.genre)?.name,
+        genre: genresFor(facets.kind, vocab).filter((g) => facets.genre.includes(g.id)).map((g) => g.name).join(' or '),
         language: facets.language?.toUpperCase(),
         decade: facets.decade && `${facets.decade}s`,
         length: LENGTHS.find((l) => l.value === facets.length)?.label,

@@ -1,27 +1,27 @@
 {
   "discover/home@1280-dark": {
-    "elements": 999,
-    "hash": "7fcf8ab8"
+    "elements": 1000,
+    "hash": "12e6bd83"
   },
   "discover/home@1280-light": {
-    "elements": 999,
-    "hash": "7fcf8ab8"
+    "elements": 1000,
+    "hash": "12e6bd83"
   },
   "discover/home@390-dark": {
-    "elements": 999,
-    "hash": "3a804277"
+    "elements": 1000,
+    "hash": "d3c65c47"
   },
   "discover/home@390-light": {
-    "elements": 999,
-    "hash": "3a804277"
+    "elements": 1000,
+    "hash": "d3c65c47"
   },
   "discover/home@900-dark": {
-    "elements": 999,
-    "hash": "1a6a636e"
+    "elements": 1000,
+    "hash": "866d6e75"
   },
   "discover/home@900-light": {
-    "elements": 999,
-    "hash": "1a6a636e"
+    "elements": 1000,
+    "hash": "866d6e75"
   },
   "entry/cover@1280-dark": {
     "elements": 35,

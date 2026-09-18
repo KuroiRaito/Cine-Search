@@ -475,7 +475,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
 
 <section id="typed"><div class="wrap">
   <div class="shead"><span class="snum">01</span><h2>What people type, and what comes back</h2></div>
-  <p><code>eval/queries.json</code> holds 120 queries in nine categories, built for this product and graded by hand. It is the best research asset the repository has, and <b>80 of the 120 have never been scored</b> &mdash; the one committed run covers exact titles, typos and partials, which are the three categories that already work.</p>
+  <p><code>eval/queries.json</code> holds 120 queries in nine categories, built for this product and graded by hand. It is the best research asset the repository has. It had <b>50 labels and a run covering 40</b> &mdash; and the unlabelled seventy were the six categories that fail, so nothing about them could be measured, only asserted. <b>All 120 are now labelled and scored</b>; the method and its two traps are in <code>eval/LABELS.md</code>.</p>
   <p>So I ran all 120 through <code>/search/multi</code>, as they are typed, and then again through two normalisations. <b>Zero-result rate</b> is the column that matters: it is the share of queries that produce a screen with nothing on it.</p>
 
   <div class="tbl-wrap"><table>
@@ -495,6 +495,25 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   </table></div>
 
   <div class="note ok"><b>The last column is the one that makes the rest safe.</b> Stripping intent words changes hit@5 on the 50 graded queries by <b>nothing at all</b> &mdash; 48% before, 48% after. It rescues a third of the empty screens without touching a single query that already worked, which is the only kind of search change worth shipping unmeasured.</div>
+
+  <h3>And now it is scored, not just counted</h3>
+  <p>The table above is my own zero-result count. The harness has a stricter metric &mdash; <b>null-and-low@5</b>, which fails a query if the top five hold nothing acceptable, so a search that answers with <i>something</i> gets no credit for it. Over all 120, both shipped variants:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Category</th><th>n</th><th>Null-and-low@5</th><th>Zero</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td class="num">exact_title</td><td class="num">15</td><td class="use"><b>0%</b></td><td class="use">0%</td><td class="use">nDCG 0.98. The name engine is excellent at names.</td></tr>
+      <tr><td class="num">partial</td><td class="num">10</td><td class="use">10%</td><td class="use">0%</td><td class="use">Prefix matching works.</td></tr>
+      <tr><td class="num">hinglish</td><td class="num">15</td><td class="use">80%</td><td class="use">80%</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num">typo</td><td class="num">20</td><td class="use">90%</td><td class="use">80%</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num">franchise</td><td class="num">10</td><td class="use">90%</td><td class="use">80%</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num">person_led</td><td class="num">15</td><td class="use"><b>100%</b></td><td class="use">60%</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num">mood</td><td class="num">20</td><td class="use"><b>100%</b></td><td class="use">95%</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num">plot_recall</td><td class="num">10</td><td class="use"><b>100%</b></td><td class="use">100%</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num">attribute</td><td class="num">5</td><td class="use"><b>100%</b></td><td class="use">100%</td><td class="use">&mdash;</td></tr>
+      <tr><td class="num"><b>All</b></td><td class="num"><b>120</b></td><td class="use"><b>75%</b></td><td class="use"><b>66%</b></td><td class="use">nDCG@10 <b>0.23</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>v2 and the baseline are indistinguishable.</b> v1: 75% null-and-low, nDCG 0.24. v2: 75%, nDCG 0.23. v2's win was always <b>one request instead of three</b> &mdash; a latency and cost win, and a real one. It was never a quality win, and now there is a number saying so before somebody spends a week tuning it.</div>
 
   <p>Read down the first column and the module writes itself. Three categories work. Six do not, and they fail for <b>three different reasons</b>:</p>
   <div class="tbl-wrap"><table>
@@ -601,7 +620,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
       <tr><td class="num"><b>1</b></td><td class="use">Drop the words that are not part of a name &mdash; <code>movies, films, show, series, all parts, in order, trilogy, with, by, best</code></td><td class="use">62% &rarr; <b>44%</b>. Franchise 80&rarr;0, person-led 40&rarr;7, attribute 100&rarr;60. <b>hit@5 unchanged</b></td><td class="use"><b>Nothing.</b> The only silent rung, and it earns it: it removes words the index cannot hold and changes no result that already worked.</td></tr>
       <tr><td class="num"><b>1b</b></td><td class="use">Split a trailing year off the name and pass it as <code>year</code></td><td class="use"><code>inception (2010)</code> &rarr; <b>0 results</b> today. <code>Inception 2010</code> &rarr; 0.</td><td class="use">Nothing &mdash; the year becomes a <b>chip</b>, visible and removable. Pasting a title with its year is the most natural paste there is, and today it is a dead end.</td></tr>
       <tr><td class="num"><b>2</b></td><td class="use">Strip Hindi particles and honorifics &mdash; <code>ki, ka, ke, koi, bhai, ji, saab</code></td><td class="use">44% &rarr; <b>42%</b>. <i>salman bhai ki movie</i> &rarr; Salman Khan, rank 1</td><td class="use">Nothing. Same argument as rung 1.</td></tr>
-      <tr><td class="num"><b>3</b></td><td class="use">Truncate to the longest prefix that still matches, <b>never below six characters</b></td><td class="use"><b>9 of 18 typos</b>, at rank 1 in eight of the nine. <i>intersteller</i>&rarr;<i>interstell</i>, <i>pulp ficiton</i>&rarr;<i>pulp fic</i>, <i>game of thornes</i>&rarr;<i>game of th</i></td><td class="use"><b>Out loud.</b> &ldquo;Showing results for <b>interstellar</b>&rdquo;, with <i>search instead for &ldquo;intersteller&rdquo;</i> underneath it.</td></tr>
+      <tr><td class="num"><b>3</b></td><td class="use">Truncate to the longest prefix that still matches, <b>never below six characters</b> &mdash; and <b>only if what remains does not parse as facets</b>, in which case this rung is skipped and the answer is a browse</td><td class="use"><b>9 of 18 typos</b>, at rank 1 in eight of the nine. <i>intersteller</i>&rarr;<i>interstell</i>, <i>pulp ficiton</i>&rarr;<i>pulp fic</i>, <i>game of thornes</i>&rarr;<i>game of th</i></td><td class="use"><b>Out loud.</b> &ldquo;Showing results for <b>interstellar</b>&rdquo;, with <i>search instead for &ldquo;intersteller&rdquo;</i> underneath it.</td></tr>
       <tr><td class="num"><b>4</b></td><td class="use">Search each word alone, pool the results, rank by popularity</td><td class="use"><b>4 more</b>: <i>brekaing bad</i>&rarr;Breaking Bad, <i>stanger things</i>&rarr;Stranger Things, <i>jurrasic park</i>&rarr;Jurassic Park, <i>forest gump</i>&rarr;Forrest Gump</td><td class="use">Out loud, as a question rather than a claim: &ldquo;Nothing for <i>forest gump</i>. <b>Did you mean Forrest Gump?</b>&rdquo; &mdash; because two of the four land at rank 2, behind a wrong answer.</td></tr>
       <tr><td class="num"><b>5</b></td><td class="use">Edit distance against a dictionary of popular titles</td><td class="use">The only rung that reaches the last five: <i>gladaitor, titanc, dangl, sholey</i></td><td class="use">Same as rung 4. <b>The only rung with a cost</b> &mdash; it needs a list we do not ship. Design says what the screen does; whether the list is worth it is a build call.</td></tr>
     </tbody>
@@ -612,6 +631,24 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   <div class="note warn"><b>A hypothesis of mine that the measurement killed.</b> I expected that re-ranking the truncated results by popularity would rescue the short ones &mdash; <i>Titanic</i> is far more popular than anything else matching <code>titan</code>. It rescued <b>nought of eight</b>. The reason is simple once you look: <i>Titanic</i> is not in the twenty results being re-ranked, so no ordering of them can find it. Re-ranking cannot add a result. Recorded because the wrong version of this is a plausible thing to build.</div>
 
   <div class="note law"><b>L2 &mdash; the box never answers a different question silently.</b> Rungs 1, 1b and 2 remove words that are <i>not part of any name</i>, so nothing is being reinterpreted. Rungs 3, 4 and 5 change the name itself, and every one of them must print what it did and offer the original back in one tap. The band is <b>one line above the results</b> &mdash; never a toast, which disappears, and never a dialog, which interrupts.</div>
+
+  <h3>The ladder, scored against the same labels</h3>
+  <p>With all 120 labelled, the ladder stops being a proposal. I ran rungs 1&ndash;4 outside the app &mdash; same queries, same labels, same metric as &sect;01 &mdash; against the shipped v2:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Category</th><th>Null-and-low@5 &mdash; v2 &rarr; ladder</th><th>Zero results &mdash; v2 &rarr; ladder</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>franchise</b></td><td class="use">90% &rarr; <b>10%</b></td><td class="use">80% &rarr; <b>0%</b></td></tr>
+      <tr><td class="num"><b>typo</b></td><td class="use">90% &rarr; <b>45%</b></td><td class="use">80% &rarr; <b>20%</b></td></tr>
+      <tr><td class="num">hinglish</td><td class="use">80% &rarr; 73%</td><td class="use">80% &rarr; <b>0%</b></td></tr>
+      <tr><td class="num">person_led</td><td class="use">100% &rarr; <b>100%</b></td><td class="use">60% &rarr; 13%</td></tr>
+      <tr><td class="num">mood</td><td class="use">100% &rarr; <b>100%</b></td><td class="use">95% &rarr; 0%</td></tr>
+      <tr><td class="num">attribute &middot; plot_recall</td><td class="use">100% &rarr; <b>100%</b></td><td class="use">100% &rarr; 0%</td></tr>
+      <tr><td class="num"><b>All 120</b></td><td class="use"><b>75% &rarr; 60%</b></td><td class="use"><b>66% &rarr; 5%</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>nDCG@10 goes <b>0.23 &rarr; 0.36</b>, a 57% improvement, for four rungs of string handling and no new data.</p>
+  <div class="note law"><b>Read the two columns against each other, because they disagree on purpose.</b> The empty screen nearly disappears &mdash; 66% to 5% &mdash; while genuine usefulness moves only from 25% to 40%. <b>The ladder converts empty screens into populated ones, and for four categories the population is wrong.</b> That is not a disappointing result, it is the argument for the rest of the module stated in numbers: <i>&ldquo;christopher nolan movies&rdquo;</i> now returns twenty films and none of them is his, because <b>his films are not in a name index</b> &mdash; they are behind the person route (&sect;08). <i>&ldquo;movies from the 90s&rdquo;</i> returns twenty films and none is from the nineties, because that is a <b>browse</b> (&sect;02). A string can only ever be rescued into another string.</div>
+  <div class="note warn"><b>And the simulation found an ordering bug in my own ladder.</b> Rung 3 answered <b>44 of the 120</b> &mdash; far more than it should, because truncation runs whenever rungs 1 and 2 come back empty, including for queries with no title in them at all. Truncating <i>&ldquo;movies from the 90s&rdquo;</i> to <i>&ldquo;movies from the 9&rdquo;</i> is not a correction, it is a different search that happens to return something. <b>The fix is an order, not a new rung:</b> after rung 2, check whether what remains parses as facets &mdash; a genre, a language, a decade, a runtime &mdash; and if it does, <b>go to Browse and stop</b>. Truncation is for a name somebody spelled wrong, and only for that.</div>
 
   <h3>When nothing survives the ladder</h3>
   <p>At 62% today and 42% after the free rungs, <b>the empty screen is the most-visited screen in this module</b> &mdash; more common than any single result. It is currently a heading, a sentence and a link to Discover.</p>
@@ -1346,7 +1383,7 @@ frames written 5799
     <thead><tr><th>Piece</th><th>Note</th></tr></thead>
     <tbody>
       <tr><td class="num">The normaliser (rungs 1, 1b, 2)</td><td class="use">The highest-value hour in the module: 62% &rarr; 42% empty, with hit@5 unchanged on the graded set. Word lists are in this document; they belong in one file with the golden set as its test.</td></tr>
-      <tr><td class="num">The eval harness</td><td class="use"><b>80 of the 120 queries have never been scored</b>, and they are the six categories that fail. Scoring them is how any of this stays honest &mdash; and it already exists, it just needs labels for the open sets.</td></tr>
+      <tr><td class="num">The eval harness</td><td class="use"><b>Done.</b> All 120 are labelled &mdash; 51 by rule, 19 by judgement &mdash; and both variants are scored over the whole set. The nineteen judgement labels are mood queries and they encode <i>my</i> taste; they are the first thing to review. <b>Two harness notes:</b> a run that reports <code>tmdb_mode: proxy</code> scored nothing and should be repeated, and <code>/search/movie?year=</code> does not outrank relevance &mdash; use <code>primary_release_year</code>.</td></tr>
       <tr><td class="num">The filter engine</td><td class="use">Nothing in Browse is built. It is one endpoint, and acceptance criteria 1.3.1, 1.3.4 and 1.3.6 have been open since the Milestone 1 rebuild dropped filters and pagination.</td></tr>
       <tr><td class="num">Rails as queries</td><td class="use">Each rail header needs the browse URL that reproduces it. Cheap, and it is what makes Browse discoverable without a fifth tab.</td></tr>
       <tr><td class="num"><code>.head-actions</code></td><td class="use">Delete. Three controls duplicated from the shell's top bar, flagged by the module's own notes.</td></tr>

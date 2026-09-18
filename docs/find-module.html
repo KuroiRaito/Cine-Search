@@ -465,11 +465,12 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   <a href="#module">03 The module</a>
   <a href="#rescue">04 The rescue ladder</a>
   <a href="#facets">05 Facets and sorts</a>
-  <a href="#rails">06 Rails are queries</a>
-  <a href="#answers">07 Person and franchise</a>
-  <a href="#screens">08 Screens</a>
-  <a href="#states">09 States</a>
-  <a href="#open">10 Decisions</a>
+  <a href="#filters">06 The filter set</a>
+  <a href="#rails">07 Rails are queries</a>
+  <a href="#answers">08 Person and franchise</a>
+  <a href="#screens">09 Screens</a>
+  <a href="#states">10 States</a>
+  <a href="#open">11 Decisions</a>
 </div></nav>
 
 <section id="typed"><div class="wrap">
@@ -695,14 +696,82 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
       <tr><td class="num"><b>Runtime</b></td><td class="use">&le;120 min: <b>more than 20,000</b> &mdash; see the cap, below</td><td class="use">Two rungs, not a slider: <i>under 90</i>, <i>under 2 hours</i>. A slider implies a precision nobody has.</td></tr>
       <tr><td class="num"><b>Decade</b></td><td class="use">The 1990s: <b>20,001 films</b></td><td class="use">Decades as chips; the year field stays for exact years and for the pasted-year rescue.</td></tr>
       <tr><td class="num"><b>Where to watch</b></td><td class="use">Netflix IN: <b>4,530</b> films. Prime Video IN: 5,396</td><td class="use">Needs <code>watch_region</code>. <b>Provider ids are per region and they move</b> &mdash; JioHotstar is 2336 in India, and the id a hardcoded list would have carried returns five films. Fetch the list, never type it.</td></tr>
-      <tr><td class="num">Keyword</td><td class="use">See the mood note in &sect;06</td><td class="use">Not offered as a facet. It is a vocabulary of 100,000 tags with no quality floor; it appears only inside a preset that has been measured.</td></tr>
+      <tr><td class="num">Keyword</td><td class="use">See the mood note in &sect;07</td><td class="use">Not offered as a facet. It is a vocabulary of 100,000 tags with no quality floor; it appears only inside a preset that has been measured.</td></tr>
     </tbody>
   </table></div>
   <div class="note warn"><b>Two ceilings to design against, not around.</b> TMDB refuses page 501 &mdash; <i>&ldquo;Pages start at 1 and max at 500&rdquo;</i> &mdash; while cheerfully reporting 1,001 pages for a decade browse. And PostgREST caps at 1,000 rows, which has already bitten the library once. A browse that can reach 20,000 results needs a <b>sort that makes the first page the answer</b>; <i>Load more</i> stops at the ceiling and says <i>&ldquo;that is as deep as TMDB goes &mdash; narrow it&rdquo;</i>, which is true and is not an error.</div>
 </div></section>
 
+<section id="filters"><div class="wrap">
+  <div class="shead"><span class="snum">06</span><h2>The filter set</h2></div>
+  <p>Filters existed before the Milestone 1 rebuild and they were not bad. I pulled the deleted component out of the history rather than working from memory &mdash; <code>src/components/Filters.jsx</code>, five facets:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>What it had</th><th>As</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Media type</td><td class="use">select</td><td class="use"><b>Keep the idea.</b> Wrong position &mdash; see the count below.</td></tr>
+      <tr><td class="num">Genre</td><td class="use">select, from TMDB's list</td><td class="use"><b>Keep.</b> The one facet everybody understands.</td></tr>
+      <tr><td class="num">Rating</td><td class="use">number input, 0&ndash;10</td><td class="use"><b>Keep as a band, coarsely.</b> A spinner invites 8.5, 11 and an empty screen.</td></tr>
+      <tr><td class="num">Release year</td><td class="use">number input</td><td class="use"><b>Replace with decades.</b> Nobody browses by 1997.</td></tr>
+      <tr><td class="num">Sort by + direction</td><td class="use">select + &uarr;&darr; toggle</td><td class="use"><b>Keep sorting, delete the direction.</b> The least popular Hindi film of all time is not a thing anybody wants, and rating-descending is the trap in &sect;05.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>What was actually wrong with it was not the facets, it was the modal.</b> It opened over the results, took an <i>Apply</i>, and closed &mdash; so you never saw a filter change anything while choosing it. You guessed, applied, and read the outcome. Acceptance criterion <b>1.3.4</b> already says the replacement expands in place and pushes results down, and it has been open since the rebuild.</div>
+
+  <h3>What the golden set actually asks to filter by</h3>
+  <p>Each of the 120 queries, tagged by the facet that would answer it. False positives removed by hand &mdash; <i>the family man</i> is a title, not a genre:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Facet</th><th>Queries</th><th>Where they come from</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Genre</b></td><td class="use"><b>15</b></td><td class="use">8 Hinglish, 7 mood. Genre is mostly how somebody describes <i>an evening</i>: <i>dark comedy</i>, <i>sad war movie</i>, <i>koi acchi thriller movie</i>.</td></tr>
+      <tr><td class="num"><b>Language</b></td><td class="use"><b>8</b></td><td class="use">Every one of them Hinglish. <i>purani hindi filme</i>, <i>tamil thriller padam</i>, <i>south ki action movie</i>.</td></tr>
+      <tr><td class="num">Rating</td><td class="use">4</td><td class="use"><i>koi acchi</i>, <i>best</i>, <i>rated above 8</i>.</td></tr>
+      <tr><td class="num">Decade</td><td class="use">3</td><td class="use"><i>movies from the 90s</i>, <i>purani</i>, <i>released this year</i>.</td></tr>
+      <tr><td class="num">Length</td><td class="use">1</td><td class="use"><i>movies under 2 hours</i>.</td></tr>
+      <tr><td class="num"><b>Media type</b></td><td class="use"><b>1</b></td><td class="use">The word appears 38 times and means the facet <b>once</b> &mdash; <i>tv shows with only one season</i>. The other 37 are the filler rung 1 strips, or a franchise: <i>john wick series</i> is a collection, not a medium.</td></tr>
+      <tr><td class="num">Where to watch</td><td class="use"><b>0</b></td><td class="use">Nobody types it. See the caveat.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>A typed corpus under-counts anything natural to click and unnatural to type.</b> Zero people typed &ldquo;netflix&rdquo;, and <i>what can I actually watch tonight</i> is still one of the most valuable questions this product can answer. The count orders the facets; it does not choose them. The one place it is decisive is <b>media type</b>: the control that led the old modal turns out to be the one people ask for least.</div>
+  <div class="note ok"><b>And the number that justifies the whole surface: 68 of the 120 queries are open-set.</b> <b>57% of what people type has no single right answer.</b> It wants a list, and a list is what a filter makes.</div>
+
+  <h3>Seven facets, one toggle, one sort</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Facet</th><th>Shown as</th><th>Where</th><th>Why it earns a row</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Kind</b></td><td class="use">All / Films / Series</td><td class="use"><b>First, always</b></td><td class="use">Asked for least, placed first &mdash; because it is a <b>precondition</b>, not a peer. It decides which genre vocabulary exists (&sect;05, L5). It is also the only facet that survives a query, where it lives beside the box as a segmented control and costs no request.</td></tr>
+      <tr><td class="num"><b>Genre</b></td><td class="use">chips, single-select</td><td class="use">Open</td><td class="use">15 queries, and the vocabulary everyone shares. Single-select to start: two genres is an AND, and an AND of two genres is usually four films.</td></tr>
+      <tr><td class="num"><b>Language</b></td><td class="use">chips</td><td class="use">Open</td><td class="use">8 queries, all Hinglish, and <b>the facet almost no Western tracker offers</b>. One parameter, 394 Hindi comedies behind it. For this audience it is not a long-tail filter, it is a primary one.</td></tr>
+      <tr><td class="num">Where to watch</td><td class="use">chips, per region</td><td class="use">More</td><td class="use">Never typed, highly acted-on. Behind <i>More</i> only because it is the one row that needs a region and a fetched provider list before it can draw &mdash; and because the presets already answer <i>tonight</i> on Discover.</td></tr>
+      <tr><td class="num">Decade</td><td class="use">chips &mdash; 2020s &hellip; 1970s</td><td class="use">More</td><td class="use">Replaces the year spinner. An exact year stays reachable through the box, which is also where a pasted <i>(2010)</i> lands.</td></tr>
+      <tr><td class="num">Length</td><td class="use">two chips</td><td class="use">More</td><td class="use"><i>Under 90</i>, <i>under 2 hours</i>. Not a slider: a slider implies a precision nobody has about a runtime.</td></tr>
+      <tr><td class="num">Rating</td><td class="use">two chips &mdash; 7+, 8+</td><td class="use">More</td><td class="use">A <b>band</b>, never a sort (&sect;05). Two rungs, because the difference between 7.4 and 7.6 is not a decision anybody makes.</td></tr>
+      <tr><td class="num"><b>Hide what I've seen</b></td><td class="use">a switch</td><td class="use"><b>Pinned, bottom</b></td><td class="use">The only filter that is not TMDB's, and <b>the only one a catalogue app cannot offer</b>. The library is already in memory, so it is exact and free. It is a switch rather than a chip because it is a lens on any result set, not a constraint within one.</td></tr>
+      <tr><td class="num">Sort</td><td class="use">on the results bar</td><td class="use">Right of the count</td><td class="use"><b>Not a filter</b> &mdash; it changes order, not membership, so it does not live in the panel. Three options: <i>Most popular</i>, <i>Most voted</i>, <i>Newest</i>. No direction toggle, and no <i>highest rated</i>: that is the Rating band plus <i>Most voted</i>, and offering it as a sort is how you get 10.0 from one vote.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What was left out, and why</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Rejected</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Age certification</td><td class="use"><b>Denser than I expected</b> &mdash; India has 8,367 U-rated and 4,650 UA films, so this was nearly a facet. It is not, because the vocabulary changes per country and India's own list has four overlapping U/A variants. It goes <b>into the &ldquo;With the parents&rdquo; preset instead</b>, where the mapping is written once and curated &mdash; which is a better answer than the genre guess that preset had before.</td></tr>
+      <tr><td class="num">Country of origin</td><td class="use">Language is the better proxy for what somebody means, and it is one parameter rather than two that disagree.</td></tr>
+      <tr><td class="num">Keyword</td><td class="use">100,000 tags with no quality floor &mdash; <i>feel good</i> has zero films. Presets only, and only when measured (&sect;07).</td></tr>
+      <tr><td class="num">Studio, cast, crew</td><td class="use">These are destinations, not filters. A director is a <b>person page</b>, which is already designed, and a studio was dropped from the title module for the same reason.</td></tr>
+      <tr><td class="num">Sort direction</td><td class="use">Ascending popularity is a joke and ascending rating is a punishment. Where a direction is meaningful the sort names it: <i>Newest</i>.</td></tr>
+      <tr><td class="num">Multi-select anything</td><td class="use">Not in the first pass. Each extra selection multiplies the ways to reach an empty screen, and FB2 shows how much work an empty screen costs.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The clutter budget</h3>
+  <div class="note law"><b>At rest: one control.</b> The box, and a filter button beside it. No facet row, no chips, nothing to read. <b>Open: three rows and a switch</b> &mdash; Kind, Genre, Language, and <i>Hide what I've seen</i>. <b>Behind <i>More</i>: four more.</b> Eight facets exist; three are ever visible without a deliberate tap. On desktop the first five sit in the row permanently, because a 1120px band has the space a 320px one does not &mdash; the set does not change, only how much of it is already unfolded.</div>
+  <div class="note law"><b>L7 &mdash; a facet appears only when it can change the answer.</b> No <i>where to watch</i> before a region is known. No genre the current medium does not have. No <i>Series</i> in a result set that is all films. A control that cannot do anything is worse than a missing one: it is a promise the screen breaks when you touch it.</div>
+  <div class="note law"><b>L8 &mdash; no Apply.</b> Every change applies immediately and <b>the count above the grid is the feedback</b> &mdash; <i>394 films</i> becomes <i>41 films</i> as the chip goes on. That single number is what the old modal could not show, and it is the difference between choosing a filter and guessing one. The panel stays open while you work; the results move underneath it.</div>
+  <div class="note"><b>Two places show state, and they have different jobs.</b> The <b>chip row</b> above the results is the record &mdash; always visible, each chip removable, nothing hidden. The <b>panel</b> is the editor, and it is closed most of the time. The filter button carries the active count so a closed panel never conceals a constraint. This is the one duplication in the module and it is deliberate.</div>
+</div></section>
+
 <section id="rails"><div class="wrap">
-  <div class="shead"><span class="snum">06</span><h2>Discover: rails that are queries</h2></div>
+  <div class="shead"><span class="snum">07</span><h2>Discover: rails that are queries</h2></div>
   <p>Four rails today, all global, none of them personal, none of them openable. The library exists now, so the first thing the front door should show is the thing you left unfinished.</p>
 
   <div class="tbl-wrap"><table>
@@ -744,7 +813,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
       <tr><td class="num"><b>Easy watch</b></td><td class="use">Comedy or Family &middot; &le;110 min &middot; rated 6.5+, most voted first</td><td class="use"><i>&ldquo;something light for a sunday&rdquo;</i>, <i>&ldquo;feel good movie&rdquo;</i></td></tr>
       <tr><td class="num"><b>Edge of the seat</b></td><td class="use">Thriller or Mystery &middot; rated 7+ &middot; sorted by popularity</td><td class="use"><i>&ldquo;koi acchi thriller movie&rdquo;</i></td></tr>
       <tr><td class="num"><b>Have a cry</b></td><td class="use">Drama &middot; rated 7.5+ &middot; <code>tearjerker</code> joined only where it has volume</td><td class="use"><i>&ldquo;movie to cry to&rdquo;</i>, <i>&ldquo;sad war movie&rdquo;</i></td></tr>
-      <tr><td class="num"><b>With the parents</b></td><td class="use">Family, Adventure or Animation &middot; rated 7+ &middot; no Horror</td><td class="use"><i>&ldquo;watch with parents&rdquo;</i>, <i>&ldquo;bacchon ke liye movie&rdquo;</i></td></tr>
+      <tr><td class="num"><b>With the parents</b></td><td class="use"><b>Certified U or U/A 7+</b> in the viewer's country &middot; rated 7+ &middot; most voted first</td><td class="use"><i>&ldquo;watch with parents&rdquo;</i>, <i>&ldquo;bacchon ke liye movie&rdquo;</i> &mdash; 8,367 U-rated films in India, which is a better answer than guessing at genres</td></tr>
       <tr><td class="num"><b>Under two hours</b></td><td class="use">&le;120 min &middot; rated 7+ &middot; most voted first</td><td class="use"><i>&ldquo;movies under 2 hours&rdquo;</i> &mdash; more than 20,000 of them</td></tr>
       <tr><td class="num"><b>Closer to home</b></td><td class="use">Original language in hi, ta, te, ml, kn &middot; rated 7+ &middot; <b>most voted first, no floor</b></td><td class="use"><i>&ldquo;purani hindi filme&rdquo;</i>, <i>&ldquo;south ki action movie&rdquo;</i>, <i>&ldquo;tamil thriller padam&rdquo;</i></td></tr>
     </tbody>
@@ -753,7 +822,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
 </div></section>
 
 <section id="answers"><div class="wrap">
-  <div class="shead"><span class="snum">07</span><h2>When the query names a person, or a franchise</h2></div>
+  <div class="shead"><span class="snum">08</span><h2>When the query names a person, or a franchise</h2></div>
 
   <h3>The person rule, amended</h3>
   <p>The search module carries a written rule: <i>people rank alongside titles, never above them</i> &mdash; so the person section sits after the grid. It was the right call when it was written, and the measurement says it is wrong for one specific case.</p>
@@ -802,6 +871,26 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
   display:inline-flex;align-items:center;gap:var(--space-4)}
 .fgo.q{background:var(--surface-hv);color:var(--text)}
 .shelf-h a{font-family:var(--f-m);font-size:9px;color:var(--acc-t);text-decoration:none;display:flex;align-items:center;gap:2px}
+/* the filter panel — rows of chips, never dropdowns on a phone */
+.fpanel{margin:var(--space-8) var(--gutter) 0;padding:var(--space-12);border-radius:var(--radius-12);
+  background:var(--bg-sub);box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub)}
+.fpanel .lab{font-family:var(--f-m);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);margin:var(--space-12) 0 var(--space-4)}
+.fpanel .lab:first-child{margin-top:0}
+.fpanel .row{display:flex;gap:var(--space-4);overflow:hidden}
+.fpanel .row .chip{height:var(--space-32);padding:0 var(--space-12);font-size:var(--text-micro)}
+.fpanel .more{display:flex;align-items:center;justify-content:center;gap:var(--space-4);width:100%;
+  margin-top:var(--space-12);padding-top:var(--space-8);border-top:var(--border-hair) solid var(--bd-sub);
+  background:none;border:0;color:var(--acc-t);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.fsw{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);
+  margin-top:var(--space-12);padding-top:var(--space-12);border-top:var(--border-hair) solid var(--bd-sub);
+  font-size:var(--text-caption);color:var(--text)}
+.fsw i{width:var(--space-32);height:var(--space-20);border-radius:var(--radius-full);background:var(--surface-hv);
+  flex:0 0 auto;position:relative;font-style:normal}
+.fsw i::after{content:"";position:absolute;top:2px;left:2px;width:var(--space-16);height:var(--space-16);
+  border-radius:var(--radius-full);background:var(--faint)}
+.fsw.on i{background:var(--acc)}
+.fsw.on i::after{left:14px;background:var(--bg)}
 /* The shared .desk box is 700px tall for a title page; this module's desktop
    frame is shorter, and a transform does not shrink the space it reserves —
    so both the frame and the scaled box are pinned to what this one needs. */
@@ -810,7 +899,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
 </style>
 
 <section id="screens"><div class="wrap">
-  <div class="shead"><span class="snum">08</span><h2>Screens</h2></div>
+  <div class="shead"><span class="snum">09</span><h2>Screens</h2></div>
   <p>Drawn at 320 &mdash; the width everything has to survive &mdash; with one desktop frame at 1120. Mock scale, as ever: these show <b>order, hierarchy and wording</b>, and where a shipped component appears it keeps everything the frame has no room to draw.</p>
 
   <div class="phones">
@@ -1087,8 +1176,40 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
     </div>
   </div>
 
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>FB0</b> the panel, open</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q ph">Films, series, people</span></div>
+          <div class="ffilt on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="fpanel">
+          <div class="lab">Kind</div>
+          <div class="row"><button class="chip on">All</button><button class="chip">Films</button><button class="chip">Series</button></div>
+          <div class="lab">Genre</div>
+          <div class="row"><button class="chip">Comedy</button><button class="chip on">Drama</button><button class="chip">Crime</button><button class="chip">Doc</button></div>
+          <div class="lab">Language</div>
+          <div class="row"><button class="chip">Any</button><button class="chip on">Malayalam</button><button class="chip">Tamil</button><button class="chip">Hindi</button></div>
+          <button class="more">More filters <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="fsw on"><span>Hide what I've seen</span><i></i></div>
+        </div>
+        <div class="fbar"><b>212 films</b><span class="srt">Most voted <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        <div class="fgrid">
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.1</span></div><div class="nm">Kumbalangi Nights</div><div class="sub">2019 &middot; 128 votes</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.9</span></div><div class="nm">Jallikattu</div><div class="sub">2019 &middot; 94 votes</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.0</span></div><div class="nm">Nadodikkattu</div><div class="sub">1987 &middot; 41 votes</div></div>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="note ok"><b>Three rows, and the count moves while you work.</b> The panel stays open, the grid moves underneath it, and <i>212 films</i> is the only feedback the old modal could never give &mdash; because it closed before you could see what you had done. <i>More filters</i> adds four rows; nothing else is ever on screen at rest.</div>
+frames written 5799
+
   <h3>Desktop &mdash; the facets are furniture</h3>
-  <p>At 1120 the facet row is <b>always visible and never a sheet</b>: five labelled controls, the way the benchmark does it and the way acceptance criterion 1.3.4 already asks for. Below 600 the same row collapses behind the one filter button beside the box, <b>expanding in place and pushing results down</b>.</p>
+  <p>At 1120 the first five facets sit in the row permanently &mdash; the way the benchmark does it, and the way acceptance criterion 1.3.4 already asks for. The set is the same eight as the phone (&sect;06); a wide band simply has room to leave more of it unfolded. Below 600 the whole row collapses behind the one filter button beside the box and <b>expands in place, pushing results down</b> &mdash; never a sheet.</p>
   <div class="deskwrap"><div class="deskscale">
     <div class="desk">
       <div class="dtop"><div class="dwm"><i></i>Cine Search</div>
@@ -1096,9 +1217,9 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
       </div>
       <div class="dfilt">
         <div class="fl grow"><u>Search</u><div><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg> <span style="flex:1;margin-left:8px;color:var(--faint)">Films, series, people</span></div></div>
-        <div class="fl set"><u>Language</u><div>Hindi <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+        <div class="fl"><u>Kind</u><div>All <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
         <div class="fl set"><u>Genre</u><div>Comedy <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
-        <div class="fl"><u>Decade</u><div>Any <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+        <div class="fl set"><u>Language</u><div>Hindi <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
         <div class="fl"><u>Where to watch</u><div>Any <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
         <div class="fl" style="min-width:auto"><u>&nbsp;</u><div style="width:44px;justify-content:center"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div></div>
       </div>
@@ -1116,7 +1237,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
 </div></section>
 
 <section id="states"><div class="wrap">
-  <div class="shead"><span class="snum">09</span><h2>States</h2></div>
+  <div class="shead"><span class="snum">10</span><h2>States</h2></div>
   <p>Every case the module has to survive. Prefixes are collision-free across the design documents &mdash; entry uses I/U/C/S, profile P/T/F/E/K/N/X/G/R, library L, title TM/TV/TP/TS.</p>
 
   <h3>FD &mdash; Discover</h3>
@@ -1142,7 +1263,7 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
       <tr><td class="tok">FQ0</td><td class="use">Box empty, page open</td><td class="use">Recents, then presets. <b>Never</b> the current &ldquo;What are you looking for?&rdquo; &mdash; a question the person has already answered by arriving.</td><td class="use">&mdash;</td></tr>
       <tr><td class="tok">FQ1</td><td class="use">Titles found</td><td class="use">Count, then the grid. Each tile carries its library state and a quick-add.</td><td class="use">exact 100% hit@5</td></tr>
       <tr><td class="tok">FQ2</td><td class="use">Titles found, people too</td><td class="use">People after the grid, at most three, gated on a photo <i>and</i> a pulse of popularity. <b>Shipped.</b></td><td class="use">&ldquo;dune&rdquo; &rarr; Aggy Dune rejected</td></tr>
-      <tr><td class="tok">FQ3</td><td class="use">The query names a person</td><td class="use">The person row goes <b>first</b> and the grid below is their work. &sect;07.</td><td class="use">13 of 15</td></tr>
+      <tr><td class="tok">FQ3</td><td class="use">The query names a person</td><td class="use">The person row goes <b>first</b> and the grid below is their work. &sect;08.</td><td class="use">13 of 15</td></tr>
       <tr><td class="tok">FQ4</td><td class="use">Two people, same name</td><td class="use"><b>Neither is promoted.</b> Both rows, each with its evidence line.</td><td class="use">Roger Deakins &times;2</td></tr>
       <tr><td class="tok">FQ5</td><td class="use">The query names a franchise</td><td class="use">One collection band above the grid, release order, <i>3 of 8 seen</i>.</td><td class="use">4 of 4 via top film</td></tr>
       <tr><td class="tok">FQ6</td><td class="use">A person with no photo</td><td class="use">Excluded. TMDB finds somebody for almost any string. <b>Shipped.</b></td><td class="use">&ldquo;the matrix&rdquo; &rarr; a boxer</td></tr>
@@ -1189,13 +1310,18 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
       <tr><td class="tok">FB10</td><td class="use">More chips than fit</td><td class="use">They wrap to a second line; past two lines the row scrolls. <b>Never truncated</b> &mdash; a hidden filter is a wrong answer with no visible cause.</td><td class="use">&mdash;</td></tr>
       <tr><td class="tok">FB11</td><td class="use">A browse shared or bookmarked</td><td class="use">Everything is in the URL, the way the query already is. That is what makes Browse a state of Search rather than a tab.</td><td class="use">&mdash;</td></tr>
       <tr><td class="tok">FB12</td><td class="use">Arrived from a preset</td><td class="use">The preset's facets are shown as ordinary chips, and taking one off is how somebody discovers what the preset meant.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB14</td><td class="use">The panel is open</td><td class="use">It <b>stays</b> open while the grid moves underneath. Every change applies at once; the count above the grid is the feedback. No Apply, no Cancel, nothing to commit.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB15</td><td class="use"><i>More filters</i> tapped</td><td class="use">Four more rows unfold in place. The state is remembered for the session, so somebody who uses <i>where to watch</i> does not re-open it every time.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB16</td><td class="use"><i>Hide what I've seen</i> is on</td><td class="use">Applied against the library in memory, so it is exact &mdash; but it filters <b>what arrived</b>, so the count says both: <i>&ldquo;18 of 20 shown &middot; 2 already watched&rdquo;</i>. A page that silently returns twelve tiles looks broken.</td><td class="use">library is in memory</td></tr>
+      <tr><td class="tok">FB17</td><td class="use"><i>Hide what I've seen</i>, guest</td><td class="use">The switch is absent, not disabled. There is no library to hide.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB18</td><td class="use">A facet that cannot act</td><td class="use">Absent. No <i>where to watch</i> without a region, no genre the current medium lacks. <b>L7.</b></td><td class="use">&mdash;</td></tr>
       <tr><td class="tok">FB13</td><td class="use">Arrived from a rail header</td><td class="use">Same: the rail's own query, as chips. <i>Trending</i> opens a popularity sort you can then narrow.</td><td class="use">&mdash;</td></tr>
     </tbody>
   </table></div>
 </div></section>
 
 <section id="open"><div class="wrap">
-  <div class="shead"><span class="snum">10</span><h2>Decisions, and what this hands over</h2></div>
+  <div class="shead"><span class="snum">11</span><h2>Decisions, and what this hands over</h2></div>
 
   <h3>Open &mdash; these are yours</h3>
   <div class="tbl-wrap"><table>
@@ -1205,6 +1331,8 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
       <tr><td class="tok">FD-2</td><td class="use"><b>Recent searches &mdash; stored where?</b> A search history is mildly sensitive and syncing it costs a table.</td><td class="use"><b>On the device, and clearable.</b> Local storage, last eight, a <i>Clear</i> in the header of that list. It never leaves the device, so there is nothing to explain in a privacy note.</td></tr>
       <tr><td class="tok">FD-3</td><td class="use"><b>Does Browse deserve its own route</b> &mdash; <code>/browse</code> rather than <code>/search</code> with facets?</td><td class="use"><b>No.</b> One route keeps one back-stack and one mental model, and the URL already distinguishes them. A second route would need its own empty state, its own history and its own answer to &ldquo;what if someone types while browsing&rdquo;.</td></tr>
       <tr><td class="tok">FD-4</td><td class="use"><b>Should the presets be editable?</b> Six is a guess at six moods.</td><td class="use"><b>Not in this pass.</b> Ship the six, and let the chip row teach people that a preset is just facets. If a saved-search feature is ever wanted, that is the shape it takes.</td></tr>
+      <tr><td class="tok">FD-6</td><td class="use"><b>Should <i>Hide what I've seen</i> default to on?</b> For a tracker it is arguably the point &mdash; you are looking for something new.</td><td class="use"><b>Off.</b> A filter nobody set, quietly removing results, is the same sin as a vote floor nobody set. It is one tap, it is remembered per session once used, and somebody who wants it will find it on their second search.</td></tr>
+      <tr><td class="tok">FD-7</td><td class="use"><b>Multi-select genres?</b> Two genres at once is a common ask.</td><td class="use"><b>Not in the first pass.</b> TMDB ANDs them, and an AND of two genres is usually a handful of films &mdash; every extra selection is another route to an empty screen. Ship single-select, watch whether people take a genre off and put another on in the same second, and add it if they do.</td></tr>
       <tr><td class="tok">FD-5</td><td class="use"><b>Language default for an Indian region.</b> Tempting to pre-set Hindi when the region is IN.</td><td class="use"><b>No pre-set filter, ever.</b> A filter nobody chose produces results nobody can explain. Put <i>Closer to home</i> in the presets instead &mdash; offered, not applied.</td></tr>
     </tbody>
   </table></div>

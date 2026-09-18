@@ -65,18 +65,42 @@ export function certificationFor(raw, region, mediaType) {
 }
 
 /** Streaming / rent / buy for one region, plus the JustWatch link TMDB requires we honour. */
+/**
+ * Two tiers, not six buckets — §03c.
+ *
+ * TMDB separates flatrate, free, ads, rent and buy, and the separation answers
+ * a question a row of logos does not: what will this cost me? Everything in
+ * `streaming` is watchable without paying for this title; everything in
+ * `paid` is not. That is the only distinction worth two rows.
+ *
+ * Deduplicated upward, because the buckets overlap. Apple TV Store is in both
+ * rent and buy for Oppenheimer, and a provider already shown as streaming is
+ * never repeated below — so "Rent or buy · 5" counts five places, not five
+ * offers.
+ *
+ * No prices, ever. TMDB does not carry them, and inventing one on a page
+ * somebody acts on is the single failure here that costs them money.
+ */
 export function providersFor(raw, region) {
     const r = raw['watch/providers']?.results?.[region];
-    if (!r) return { region, link: null, flatrate: [], rent: [], buy: [], any: false };
-    const map = (list) => (list || []).map((p) => ({
+    const empty = { region, link: null, streaming: [], paid: [], any: false };
+    if (!r) return empty;
+    const map = (list, note) => (list || []).map((p) => ({
         id: p.provider_id,
         name: p.provider_name,
         logo: p.logo_path ? `${IMG}/w92${p.logo_path}` : null,
+        note: note || null,
     }));
-    const flatrate = map(r.flatrate);
-    const rent = map(r.rent);
-    const buy = map(r.buy);
-    return { region, link: r.link || null, flatrate, rent, buy, any: Boolean(flatrate.length || rent.length || buy.length) };
+
+    const seen = new Set();
+    const once = (list) => list.filter((p) => !seen.has(p.id) && seen.add(p.id));
+
+    /* Order within the tier is the order of certainty about the cost: a
+       subscription you may already have, then free, then free with ads. */
+    const streaming = once([...map(r.flatrate), ...map(r.free, 'free'), ...map(r.ads, 'with ads')]);
+    const paid = once([...map(r.rent), ...map(r.buy)]);
+
+    return { region, link: r.link || null, streaming, paid, any: Boolean(streaming.length || paid.length) };
 }
 
 /**
@@ -87,6 +111,29 @@ export function providersFor(raw, region) {
  * Season 0 (specials) is excluded - verified, Breaking Bad's number_of_episodes
  * of 62 already excludes its 9 specials.
  */
+/**
+ * One trailer, or none.
+ *
+ * Verified in §01: three official YouTube trailers for Dune: Part Two, one for
+ * Severance. Official is the filter that matters — the unofficial results are
+ * fan edits and reaction videos, which is not what "watch the trailer" means.
+ * A teaser is accepted only when there is no trailer, because a teaser is
+ * still the studio showing you the film.
+ */
+export function trailerFrom(videos) {
+    const yt = (videos || []).filter((v) => v.site === 'YouTube' && v.official && v.key);
+    const pick = yt.find((v) => v.type === 'Trailer') || yt.find((v) => v.type === 'Teaser');
+    if (!pick) return null;
+    return {
+        key: pick.key,
+        name: pick.name || 'Trailer',
+        /* hqdefault, not maxresdefault: maxres is absent for a good share of
+           videos and YouTube answers with a 404 image rather than a fallback,
+           which is a broken picture where the trailer should be. */
+        still: `https://img.youtube.com/vi/${pick.key}/hqdefault.jpg`,
+    };
+}
+
 export function airedEpisodeCount(raw) {
     const last = raw.last_episode_to_air;
     if (!last) return 0;
@@ -131,6 +178,10 @@ const toCard = (r) => ({
     poster: posterUrl(r.poster_path, 'w342'),
     posterPath: r.poster_path,
     voteAverage: r.vote_average || null,
+    /* Carried so a person page can tell a career from a talk-show appearance.
+       §05: appearing on Fallon is not a body of work, and the popularity
+       signal says otherwise unless those genres are taken out of it. */
+    genreIds: r.genre_ids || [],
 });
 
 /**
@@ -279,6 +330,39 @@ export function toTitleView(raw, mediaType, region) {
         episodeCount: isTV ? raw.number_of_episodes : null,
         airedEpisodes: isTV ? airedEpisodeCount(raw) : null,
         status: raw.status || null,
+        /* The four discriminators the title design sampled TMDB to find. `type`
+           singles out a miniseries, `status` separates returning from ended,
+           and in_production with next_episode_to_air together separate
+           "back next Friday" from "coming back, nobody knows when" — which is
+           a real and common state, and the one the first design missed. */
+        type: isTV ? raw.type || null : null,
+        inProduction: isTV ? Boolean(raw.in_production) : null,
+        nextEpisode: raw.next_episode_to_air
+            ? {
+                season: raw.next_episode_to_air.season_number,
+                number: raw.next_episode_to_air.episode_number,
+                name: raw.next_episode_to_air.name || null,
+                airDate: raw.next_episode_to_air.air_date || null,
+            }
+            : null,
+        /* Already in the response — external_ids rides the same request — and
+           the key to every Wikipedia article about this thing, in any language.
+           §04. */
+        wikidataId: raw.external_ids?.wikidata_id || null,
+        /* Band 4. Fetched on every load since Milestone 1 and drawn nowhere —
+           the main decision aid for "should I watch this", and it was the
+           biggest single omission in the first design too. Official trailers
+           only, newest first, and a teaser rather than nothing. */
+        trailer: trailerFrom(raw.videos?.results),
+        /* Band 11. Films only, and independent of released/upcoming — an
+           unreleased film can belong to a collection. */
+        collection: raw.belongs_to_collection
+            ? { id: raw.belongs_to_collection.id, name: raw.belongs_to_collection.name }
+            : null,
+        /* The full date, not just the year: an unreleased title's date is the
+           headline rather than a footnote, and "2026" is not a headline. */
+        releaseDate: raw.release_date || raw.first_air_date || null,
+        lastAirDate: isTV ? raw.last_air_date || null : null,
         // Carried along so saving never needs a second fetch of what we have.
         catalog: toCatalog(raw, mediaType),
     };
@@ -289,6 +373,14 @@ export function toSeasonView(raw) {
     return {
         seasonNumber: raw.season_number,
         name: raw.name,
+        /* TV9: the band header takes the season's identity, which is what a
+           season page would have been for. Seasons exist with no poster and no
+           air date — the header is a name and a count, and artwork is
+           decoration whose absence changes nothing. */
+        airDate: raw.air_date || null,
+        year: raw.air_date ? String(raw.air_date).slice(0, 4) : null,
+        overview: raw.overview?.trim() || null,
+        poster: posterUrl(raw.poster_path, 'w185'),
         episodes: (raw.episodes || []).map((e) => ({
             id: e.id,
             number: e.episode_number,
@@ -302,6 +394,12 @@ export function toSeasonView(raw) {
             voteAverage: e.vote_average ? Number(e.vote_average).toFixed(1) : null,
             still: stillUrl(e.still_path),
             overview: e.overview?.trim() || null,
+            /* For the episode sheet. Six is what fits before the sheet becomes
+               a cast list, and a guest star list longer than that is a crowd
+               scene rather than a fact about the episode. */
+            guests: (e.guest_stars || []).slice(0, 6).map((g) => ({
+                id: g.id, name: g.name, character: g.character || null,
+            })),
         })),
     };
 }
@@ -360,13 +458,18 @@ function notableCredits(list) {
  * Hans Zimmer has no Director or Writer credits and his cast credits are all
  * "Self", so his filmography came out empty behind a biography.
  */
+/* `label` is what somebody DID, not what they are. §05 allows no job title on a
+   person page — not a badge, not a subtitle, and not a filter chip either,
+   which is where they had survived: the chips read "Director" and "Writer".
+   The old nouns are gone; anything that needs to name the job for a different
+   reason (a cast row on a title page) uses `job` from the credit itself. */
 const ROLES = [
-    { key: 'director', label: 'Director', verb: 'directed', jobs: ['Director'] },
-    { key: 'creator', label: 'Creator', verb: 'created', jobs: ['Creator'] },
-    { key: 'writer', label: 'Writer', verb: 'written', jobs: ['Writer', 'Screenplay'] },
-    { key: 'composer', label: 'Composer', verb: 'scored', jobs: ['Original Music Composer'] },
-    { key: 'camera', label: 'Cinematographer', verb: 'shot', jobs: ['Director of Photography'] },
-    { key: 'cast', label: 'Cast', verb: 'acted in', jobs: null },
+    { key: 'director', label: 'Directed', verb: 'directed', jobs: ['Director'] },
+    { key: 'creator', label: 'Created', verb: 'created', jobs: ['Creator'] },
+    { key: 'writer', label: 'Wrote', verb: 'written', jobs: ['Writer', 'Screenplay'] },
+    { key: 'composer', label: 'Scored', verb: 'scored', jobs: ['Original Music Composer'] },
+    { key: 'camera', label: 'Shot', verb: 'shot', jobs: ['Director of Photography'] },
+    { key: 'cast', label: 'Acted in', verb: 'acted in', jobs: null },
 ];
 
 /** Which role a stored credit belongs to, so a card can find its denominator. */
@@ -386,6 +489,18 @@ export function roleForJob(role, job) {
  * Director for a director, Cast for an actor, and Composer for a composer,
  * without needing a rule for each.
  */
+/** Every released credit once, however many jobs it was under. */
+function countCredits(credits) {
+    const seen = new Set();
+    const today = new Date().toISOString().slice(0, 10);
+    for (const c of [...(credits.cast || []), ...(credits.crew || [])]) {
+        const d = dateOf(c);
+        if (!d || d > today || isSelf(c)) continue;
+        seen.add(`${c.media_type}-${c.id}`);
+    }
+    return seen.size;
+}
+
 export function toPersonView(raw) {
     const credits = raw.combined_credits || {};
 
@@ -406,16 +521,24 @@ export function toPersonView(raw) {
     };
 
     const roles = ROLES.map(build)
-        // A role with nothing left after filtering shows no tab. An empty grid
-        // behind a tab that promised a count is worse than no tab.
-        .filter((r) => r.items.length)
-        .sort((a, b) => b.items.length - a.items.length);
+        // A role with nothing left after filtering shows no chip. An empty grid
+        // behind a chip that promised a count is worse than no chip.
+        .filter((r) => r.items.length);
 
     return {
         id: raw.id,
         name: raw.name,
         department: raw.known_for_department || null,
         photo: profileUrl(raw.profile_path, 'h632'),
+        /* The whole career, before the relevance filter thins it for display.
+           "Credits 10" for Denis Villeneuve is visibly wrong to anybody who
+           knows the work, and the filter exists to keep a grid readable rather
+           than to decide what somebody has done. */
+        creditCount: countCredits(credits),
+        /* §04's work, used here for the one thing no computed label beats: a
+           line a human wrote. "American filmmaker and actress" answers in five
+           words what two algorithms could not. */
+        wikidataId: raw.external_ids?.wikidata_id || null,
         biography: raw.biography?.trim() || null,
         birthday: raw.birthday || null,
         deathday: raw.deathday || null,

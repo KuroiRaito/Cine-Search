@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import './title.css';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { titleFull, season as fetchSeason } from '../../shared/tmdb/endpoints.js';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { titleFull, season as fetchSeason, collection as fetchCollection } from '../../shared/tmdb/endpoints.js';
 import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
+import { wikiSummary } from '../../shared/wiki/wiki.js';
 import { useRegion } from '../../shared/hooks/useRegion.js';
 import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, Icon, initialsOf } from '../../shared/ui/index.js';
 import { TitleSkeleton } from './TitleSkeleton.jsx';
@@ -15,6 +16,11 @@ import {
     statusMeta, statusTone, episodesWatched, isWatched, runningOrder, nextUnwatched,
     rememberSeasonRuntime,
 } from '../library';
+import {
+    cohortOf, shows, leadsWithDate, longDate, yearsOf, primaryFor, seriesNote,
+    NOT_PREMIERED, FINISHED,
+} from './cohort.js';
+import { orderTabs, tabLabel, tabCount, seasonTitle, episodeName } from './seasons.js';
 
 const displayName = (type, code) => {
     if (!code) return null;
@@ -53,6 +59,29 @@ export default function Title() {
     const { region } = useRegion();
     const [expanded, setExpanded] = useState(false);
     const [openCard, setOpenCard] = useState(null);
+    /* §03b: ?season=2 deep-links with that tab selected, which is most of what
+       a season page would have bought — for a query parameter rather than a
+       route, a layout and a back-stack entry. Replaced rather than pushed, so
+       tapping through six seasons does not bury the page somebody came from.
+
+       Absent until somebody picks. Until then the band follows progress:
+       landing on season 21 of 24 with the row showing S1–S4 is the failure the
+       tabs exist to prevent. */
+    const [params, setParams] = useSearchParams();
+    /* Read as a string first. Number(null) is 0, and 0 is a real season — the
+       specials — so treating "absent" as a number silently landed every arrival
+       on Specials, which §03b says must never be first. */
+    const raw = params.get('season');
+    const asked = raw === null ? null : Number(raw);
+    const picked = asked !== null && Number.isInteger(asked) && asked >= 0 ? asked : null;
+    const setPicked = (n) => {
+        const next = new URLSearchParams(params);
+        next.set('season', String(n));
+        setParams(next, { replace: true });
+    };
+    const [jumpTo, setJumpTo] = useState(null);
+    const [stores, setStores] = useState(false);
+    const [playing, setPlaying] = useState(false);
     const [prompt, setPrompt] = useState(null);
     const [editing, setEditing] = useState(false);
     const [toast, setToast] = useState(null);
@@ -68,6 +97,34 @@ export default function Title() {
         ({ signal }) => titleFull(id, mediaType, { signal }).then((raw) => toTitleView(raw, mediaType, region)),
         [id, mediaType, region],
         { skip: !valid },
+    );
+
+    /* Derived above the early returns, because the season fetch below is a hook
+       and a hook cannot sit behind a `return`. Everything here tolerates `data`
+       being null, which is the state the skeleton is drawn in. */
+    const tvNow = data?.mediaType === 'tv';
+    const entryNow = data ? lib.entryFor(data.mediaType, data.id) : null;
+    const orderNow = tvNow ? runningOrder(data.seasons, data.airedEpisodes) : [];
+    const nextNow = tvNow ? nextUnwatched(orderNow, entryNow?.watched_episodes) : null;
+    const season = picked ?? nextNow?.season ?? data?.seasons?.[0]?.season_number ?? 1;
+
+    /* The season the page is showing, fetched here rather than inside the
+       episode band: the band draws it, but the primary button needs a name out
+       of it — "next up Breakage" is an episode title, and only this payload
+       knows it. */
+    /* §04. Never awaited by anything the page needs: it resolves to null on
+       any failure, and two series in three have no article at all. The page is
+       complete without it and says nothing about its absence. */
+    const wiki = useAsync(
+        ({ signal }) => wikiSummary(data?.wikidataId, { signal }),
+        [data?.wikidataId],
+        { skip: !data?.wikidataId },
+    ).data;
+
+    const seasonAsync = useAsync(
+        ({ signal }) => fetchSeason(data.id, season, { signal }).then(toSeasonView),
+        [data?.id, season],
+        { skip: !tvNow },
     );
 
     if (!valid) {
@@ -90,8 +147,8 @@ export default function Title() {
     }
 
     const t = data;
-    const isTV = t.mediaType === 'tv';
-    const entry = lib.entryFor(t.mediaType, t.id);
+    const isTV = tvNow;
+    const entry = entryNow;
     const saved = Boolean(entry);
     const state = entry ? statusMeta(entry.status) : null;
 
@@ -111,8 +168,19 @@ export default function Title() {
     };
     const primaryVerb = isTV ? 'track' : 'want';
 
-    const order = isTV ? runningOrder(t.seasons, t.airedEpisodes) : [];
+    const order = orderNow;
     const seen = episodesWatched(entry?.watched_episodes);
+
+    /* One reading of the data, and everything below asks it rather than
+       re-deriving its own answer from t.status. */
+    const cohort = cohortOf(t);
+    const next = nextNow;
+    /* The name only exists when the loaded season is the one the next episode
+       is in. When it is not, the button says where without saying what — which
+       is still true, and better than waiting for a second request to say it. */
+    const nextNamed = next && seasonAsync.data?.seasonNumber === next.season
+        ? { ...next, name: seasonAsync.data.episodes.find((e) => e.number === next.episode)?.name || null }
+        : next;
 
     const quickSave = async () => {
         const ok = await lib.save(t, { status: 'want_to_watch' });
@@ -151,12 +219,41 @@ export default function Title() {
     const makers = t.crew.filter((c) => c.job === 'Director' || c.job === 'Creator');
     const lang = languageName(t.originalLanguage);
 
-    const meta = [t.year, t.genres.join(', '), t.runtime,
-        isTV && `${t.seasonCount} season${t.seasonCount === 1 ? '' : 's'}`].filter(Boolean).join(' · ');
+    /* A series is a run, and the run says whether it is over: "2022–" is still
+       going, "2008–2013" is not. A cohort that has not premiered has a season
+       count that describes nothing yet, so it does not carry one. */
+    const headline = leadsWithDate(cohort)
+        ? `${isTV ? 'First episode' : 'In cinemas'} ${longDate(t.releaseDate) || 'date to be announced'}`
+        : null;
+    const meta = [
+        !headline && yearsOf(t, cohort),
+        t.runtime,
+        isTV && cohort !== NOT_PREMIERED && `${t.seasonCount} season${t.seasonCount === 1 ? '' : 's'}`,
+        isTV && cohort !== NOT_PREMIERED && `${t.episodeCount} episodes`,
+        isTV && cohort === FINISHED && (t.status === 'Canceled' || t.status === 'Cancelled' ? 'Cancelled' : 'Ended'),
+        t.genres.join(', ') || null,
+    ].filter(Boolean).join(' · ');
 
     // Every control a guest can reach raises the sign-in sheet. They stay
     // visible rather than hidden: concealing them would hide the product from
     // exactly the people who haven't seen it yet.
+    /* Band 2. Five cohorts, five different buttons, one position — somebody
+       arriving at a series from Search and a film from their library finds the
+       thing they came to do in the same place on both. */
+    const primary = primaryFor(t, cohort, {
+        saved, statusLabel: state?.label, seen, aired: t.airedEpisodes, next: nextNamed,
+    });
+    const note = isTV ? seriesNote(t, cohort) : null;
+
+    /* "Continue · S2 E5" goes to S2 E5. A button that names an episode and then
+       opens a status editor is naming something it does not do. */
+    const continueToNext = () => {
+        if (!next) return;
+        setPicked(next.season);
+        setJumpTo({ ...next, at: Date.now() });
+    };
+    const isContinue = isTV && Boolean(next) && !primary.standalone && !primary.saved;
+
     const actions = (
         <>
             <div className={`arow ${statusTone(entry?.status)}`}>
@@ -167,11 +264,14 @@ export default function Title() {
                 <button
                     type="button"
                     className={`spill${saved ? ' set' : ''}`}
-                    onClick={() => gate(saved ? 'edit' : primaryVerb, () => (saved ? setEditing(true) : quickSave()))}
+                    onClick={() => (isContinue
+                        ? continueToNext()
+                        : gate(saved ? 'edit' : primaryVerb, () => (saved ? setEditing(true) : quickSave())))}
                 >
-                    {saved
-                        ? <>{state?.icon && <Icon name={state.icon} size={16} />} {state?.label} <Icon name="down" size={16} /></>
-                        : (isTV ? 'Track this series' : <><Icon name="add" size={16} /> Want to watch</>)}
+                    {primary.saved && state?.icon && <Icon name={state.icon} size={16} />}
+                    {!saved && !isTV && !primary.standalone && <Icon name="add" size={16} />}
+                    {primary.label}
+                    {primary.saved && <Icon name="down" size={16} />}
                 </button>
                 <button
                     type="button"
@@ -188,33 +288,68 @@ export default function Title() {
                 ><Icon name="edit" size={20} /></button>
             </div>
 
-            {/* Episodes, never seasons: "3 of 5 seasons" hides that season three
-                is twenty-two episodes long. */}
-            {isTV && saved && order.length > 0 && (
+            {/* §03d: the verb takes the button, the detail goes underneath on
+                the line that already states progress. Stacking a label over a
+                caption made the control read as two controls in a box.
+
+                Episodes, never seasons: "3 of 5 seasons" hides that season
+                three is twenty-two episodes long. */}
+            {isTV && saved && shows(cohort, 'progress') && primary.detail && (
                 <div className="prg">
-                    <div className="prg-h">
-                        <span>Progress</span>
-                        <b>{seen} of {order.length}</b>
-                    </div>
-                    <div className="prg-bar">
-                        <i style={{ width: `${Math.round((seen / order.length) * 100)}%` }} />
-                    </div>
+                    <div className="prg-h"><span>{primary.detail}</span></div>
+                    {order.length > 0 && !primary.standalone && (
+                        <div className="prg-bar">
+                            <i style={{ width: `${Math.round((seen / order.length) * 100)}%` }} />
+                        </div>
+                    )}
                 </div>
             )}
 
+            {note && <p className="snote">{note}</p>}
+
+        </>
+    );
+
+    /* §03 bands 4 and 5, in that order — which is why they are here rather
+       than in the action rail. Where to watch used to live inside `actions`,
+       so on a phone it drew before the trailer: band 5 above band 4. The rail
+       is the actions; these are content, and TS14's desktop column split is
+       what the rail is for. */
+    const watchHere = (
+        <>
+            {/* §03c. Two rows, not six: the three-tier draft pushed the scores,
+                your rating and the synopsis below the fold on a 320px screen,
+                which is the richest data on the page losing its place to a
+                list of shops. Streaming is one row; rent is one chip. */}
+            {shows(cohort, 'providers') && (
             <div className="prov">
                 <div className="prov-l">Where to watch · {countryName(t.providers.region)}</div>
                 {t.providers.any ? (
-                    <div className="provrow">
-                        {[...t.providers.flatrate, ...t.providers.rent, ...t.providers.buy]
-                            .filter((p, i, all) => all.findIndex((x) => x.id === p.id) === i)
-                            .slice(0, 6)
-                            .map((p) => (
-                                <span className="pchip" key={p.id}>
-                                    {p.logo && <img className="plogo" src={p.logo} alt="" loading="lazy" />}{p.name}
-                                </span>
-                            ))}
-                    </div>
+                    <>
+                        {t.providers.streaming.length > 0 && (
+                            <div className="provrow">
+                                {t.providers.streaming.map((p) => (
+                                    <span className="pchip" key={p.id}>
+                                        {p.logo && <img className="plogo" src={p.logo} alt="" loading="lazy" />}
+                                        {p.name}
+                                        {p.note && <i className="pnote">{p.note}</i>}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                        {/* Seven storefronts for Oppenheimer in the US, and the
+                            same seven for nearly everything. A list adds nothing
+                            a count does not. */}
+                        {t.providers.paid.length > 0 && (
+                            <button type="button" className="pchip paid" onClick={() => setStores(true)}>
+                                Rent or buy · {t.providers.paid.length}
+                                <Icon name="forward" size={16} />
+                            </button>
+                        )}
+                        {t.providers.streaming.length === 0 && (
+                            <p className="prov-none">Not streaming in {countryName(t.providers.region)}.</p>
+                        )}
+                    </>
                 ) : (
                     <p className="prov-none">
                         Not available in {countryName(t.providers.region)}.
@@ -222,6 +357,7 @@ export default function Title() {
                     </p>
                 )}
             </div>
+            )}
 
             {makers.length > 0 && (
                 <div className="prov">
@@ -306,8 +442,10 @@ export default function Title() {
 
     return (
         <div className="page">
-            <div className="hero">
-                {t.backdrop && <img src={t.backdrop} alt="" fetchPriority="high" />}
+            <div className={`hero${!t.backdrop && !t.poster ? ' noart' : ''}`}>
+                {t.backdrop
+                    ? <img src={t.backdrop} alt="" fetchPriority="high" />
+                    : t.poster && <img className="fromposter" src={t.poster} alt="" fetchPriority="high" />}
                 <div className="hero-nav">
                     <button type="button" className="circ on-image" onClick={() => navigate(-1)} aria-label="Back"><Icon name="back" size={24} /></button>
                 </div>
@@ -320,16 +458,53 @@ export default function Title() {
                 </div>
 
                 <div className="thead">
-                    <h1>{t.title}</h1>
+                    <h1 title={t.title}>{t.title}</h1>
                     <div className="metaline">
                         {t.certification && <span className="cert">{t.certification}</span>}{meta}
                     </div>
-                    {t.tagline && <p className="tagline">“{t.tagline}”</p>}
+                    {/* §04: one human-written line that says what a thing is.
+                        TMDB has no equivalent — it has genres and a marketing
+                        synopsis. Absent for most series, and nothing marks the
+                        absence. */}
+                    {wiki?.description && <p className="wdesc">{wiki.description}</p>}
+                    {headline && <p className="headline">{headline}</p>}
+                    {/* The tagline yields to the description. Both are one
+                        muted line under the title, and only one of them is a
+                        fact: "2024 film by Denis Villeneuve" against "Long live
+                        the fighters". Undesigned furniture, kept for the titles
+                        where Wikipedia has nothing. */}
+                    {t.tagline && !headline && !wiki?.description && <p className="tagline">“{t.tagline}”</p>}
                 </div>
 
                 <div className="tbody">
                     <div className="tside-inline">{actions}</div>
 
+                    {/* Band 4. A 16:9 still with a play control, never an
+                        autoplaying embed — the frame is the decision aid, and
+                        sound starting by itself on somebody's commute is not.
+                        It plays when it is asked to and not before. */}
+                    {t.trailer && shows(cohort, 'providers') && (
+                        <div className="trailer">
+                            {playing ? (
+                                <iframe
+                                    src={`https://www.youtube-nocookie.com/embed/${t.trailer.key}?autoplay=1`}
+                                    title={t.trailer.name}
+                                    allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+                                    allowFullScreen
+                                />
+                            ) : (
+                                <button type="button" className="tplay" onClick={() => setPlaying(true)}>
+                                    <img src={t.trailer.still} alt="" loading="lazy" />
+                                    <span className="tplay-b"><Icon name="watching" size={24} /></span>
+                                    <span className="tplay-l">{t.trailer.name}</span>
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="tbelow">{watchHere}</div>
+
+                    {shows(cohort, 'scores') && (
                     <div className="scores">
                         <div className="s gold">
                             <b>{t.voteAverage || '—'}</b>
@@ -339,35 +514,82 @@ export default function Title() {
                             interesting number. */}
                         <div className={`s${entry?.rating != null ? ' gold' : ' dim'}`}>
                             <b>{entry?.rating ?? '—'}</b>
-                            <span className="lbl-short">Yours</span>
-                            <span className="lbl-long">Your score</span>
+                            <span>Your rating</span>
                         </div>
                         <div className={`s${entry?.rewatch_count ? '' : ' dim'}`}>
                             <b>{entry?.rewatch_count || '—'}</b>
                             <span>Rewatches</span>
                         </div>
                     </div>
+                    )}
 
-                    {t.overview && (
-                        <div className="sect">
-                            <div className="sect-h"><span>Overview</span></div>
-                            <p className={`ov${expanded ? '' : ' clamped'}`}>{t.overview}</p>
-                            <button type="button" className="more" onClick={() => setExpanded((v) => !v)}>
-                                {expanded ? 'Less' : 'More'}
-                            </button>
+                    {/* Band 7. notes and recommended_by are both stored and
+                        were shown on no screen — the same hole the library
+                        document found. Present only when set, and nothing
+                        marks the absence. */}
+                    {(entry?.notes || entry?.recommended_by) && (
+                        <div className="sect ynote">
+                            <div className="sect-h"><span>Your note</span></div>
+                            {entry.notes && <p className="ynote-t">{entry.notes}</p>}
+                            {entry.recommended_by && <p className="ynote-f">From {entry.recommended_by}</p>}
                         </div>
                     )}
 
-                    {cards}
+                    {(t.overview || wiki?.extract) && shows(cohort, 'overview') && (
+                        <div className="sect">
+                            <div className="sect-h"><span>Overview</span></div>
+                            {t.overview && <>
+                                <p className={`ov${expanded ? '' : ' clamped'}`}>{t.overview}</p>
+                                <button type="button" className="more" onClick={() => setExpanded((v) => !v)}>
+                                    {expanded ? 'Less' : 'More'}
+                                </button>
+                            </>}
+                            {/* Two voices, not one merged one. TMDB sells the
+                                film; Wikipedia describes it. Somebody who has
+                                read the synopsis and still does not know what
+                                the thing is gets an answer.
 
-                    {isTV && (
+                                Attributed rather than absorbed, and that is a
+                                requirement rather than a courtesy: the text is
+                                CC BY-SA, and it is user-edited, so it is
+                                labelled as Wikipedia's words and never ours. */}
+                            {wiki?.extract && (
+                                <div className="wbg">
+                                    <div className="prov-l">Background · from Wikipedia</div>
+                                    <p className="ov">{wiki.extract}</p>
+                                    {wiki.url && (
+                                        <a className="more" href={wiki.url} target="_blank" rel="noreferrer noopener">
+                                            Read on Wikipedia
+                                        </a>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Band 9 before band 10. The episode list is the reason a
+                        series page exists; it used to sit below four preview
+                        cards, which put "Themes" above "what do I watch next". */}
+                    {isTV && shows(cohort, 'episodes') && (
                         <Episodes
                             title={t}
                             entry={entry}
+                            season={season}
+                            onSeason={setPicked}
+                            jumpTo={jumpTo}
+                            onJumped={() => setJumpTo(null)}
+                            state={seasonAsync}
                             onTick={tickEpisode}
                             onMarkSeason={markSeason}
                         />
                     )}
+
+                    {cards}
+
+                    {/* Band 11. Films only, and independent of the cohort — an
+                        unreleased film can belong to a collection, which is
+                        often the only thing there is to say about it. */}
+                    {t.collection && <Collection collection={t.collection} lib={lib} stateFor={stateFor} onAdd={quickAdd} />}
 
                     {t.related.length > 0 && (
                         <div className="sect">
@@ -384,6 +606,14 @@ export default function Title() {
                 <aside className="tside">{actions}</aside>
             </div>
 
+            {stores && (
+                <StoreSheet
+                    region={countryName(t.providers.region)}
+                    stores={t.providers.paid}
+                    link={t.providers.link}
+                    onClose={() => setStores(false)}
+                />
+            )}
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
             {editing && <Editor title={t} onClose={() => setEditing(false)} />}
             <Toast
@@ -396,17 +626,77 @@ export default function Title() {
     );
 }
 
-function Episodes({ title, entry, onTick, onMarkSeason }) {
+/**
+ * The storefronts, behind a count.
+ *
+ * §03c keeps this off the page because the list is the same nearly everywhere —
+ * and because putting it inline is what pushed the scores and the synopsis
+ * below the fold at 320. No prices: TMDB does not carry them, and a made-up
+ * "from £3.49" on a page somebody acts on is the one failure here that costs
+ * them money.
+ */
+function StoreSheet({ region, stores, link, onClose }) {
+    useEffect(() => {
+        const opener = document.activeElement;
+        const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            if (opener instanceof HTMLElement && document.contains(opener)) opener.focus();
+        };
+    }, [onClose]);
+
+    return (
+        <div className="scrim" role="dialog" aria-modal="true" aria-label="Rent or buy" onClick={onClose}>
+            <div className="sheet" onClick={(e) => e.stopPropagation()}>
+                <div className="grab" />
+                <h2 className="sheet-title">Rent or buy</h2>
+                <p className="sheet-body">{stores.length} places in {region}. Prices are not ours to quote.</p>
+                <div className="storelist">
+                    {stores.map((p) => (
+                        <span className="pchip" key={p.id}>
+                            {p.logo && <img className="plogo" src={p.logo} alt="" loading="lazy" />}{p.name}
+                        </span>
+                    ))}
+                </div>
+                {link && (
+                    <a className="btn quiet storelink" href={link} target="_blank" rel="noreferrer noopener">
+                        See them on TMDB
+                    </a>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onTick, onMarkSeason }) {
     const { isSignedIn, authReady } = useAuth();
     const [prompt, setPrompt] = useState(null);
-    const tabs = [...title.seasons, ...(title.specials ? [title.specials] : [])];
-    const [active, setActive] = useState(tabs[0]?.season_number ?? 1);
+    const [open, setOpen] = useState(null);
+    const tabs = orderTabs(title.seasons, title.specials);
+    const active = season;
+    const { data, error, loading, retry } = state;
+    const row = useRef(null);
 
-    const load = useCallback(
-        ({ signal }) => fetchSeason(title.id, active, { signal }).then(toSeasonView),
-        [title.id, active],
-    );
-    const { data, error, loading, retry } = useAsync(load, [title.id, active]);
+    /* Grey's Anatomy has 24 seasons. Landing on season 21 with the row showing
+       S1–S4 is the failure the tabs exist to prevent, so the selected one is
+       brought into view on arrival — and never a dropdown, because a dropdown
+       hides how long the show is, and how long it is happens to be the most
+       useful fact on the page. */
+    useEffect(() => {
+        const el = row.current?.querySelector('[aria-pressed="true"]');
+        el?.scrollIntoView({ block: 'nearest', inline: 'center' });
+    }, [active, tabs.length]);
+
+    /* Arriving by way of "Continue · S2 E5". The season has already changed by
+       the time this runs; wait for its episodes, then put the row somewhere a
+       person can see it. */
+    useEffect(() => {
+        if (!jumpTo || jumpTo.season !== active || !data?.episodes?.length) return;
+        document.getElementById(`ep-${active}-${jumpTo.episode}`)
+            ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        onJumped();
+    }, [jumpTo, active, data, onJumped]);
 
     // Once per season per session: the update fills a blank and never overwrites,
     // so repeating it would only cost a round trip.
@@ -445,7 +735,11 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
     return (
         <div className="sect">
             <div className="sect-h"><span>Episodes</span></div>
-            <div className="seasonsw" role="tablist" aria-label="Seasons">
+            {/* §03b: with one season there is no tab row at all — a single tab
+                is a label pretending to be a control. This is also TV5, the
+                miniseries, which needs no rule of its own to get it right. */}
+            {tabs.length > 1 && (
+            <div className="seasonsw" role="tablist" aria-label="Seasons" ref={row}>
                 {tabs.map((s) => (
                     <button
                         key={s.id ?? s.season_number}
@@ -453,29 +747,43 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
                         role="tab"
                         className="sw"
                         aria-pressed={active === s.season_number}
-                        onClick={() => setActive(s.season_number)}
+                        onClick={() => onSeason(s.season_number)}
                     >
-                        {s.season_number === 0 ? 'Specials' : `Season ${s.season_number}`}
-                        <em>{s.episode_count}</em>
+                        {tabLabel(s)}
+                        <em>{tabCount(s, watched)}</em>
                     </button>
                 ))}
             </div>
+            )}
 
-            {aired.length > 0 && (
-                <div className="sect-h markrow">
-                    {/* Per season, counted against that season. The run total is
-                        already on the progress bar above; putting "5 of 62" next
-                        to a seven-episode season measures one thing with the
-                        other thing's ruler. */}
-                    <span>
-                        {active === 0 ? 'Specials' : `Season ${active}`}
-                        {' · '}
-                        {seenHere > 0 ? `${seenHere} of ${aired.length} watched` : `${aired.length} aired`}
-                    </span>
-                    {/* Per season, never per series. */}
-                    <button type="button" className="markall" onClick={markAll}>
-                        {allSeen ? 'Clear season' : 'Mark all'}
-                    </button>
+            {/* TV9. The band header becomes the season — which is what a season
+                page would have been for, and it costs a header rather than a
+                route. Counted against this season: the run total is on the line
+                under the primary, and putting "5 of 62" beside a seven-episode
+                season measures one thing with the other thing's ruler. */}
+            {data && (
+                <div className="shead">
+                    {data.poster && <img className="sposter" src={data.poster} alt="" loading="lazy" />}
+                    <div className="sbody">
+                        <div className="sect-h markrow">
+                            <span>
+                                {[
+                                    seasonTitle({ ...data, season_number: active }),
+                                    data.year,
+                                    aired.length > 0 && (seenHere > 0
+                                        ? `${seenHere} of ${aired.length}`
+                                        : `${aired.length} aired`),
+                                ].filter(Boolean).join(' · ')}
+                            </span>
+                            {/* Per season, never per series. */}
+                            {aired.length > 0 && (
+                                <button type="button" className="markall" onClick={markAll}>
+                                    {allSeen ? 'Clear season' : 'Mark all'}
+                                </button>
+                            )}
+                        </div>
+                        {data.overview && <p className="sov">{data.overview}</p>}
+                    </div>
                 </div>
             )}
 
@@ -485,10 +793,15 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
                 {data?.episodes.map((e) => {
                     const on = isWatched(watched, active, e.number);
                     return (
-                        <div className={`eprow${e.aired ? '' : ' unaired'}`} key={e.id}>
+                        <div className={`eprow${e.aired ? '' : ' unaired'}`} key={e.id} id={`ep-${active}-${e.number}`}>
                             <div className="still">{e.still && <img src={e.still} alt="" loading="lazy" />}</div>
                             <div className="body">
-                                <div className="en">{e.number}. {e.name}</div>
+                                {/* Two targets, not one with a hotspot: the tick
+                                    marks it, the name opens it, and the rest of
+                                    the row does nothing. */}
+                                <button type="button" className="en" onClick={() => setOpen(e)}>
+                                    {e.number}. {episodeName(e)}
+                                </button>
                                 <div className="ed">
                                     {[e.airDate || 'TBA', e.runtime].filter(Boolean).join(' · ')}
                                     {e.voteAverage > 0 && <> · <span className="sc"><Icon name="star" size={12} /> {e.voteAverage}</span></>}
@@ -511,7 +824,111 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
                 {data && !data.episodes.length && <p className="prov-none">No episode information yet.</p>}
             </div>
 
+            {open && (
+                <EpisodeSheet
+                    episode={open}
+                    season={active}
+                    watched={isWatched(watched, active, open.number)}
+                    onTick={(on) => { tick(open, on); setOpen(null); }}
+                    onClose={() => setOpen(null)}
+                />
+            )}
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
+        </div>
+    );
+}
+
+/**
+ * Band 11 — the collection.
+ *
+ * "2 of 3 seen" is the only number on this page that is about a body of work
+ * rather than about one title, which is why it earns a band of its own rather
+ * than a line in the details card. Films only: a series is already its own
+ * collection, and it has an episode list.
+ *
+ * Seen means watched. A film sitting in want-to-watch is the opposite of seen,
+ * and counting it would make the fraction say the thing somebody is using it
+ * to find out.
+ */
+function Collection({ collection, lib, stateFor, onAdd }) {
+    /* endpoints.collection() already returns the films as cards — the name
+       comes from belongs_to_collection, which the title response carried. */
+    const { data } = useAsync(
+        ({ signal }) => fetchCollection(collection.id, { signal }),
+        [collection.id],
+    );
+    // Absent until it arrives, rather than a heading over a blank: the band is
+    // one request away from being complete and nothing above it depends on it.
+    if (!data?.length) return null;
+
+    const films = [...data].sort((a, b) => String(a.year || '9999').localeCompare(String(b.year || '9999')));
+    const seen = films.filter((f) => lib.entryFor('movie', f.id)?.status === 'watched').length;
+    return (
+        <div className="sect">
+            <div className="sect-h"><span>Collection</span></div>
+            <div className="coll-h">
+                <b>{collection.name}</b>
+                <span>{seen} of {films.length} seen</span>
+            </div>
+            <div className="prg-bar">
+                <i style={{ width: `${Math.round((seen / films.length) * 100)}%` }} />
+            </div>
+            <div className="rail related">
+                {films.map((f) => (
+                    <Tile key={f.id} item={f} onAdd={onAdd} state={stateFor(f)} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+/**
+ * TV10 — an episode is a sheet, not a page.
+ *
+ * You never arrive at an episode cold. You are always inside a list of
+ * sixty-two, and a page would take you out of it, costing your scroll position
+ * to show you a still and a paragraph.
+ *
+ * This is also where per-episode rating would go, and that is the point of
+ * choosing a sheet: we do not support it — rating is per title today — and it
+ * is a real product question rather than a layout one. A sheet leaves the room
+ * for it without committing to it, and without a route that would have to be
+ * un-built if the answer is no.
+ */
+function EpisodeSheet({ episode: e, season, watched, onTick, onClose }) {
+    useEffect(() => {
+        const opener = document.activeElement;
+        const onKey = (k) => { if (k.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            if (opener instanceof HTMLElement && document.contains(opener)) opener.focus();
+        };
+    }, [onClose]);
+
+    const facts = [e.airDate || 'Not aired yet', e.runtime].filter(Boolean).join(' · ');
+    return (
+        <div className="scrim" role="dialog" aria-modal="true" aria-label={episodeName(e)} onClick={onClose}>
+            <div className="sheet" onClick={(ev) => ev.stopPropagation()}>
+                <div className="grab" />
+                {e.still && <img className="epstill" src={e.still} alt="" />}
+                <h2 className="sheet-title">{episodeName(e)}</h2>
+                <p className="sheet-body">S{season} E{e.number} · {facts}</p>
+                {e.overview && <p className="epov">{e.overview}</p>}
+                {e.guests.length > 0 && (
+                    <div className="epguests">
+                        <div className="prov-l">Guest stars</div>
+                        {e.guests.map((g) => (
+                            <PersonRow key={g.id} person={g} sub={g.character} />
+                        ))}
+                    </div>
+                )}
+                {e.aired && (
+                    <button type="button" className="btn epmark" onClick={() => onTick(!watched)}>
+                        {watched ? 'Un-mark watched' : 'Mark watched'}
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

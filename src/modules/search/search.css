@@ -39,3 +39,63 @@
 .nothing-why { margin-top: var(--space-8); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }
 .nothing .btn { margin-top: var(--space-16); }
 .saidchips { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-top: var(--space-8); }
+
+/* ---- Browse: the panel, the record, and the bar ----
+
+   Two places show state and they have different jobs. The chip row above the
+   results is the record — always visible, each chip removable, nothing hidden.
+   The panel is the editor, and it is closed most of the time. */
+
+/* At rest this is the only control besides the box. It carries the active
+   count, so a closed panel never conceals a constraint. */
+.filterbtn { display: inline-flex; align-items: center; gap: var(--space-8); margin-top: var(--space-12); }
+.filterbtn em { font-style: normal; font-variant-numeric: tabular-nums; background: var(--acc); color: var(--on-beam-9); border-radius: var(--radius-full); padding: 0 var(--space-8); font-size: var(--text-micro); line-height: var(--lh-caption); }
+
+.panel { margin: var(--space-12) var(--gutter) 0; }
+.frow + .frow { margin-top: var(--space-16); }
+.frow-l {
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro);
+  letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: var(--space-8);
+}
+/* The panel supplies its own gutter, so the chip row inside it must not add a
+   second one. Same reason .grid has a flush variant. */
+.chips.flush { padding: 0; }
+
+.morefilters {
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  margin-top: var(--space-16); background: none; border: 0; padding: var(--space-8) 0;
+  font-family: var(--f-s); font-size: var(--text-body-sm); line-height: var(--lh-body-sm);
+  font-weight: 600; color: var(--acc-t); cursor: pointer; min-height: var(--control-sm);
+}
+
+/* Pinned at the bottom because it is a lens on any result set rather than a
+   constraint within one. Absent for a guest, never disabled. */
+.hideseen {
+  display: flex; align-items: center; gap: var(--space-8); margin-top: var(--space-16);
+  padding-top: var(--space-16); border-top: var(--border-hair) solid var(--bd-sub);
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--text); cursor: pointer;
+}
+
+/* A chip in the record carries its own removal. */
+.chip.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+.chip.on svg { vertical-align: middle; margin-left: var(--space-4); opacity: .7; }
+
+/* A facet that was dropped says so. Silence would be the screen answering a
+   question nobody asked. */
+.dropped {
+  margin: var(--space-12) var(--gutter) 0;
+  font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted);
+}
+
+/* The count is the feedback — 394 films becomes 41 films as the chip goes on.
+   The sort sits beside it because it changes order, not membership. */
+.bbar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-8);
+  margin: var(--space-16) var(--gutter) 0;
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted);
+}
+.bsort {
+  background: var(--surface); color: var(--text); border: var(--border-hair) solid var(--bd);
+  border-radius: var(--radius-8); padding: var(--space-4) var(--space-8);
+  font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); min-height: var(--control-sm);
+}

@@ -13,7 +13,7 @@ import Icon from './Icon.jsx';
  * module supplies both through useTileStates() and useQuickAdd(), so this
  * primitive can be drawn, designed and tested on its own.
  */
-export function Tile({ item, state, onAdd }) {
+export function Tile({ item, state, onAdd, votes = false }) {
     const press = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -33,14 +33,20 @@ export function Tile({ item, state, onAdd }) {
                         aria-label={state ? `${item.title} — ${state.label}` : `Add ${item.title}`}
                         aria-disabled={state ? true : undefined}
                         onClick={press}
-                    >{state ? state.icon : '+'}</button>
+                    >{state ? <Icon name={state.icon} size={16} /> : <Icon name="add" size={16} />}</button>
                 )}
                 {item.voteAverage > 0 && (
                     <span className="score-badge"><Icon name="star" size={16} /> {Number(item.voteAverage).toFixed(1)}</span>
                 )}
             </div>
             <div className="name">{item.title}</div>
-            <div className="meta">{item.year || '—'}</div>
+            {/* The year is never omitted on a search grid, even when it is
+                unknown — FQ21, where four results share a name and the year is
+                the only thing telling them apart. */}
+            <div className="meta">
+                {item.year || '—'}
+                {votes && item.voteCount > 0 && ` · ${item.voteCount.toLocaleString('en-GB')} votes`}
+            </div>
         </Link>
     );
 }

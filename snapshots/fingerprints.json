@@ -1,27 +1,27 @@
 {
   "discover/home@1280-dark": {
-    "elements": 759,
-    "hash": "137a2288"
+    "elements": 999,
+    "hash": "7fcf8ab8"
   },
   "discover/home@1280-light": {
-    "elements": 759,
-    "hash": "137a2288"
+    "elements": 999,
+    "hash": "7fcf8ab8"
   },
   "discover/home@390-dark": {
-    "elements": 759,
-    "hash": "b79b9cd1"
+    "elements": 999,
+    "hash": "3a804277"
   },
   "discover/home@390-light": {
-    "elements": 759,
-    "hash": "b79b9cd1"
+    "elements": 999,
+    "hash": "3a804277"
   },
   "discover/home@900-dark": {
-    "elements": 759,
-    "hash": "689e854a"
+    "elements": 999,
+    "hash": "1a6a636e"
   },
   "discover/home@900-light": {
-    "elements": 759,
-    "hash": "689e854a"
+    "elements": 999,
+    "hash": "1a6a636e"
   },
   "entry/cover@1280-dark": {
     "elements": 35,
@@ -144,28 +144,28 @@
     "hash": "c3592c72"
   },
   "person/director@1280-dark": {
-    "elements": 181,
-    "hash": "c7859894"
+    "elements": 223,
+    "hash": "b57e2314"
   },
   "person/director@1280-light": {
-    "elements": 181,
-    "hash": "c7859894"
+    "elements": 223,
+    "hash": "b57e2314"
   },
   "person/director@390-dark": {
-    "elements": 181,
-    "hash": "e2b32c60"
+    "elements": 223,
+    "hash": "ea798941"
   },
   "person/director@390-light": {
-    "elements": 181,
-    "hash": "e2b32c60"
+    "elements": 223,
+    "hash": "ea798941"
   },
   "person/director@900-dark": {
-    "elements": 181,
-    "hash": "22e47168"
+    "elements": 223,
+    "hash": "66cdc069"
   },
   "person/director@900-light": {
-    "elements": 181,
-    "hash": "22e47168"
+    "elements": 223,
+    "hash": "66cdc069"
   },
   "profile/profile@1280-dark": {
     "elements": 41,
@@ -216,75 +216,75 @@
     "hash": "cecb2f75"
   },
   "search/results@1280-dark": {
-    "elements": 145,
-    "hash": "7ce46386"
+    "elements": 172,
+    "hash": "f60967d8"
   },
   "search/results@1280-light": {
-    "elements": 145,
-    "hash": "7ce46386"
+    "elements": 172,
+    "hash": "f60967d8"
   },
   "search/results@390-dark": {
-    "elements": 145,
-    "hash": "2275e9f1"
+    "elements": 172,
+    "hash": "4b225564"
   },
   "search/results@390-light": {
-    "elements": 145,
-    "hash": "2275e9f1"
+    "elements": 172,
+    "hash": "4b225564"
   },
   "search/results@900-dark": {
-    "elements": 145,
-    "hash": "5256e5ee"
+    "elements": 172,
+    "hash": "f54cab90"
   },
   "search/results@900-light": {
-    "elements": 145,
-    "hash": "5256e5ee"
+    "elements": 172,
+    "hash": "f54cab90"
   },
   "title/film@1280-dark": {
-    "elements": 260,
-    "hash": "18403f2b"
+    "elements": 296,
+    "hash": "722a291"
   },
   "title/film@1280-light": {
-    "elements": 260,
-    "hash": "18403f2b"
+    "elements": 296,
+    "hash": "722a291"
   },
   "title/film@390-dark": {
-    "elements": 260,
-    "hash": "fc3e6c42"
+    "elements": 296,
+    "hash": "fca2b382"
   },
   "title/film@390-light": {
-    "elements": 260,
-    "hash": "fc3e6c42"
+    "elements": 296,
+    "hash": "fca2b382"
   },
   "title/film@900-dark": {
-    "elements": 260,
-    "hash": "dd69c5"
+    "elements": 296,
+    "hash": "a6edadef"
   },
   "title/film@900-light": {
-    "elements": 260,
-    "hash": "dd69c5"
+    "elements": 296,
+    "hash": "a6edadef"
   },
   "title/series@1280-dark": {
-    "elements": 346,
-    "hash": "bd10f5a5"
+    "elements": 382,
+    "hash": "c9252d73"
   },
   "title/series@1280-light": {
-    "elements": 346,
-    "hash": "bd10f5a5"
+    "elements": 382,
+    "hash": "c9252d73"
   },
   "title/series@390-dark": {
-    "elements": 346,
-    "hash": "b8b75e8d"
+    "elements": 382,
+    "hash": "925df6c5"
   },
   "title/series@390-light": {
-    "elements": 346,
-    "hash": "b8b75e8d"
+    "elements": 382,
+    "hash": "925df6c5"
   },
   "title/series@900-dark": {
-    "elements": 346,
-    "hash": "98348d26"
+    "elements": 382,
+    "hash": "ae8ec29e"
   },
   "title/series@900-light": {
-    "elements": 346,
-    "hash": "98348d26"
+    "elements": 382,
+    "hash": "ae8ec29e"
   }
 }

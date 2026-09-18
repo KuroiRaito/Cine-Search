@@ -164,6 +164,38 @@
 .keywords { display: flex; gap: var(--space-8); flex-wrap: wrap; }
 .kw { font-size: var(--text-micro); line-height: var(--lh-micro); padding: var(--space-4) var(--space-8); border-radius: var(--radius-full); background: var(--ink-3); color: var(--muted); }
 
+/* Band 4. A frame with a play control on it, and nothing that starts by
+   itself. 16:9 because that is the shape every trailer is. */
+.trailer { margin-top: var(--space-16); border-radius: var(--radius-12); overflow: hidden; background: var(--ink-4); }
+.trailer iframe { display: block; width: 100%; aspect-ratio: 16/9; border: 0; }
+.tplay {
+  display: block; position: relative; width: 100%; aspect-ratio: 16/9;
+  padding: 0; border: 0; background: none; cursor: pointer; overflow: hidden;
+}
+.tplay img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tplay::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(4,6,12,.78), transparent 58%); }
+.tplay-b {
+  position: absolute; inset: 0; margin: auto; width: var(--control-lg); height: var(--control-lg);
+  border-radius: var(--radius-full); background: var(--scrim-wash); color: var(--mar-9);
+  display: grid; place-items: center; z-index: 2;
+}
+.tplay-l {
+  position: absolute; left: var(--space-12); right: var(--space-12); bottom: var(--space-8); z-index: 2;
+  font-family: var(--f-s); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600;
+  color: var(--mar-9); text-align: left;
+  display: -webkit-box; -webkit-line-clamp: 1; line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tbelow { margin-top: var(--space-4); }
+
+/* Band 7. Your words, so they are set as words rather than as a field. */
+.ynote-t { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--text); max-width: var(--measure); }
+.ynote-f { margin-top: var(--space-4); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); }
+
+/* Band 11. */
+.coll-h { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-8); margin-bottom: var(--space-8); }
+.coll-h b { font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 700; }
+.coll-h span { font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); font-variant-numeric: tabular-nums; }
+
 .rail.related { padding-inline: 0; margin-top: var(--space-2); }
 
 /* ---------------- episodes ---------------- */

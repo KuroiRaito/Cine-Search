@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import './title.css';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { titleFull, season as fetchSeason } from '../../shared/tmdb/endpoints.js';
+import { titleFull, season as fetchSeason, collection as fetchCollection } from '../../shared/tmdb/endpoints.js';
 import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { wikiSummary } from '../../shared/wiki/wiki.js';
@@ -81,6 +81,7 @@ export default function Title() {
     };
     const [jumpTo, setJumpTo] = useState(null);
     const [stores, setStores] = useState(false);
+    const [playing, setPlaying] = useState(false);
     const [prompt, setPrompt] = useState(null);
     const [editing, setEditing] = useState(false);
     const [toast, setToast] = useState(null);
@@ -306,6 +307,16 @@ export default function Title() {
 
             {note && <p className="snote">{note}</p>}
 
+        </>
+    );
+
+    /* §03 bands 4 and 5, in that order — which is why they are here rather
+       than in the action rail. Where to watch used to live inside `actions`,
+       so on a phone it drew before the trailer: band 5 above band 4. The rail
+       is the actions; these are content, and TS14's desktop column split is
+       what the rail is for. */
+    const watchHere = (
+        <>
             {/* §03c. Two rows, not six: the three-tier draft pushed the scores,
                 your rating and the synopsis below the fold on a 320px screen,
                 which is the richest data on the page losing its place to a
@@ -466,6 +477,31 @@ export default function Title() {
                 <div className="tbody">
                     <div className="tside-inline">{actions}</div>
 
+                    {/* Band 4. A 16:9 still with a play control, never an
+                        autoplaying embed — the frame is the decision aid, and
+                        sound starting by itself on somebody's commute is not.
+                        It plays when it is asked to and not before. */}
+                    {t.trailer && shows(cohort, 'providers') && (
+                        <div className="trailer">
+                            {playing ? (
+                                <iframe
+                                    src={`https://www.youtube-nocookie.com/embed/${t.trailer.key}?autoplay=1`}
+                                    title={t.trailer.name}
+                                    allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+                                    allowFullScreen
+                                />
+                            ) : (
+                                <button type="button" className="tplay" onClick={() => setPlaying(true)}>
+                                    <img src={t.trailer.still} alt="" loading="lazy" />
+                                    <span className="tplay-b"><Icon name="watching" size={24} /></span>
+                                    <span className="tplay-l">{t.trailer.name}</span>
+                                </button>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="tbelow">{watchHere}</div>
+
                     {shows(cohort, 'scores') && (
                     <div className="scores">
                         <div className="s gold">
@@ -483,6 +519,18 @@ export default function Title() {
                             <span>Rewatches</span>
                         </div>
                     </div>
+                    )}
+
+                    {/* Band 7. notes and recommended_by are both stored and
+                        were shown on no screen — the same hole the library
+                        document found. Present only when set, and nothing
+                        marks the absence. */}
+                    {(entry?.notes || entry?.recommended_by) && (
+                        <div className="sect ynote">
+                            <div className="sect-h"><span>Your note</span></div>
+                            {entry.notes && <p className="ynote-t">{entry.notes}</p>}
+                            {entry.recommended_by && <p className="ynote-f">From {entry.recommended_by}</p>}
+                        </div>
                     )}
 
                     {(t.overview || wiki?.extract) && shows(cohort, 'overview') && (
@@ -535,6 +583,11 @@ export default function Title() {
                     )}
 
                     {cards}
+
+                    {/* Band 11. Films only, and independent of the cohort — an
+                        unreleased film can belong to a collection, which is
+                        often the only thing there is to say about it. */}
+                    {t.collection && <Collection collection={t.collection} lib={lib} stateFor={stateFor} onAdd={quickAdd} />}
 
                     {t.related.length > 0 && (
                         <div className="sect">
@@ -779,6 +832,50 @@ function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onT
                 />
             )}
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
+        </div>
+    );
+}
+
+/**
+ * Band 11 — the collection.
+ *
+ * "2 of 3 seen" is the only number on this page that is about a body of work
+ * rather than about one title, which is why it earns a band of its own rather
+ * than a line in the details card. Films only: a series is already its own
+ * collection, and it has an episode list.
+ *
+ * Seen means watched. A film sitting in want-to-watch is the opposite of seen,
+ * and counting it would make the fraction say the thing somebody is using it
+ * to find out.
+ */
+function Collection({ collection, lib, stateFor, onAdd }) {
+    /* endpoints.collection() already returns the films as cards — the name
+       comes from belongs_to_collection, which the title response carried. */
+    const { data } = useAsync(
+        ({ signal }) => fetchCollection(collection.id, { signal }),
+        [collection.id],
+    );
+    // Absent until it arrives, rather than a heading over a blank: the band is
+    // one request away from being complete and nothing above it depends on it.
+    if (!data?.length) return null;
+
+    const films = [...data].sort((a, b) => String(a.year || '9999').localeCompare(String(b.year || '9999')));
+    const seen = films.filter((f) => lib.entryFor('movie', f.id)?.status === 'watched').length;
+    return (
+        <div className="sect">
+            <div className="sect-h"><span>Collection</span></div>
+            <div className="coll-h">
+                <b>{collection.name}</b>
+                <span>{seen} of {films.length} seen</span>
+            </div>
+            <div className="prg-bar">
+                <i style={{ width: `${Math.round((seen / films.length) * 100)}%` }} />
+            </div>
+            <div className="rail related">
+                {films.map((f) => (
+                    <Tile key={f.id} item={f} onAdd={onAdd} state={stateFor(f)} />
+                ))}
+            </div>
         </div>
     );
 }

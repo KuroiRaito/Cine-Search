@@ -111,6 +111,29 @@ export function providersFor(raw, region) {
  * Season 0 (specials) is excluded - verified, Breaking Bad's number_of_episodes
  * of 62 already excludes its 9 specials.
  */
+/**
+ * One trailer, or none.
+ *
+ * Verified in §01: three official YouTube trailers for Dune: Part Two, one for
+ * Severance. Official is the filter that matters — the unofficial results are
+ * fan edits and reaction videos, which is not what "watch the trailer" means.
+ * A teaser is accepted only when there is no trailer, because a teaser is
+ * still the studio showing you the film.
+ */
+export function trailerFrom(videos) {
+    const yt = (videos || []).filter((v) => v.site === 'YouTube' && v.official && v.key);
+    const pick = yt.find((v) => v.type === 'Trailer') || yt.find((v) => v.type === 'Teaser');
+    if (!pick) return null;
+    return {
+        key: pick.key,
+        name: pick.name || 'Trailer',
+        /* hqdefault, not maxresdefault: maxres is absent for a good share of
+           videos and YouTube answers with a 404 image rather than a fallback,
+           which is a broken picture where the trailer should be. */
+        still: `https://img.youtube.com/vi/${pick.key}/hqdefault.jpg`,
+    };
+}
+
 export function airedEpisodeCount(raw) {
     const last = raw.last_episode_to_air;
     if (!last) return 0;
@@ -322,6 +345,16 @@ export function toTitleView(raw, mediaType, region) {
            the key to every Wikipedia article about this thing, in any language.
            §04. */
         wikidataId: raw.external_ids?.wikidata_id || null,
+        /* Band 4. Fetched on every load since Milestone 1 and drawn nowhere —
+           the main decision aid for "should I watch this", and it was the
+           biggest single omission in the first design too. Official trailers
+           only, newest first, and a teaser rather than nothing. */
+        trailer: trailerFrom(raw.videos?.results),
+        /* Band 11. Films only, and independent of released/upcoming — an
+           unreleased film can belong to a collection. */
+        collection: raw.belongs_to_collection
+            ? { id: raw.belongs_to_collection.id, name: raw.belongs_to_collection.name }
+            : null,
         /* The full date, not just the year: an unreleased title's date is the
            headline rather than a footnote, and "2026" is not a headline. */
         releaseDate: raw.release_date || raw.first_air_date || null,

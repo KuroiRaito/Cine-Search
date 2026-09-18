@@ -19,7 +19,8 @@
     "test:api": "node scripts/smoke-api.mjs",
     "verify": "node scripts/verify.mjs",
     "snap": "node scripts/snap.mjs",
-    "auth": "node --env-file=.env scripts/auth-cases.mjs"
+    "auth": "node --env-file=.env scripts/auth-cases.mjs",
+    "cohorts": "node scripts/title-cohorts.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",

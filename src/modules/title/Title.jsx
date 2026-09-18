@@ -15,6 +15,10 @@ import {
     statusMeta, statusTone, episodesWatched, isWatched, runningOrder, nextUnwatched,
     rememberSeasonRuntime,
 } from '../library';
+import {
+    cohortOf, shows, leadsWithDate, longDate, yearsOf, primaryFor, seriesNote,
+    NOT_PREMIERED, FINISHED,
+} from './cohort.js';
 
 const displayName = (type, code) => {
     if (!code) return null;
@@ -53,6 +57,11 @@ export default function Title() {
     const { region } = useRegion();
     const [expanded, setExpanded] = useState(false);
     const [openCard, setOpenCard] = useState(null);
+    /* Null until somebody taps a tab. Until then the band follows progress —
+       §03b: landing on season 21 of 24 with the row showing S1–S4 is the
+       failure the tabs exist to prevent. */
+    const [picked, setPicked] = useState(null);
+    const [jumpTo, setJumpTo] = useState(null);
     const [prompt, setPrompt] = useState(null);
     const [editing, setEditing] = useState(false);
     const [toast, setToast] = useState(null);
@@ -68,6 +77,25 @@ export default function Title() {
         ({ signal }) => titleFull(id, mediaType, { signal }).then((raw) => toTitleView(raw, mediaType, region)),
         [id, mediaType, region],
         { skip: !valid },
+    );
+
+    /* Derived above the early returns, because the season fetch below is a hook
+       and a hook cannot sit behind a `return`. Everything here tolerates `data`
+       being null, which is the state the skeleton is drawn in. */
+    const tvNow = data?.mediaType === 'tv';
+    const entryNow = data ? lib.entryFor(data.mediaType, data.id) : null;
+    const orderNow = tvNow ? runningOrder(data.seasons, data.airedEpisodes) : [];
+    const nextNow = tvNow ? nextUnwatched(orderNow, entryNow?.watched_episodes) : null;
+    const season = picked ?? nextNow?.season ?? data?.seasons?.[0]?.season_number ?? 1;
+
+    /* The season the page is showing, fetched here rather than inside the
+       episode band: the band draws it, but the primary button needs a name out
+       of it — "next up Breakage" is an episode title, and only this payload
+       knows it. */
+    const seasonAsync = useAsync(
+        ({ signal }) => fetchSeason(data.id, season, { signal }).then(toSeasonView),
+        [data?.id, season],
+        { skip: !tvNow },
     );
 
     if (!valid) {
@@ -90,8 +118,8 @@ export default function Title() {
     }
 
     const t = data;
-    const isTV = t.mediaType === 'tv';
-    const entry = lib.entryFor(t.mediaType, t.id);
+    const isTV = tvNow;
+    const entry = entryNow;
     const saved = Boolean(entry);
     const state = entry ? statusMeta(entry.status) : null;
 
@@ -111,8 +139,19 @@ export default function Title() {
     };
     const primaryVerb = isTV ? 'track' : 'want';
 
-    const order = isTV ? runningOrder(t.seasons, t.airedEpisodes) : [];
+    const order = orderNow;
     const seen = episodesWatched(entry?.watched_episodes);
+
+    /* One reading of the data, and everything below asks it rather than
+       re-deriving its own answer from t.status. */
+    const cohort = cohortOf(t);
+    const next = nextNow;
+    /* The name only exists when the loaded season is the one the next episode
+       is in. When it is not, the button says where without saying what — which
+       is still true, and better than waiting for a second request to say it. */
+    const nextNamed = next && seasonAsync.data?.seasonNumber === next.season
+        ? { ...next, name: seasonAsync.data.episodes.find((e) => e.number === next.episode)?.name || null }
+        : next;
 
     const quickSave = async () => {
         const ok = await lib.save(t, { status: 'want_to_watch' });
@@ -151,12 +190,41 @@ export default function Title() {
     const makers = t.crew.filter((c) => c.job === 'Director' || c.job === 'Creator');
     const lang = languageName(t.originalLanguage);
 
-    const meta = [t.year, t.genres.join(', '), t.runtime,
-        isTV && `${t.seasonCount} season${t.seasonCount === 1 ? '' : 's'}`].filter(Boolean).join(' · ');
+    /* A series is a run, and the run says whether it is over: "2022–" is still
+       going, "2008–2013" is not. A cohort that has not premiered has a season
+       count that describes nothing yet, so it does not carry one. */
+    const headline = leadsWithDate(cohort)
+        ? `${isTV ? 'First episode' : 'In cinemas'} ${longDate(t.releaseDate) || 'date to be announced'}`
+        : null;
+    const meta = [
+        !headline && yearsOf(t, cohort),
+        t.runtime,
+        isTV && cohort !== NOT_PREMIERED && `${t.seasonCount} season${t.seasonCount === 1 ? '' : 's'}`,
+        isTV && cohort !== NOT_PREMIERED && `${t.episodeCount} episodes`,
+        isTV && cohort === FINISHED && (t.status === 'Canceled' || t.status === 'Cancelled' ? 'Cancelled' : 'Ended'),
+        t.genres.join(', ') || null,
+    ].filter(Boolean).join(' · ');
 
     // Every control a guest can reach raises the sign-in sheet. They stay
     // visible rather than hidden: concealing them would hide the product from
     // exactly the people who haven't seen it yet.
+    /* Band 2. Five cohorts, five different buttons, one position — somebody
+       arriving at a series from Search and a film from their library finds the
+       thing they came to do in the same place on both. */
+    const primary = primaryFor(t, cohort, {
+        saved, statusLabel: state?.label, seen, aired: t.airedEpisodes, next: nextNamed,
+    });
+    const note = isTV ? seriesNote(t, cohort) : null;
+
+    /* "Continue · S2 E5" goes to S2 E5. A button that names an episode and then
+       opens a status editor is naming something it does not do. */
+    const continueToNext = () => {
+        if (!next) return;
+        setPicked(next.season);
+        setJumpTo({ ...next, at: Date.now() });
+    };
+    const isContinue = isTV && Boolean(next) && !primary.standalone && !primary.saved;
+
     const actions = (
         <>
             <div className={`arow ${statusTone(entry?.status)}`}>
@@ -167,11 +235,14 @@ export default function Title() {
                 <button
                     type="button"
                     className={`spill${saved ? ' set' : ''}`}
-                    onClick={() => gate(saved ? 'edit' : primaryVerb, () => (saved ? setEditing(true) : quickSave()))}
+                    onClick={() => (isContinue
+                        ? continueToNext()
+                        : gate(saved ? 'edit' : primaryVerb, () => (saved ? setEditing(true) : quickSave())))}
                 >
-                    {saved
-                        ? <>{state?.icon && <Icon name={state.icon} size={16} />} {state?.label} <Icon name="down" size={16} /></>
-                        : (isTV ? 'Track this series' : <><Icon name="add" size={16} /> Want to watch</>)}
+                    {primary.saved && state?.icon && <Icon name={state.icon} size={16} />}
+                    {!saved && !isTV && !primary.standalone && <Icon name="add" size={16} />}
+                    {primary.label}
+                    {primary.saved && <Icon name="down" size={16} />}
                 </button>
                 <button
                     type="button"
@@ -188,20 +259,26 @@ export default function Title() {
                 ><Icon name="edit" size={20} /></button>
             </div>
 
-            {/* Episodes, never seasons: "3 of 5 seasons" hides that season three
-                is twenty-two episodes long. */}
-            {isTV && saved && order.length > 0 && (
+            {/* §03d: the verb takes the button, the detail goes underneath on
+                the line that already states progress. Stacking a label over a
+                caption made the control read as two controls in a box.
+
+                Episodes, never seasons: "3 of 5 seasons" hides that season
+                three is twenty-two episodes long. */}
+            {isTV && saved && shows(cohort, 'progress') && primary.detail && (
                 <div className="prg">
-                    <div className="prg-h">
-                        <span>Progress</span>
-                        <b>{seen} of {order.length}</b>
-                    </div>
-                    <div className="prg-bar">
-                        <i style={{ width: `${Math.round((seen / order.length) * 100)}%` }} />
-                    </div>
+                    <div className="prg-h"><span>{primary.detail}</span></div>
+                    {order.length > 0 && !primary.standalone && (
+                        <div className="prg-bar">
+                            <i style={{ width: `${Math.round((seen / order.length) * 100)}%` }} />
+                        </div>
+                    )}
                 </div>
             )}
 
+            {note && <p className="snote">{note}</p>}
+
+            {shows(cohort, 'providers') && (
             <div className="prov">
                 <div className="prov-l">Where to watch · {countryName(t.providers.region)}</div>
                 {t.providers.any ? (
@@ -222,6 +299,7 @@ export default function Title() {
                     </p>
                 )}
             </div>
+            )}
 
             {makers.length > 0 && (
                 <div className="prov">
@@ -324,12 +402,14 @@ export default function Title() {
                     <div className="metaline">
                         {t.certification && <span className="cert">{t.certification}</span>}{meta}
                     </div>
-                    {t.tagline && <p className="tagline">“{t.tagline}”</p>}
+                    {headline && <p className="headline">{headline}</p>}
+                    {t.tagline && !headline && <p className="tagline">“{t.tagline}”</p>}
                 </div>
 
                 <div className="tbody">
                     <div className="tside-inline">{actions}</div>
 
+                    {shows(cohort, 'scores') && (
                     <div className="scores">
                         <div className="s gold">
                             <b>{t.voteAverage || '—'}</b>
@@ -346,8 +426,9 @@ export default function Title() {
                             <span>Rewatches</span>
                         </div>
                     </div>
+                    )}
 
-                    {t.overview && (
+                    {t.overview && shows(cohort, 'overview') && (
                         <div className="sect">
                             <div className="sect-h"><span>Overview</span></div>
                             <p className={`ov${expanded ? '' : ' clamped'}`}>{t.overview}</p>
@@ -360,10 +441,15 @@ export default function Title() {
                     {/* Band 9 before band 10. The episode list is the reason a
                         series page exists; it used to sit below four preview
                         cards, which put "Themes" above "what do I watch next". */}
-                    {isTV && (
+                    {isTV && shows(cohort, 'episodes') && (
                         <Episodes
                             title={t}
                             entry={entry}
+                            season={season}
+                            onSeason={setPicked}
+                            jumpTo={jumpTo}
+                            onJumped={() => setJumpTo(null)}
+                            state={seasonAsync}
                             onTick={tickEpisode}
                             onMarkSeason={markSeason}
                         />
@@ -398,17 +484,22 @@ export default function Title() {
     );
 }
 
-function Episodes({ title, entry, onTick, onMarkSeason }) {
+function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onTick, onMarkSeason }) {
     const { isSignedIn, authReady } = useAuth();
     const [prompt, setPrompt] = useState(null);
     const tabs = [...title.seasons, ...(title.specials ? [title.specials] : [])];
-    const [active, setActive] = useState(tabs[0]?.season_number ?? 1);
+    const active = season;
+    const { data, error, loading, retry } = state;
 
-    const load = useCallback(
-        ({ signal }) => fetchSeason(title.id, active, { signal }).then(toSeasonView),
-        [title.id, active],
-    );
-    const { data, error, loading, retry } = useAsync(load, [title.id, active]);
+    /* Arriving by way of "Continue · S2 E5". The season has already changed by
+       the time this runs; wait for its episodes, then put the row somewhere a
+       person can see it. */
+    useEffect(() => {
+        if (!jumpTo || jumpTo.season !== active || !data?.episodes?.length) return;
+        document.getElementById(`ep-${active}-${jumpTo.episode}`)
+            ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        onJumped();
+    }, [jumpTo, active, data, onJumped]);
 
     // Once per season per session: the update fills a blank and never overwrites,
     // so repeating it would only cost a round trip.
@@ -447,6 +538,10 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
     return (
         <div className="sect">
             <div className="sect-h"><span>Episodes</span></div>
+            {/* §03b: with one season there is no tab row at all — a single tab
+                is a label pretending to be a control. This is also TV5, the
+                miniseries, which needs no rule of its own to get it right. */}
+            {tabs.length > 1 && (
             <div className="seasonsw" role="tablist" aria-label="Seasons">
                 {tabs.map((s) => (
                     <button
@@ -455,13 +550,14 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
                         role="tab"
                         className="sw"
                         aria-pressed={active === s.season_number}
-                        onClick={() => setActive(s.season_number)}
+                        onClick={() => onSeason(s.season_number)}
                     >
                         {s.season_number === 0 ? 'Specials' : `Season ${s.season_number}`}
                         <em>{s.episode_count}</em>
                     </button>
                 ))}
             </div>
+            )}
 
             {aired.length > 0 && (
                 <div className="sect-h markrow">
@@ -487,7 +583,7 @@ function Episodes({ title, entry, onTick, onMarkSeason }) {
                 {data?.episodes.map((e) => {
                     const on = isWatched(watched, active, e.number);
                     return (
-                        <div className={`eprow${e.aired ? '' : ' unaired'}`} key={e.id}>
+                        <div className={`eprow${e.aired ? '' : ' unaired'}`} key={e.id} id={`ep-${active}-${e.number}`}>
                             <div className="still">{e.still && <img src={e.still} alt="" loading="lazy" />}</div>
                             <div className="body">
                                 <div className="en">{e.number}. {e.name}</div>

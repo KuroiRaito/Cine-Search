@@ -54,6 +54,16 @@
 .cert { border: var(--border-hair) solid var(--bd-str); border-radius: var(--radius-4); padding: 0 var(--space-4); margin-right: var(--space-4); }
 .tagline { margin-top: var(--space-8); font-size: var(--text-caption); line-height: var(--lh-caption); font-style: italic; color: var(--muted); }
 
+/* TM2 / TV0: nothing has come out, so the date is the headline rather than a
+   footnote. It takes the line the tagline would have had — an unreleased title
+   rarely has one, and when it has both, the date is the more useful fact. */
+.headline { margin-top: var(--space-8); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 600; color: var(--acc-t); }
+
+/* The line under the primary that is about the series rather than about you:
+   when the next episode airs, that it is renewed with no date, that it was
+   cancelled before it ended. */
+.snote { margin-top: var(--space-8); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); }
+
 /* The action rail lives inline on a phone and moves into the sidebar on
    desktop. Only one copy is ever visible. */
 .tside { display: none; }
@@ -165,7 +175,7 @@
 /* Episodes, never seasons, and always watched-of-total across the whole run:
    "3 of 5 seasons" hides that season three is 22 episodes long. */
 .prg { margin-top: var(--space-12); border-top: var(--border-hair) solid var(--bd-sub); padding-top: var(--space-12); }
-.prg-h { display: flex; justify-content: space-between; font-size: var(--text-micro); line-height: var(--lh-micro); margin-bottom: var(--space-8); }
+.prg-h { display: flex; justify-content: space-between; gap: var(--space-8); font-size: var(--text-micro); line-height: var(--lh-micro); margin-bottom: var(--space-8); }
 .prg-h span { color: var(--muted); }
 .prg-h b { font-family: var(--f-m); font-weight: 400; color: var(--acc-t); }
 .prg-bar { height: var(--space-4); border-radius: var(--radius-full); background: var(--ink-5); overflow: hidden; }

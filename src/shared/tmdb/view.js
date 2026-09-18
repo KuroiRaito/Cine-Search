@@ -279,6 +279,25 @@ export function toTitleView(raw, mediaType, region) {
         episodeCount: isTV ? raw.number_of_episodes : null,
         airedEpisodes: isTV ? airedEpisodeCount(raw) : null,
         status: raw.status || null,
+        /* The four discriminators the title design sampled TMDB to find. `type`
+           singles out a miniseries, `status` separates returning from ended,
+           and in_production with next_episode_to_air together separate
+           "back next Friday" from "coming back, nobody knows when" — which is
+           a real and common state, and the one the first design missed. */
+        type: isTV ? raw.type || null : null,
+        inProduction: isTV ? Boolean(raw.in_production) : null,
+        nextEpisode: raw.next_episode_to_air
+            ? {
+                season: raw.next_episode_to_air.season_number,
+                number: raw.next_episode_to_air.episode_number,
+                name: raw.next_episode_to_air.name || null,
+                airDate: raw.next_episode_to_air.air_date || null,
+            }
+            : null,
+        /* The full date, not just the year: an unreleased title's date is the
+           headline rather than a footnote, and "2026" is not a headline. */
+        releaseDate: raw.release_date || raw.first_air_date || null,
+        lastAirDate: isTV ? raw.last_air_date || null : null,
         // Carried along so saving never needs a second fetch of what we have.
         catalog: toCatalog(raw, mediaType),
     };

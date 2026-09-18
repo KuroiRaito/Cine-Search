@@ -65,8 +65,9 @@ export function genresFor(kind, { movie = [], tv = [] } = {}) {
 
 /** The facets a browse carries, with nothing set. */
 export const EMPTY = {
-    kind: 'all', genre: null, language: null, decade: null,
-    length: null, rating: null, provider: null, region: null, unseen: false, sort: DEFAULT_SORT,
+    kind: 'all', genre: [], language: null, decade: null,
+    length: null, rating: null, provider: null, region: null,
+    keyword: null, cert: null, from: null, to: null, unseen: false, sort: DEFAULT_SORT,
 };
 
 const asNumber = (v) => (v === null || v === '' || v === undefined ? null : Number(v));
@@ -80,12 +81,22 @@ export function fromParams(params) {
     const kind = KINDS.some((x) => x.key === get('kind')) ? get('kind') : 'all';
     return {
         kind,
-        genre: asNumber(get('genre')),
+        /* A list, because a preset may arrive carrying two — Comedy or Family
+           — and taking one off is how somebody discovers what the preset meant.
+           The panel still offers one at a time (FD-7): an AND of two genres is
+           usually four films, and TMDB ANDs a comma where it ORs a pipe. */
+        genre: (get('genre') || '').split('|').filter(Boolean).map(Number),
         language: get('lang') || null,
         decade: asNumber(get('decade')),
         length: asNumber(get('len')),
         rating: asNumber(get('rated')),
         provider: asNumber(get('on')),
+        keyword: asNumber(get('kw')),
+        cert: get('cert') || null,
+        /* A date range, which a decade is one round case of. The rails need it:
+           "In cinemas now" is this month, not this decade. */
+        from: get('from') || null,
+        to: get('to') || null,
         /* A provider id means nothing without the region it was chosen in —
            Amazon Prime Video is 119 in India and 9 in the United States. It
            rides the URL beside the id, or a browse shared from Mumbai quietly
@@ -104,12 +115,16 @@ export function toParams(f, base = {}) {
         else out.set(k, String(v));
     };
     set('kind', f.kind, 'all');
-    set('genre', f.genre);
+    set('genre', f.genre?.length ? f.genre.join('|') : null);
     set('lang', f.language);
     set('decade', f.decade);
     set('len', f.length);
     set('rated', f.rating);
     set('on', f.provider);
+    set('kw', f.keyword);
+    set('cert', f.cert);
+    set('from', f.from);
+    set('to', f.to);
     set('in', f.provider ? f.region : null);
     set('unseen', f.unseen ? '1' : null);
     set('sort', f.sort, DEFAULT_SORT);
@@ -119,7 +134,8 @@ export function toParams(f, base = {}) {
 /** Is anything actually constraining the list? A browse with nothing set is
  *  just "everything, most popular first", which is a legitimate screen. */
 export const activeCount = (f) => [
-    f.kind !== 'all', f.genre, f.language, f.decade, f.length, f.rating, f.provider, f.unseen,
+    f.kind !== 'all', f.genre?.length, f.language, f.decade, f.length,
+    f.rating, f.provider, f.keyword, f.cert, f.from || f.to, f.unseen,
 ].filter(Boolean).length;
 
 /**
@@ -141,7 +157,14 @@ export function toQuery(f, mediaType) {
     if (f.rating && f.sort === DEFAULT_SORT) sortBy = 'vote_count.desc';
 
     const params = { sort_by: sortBy, include_adult: false };
-    if (f.genre) params.with_genres = String(f.genre);
+    // A pipe is OR and a comma is AND. Comedy-or-Family is a shelf;
+    // Comedy-and-Family is four films.
+    if (f.genre?.length) params.with_genres = f.genre.join('|');
+    if (f.keyword) params.with_keywords = String(f.keyword);
+    if (f.cert && f.region) {
+        params.certification_country = f.region;
+        params.certification = f.cert;
+    }
     if (f.language) params.with_original_language = Array.isArray(f.language) ? f.language.join('|') : f.language;
     if (f.rating) params['vote_average.gte'] = String(f.rating);
     if (f.length) params['with_runtime.lte'] = String(f.length);
@@ -149,8 +172,11 @@ export function toQuery(f, mediaType) {
         params.with_watch_providers = String(f.provider);
         params.watch_region = f.region;
     }
-    if (f.decade) {
-        const [from, to] = [`${f.decade}-01-01`, `${f.decade + 9}-12-31`];
+    const range = f.from || f.to
+        ? [f.from || '1888-01-01', f.to || '2999-12-31']
+        : f.decade && [`${f.decade}-01-01`, `${f.decade + 9}-12-31`];
+    if (range) {
+        const [from, to] = range;
         if (mediaType === 'tv') {
             params['first_air_date.gte'] = from;
             params['first_air_date.lte'] = to;
@@ -161,6 +187,17 @@ export function toQuery(f, mediaType) {
     }
     return params;
 }
+
+/**
+ * Is this URL a browse at all?
+ *
+ * Not the same question as "is anything constraining it". A rail header opens
+ * "everything, most popular" — no facet, just an ordering — and that is a
+ * legitimate screen rather than an empty one. So the marker is the presence of
+ * any browse key, not the count of constraints.
+ */
+const BROWSE_KEYS = ['kind', 'genre', 'lang', 'decade', 'len', 'rated', 'on', 'kw', 'cert', 'from', 'to', 'unseen', 'sort'];
+export const isBrowseUrl = (params) => BROWSE_KEYS.some((k) => params.get(k) !== null);
 
 /**
  * FB4 — the count reads 20,000+, never 20,001.
@@ -196,15 +233,23 @@ export const canLoadMore = (page, totalPages) => page < Math.min(totalPages, MAX
  */
 export function reconcile(facets, vocab) {
     const allowed = genresFor(facets.kind, vocab);
-    if (!facets.genre || !allowed.length) return { facets, dropped: [] };
-    if (allowed.some((g) => g.id === facets.genre)) return { facets, dropped: [] };
+    if (!facets.genre?.length || !allowed.length) return { facets, dropped: [] };
 
+    const ok = facets.genre.filter((id) => allowed.some((g) => g.id === id));
+    const gone = facets.genre.filter((id) => !ok.includes(id));
+    if (!gone.length) return { facets, dropped: [] };
+
+    /* A bundle can lose one genre and keep another — Thriller or Mystery,
+       switched to series, keeps Mystery and loses Thriller. Each one that goes
+       says so by name. */
     const everywhere = [...(vocab.movie || []), ...(vocab.tv || [])];
-    const name = everywhere.find((g) => g.id === facets.genre)?.name || 'That genre';
     const where = KINDS.find((k) => k.key === facets.kind)?.label.toLowerCase() || 'here';
     return {
-        facets: { ...facets, genre: null },
-        dropped: [{ kind: 'genre', label: name, why: `${name} is not a genre ${where} have` }],
+        facets: { ...facets, genre: ok },
+        dropped: gone.map((id) => {
+            const name = everywhere.find((g) => g.id === id)?.name || 'That genre';
+            return { kind: `genre-${id}`, label: name, why: `${name} is not a genre ${where} have` };
+        }),
     };
 }
 
@@ -279,10 +324,10 @@ export function regionChoices(locale) {
  */
 export function blameTrials(f, labels) {
     const each = [
-        ['genre', { genre: null }], ['language', { language: null }],
+        ['genre', { genre: [] }], ['language', { language: null }],
         ['decade', { decade: null }], ['length', { length: null }],
         ['rating', { rating: null }], ['provider', { provider: null }],
-    ].filter(([key]) => f[key]);
+    ].filter(([key]) => (key === 'genre' ? f.genre?.length : f[key]));
     if (f.kind !== 'all') each.push(['kind', { kind: 'all' }]);
     if (each.length < 2) return [];
     return each.map(([key, off]) => ({ chip: labels[key] || key, facets: { ...f, ...off } }));

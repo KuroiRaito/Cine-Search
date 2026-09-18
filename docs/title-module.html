@@ -563,19 +563,10 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
     </tbody>
   </table></div>
   <div class="note law"><b>The sheet is where per-episode rating would go, and that is the point of choosing a sheet.</b> We do not support it &mdash; rating is per title today &mdash; and it is a real product question rather than a layout one. A sheet leaves the room for it without committing to it, and without a route that would have to be un-built if the answer is no.</div>
-</div></section>
 
-<section id="craft"><div class="wrap">
-  <div class="shead"><span class="snum">03d</span><h2>Three rules the first drawings broke</h2></div>
-  <p>All three came out of review, all three were repeated across several frames, and all three are cheap to state and easy to get wrong again.</p>
-
-  <div class="note law"><b>A primary button is one line.</b> Stacking a label over a caption &mdash; <i>Continue</i> over <i>S2 E5 &middot; Breakage</i> &mdash; pushes the control to 52px and makes it read as two controls in a box. The verb takes the button; the detail goes <b>beside it on the same line</b> when it is short, and <b>below the button</b> when it is not, on the line that already states progress.
-  <br><br>So: <code>Continue &middot; S2 E5</code> in the button, <i>&ldquo;11 of 62 &middot; next up Breakage&rdquo;</i> underneath. And <i>Caught up</i> stands alone, because <i>19 of 19 aired</i> was already written directly below it &mdash; the button was repeating the page.</div>
-
-  <div class="note law"><b>Season selectors are pills.</b> One line, <code>--radius-full</code>, the count inline beside the number rather than stacked under it. A two-line tab in a scrolling row reads as a stack of small boxes, which is what made the first version off-putting.</div>
-
-  <div class="note law"><b>A rating is a <span style="color:var(--rate-t)">filled</span> star and a number, side by side. Always.</b> Never stacked, never outlined. An outlined star is the <i>empty</i> half of a rating control &mdash; using it to display a score says the opposite of what is meant, and it is the difference between &ldquo;rated 9&rdquo; and &ldquo;rate this&rdquo;.
-  <br><br>Lucide's star is a stroke icon by default, so the rating star is drawn with <code>fill="currentColor"</code> and a lighter stroke. This applies everywhere a score appears &mdash; tile badges, episode rows, the scores band, the library's compact row.</div>
+  <h3>What the frames do not draw</h3>
+  <div class="note law"><b>The episode row keeps its still.</b> The frames in &sect;06 draw an episode as <code>1 &middot; Groundhogs &middot; &check;</code>, and that is <b>mock scale, not a specification</b> &mdash; at 280px a 64px thumbnail takes a quarter of the row and carries none of the information those frames exist to show. The row that ships is the row that is built: <b>still, number and name, air date &middot; runtime &middot; score, tick</b> &mdash; <code>Title.jsx:489</code>, <code>.eprow .still</code> at 64px on a phone and 84px in the expanded band, where the doc's own reasoning is that the still &ldquo;is the only thing in the row that identifies the episode before you have read its name&rdquo;.
+  <br><br><b>This section adds three things to that list and changes nothing else:</b> the season pills above it, Specials placed last and outside the denominator, and the name opening a sheet. Anything drawn <i>away</i> in a frame &mdash; artwork, a score, a date &mdash; is absent for room, never as an instruction to remove it. Where a frame and a shipped component disagree on detail, <b>the shipped component wins</b> unless this document says in words that it should change.</div>
 </div></section>
 
 <section id="watch"><div class="wrap">
@@ -606,6 +597,19 @@ ads        Fandango at Home Free</pre>
   <div class="note"><b>If <code>services</code> ever becomes settable</b> &mdash; a settings screen listing the services somebody subscribes to &mdash; the streaming tier splits in two and yours come first. The design is ready for it. It is not built on it.</div>
 
   <div class="note law"><b>No prices, ever.</b> TMDB does not carry them. No &ldquo;from &pound;3.49&rdquo;, no cheapest-first. Inventing a price on a page somebody acts on is the one failure here that costs them money.</div>
+</div></section>
+
+<section id="craft"><div class="wrap">
+  <div class="shead"><span class="snum">03d</span><h2>Three rules the first drawings broke</h2></div>
+  <p>All three came out of review, all three were repeated across several frames, and all three are cheap to state and easy to get wrong again.</p>
+
+  <div class="note law"><b>A primary button is one line.</b> Stacking a label over a caption &mdash; <i>Continue</i> over <i>S2 E5 &middot; Breakage</i> &mdash; pushes the control to 52px and makes it read as two controls in a box. The verb takes the button; the detail goes <b>beside it on the same line</b> when it is short, and <b>below the button</b> when it is not, on the line that already states progress.
+  <br><br>So: <code>Continue &middot; S2 E5</code> in the button, <i>&ldquo;11 of 62 &middot; next up Breakage&rdquo;</i> underneath. And <i>Caught up</i> stands alone, because <i>19 of 19 aired</i> was already written directly below it &mdash; the button was repeating the page.</div>
+
+  <div class="note law"><b>Season selectors are pills.</b> One line, <code>--radius-full</code>, the count inline beside the number rather than stacked under it. A two-line tab in a scrolling row reads as a stack of small boxes, which is what made the first version off-putting.</div>
+
+  <div class="note law"><b>A rating is a <span style="color:var(--rate-t)">filled</span> star and a number, side by side. Always.</b> Never stacked, never outlined. An outlined star is the <i>empty</i> half of a rating control &mdash; using it to display a score says the opposite of what is meant, and it is the difference between &ldquo;rated 9&rdquo; and &ldquo;rate this&rdquo;.
+  <br><br>Lucide's star is a stroke icon by default, so the rating star is drawn with <code>fill="currentColor"</code> and a lighter stroke. This applies everywhere a score appears &mdash; tile badges, episode rows, the scores band, the library's compact row.</div>
 </div></section>
 
 

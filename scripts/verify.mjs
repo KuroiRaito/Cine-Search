@@ -237,7 +237,7 @@ for (const f of jsx) {
    the last step of converting it, so this list is also the migration
    board: what is listed is on the scale and stays there.
    --------------------------------------------------------------- */
-const CONVERTED = ['entry', 'profile'];
+const CONVERTED = ['entry', 'profile', 'title', 'person'];
 
 /* Three raw lengths are legal, and each is legal for a stated reason rather
    than because it was hard to convert:

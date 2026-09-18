@@ -339,8 +339,7 @@ export default function Title() {
                             interesting number. */}
                         <div className={`s${entry?.rating != null ? ' gold' : ' dim'}`}>
                             <b>{entry?.rating ?? '—'}</b>
-                            <span className="lbl-short">Yours</span>
-                            <span className="lbl-long">Your score</span>
+                            <span>Your rating</span>
                         </div>
                         <div className={`s${entry?.rewatch_count ? '' : ' dim'}`}>
                             <b>{entry?.rewatch_count || '—'}</b>
@@ -358,8 +357,9 @@ export default function Title() {
                         </div>
                     )}
 
-                    {cards}
-
+                    {/* Band 9 before band 10. The episode list is the reason a
+                        series page exists; it used to sit below four preview
+                        cards, which put "Themes" above "what do I watch next". */}
                     {isTV && (
                         <Episodes
                             title={t}
@@ -368,6 +368,8 @@ export default function Title() {
                             onMarkSeason={markSeason}
                         />
                     )}
+
+                    {cards}
 
                     {t.related.length > 0 && (
                         <div className="sect">

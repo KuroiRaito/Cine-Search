@@ -19,7 +19,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import {
     INTENT, PARTICLES, stripIntent, stripParticles, splitYear, rungs,
-    prefixes, MIN_PREFIX, isCorrectionOf,
+    prefixes, MIN_PREFIX, isCorrectionOf, retryWords, editDistance, isNearMiss, bestGuess,
 } from '../src/modules/search/normalise.js';
 import { parseFacets, isBrowse, chipsOf } from '../src/modules/search/facets.js';
 
@@ -153,6 +153,32 @@ is('facets  a mood word is not a genre — sad is not Drama',
 is('facets  and a plain title parses as nothing',
     facets('breaking bad'), '');
 
+/* ---- rung 4, which asks rather than claims ---------------------------- */
+
+console.log('');
+is('rung 4  one- and two-letter words match everything and rank nothing',
+    retryWords('the lord of the rings').join(','), 'the,lord,the,rings');
+is('rung 4  the four the design measures are one or two edits out',
+    [['brekaing bad', 'Breaking Bad'], ['stanger things', 'Stranger Things'],
+        ['jurrasic park', 'Jurassic Park'], ['forest gump', 'Forrest Gump']]
+        .map(([q, t]) => editDistance(q, t)).join(','), '2,1,2,1');
+is('rung 4  and all four are near misses',
+    [['brekaing bad', 'Breaking Bad'], ['stanger things', 'Stranger Things'],
+        ['jurrasic park', 'Jurassic Park'], ['forest gump', 'Forrest Gump']]
+        .every(([q, t]) => isNearMiss(q, t)), true);
+is('rung 4  a popular film sharing one word is not a correction',
+    isNearMiss('sad war', 'All Quiet on the Western Front'), false);
+is('rung 4  nor is a sentence',
+    isNearMiss('something to watch while eating', 'Something Borrowed'), false);
+is('rung 4  one guess, not five — a list of guesses is a second failure',
+    bestGuess('forest gump', [
+        { title: 'Forrest Gump', popularity: 60 },
+        { title: 'Forest', popularity: 9 },
+        { title: 'The Gumball Rally', popularity: 90 },
+    ])?.title, 'Forrest Gump');
+is('rung 4  and nothing at all when nothing is close',
+    bestGuess('sad war', [{ title: 'Apocalypse Now', popularity: 99 }]), null);
+
 /* ---- what the rules do to the whole set ------------------------------- */
 
 const cats = {};
@@ -214,7 +240,7 @@ if (LIVE) {
                 const r = await fetch(`${base}/api/tmdb?${params}`);
                 if (r.ok) {
                     const rows = (await r.json()).results || [];
-                    return { n: rows.length, top: rows[0]?.title || rows[0]?.name || null };
+                    return { n: rows.length, top: rows[0]?.title || rows[0]?.name || null, rows };
                 }
             } catch { /* fall through to the wait */ }
             await new Promise((res) => setTimeout(res, 400 * (i + 1)));
@@ -224,11 +250,11 @@ if (LIVE) {
     const count = async (q, year) => (await ask(q, year))?.n ?? null;
 
     console.log('  Against live TMDB — zero-result rate by category\n');
-    console.log('    category       n   as typed   after the ladder   browse   truncated');
+    console.log('    category       n   as typed   after the ladder   browse   truncated   asked');
     const live = {};
     let unmeasured = 0;
     for (const q of set) {
-        const c = (live[q.category] ||= { n: 0, raw: 0, done: 0, browse: 0, cut: 0, cutQ: [] });
+        const c = (live[q.category] ||= { n: 0, raw: 0, done: 0, browse: 0, cut: 0, asked: 0, cutQ: [], askQ: [] });
         c.n += 1;
         const first = await count(q.query);
         if (first === null) { unmeasured += 1; continue; }
@@ -257,6 +283,17 @@ if (LIVE) {
                 }
             }
         }
+        if (!best) {
+            /* Rung 4. Every word on its own, pooled, and the most popular
+               near miss offered as a question. */
+            const pool = [];
+            for (const w of retryWords(left)) {
+                const hit = await ask(w);
+                if (hit?.rows) pool.push(...hit.rows);
+            }
+            const guess = bestGuess(left, pool);
+            if (guess) { best = 1; how = 'rung 4'; c.asked += 1; c.askQ.push(`${q.query} → ${guess.title || guess.name}`); }
+        }
         if (!best) c.done += 1;
         if (how === 'rung 3') c.cutQ.push(`${q.query}`);
     }
@@ -264,13 +301,15 @@ if (LIVE) {
     let N = 0, R = 0, D = 0;
     for (const [k, c] of Object.entries(live)) {
         N += c.n; R += c.raw; D += c.done;
-        console.log(`    ${k.padEnd(13)}${String(c.n).padStart(2)}   ${pc(c.raw, c.n).padStart(6)}   ${pc(c.done, c.n).padStart(12)}   ${String(c.browse).padStart(6)}   ${String(c.cut).padStart(9)}`);
+        console.log(`    ${k.padEnd(13)}${String(c.n).padStart(2)}   ${pc(c.raw, c.n).padStart(6)}   ${pc(c.done, c.n).padStart(12)}   ${String(c.browse).padStart(6)}   ${String(c.cut).padStart(9)}   ${String(c.asked).padStart(5)}`);
     }
     const B = Object.values(live).reduce((n, c) => n + c.browse, 0);
     const C = Object.values(live).reduce((n, c) => n + c.cut, 0);
-    console.log(`    ${'all'.padEnd(13)}${String(N).padStart(2)}   ${pc(R, N).padStart(6)}   ${pc(D, N).padStart(12)}   ${String(B).padStart(6)}   ${String(C).padStart(9)}`);
+    console.log(`    ${'all'.padEnd(13)}${String(N).padStart(2)}   ${pc(R, N).padStart(6)}   ${pc(D, N).padStart(12)}   ${String(B).padStart(6)}   ${String(C).padStart(9)}   ${String(Object.values(live).reduce((n, c) => n + c.asked, 0)).padStart(5)}`);
     const cuts = Object.values(live).flatMap((c) => c.cutQ);
     if (cuts.length) console.log(`\n    truncation rescued: ${cuts.join(', ')}`);
+    const asks = Object.values(live).flatMap((c) => c.askQ);
+    if (asks.length) console.log(`\n    did you mean:\n      ${asks.join('\n      ')}`);
     if (unmeasured) console.log(`\n    ${unmeasured} could not be measured — requests failed, not empty answers.`);
     console.log('');
     await server.close();

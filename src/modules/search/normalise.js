@@ -99,6 +99,77 @@ export function splitYear(query) {
 }
 
 /**
+ * Rung 4 — search each word alone, pool what comes back, rank by popularity.
+ *
+ * Truncation cannot reach a misspelling in the middle of a word: `brekaing bad`
+ * has no prefix that is a prefix of Breaking Bad. But `bad` on its own does
+ * find it, and so does `things` for `stanger things`. Four of the golden set's
+ * eighteen typos come back this way.
+ *
+ * Announced as a QUESTION, never as a claim — "Nothing for forest gump. Did
+ * you mean Forrest Gump?" — because two of the four land at rank 2, behind a
+ * wrong answer. Rung 3 can say "showing results for" because a prefix match is
+ * evidence; this is a guess, and a guess asks.
+ */
+
+/** Words worth asking about. One- and two-letter words match everything and
+ *  rank nothing, so they only add noise to the pool. */
+export const retryWords = (query) =>
+    String(query || '').toLowerCase().split(/\s+/).filter((w) => w.length >= 3);
+
+const fold = (v) => String(v || '')
+    .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+    .toLowerCase().replace(/[^a-z0-9]/g, '');
+
+/** Levenshtein, on the folded strings. Two rows rather than a full matrix —
+ *  this runs against a pool of twenty candidates on every failed search. */
+export function editDistance(a, b) {
+    const x = fold(a);
+    const y = fold(b);
+    if (!x.length || !y.length) return Math.max(x.length, y.length);
+    let prev = Array.from({ length: y.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= x.length; i += 1) {
+        const row = [i];
+        for (let j = 1; j <= y.length; j += 1) {
+            row[j] = Math.min(
+                prev[j] + 1,
+                row[j - 1] + 1,
+                prev[j - 1] + (x[i - 1] === y[j - 1] ? 0 : 1),
+            );
+        }
+        prev = row;
+    }
+    return prev[y.length];
+}
+
+/**
+ * Is this candidate a plausible spelling of what was typed?
+ *
+ * Rung 4 pools results from single words, so without this it will happily
+ * suggest the most popular film containing the word `war` as a correction of
+ * `sad war` — the same failure rung 3 had, in a different costume. A
+ * misspelling is a few letters wrong: the design's own four are one or two
+ * edits each.
+ *
+ * A fifth of the query's length, and never less than two, which is what those
+ * four need and what a sentence cannot reach.
+ */
+export const isNearMiss = (query, title) =>
+    editDistance(query, title) <= Math.max(2, Math.round(fold(query).length * 0.2));
+
+/**
+ * Pick the one candidate to offer, from everything the words brought back.
+ *
+ * One, not five. A list of guesses is a second failure — the screen is already
+ * apologising, and five apologies are not better than one.
+ */
+export function bestGuess(query, candidates) {
+    const near = (candidates || []).filter((c) => isNearMiss(query, c.title || c.name));
+    if (!near.length) return null;
+    return [...near].sort((a, b) => (b.popularity || 0) - (a.popularity || 0))[0];
+}
+
+/**
  * The three silent rungs, in the order the ladder runs them.
  *
  * Returns the attempts to make, each with what changed, so the caller can stop

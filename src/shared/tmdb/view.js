@@ -555,4 +555,9 @@ export const fromItem = (it) => ({
     poster: posterUrl(it.poster_path, 'w342'),
     posterPath: it.poster_path,
     voteAverage: it.vote_average || null,
+    /* FB1 — every tile in a browse carries its vote count beside its score.
+       8.0 from 79 votes and 8.5 from 41,165 are different claims and must not
+       render identically; it is what makes the no-floor rule safe, because the
+       weak evidence stays visible as weak evidence. */
+    voteCount: it.vote_count || 0,
 });

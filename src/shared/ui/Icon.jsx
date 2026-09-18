@@ -18,7 +18,7 @@
 import {
     ArrowDown, ArrowRight, ArrowUp, BookMarked, Bookmark, Check, ChevronDown, ChevronLeft, ChevronRight, ChevronUp,
     CircleCheck, CirclePause, CirclePlay, CircleUser, CircleX, Compass, Ellipsis, Film, GripVertical,
-    Heart, Minus, Moon, Pencil, Plus, RotateCcw, Search, Settings, Star, Sun, Tv, X,
+    Heart, ListFilter, Minus, Moon, Pencil, Plus, RotateCcw, Search, Settings, Star, Sun, Tv, X,
 } from 'lucide-react';
 
 /** Role → drawing. The role is what the product calls it; the icon can change. */
@@ -34,6 +34,9 @@ const ICONS = {
     // actions
     add: Plus, remove: Minus, edit: Pencil, close: X, check: Check,
     more: Ellipsis, reorder: GripVertical, go: ArrowRight, settings: Settings,
+    // The module's one new role. Facet controls carry words, not pictures — a
+    // genre has no icon anybody can read — so this is the only one Browse adds.
+    filter: ListFilter,
     // moving an item within a list — an arrow, not a chevron: a chevron
     // navigates, an arrow moves the thing you are pointing at
     earlier: ArrowUp, later: ArrowDown,

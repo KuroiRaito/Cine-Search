@@ -22,6 +22,10 @@ import {
     prefixes, MIN_PREFIX, isCorrectionOf, retryWords, editDistance, isNearMiss, bestGuess,
 } from '../src/modules/search/normalise.js';
 import { parseFacets, isBrowse, chipsOf } from '../src/modules/search/facets.js';
+import {
+    SORTS, KINDS, SHARED_GENRE_IDS, genresFor, EMPTY, fromParams, toParams,
+    activeCount, toQuery, readCount, canLoadMore, CEILING, MAX_PAGE, reconcile, blame,
+} from '../src/modules/search/browse.js';
 
 /* TMDB's film list, which is what a search with no medium chosen offers. Fixed
    here so the rules half stays offline; the app fetches it. */
@@ -178,6 +182,92 @@ is('rung 4  one guess, not five — a list of guesses is a second failure',
     ])?.title, 'Forrest Gump');
 is('rung 4  and nothing at all when nothing is close',
     bestGuess('sad war', [{ title: 'Apocalypse Now', popularity: 99 }]), null);
+
+/* ---- Browse: the filter engine --------------------------------------- */
+
+console.log('');
+const TV_GENRES = [
+    { id: 10759, name: 'Action & Adventure' }, { id: 16, name: 'Animation' },
+    { id: 35, name: 'Comedy' }, { id: 80, name: 'Crime' }, { id: 99, name: 'Documentary' },
+    { id: 18, name: 'Drama' }, { id: 10751, name: 'Family' }, { id: 10762, name: 'Kids' },
+    { id: 9648, name: 'Mystery' }, { id: 10763, name: 'News' }, { id: 10764, name: 'Reality' },
+    { id: 10765, name: 'Sci-Fi & Fantasy' }, { id: 10766, name: 'Soap' },
+    { id: 10767, name: 'Talk' }, { id: 10768, name: 'War & Politics' }, { id: 37, name: 'Western' },
+];
+const VOCAB = { movie: GENRES, tv: TV_GENRES };
+
+is('L5      All offers only what means the same on both sides',
+    genresFor('all', VOCAB).length, 8);
+is('L5      and every one of them is shared',
+    genresFor('all', VOCAB).every((g) => SHARED_GENRE_IDS.includes(g.id)), true);
+is('L5      films get nineteen, series sixteen',
+    `${genresFor('movie', VOCAB).length}/${genresFor('tv', VOCAB).length}`, '19/16');
+is('L5      Thriller is a film genre and not a series one',
+    [genresFor('movie', VOCAB), genresFor('tv', VOCAB)].map((l) => l.some((g) => g.name === 'Thriller')).join(','),
+    'true,false');
+
+is('sorts   three, and no direction toggle',
+    SORTS.map((s) => s.label).join(' · '), 'Most popular · Most voted · Newest');
+is('sorts   and no "highest rated" — that is a band plus Most voted',
+    SORTS.some((s) => /rated|rating/i.test(s.label)), false);
+
+is('L4      a rating band orders itself by evidence, not by popularity',
+    toQuery({ ...EMPTY, rating: 8 }, 'movie').sort_by, 'vote_count.desc');
+is('L4      and nothing is excluded — no vote floor anywhere in the request',
+    Object.keys(toQuery({ ...EMPTY, rating: 8 }, 'movie')).some((k) => k.includes('vote_count.gte')), false);
+is('L4      an explicit sort still wins',
+    toQuery({ ...EMPTY, rating: 8, sort: 'newest' }, 'movie').sort_by, 'primary_release_date.desc');
+is('query   series date under a different name',
+    toQuery({ ...EMPTY, sort: 'newest' }, 'tv').sort_by, 'first_air_date.desc');
+is('query   and their decade does too',
+    Object.keys(toQuery({ ...EMPTY, decade: 1990 }, 'tv')).sort().join(','),
+    'first_air_date.gte,first_air_date.lte,include_adult,sort_by');
+is('query   a language is one parameter',
+    toQuery({ ...EMPTY, language: 'hi' }, 'movie').with_original_language, 'hi');
+is('query   and a group of them is still one',
+    toQuery({ ...EMPTY, language: ['ta', 'te', 'ml', 'kn'] }, 'movie').with_original_language, 'ta|te|ml|kn');
+
+const url = toParams({ ...EMPTY, kind: 'movie', genre: 35, language: 'hi', rating: 7 });
+is('FB11    a browse is entirely in the URL',
+    url.toString(), 'kind=movie&genre=35&lang=hi&rated=7');
+is('FB11    and comes back out of it',
+    JSON.stringify(fromParams(new URLSearchParams(url))),
+    JSON.stringify({ ...EMPTY, kind: 'movie', genre: 35, language: 'hi', rating: 7 }));
+is('FB11    nothing set is a bare URL, not a list of defaults',
+    toParams(EMPTY).toString(), '');
+is('FB11    a nonsense value falls back rather than failing',
+    fromParams(new URLSearchParams('kind=banana&sort=alphabetical')).kind + '/' 
+        + fromParams(new URLSearchParams('kind=banana&sort=alphabetical')).sort, 'all/popular');
+is('panel   the filter button carries the active count',
+    activeCount({ ...EMPTY, kind: 'movie', genre: 35, unseen: true }), 3);
+is('panel   and nothing set counts nothing',
+    activeCount(EMPTY), 0);
+
+const switched = reconcile({ ...EMPTY, kind: 'tv', genre: 53 }, VOCAB);
+is('FB6     a film-only genre is dropped when the medium changes',
+    switched.facets.genre, null);
+is('FB6     and named, because a silent substitution invents an answer',
+    switched.dropped[0].why, 'Thriller is not a genre series have');
+is('FB3     the same rule arriving by URL — horror series is not a thin result',
+    reconcile({ ...EMPTY, kind: 'tv', genre: 27 }, VOCAB).dropped.length, 1);
+is('FB6     a shared genre survives the switch',
+    reconcile({ ...EMPTY, kind: 'tv', genre: 35 }, VOCAB).dropped.length, 0);
+
+is('FB2     the chip whose removal rescues the fewest is the culprit',
+    blame([
+        { chip: 'Tamil', count: 41 }, { chip: 'Animation', count: 120 }, { chip: 'Netflix', count: 9 },
+    ]).chip, 'Netflix');
+is('FB2     and when nothing rescues it, no chip is blamed',
+    blame([{ chip: 'Tamil', count: 0 }, { chip: 'Animation', count: 0 }]), null);
+
+is('FB4     the ceiling reads as a ceiling',
+    readCount(CEILING), '20,000+');
+is('FB4     a real count reads as a number',
+    readCount(394), '394');
+is('FB5     load more retires at TMDB\'s last page',
+    [canLoadMore(1, 1001), canLoadMore(MAX_PAGE, 1001)].join(','), 'true,false');
+is('FB5     and at a real end before it',
+    canLoadMore(3, 3), false);
 
 /* ---- what the rules do to the whole set ------------------------------- */
 

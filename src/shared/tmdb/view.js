@@ -178,6 +178,10 @@ const toCard = (r) => ({
     poster: posterUrl(r.poster_path, 'w342'),
     posterPath: r.poster_path,
     voteAverage: r.vote_average || null,
+    /* Carried so a person page can tell a career from a talk-show appearance.
+       §05: appearing on Fallon is not a body of work, and the popularity
+       signal says otherwise unless those genres are taken out of it. */
+    genreIds: r.genre_ids || [],
 });
 
 /**
@@ -454,13 +458,18 @@ function notableCredits(list) {
  * Hans Zimmer has no Director or Writer credits and his cast credits are all
  * "Self", so his filmography came out empty behind a biography.
  */
+/* `label` is what somebody DID, not what they are. §05 allows no job title on a
+   person page — not a badge, not a subtitle, and not a filter chip either,
+   which is where they had survived: the chips read "Director" and "Writer".
+   The old nouns are gone; anything that needs to name the job for a different
+   reason (a cast row on a title page) uses `job` from the credit itself. */
 const ROLES = [
-    { key: 'director', label: 'Director', verb: 'directed', jobs: ['Director'] },
-    { key: 'creator', label: 'Creator', verb: 'created', jobs: ['Creator'] },
-    { key: 'writer', label: 'Writer', verb: 'written', jobs: ['Writer', 'Screenplay'] },
-    { key: 'composer', label: 'Composer', verb: 'scored', jobs: ['Original Music Composer'] },
-    { key: 'camera', label: 'Cinematographer', verb: 'shot', jobs: ['Director of Photography'] },
-    { key: 'cast', label: 'Cast', verb: 'acted in', jobs: null },
+    { key: 'director', label: 'Directed', verb: 'directed', jobs: ['Director'] },
+    { key: 'creator', label: 'Created', verb: 'created', jobs: ['Creator'] },
+    { key: 'writer', label: 'Wrote', verb: 'written', jobs: ['Writer', 'Screenplay'] },
+    { key: 'composer', label: 'Scored', verb: 'scored', jobs: ['Original Music Composer'] },
+    { key: 'camera', label: 'Shot', verb: 'shot', jobs: ['Director of Photography'] },
+    { key: 'cast', label: 'Acted in', verb: 'acted in', jobs: null },
 ];
 
 /** Which role a stored credit belongs to, so a card can find its denominator. */
@@ -480,6 +489,18 @@ export function roleForJob(role, job) {
  * Director for a director, Cast for an actor, and Composer for a composer,
  * without needing a rule for each.
  */
+/** Every released credit once, however many jobs it was under. */
+function countCredits(credits) {
+    const seen = new Set();
+    const today = new Date().toISOString().slice(0, 10);
+    for (const c of [...(credits.cast || []), ...(credits.crew || [])]) {
+        const d = dateOf(c);
+        if (!d || d > today || isSelf(c)) continue;
+        seen.add(`${c.media_type}-${c.id}`);
+    }
+    return seen.size;
+}
+
 export function toPersonView(raw) {
     const credits = raw.combined_credits || {};
 
@@ -500,16 +521,24 @@ export function toPersonView(raw) {
     };
 
     const roles = ROLES.map(build)
-        // A role with nothing left after filtering shows no tab. An empty grid
-        // behind a tab that promised a count is worse than no tab.
-        .filter((r) => r.items.length)
-        .sort((a, b) => b.items.length - a.items.length);
+        // A role with nothing left after filtering shows no chip. An empty grid
+        // behind a chip that promised a count is worse than no chip.
+        .filter((r) => r.items.length);
 
     return {
         id: raw.id,
         name: raw.name,
         department: raw.known_for_department || null,
         photo: profileUrl(raw.profile_path, 'h632'),
+        /* The whole career, before the relevance filter thins it for display.
+           "Credits 10" for Denis Villeneuve is visibly wrong to anybody who
+           knows the work, and the filter exists to keep a grid readable rather
+           than to decide what somebody has done. */
+        creditCount: countCredits(credits),
+        /* §04's work, used here for the one thing no computed label beats: a
+           line a human wrote. "American filmmaker and actress" answers in five
+           words what two algorithms could not. */
+        wikidataId: raw.external_ids?.wikidata_id || null,
         biography: raw.biography?.trim() || null,
         birthday: raw.birthday || null,
         deathday: raw.deathday || null,

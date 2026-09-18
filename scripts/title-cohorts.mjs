@@ -22,6 +22,9 @@ import {
 import {
     orderTabs, tabLabel, tabCount, seasonTitle, seenIn, episodeName,
 } from '../src/modules/title/seasons.js';
+import {
+    rankOf, orderRoles, leadRoles, neitherWins, hasProgress, evidenceLine, activeYears, allCredits,
+} from '../src/modules/person/people.js';
 
 const film = (o) => ({ mediaType: 'movie', status: 'Released', year: '2024', ...o });
 const series = (o) => ({
@@ -193,6 +196,64 @@ is('TV7      TMDB leaves the name blank for unaired runs',
     episodeName({ number: 7, name: '' }), 'Episode 7');
 is('TV7      and a named one is left alone',
     episodeName({ number: 7, name: 'Breakage' }), 'Breakage');
+
+/* ---- §05 · the person page, which never labels the person -------------- */
+
+console.log('');
+const credit = (title, year, genres = [28]) => ({ id: title.length * 7 + year, mediaType: 'movie', title, year: String(year), genreIds: genres });
+const TALK = 10767;
+
+const directed = {
+    key: 'director', label: 'Directed', verb: 'directed', filteredOut: 0,
+    items: [credit('Barbie', 2023), credit('Lady Bird', 2017), credit('Little Women', 2019)],
+};
+const acted = {
+    key: 'cast', label: 'Acted in', verb: 'acted in', filteredOut: 0,
+    items: [
+        credit('Frances Ha', 2012), credit('Jackie', 2016), credit('20th Century Women', 2016),
+        // The credit that broke every popularity signal the design tested.
+        credit('The Tonight Show', 2019, [TALK]),
+        credit('Watch What Happens Live', 2018, [TALK]),
+    ],
+};
+const scored = {
+    key: 'composer', label: 'Scored', verb: 'scored', filteredOut: 0,
+    items: Array.from({ length: 9 }, (_, i) => credit(`Score ${i}`, 2000 + i)),
+};
+
+is('TP  a talk-show slot is not a body of work',
+    `${acted.items.length} credits, ${rankOf(acted)} count`, '5 credits, 3 count');
+is('TP  and it stays in the filmography, where it is a real credit',
+    acted.items.length, 5);
+is('TP  sections are ordered by what is left',
+    orderRoles([acted, scored, directed]).map((r) => r.label).join(' → '),
+    'Scored → Acted in → Directed');
+
+is('TP4 when the top two are close, neither wins',
+    neitherWins([directed, acted]), true);
+is('TP4 and then authored work leads — §06 draws Directed first, twice',
+    leadRoles([acted, directed]).map((r) => r.label).join(' → '), 'Directed → Acted in');
+is('TP3 but when the numbers do choose, they choose',
+    leadRoles([scored, directed]).map((r) => r.label).join(' → '), 'Scored → Directed');
+is('TP3 when they are not, one does',
+    neitherWins([scored, directed]), false);
+
+is('TP1 a bar on authored work',
+    ['director', 'creator', 'writer'].every(hasProgress), true);
+is('TP2 no bar on acting — a filmography is not a canon',
+    hasProgress('cast'), false);
+is('TP3 and none on crew: "6 of 202 scored" is not a claim anybody makes',
+    hasProgress('composer'), false);
+
+is('TP  the line under the name is verbs and titles, never a job title',
+    evidenceLine([directed, acted]), 'Directed Barbie, Lady Bird · Acted in Frances Ha, Jackie');
+is('TP  and a talk show never becomes the evidence',
+    evidenceLine([acted], { roleLimit: 1, titleLimit: 5 }).includes('Tonight Show'), false);
+
+is('TP  active years span the work, not the life',
+    activeYears([directed, acted]), '2012–23');
+is('TP  one credit each way, counted once',
+    allCredits([directed, { ...directed, key: 'writer', label: 'Wrote' }]).length, 3);
 
 /* ---- and the thing the whole system is for ---------------------------- */
 

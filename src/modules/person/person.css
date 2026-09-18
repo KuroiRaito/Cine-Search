@@ -24,10 +24,24 @@
 .phead h1 { font-size: var(--text-title); line-height: var(--lh-title); font-weight: 700; letter-spacing: -.03em; }
 .phead .sub { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); margin-top: var(--space-2); }
 
+/* The line that replaced the job title. It reads as the page's claim about the
+   person, so it carries the weight the subtitle used to — but it is a list, not
+   a claim, which is the entire point of §05. */
+.evidence { margin-top: var(--space-4); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--text); font-weight: 600; }
+
+/* Three numbers, not a paragraph. Same shape as the profile's stat tiles,
+   because they answer the same kind of question. */
+.pstats { display: flex; gap: var(--space-16); margin: var(--section-gap) var(--gutter) 0; max-width: 440px; }
+.pstats div { flex: 1; min-width: 0; }
+.pstats b { display: block; font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 800; font-variant-numeric: tabular-nums; }
+.pstats span { display: block; font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); }
+
 .track-hint {
   margin: var(--section-gap) var(--gutter) 0; font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted);
 }
-.rolesw { display: flex; gap: var(--space-2); overflow-x: auto; margin: var(--space-12) var(--gutter) 0; background: var(--bg-sub); border-radius: var(--radius-12); padding: var(--space-4); scrollbar-width: none; }
+.rolesw { display: flex; gap: var(--space-8); overflow-x: auto; margin: var(--space-16) var(--gutter) 0; padding: var(--space-2) 0; scrollbar-width: none; }
+.rolesw .sw { border-radius: var(--radius-full); background: var(--surface); }
+.rolesw .sw[aria-pressed="true"] { background: var(--acc-bg); }
 .rolesw::-webkit-scrollbar { height: 0; }
 
 .bio { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); max-width: var(--measure); }
@@ -48,7 +62,11 @@
      The role tabs sit directly beneath, so they share the edge. */
   max-width: 440px;
 }
-.collectbar { margin: var(--space-16) var(--gutter) 0; }
+.collectbar { margin: var(--section-gap) var(--gutter) 0; }
+/* A section with no bar is a heading and a count, and must not leave the hole
+   the bar would have filled. */
+.collectbar .cb-t { margin-bottom: 0; }
+.collectbar .cb-track + .cb-sub, .collectbar .cb-t + .cb-track { margin-top: var(--space-8); }
 .cb-t { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--space-8); gap: var(--space-8); }
 .cb-t b { font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 700; letter-spacing: -.02em; color: var(--text); }
 .cb-t b i { font-style: normal; color: var(--st-done-9); }

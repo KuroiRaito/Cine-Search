@@ -240,51 +240,51 @@
     "hash": "5256e5ee"
   },
   "title/film@1280-dark": {
-    "elements": 269,
-    "hash": "fad00e6e"
+    "elements": 273,
+    "hash": "c21cc798"
   },
   "title/film@1280-light": {
-    "elements": 269,
-    "hash": "fad00e6e"
+    "elements": 273,
+    "hash": "c21cc798"
   },
   "title/film@390-dark": {
-    "elements": 269,
-    "hash": "c543a804"
+    "elements": 273,
+    "hash": "a179000a"
   },
   "title/film@390-light": {
-    "elements": 269,
-    "hash": "c543a804"
+    "elements": 273,
+    "hash": "a179000a"
   },
   "title/film@900-dark": {
-    "elements": 269,
-    "hash": "408013ac"
+    "elements": 273,
+    "hash": "794eb02b"
   },
   "title/film@900-light": {
-    "elements": 269,
-    "hash": "408013ac"
+    "elements": 273,
+    "hash": "794eb02b"
   },
   "title/series@1280-dark": {
-    "elements": 362,
-    "hash": "826cc41a"
+    "elements": 366,
+    "hash": "43b482af"
   },
   "title/series@1280-light": {
-    "elements": 362,
-    "hash": "826cc41a"
+    "elements": 366,
+    "hash": "43b482af"
   },
   "title/series@390-dark": {
-    "elements": 362,
-    "hash": "4a7eeb77"
+    "elements": 366,
+    "hash": "3fdea77"
   },
   "title/series@390-light": {
-    "elements": 362,
-    "hash": "4a7eeb77"
+    "elements": 366,
+    "hash": "3fdea77"
   },
   "title/series@900-dark": {
-    "elements": 362,
-    "hash": "3f663584"
+    "elements": 366,
+    "hash": "f6a336c8"
   },
   "title/series@900-light": {
-    "elements": 362,
-    "hash": "3f663584"
+    "elements": 366,
+    "hash": "f6a336c8"
   }
 }

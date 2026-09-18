@@ -54,6 +54,12 @@
 .cert { border: var(--border-hair) solid var(--bd-str); border-radius: var(--radius-4); padding: 0 var(--space-4); margin-right: var(--space-4); }
 .tagline { margin-top: var(--space-8); font-size: var(--text-caption); line-height: var(--lh-caption); font-style: italic; color: var(--muted); }
 
+/* §04: the one line a human wrote. It sits under the title because it answers
+   "what is this" before any metadata line does, and it is quiet because it is
+   an enhancement — two series in three have none, and the head must not look
+   like it is missing something. */
+.wdesc { margin-top: var(--space-4); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }
+
 /* TM2 / TV0: nothing has come out, so the date is the headline rather than a
    footnote. It takes the line the tagline would have had — an unreleased title
    rarely has one, and when it has both, the date is the more useful fact. */
@@ -115,6 +121,12 @@
 .scores .s span { display: block; font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-4); white-space: nowrap; }
 .ov { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); max-width: var(--measure); }
 .ov.clamped { display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+/* The second voice, under the first. Separated by a rule rather than a gap,
+   because the point is that these are two sources and not one longer one. */
+.wbg { margin-top: var(--space-16); border-top: var(--border-hair) solid var(--bd-sub); padding-top: var(--space-12); }
+.wbg .prov-l { margin-bottom: var(--space-8); }
+.wbg .more { display: inline-block; text-decoration: none; }
+
 .more {
   background: none; border: 0; color: var(--acc-t); cursor: pointer;
   font-family: var(--f-s); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 600;

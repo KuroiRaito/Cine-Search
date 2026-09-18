@@ -318,6 +318,10 @@ export function toTitleView(raw, mediaType, region) {
                 airDate: raw.next_episode_to_air.air_date || null,
             }
             : null,
+        /* Already in the response — external_ids rides the same request — and
+           the key to every Wikipedia article about this thing, in any language.
+           §04. */
+        wikidataId: raw.external_ids?.wikidata_id || null,
         /* The full date, not just the year: an unreleased title's date is the
            headline rather than a footnote, and "2026" is not a headline. */
         releaseDate: raw.release_date || raw.first_air_date || null,

@@ -4,6 +4,7 @@ import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { titleFull, season as fetchSeason } from '../../shared/tmdb/endpoints.js';
 import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
+import { wikiSummary } from '../../shared/wiki/wiki.js';
 import { useRegion } from '../../shared/hooks/useRegion.js';
 import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, Icon, initialsOf } from '../../shared/ui/index.js';
 import { TitleSkeleton } from './TitleSkeleton.jsx';
@@ -110,6 +111,15 @@ export default function Title() {
        episode band: the band draws it, but the primary button needs a name out
        of it — "next up Breakage" is an episode title, and only this payload
        knows it. */
+    /* §04. Never awaited by anything the page needs: it resolves to null on
+       any failure, and two series in three have no article at all. The page is
+       complete without it and says nothing about its absence. */
+    const wiki = useAsync(
+        ({ signal }) => wikiSummary(data?.wikidataId, { signal }),
+        [data?.wikidataId],
+        { skip: !data?.wikidataId },
+    ).data;
+
     const seasonAsync = useAsync(
         ({ signal }) => fetchSeason(data.id, season, { signal }).then(toSeasonView),
         [data?.id, season],
@@ -439,8 +449,18 @@ export default function Title() {
                     <div className="metaline">
                         {t.certification && <span className="cert">{t.certification}</span>}{meta}
                     </div>
+                    {/* §04: one human-written line that says what a thing is.
+                        TMDB has no equivalent — it has genres and a marketing
+                        synopsis. Absent for most series, and nothing marks the
+                        absence. */}
+                    {wiki?.description && <p className="wdesc">{wiki.description}</p>}
                     {headline && <p className="headline">{headline}</p>}
-                    {t.tagline && !headline && <p className="tagline">“{t.tagline}”</p>}
+                    {/* The tagline yields to the description. Both are one
+                        muted line under the title, and only one of them is a
+                        fact: "2024 film by Denis Villeneuve" against "Long live
+                        the fighters". Undesigned furniture, kept for the titles
+                        where Wikipedia has nothing. */}
+                    {t.tagline && !headline && !wiki?.description && <p className="tagline">“{t.tagline}”</p>}
                 </div>
 
                 <div className="tbody">
@@ -465,13 +485,35 @@ export default function Title() {
                     </div>
                     )}
 
-                    {t.overview && shows(cohort, 'overview') && (
+                    {(t.overview || wiki?.extract) && shows(cohort, 'overview') && (
                         <div className="sect">
                             <div className="sect-h"><span>Overview</span></div>
-                            <p className={`ov${expanded ? '' : ' clamped'}`}>{t.overview}</p>
-                            <button type="button" className="more" onClick={() => setExpanded((v) => !v)}>
-                                {expanded ? 'Less' : 'More'}
-                            </button>
+                            {t.overview && <>
+                                <p className={`ov${expanded ? '' : ' clamped'}`}>{t.overview}</p>
+                                <button type="button" className="more" onClick={() => setExpanded((v) => !v)}>
+                                    {expanded ? 'Less' : 'More'}
+                                </button>
+                            </>}
+                            {/* Two voices, not one merged one. TMDB sells the
+                                film; Wikipedia describes it. Somebody who has
+                                read the synopsis and still does not know what
+                                the thing is gets an answer.
+
+                                Attributed rather than absorbed, and that is a
+                                requirement rather than a courtesy: the text is
+                                CC BY-SA, and it is user-edited, so it is
+                                labelled as Wikipedia's words and never ours. */}
+                            {wiki?.extract && (
+                                <div className="wbg">
+                                    <div className="prov-l">Background · from Wikipedia</div>
+                                    <p className="ov">{wiki.extract}</p>
+                                    {wiki.url && (
+                                        <a className="more" href={wiki.url} target="_blank" rel="noreferrer noopener">
+                                            Read on Wikipedia
+                                        </a>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
 

@@ -70,7 +70,7 @@ const CHECK = args.includes('--check');
 const RECORD = args.includes('--record');
 
 /**
- * Every /api/tmdb response, frozen.
+ * Every third-party response, frozen.
  *
  * This is the fix the previous version of this comment described and deferred.
  * A fingerprint is meant to be a fact about the code, and it was not: `title`
@@ -85,7 +85,7 @@ const RECORD = args.includes('--record');
  * network exactly as before. What is pinned is *which* ones — and a reviewer
  * comparing two runs of a module wants that pinned anyway.
  *
- *   npm run snap -- --record      re-record from live TMDB
+ *   npm run snap -- --record      re-record from live TMDB and Wikipedia
  *
  * Re-record when an endpoint changes or a screen starts asking for something
  * new; a request with no fixture falls through to the network and is listed at
@@ -127,15 +127,25 @@ const browser = await chromium.launch();
 const results = {};
 let shots = 0;
 
-/* Keyed by the query string, which is the whole request: client.js builds
-   every call as /api/tmdb?path=<path>&<params>. */
+/* TMDB is keyed by its query string — client.js builds every call as
+   /api/tmdb?path=<path>&<params>, and the dev server's port changes per run so
+   the rest of the URL is not stable. Wikidata and Wikipedia are keyed by the
+   whole URL, because that is what identifies them. */
 const fixtures = !RECORD && existsSync(FIXTURES)
     ? JSON.parse(gunzipSync(readFileSync(FIXTURES)).toString('utf8'))
     : {};
 const recorded = {};
 const missed = new Set();
 
-const keyOf = (url) => new URL(url).search.replace(/^\?/, '');
+const keyOf = (url) => {
+    const u = new URL(url);
+    return u.pathname === '/api/tmdb' ? u.search.replace(/^\?/, '') : url;
+};
+
+/* Wikipedia arrives after the page has drawn and changes its height by a line.
+   Left live, it would put the fingerprints back where they were before they
+   were pinned — and worse, because the article text itself is edited. */
+const THIRD_PARTY = ['**/api/tmdb**', '**wikidata.org/**', '**wikipedia.org/**'];
 
 /* TMDB answers the provider and certification questions for every country it
    knows, and a title page renders exactly one. Keeping all of them made the
@@ -157,8 +167,8 @@ function trim(body) {
     return JSON.stringify(data);
 }
 
-async function pinTmdb(ctx) {
-    await ctx.route('**/api/tmdb**', async (route) => {
+async function pinThirdParty(ctx) {
+    for (const pattern of THIRD_PARTY) await ctx.route(pattern, async (route) => {
         const key = keyOf(route.request().url());
         const hit = fixtures[key];
         if (hit) {
@@ -178,8 +188,14 @@ try {
         for (const screen of MODULES[mod]) {
             for (const theme of THEMES) {
                 const ctx = await browser.newContext({ colorScheme: theme, viewport: { width: 390, height: 900 } });
-                await pinTmdb(ctx);
+                await pinThirdParty(ctx);
                 const page = await ctx.newPage();
+                /* useRegion asks ipapi.co where the browser is, and the answer
+                   decides which TMDB requests the app makes at all — two
+                   recordings taken minutes apart differed by two endpoints
+                   because of it. Snap is not testing geolocation, so it says
+                   where it is and the lookup never happens. */
+                await page.addInitScript(() => localStorage.setItem('user_region', 'US'));
                 // Signing in is the app's own flow, not a fixture: the snapshot
                 // should show what a signed-in person sees.
                 if (!screen.guest && process.env.SNAP_EMAIL) {
@@ -216,7 +232,9 @@ try {
 if (RECORD) {
     writeFileSync(FIXTURES, gzipSync(JSON.stringify(recorded), { level: 9 }));
     const kb = Math.round(readFileSync(FIXTURES).length / 1024);
-    console.log(`\n  Recorded ${Object.keys(recorded).length} TMDB responses, ${kb} KB.\n`);
+    const wiki = Object.keys(recorded).filter((k) => k.startsWith('http')).length;
+    console.log(`\n  Recorded ${Object.keys(recorded).length} responses`
+        + ` (${Object.keys(recorded).length - wiki} TMDB, ${wiki} Wikidata/Wikipedia), ${kb} KB.\n`);
     process.exit(0);
 }
 

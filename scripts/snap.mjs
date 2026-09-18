@@ -5,6 +5,7 @@
  *   npm run snap                     every module
  *   npm run snap -- title person     just those
  *   npm run snap -- --check          compare against the committed fingerprints
+ *   npm run snap -- --record         re-record the frozen TMDB responses
  *
  * Why this exists: the design work on this project kept drifting, and nobody
  * could see it until a person opened the app and scrolled. A module's pull
@@ -15,6 +16,7 @@
  *
  *   snapshots/<module>/<screen>@<width>-<theme>.png   for a human to look at
  *   snapshots/fingerprints.json                       for a machine to compare
+ *   snapshots/tmdb-fixtures.json.gz                   so the machine gets the same page twice
  *
  * The images are gitignored. A full-page capture at 1280 is about 2 MB, and a
  * full sweep is over a hundred of them — committing those would put hundreds of
@@ -30,6 +32,7 @@
 import { chromium } from 'playwright';
 import { createServer } from 'vite';
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { gzipSync, gunzipSync } from 'node:zlib';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
@@ -37,6 +40,7 @@ import process from 'node:process';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const OUT = join(ROOT, 'snapshots');
 const FINGERPRINTS = join(OUT, 'fingerprints.json');
+const FIXTURES = join(OUT, 'tmdb-fixtures.json.gz');
 
 /* One representative screen per module, and the widths that change its shape.
    390 is the phone, 900 the tablet band the design system never drew, 1280 the
@@ -63,25 +67,31 @@ const THEMES = ['dark', 'light'];
 
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
+const RECORD = args.includes('--record');
 
 /**
- * Modules whose fingerprint is not a fact about the code.
+ * Every /api/tmdb response, frozen.
  *
- * `discover` is rails of whatever TMDB is trending this minute, so its element
- * count is live data: three consecutive runs measured 579, 576 and 756. A
- * check that cannot agree with itself is worse than no check — it goes red for
- * reasons nobody caused and teaches everyone to ignore it.
+ * This is the fix the previous version of this comment described and deferred.
+ * A fingerprint is meant to be a fact about the code, and it was not: `title`
+ * moved twelve fingerprints in a week because TMDB added twenty recommendations
+ * to Breaking Bad, and `discover` could not agree with itself across three
+ * consecutive runs — 579, 576, then 756 elements. A check that goes red for
+ * reasons nobody caused teaches everyone to ignore it.
  *
- * It is still screenshot, because the pictures are for a person to look at and
- * changing artwork is the point there. Only the comparison is skipped.
+ * The old note assumed this needed two passes, because the screenshots want
+ * real artwork. It does not. Freezing the JSON does not freeze the pictures:
+ * image.tmdb.org is left alone, so every poster and still still loads over the
+ * network exactly as before. What is pinned is *which* ones — and a reviewer
+ * comparing two runs of a module wants that pinned anyway.
  *
- * The real fix is for snap to serve a fixed TMDB payload while it measures,
- * which would make every module deterministic rather than just this one —
- * search, title and person all drift when TMDB edits a cast list. That is its
- * own piece of work: the screenshots want the real artwork, so it means two
- * passes rather than one flag.
+ *   npm run snap -- --record      re-record from live TMDB
+ *
+ * Re-record when an endpoint changes or a screen starts asking for something
+ * new; a request with no fixture falls through to the network and is listed at
+ * the end, so a stale set says so rather than going quietly wrong.
  */
-const NOT_COMPARED = new Set(['discover']);
+const NOT_COMPARED = new Set();
 const wanted = args.filter((a) => !a.startsWith('--'));
 const modules = Object.keys(MODULES).filter((m) => !wanted.length || wanted.includes(m));
 
@@ -117,12 +127,58 @@ const browser = await chromium.launch();
 const results = {};
 let shots = 0;
 
+/* Keyed by the query string, which is the whole request: client.js builds
+   every call as /api/tmdb?path=<path>&<params>. */
+const fixtures = !RECORD && existsSync(FIXTURES)
+    ? JSON.parse(gunzipSync(readFileSync(FIXTURES)).toString('utf8'))
+    : {};
+const recorded = {};
+const missed = new Set();
+
+const keyOf = (url) => new URL(url).search.replace(/^\?/, '');
+
+/* TMDB answers the provider and certification questions for every country it
+   knows, and a title page renders exactly one. Keeping all of them made the
+   recorded set twice the size to no effect on a single pixel. Everything a
+   screen actually draws is kept whole — the cast list is 218 KB on Inception
+   and stays 218 KB, because trimming it would make the fingerprint measure a
+   shorter page than the one people load. */
+const REGIONS = ['US', 'IN'];
+function trim(body) {
+    let data;
+    try { data = JSON.parse(body); } catch { return body; }
+    for (const field of ['watch/providers', 'release_dates', 'content_ratings']) {
+        const block = data[field];
+        if (!block?.results) continue;
+        block.results = Array.isArray(block.results)
+            ? block.results.filter((r) => REGIONS.includes(r.iso_3166_1))
+            : Object.fromEntries(Object.entries(block.results).filter(([k]) => REGIONS.includes(k)));
+    }
+    return JSON.stringify(data);
+}
+
+async function pinTmdb(ctx) {
+    await ctx.route('**/api/tmdb**', async (route) => {
+        const key = keyOf(route.request().url());
+        const hit = fixtures[key];
+        if (hit) {
+            return route.fulfill({ status: hit.status, contentType: 'application/json', body: hit.body });
+        }
+        missed.add(key);
+        const res = await route.fetch();
+        const body = await res.text();
+        if (RECORD) recorded[key] = { status: res.status(), body: trim(body) };
+        return route.fulfill({ status: res.status(), contentType: 'application/json', body });
+    });
+}
+
 try {
     for (const mod of modules) {
         mkdirSync(join(OUT, mod), { recursive: true });
         for (const screen of MODULES[mod]) {
             for (const theme of THEMES) {
                 const ctx = await browser.newContext({ colorScheme: theme, viewport: { width: 390, height: 900 } });
+                await pinTmdb(ctx);
                 const page = await ctx.newPage();
                 // Signing in is the app's own flow, not a fixture: the snapshot
                 // should show what a signed-in person sees.
@@ -155,6 +211,19 @@ try {
 } finally {
     await browser.close();
     await server.close();
+}
+
+if (RECORD) {
+    writeFileSync(FIXTURES, gzipSync(JSON.stringify(recorded), { level: 9 }));
+    const kb = Math.round(readFileSync(FIXTURES).length / 1024);
+    console.log(`\n  Recorded ${Object.keys(recorded).length} TMDB responses, ${kb} KB.\n`);
+    process.exit(0);
+}
+
+if (missed.size) {
+    console.log(`\n  ${missed.size} request(s) had no fixture and went to the network:`);
+    for (const k of [...missed].slice(0, 8)) console.log(`    ${k}`);
+    console.log('  Those screens are measuring live data. Re-record: npm run snap -- --record\n');
 }
 
 if (CHECK) {

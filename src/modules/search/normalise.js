@@ -109,6 +109,77 @@ export function splitYear(query) {
  * and no particles, so for them this is a list of one and no extra request is
  * ever made.
  */
+/**
+ * Rung 3 — the longest prefix that still matches, and never below six.
+ *
+ * TMDB matches word prefixes, so truncating a misspelling works: intersteller
+ * loses two letters and becomes interstell, which is a prefix of Interstellar.
+ * It works until the prefix stops being the word, and six characters is where
+ * the evidence stops rather than a round number — `titan` returns 610 results
+ * and not one of the first twenty is Titanic, `shol` returns people called
+ * Sholto-Douglas, `dang` returns a film called Dang!. Below six a correction
+ * quietly becomes a different search, which is the failure this rung exists to
+ * prevent.
+ *
+ * Returns candidates longest first. The caller asks for each in turn and stops
+ * at the first that answers, which is what "longest prefix that still matches"
+ * means in practice.
+ */
+export const MIN_PREFIX = 6;
+
+/**
+ * Did the truncation actually find the thing, or just find something?
+ *
+ * This is the half of rung 3 the design names without stating. "Truncate to the
+ * longest prefix that still **matches**" — matches the title, not merely
+ * returns rows. Without the check, truncation answers anything: `movie where
+ * guy loses his memory` becomes `where guy loses his mem`, TMDB hands back a
+ * film, and the screen announces a correction nobody made to a title nobody
+ * typed. Measured: 40 of the 120 golden queries were "rescued" that way,
+ * including every plot-recall query and thirteen of twenty moods.
+ *
+ * A correction is a prefix of the answer. `interstell` is a prefix of
+ * Interstellar and `game of th` is a prefix of Game of Thrones; `where guy
+ * loses his mem` is a prefix of nothing. Spaces are ignored on both sides, so a
+ * truncation landing mid-word still counts.
+ */
+export const isCorrectionOf = (prefix, title) => {
+    const fold = (v) => String(v || '')
+        .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+        .toLowerCase().replace(/[^a-z0-9]/g, '');
+    const p = fold(prefix);
+    return p.length > 0 && fold(title).startsWith(p);
+};
+
+/**
+ * And never less than half of what was typed.
+ *
+ * Six characters is the right floor for a word and the wrong one for a
+ * sentence. `something to watch while eating` truncated to `someth` returns a
+ * film beginning with "Someth" — which satisfies every other rule here and is
+ * not a correction of anything. Measured: the flat floor let truncation claim
+ * nine of twenty moods and seven of ten plot-recall queries, which is the very
+ * failure this rung was re-ordered to prevent.
+ *
+ * A misspelling is one or two letters wrong. The design's own examples lose two
+ * characters (intersteller), four (pulp ficiton) and five (game of thornes) —
+ * never most of the query. Half is the generous reading of that.
+ */
+const floorFor = (q) => Math.max(MIN_PREFIX, Math.ceil(q.length / 2));
+
+export function prefixes(query, floor) {
+    const q = String(query || '').trim();
+    const stop = floor ?? floorFor(q);
+    const out = [];
+    for (let n = q.length - 1; n >= stop; n -= 1) {
+        const candidate = q.slice(0, n).trim();
+        // Trimming a trailing space can repeat a candidate; asking twice for
+        // the same string is a request bought and thrown away.
+        if (candidate.length >= stop && candidate !== out.at(-1)) out.push(candidate);
+    }
+    return out;
+}
+
 export function rungs(raw) {
     const asTyped = String(raw || '').trim();
     const out = [{ rung: 0, query: asTyped, year: null }];

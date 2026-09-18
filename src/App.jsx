@@ -15,6 +15,7 @@ const Auth = lazy(() => import('./modules/entry').then((m) => ({ default: m.Auth
 import About from './app/About.jsx';
 import NotFound from './app/NotFound.jsx';
 import Boundary from './app/Boundary.jsx';
+import Navigation from './app/Navigation.jsx';
 import { useAuth } from './shared/auth/AuthProvider.jsx';
 import { hasSeenCover } from './app/firstVisit.js';
 import ThemeToggle from './shared/theme/ThemeToggle.jsx';
@@ -54,6 +55,10 @@ function Shell({ children }) {
 
     return (
         <div className="app">
+            {/* SH11 / SH12 — scroll, focus and the announcement that go with a
+                route change. Inside the shell so it survives a route boundary
+                catching, and so it is mounted for every route that has one. */}
+            <Navigation />
             <header className="topbar">
                 <div className="topbar-in">
                     <NavLink to="/" className="wordmark"><i />Cine Search</NavLink>

@@ -5,7 +5,7 @@ import {
 } from '../../shared/tmdb/endpoints.js';
 import { fromItem } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
-import { useRegion } from '../../shared/hooks/useRegion.js';
+import { useRegion } from '../../shared/hooks/RegionProvider.jsx';
 import { Rail, Skeleton, ErrorBox, Icon } from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import {

@@ -95,6 +95,26 @@ export function clearCache() {
     CACHE.clear();
 }
 
+/* SH7 — where the visitor is, learned from a call the app was making anyway.
+ *
+ * /api/tmdb runs on our own deployment and Vercel hands it the requester's
+ * country; it echoes that back on every response. So the region costs no
+ * request, cannot be blocked by a tracker blocker, cannot hang, and no IP
+ * address leaves the product. It replaces a fetch to ipapi.co that ran on first
+ * load, before anybody had tapped anything, with no consent and no mention
+ * anywhere in the interface.
+ *
+ * A one-slot broadcast rather than a return value: whichever call answers
+ * first knows, and every reader is told.
+ */
+const countryWatchers = new Set();
+let lastCountry = null;
+export const onCountry = (fn) => {
+    countryWatchers.add(fn);
+    if (lastCountry) fn(lastCountry);
+    return () => countryWatchers.delete(fn);
+};
+
 async function fetchJson(url, path) {
     let res;
     try {
@@ -103,6 +123,11 @@ async function fetchJson(url, path) {
         throw new TmdbError(err?.message || 'network error', { path });
     }
     if (!res.ok) throw new TmdbError(`TMDB responded ${res.status}`, { status: res.status, path });
+    const country = res.headers?.get?.('x-cine-country');
+    if (country && country !== lastCountry) {
+        lastCountry = country;
+        for (const fn of countryWatchers) fn(country);
+    }
     return res.json();
 }
 

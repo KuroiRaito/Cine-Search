@@ -20,7 +20,8 @@
     "verify": "node scripts/verify.mjs",
     "snap": "node scripts/snap.mjs",
     "auth": "node --env-file=.env scripts/auth-cases.mjs",
-    "cohorts": "node scripts/title-cohorts.mjs"
+    "cohorts": "node scripts/title-cohorts.mjs",
+    "find": "node --env-file-if-exists=.env scripts/find-cases.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",

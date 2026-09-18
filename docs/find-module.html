@@ -1,0 +1,1366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Find Module</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Projector — the find module (discover + search). Built on the tokens in docs/foundations.html;
+   no loose numbers here either. */
+:root{
+  color-scheme:dark;
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-3:#0A2530;--beam-7:#155A72;--beam-9:#25BADF;--beam-11:#6FDCF5;
+  --mar-3:#2B210B;--mar-7:#6B5316;--mar-9:#F5C45C;--mar-11:#F0C468;
+  --st-done-3:#07241F;--st-done-9:#2ABFA0;--st-done-11:#6FE0C8;
+  --st-drop-3:#26100C;--st-drop-9:#B5594A;--st-drop-11:#DC8E7F;
+  --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
+  --on-beam-9:#06333F;
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);
+  --grid-line:rgba(111,220,245,.13);
+  --space-0:0px;--space-2:2px;--space-4:4px;--space-8:8px;--space-12:12px;
+  --space-16:16px;--space-20:20px;--space-24:24px;--space-32:32px;--space-40:40px;
+  --space-48:48px;--space-64:64px;--space-80:80px;
+  --radius-4:4px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-full:999px;
+  --border-hair:1px;--border-focus:2px;
+  --control-sm:36px;--control-md:44px;--control-lg:52px;
+  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+  --f-d:'Archivo',system-ui,sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',ui-monospace,monospace;
+  --dur-fast:120ms;--dur-base:200ms;--ease-out:cubic-bezier(.2,0,0,1);
+  --shadow-raised:0 6px 16px -4px rgba(0,0,0,.6);--scrim-wash:rgba(4,6,12,.62);
+  --z-nav:40;--z-scrim:60;
+  --gutter:var(--space-16);--control-h:var(--control-md);--radius-control:var(--radius-12);
+  --field-gap:var(--space-8);--field-stack:var(--space-16);--section-gap:var(--space-24);
+  --form-max:420px;--measure:65ch;--shell-max:none;
+  --text-micro:11px;--lh-micro:16px;--text-caption:12px;--lh-caption:16px;
+  --text-body-sm:13px;--lh-body-sm:20px;--text-label:13px;--lh-label:16px;
+  --text-body:15px;--lh-body:24px;--text-title-sm:17px;--lh-title-sm:24px;
+  --text-title:21px;--lh-title:28px;--text-display-sm:27px;--lh-display-sm:32px;
+  --text-display:40px;--lh-display:44px;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-s);font-size:var(--text-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:var(--border-focus) solid var(--acc);outline-offset:3px;border-radius:var(--radius-4)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 var(--space-24)}
+.mast{border-bottom:var(--border-hair) solid var(--bd-sub);padding:var(--space-64) 0 var(--space-40);position:relative;overflow:hidden}
+.mast::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to right,var(--grid-line) 0 1px,transparent 1px var(--space-4)),
+             repeating-linear-gradient(to bottom,var(--grid-line) 0 1px,transparent 1px var(--space-4));
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%);
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%)}
+.mast .wrap{position:relative}
+.eyebrow{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t);display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-16)}
+.eyebrow i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal;flex:0 0 auto}
+h1{font-family:var(--f-d);font-size:var(--text-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.04em;margin:0 0 var(--space-16);text-wrap:balance}
+.lede{font-size:var(--text-body);line-height:var(--lh-body);color:var(--muted);max-width:62ch;margin:0}
+.lede b{color:var(--text);font-weight:600}
+nav.toc{border-bottom:var(--border-hair) solid var(--bd-sub);position:sticky;top:0;z-index:var(--z-nav);
+  background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px)}
+nav.toc .wrap{display:flex;gap:var(--space-4);overflow-x:auto;padding-top:var(--space-8);padding-bottom:var(--space-8)}
+nav.toc a{flex:0 0 auto;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);
+  letter-spacing:.04em;color:var(--muted);text-decoration:none;padding:var(--space-8) var(--space-12);border-radius:var(--radius-8)}
+nav.toc a:hover{background:var(--surface);color:var(--text)}
+section{padding:var(--space-64) 0;border-bottom:var(--border-hair) solid var(--bd-sub)}
+.shead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
+.snum{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc);flex:0 0 auto}
+h2{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+h3{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;margin:var(--space-40) 0 var(--space-12)}
+h4{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:var(--space-24) 0 var(--space-12)}
+section > .wrap > p,.prose{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0 0 var(--space-12)}
+section > .wrap > p b,.prose b{color:var(--text);font-weight:600}
+code{font-family:var(--f-m);font-size:.92em;background:var(--surface);padding:var(--space-2) var(--space-4);border-radius:var(--radius-4);color:var(--acc-t)}
+.tbl-wrap{overflow-x:auto;margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12)}
+table{width:100%;border-collapse:collapse;font-size:var(--text-body-sm);line-height:var(--lh-body-sm)}
+th{text-align:left;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd);background:var(--bg-sub);white-space:nowrap}
+td{padding:var(--space-12) var(--space-16);border-bottom:var(--border-hair) solid var(--bd-sub);vertical-align:top;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.tok,td.num{font-family:var(--f-m);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.tok{color:var(--acc-t)}td.num{color:var(--text)}
+tbody tr:hover td{background:color-mix(in srgb,var(--surface) 55%,transparent)}
+.note{border-left:var(--border-focus) solid var(--acc-bd);background:var(--acc-bg);padding:var(--space-12) var(--space-16);
+  border-radius:0 var(--radius-8) var(--radius-8) 0;margin:var(--space-16) 0;font-size:var(--text-body-sm);
+  line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure)}
+.note b{color:var(--acc-t);font-weight:600}
+.note.warn{border-left-color:var(--rate-bd);background:var(--rate-bg)}
+.note.warn b{color:var(--rate-t)}
+.note.law{border-left-color:var(--st-drop-9);background:var(--st-drop-3)}
+.note.law b{color:var(--st-drop-11)}
+.note.ok{border-left-color:var(--st-done-9);background:var(--st-done-3)}
+.note.ok b{color:var(--st-done-11)}
+pre{background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);
+  padding:var(--space-16);overflow-x:auto;margin:var(--space-16) 0;font-family:var(--f-m);
+  font-size:var(--text-caption);line-height:var(--lh-body-sm);color:var(--muted)}
+pre b{color:var(--acc-t);font-weight:500}pre i{color:var(--faint);font-style:normal}
+pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11);text-decoration:none}
+</style>
+<style>
+.phones{display:flex;flex-wrap:wrap;gap:var(--space-24);margin-top:var(--space-16);align-items:flex-start}
+.phone{flex:0 0 auto;width:320px;max-width:100%}
+.phone-cap{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:var(--space-8);display:flex;gap:var(--space-8)}
+.phone-cap b{color:var(--acc-t);font-weight:600}
+.screen{width:320px;max-width:100%;height:600px;overflow:hidden;position:relative;background:var(--bg);
+  border:var(--border-hair) solid var(--bd);border-radius:var(--radius-16);--gutter:var(--space-16)}
+.screen *{box-sizing:border-box}
+.scroll{height:100%;overflow:hidden}
+
+/* --- banner + avatar --- */
+.pbanner{position:relative;aspect-ratio:3/1;background:linear-gradient(115deg,var(--ink-5),var(--beam-7) 55%,var(--mar-7));overflow:hidden}
+.pbanner.empty{background:repeating-linear-gradient(45deg,var(--ink-3) 0 6px,var(--ink-2) 6px 12px);display:grid;place-items:center}
+.pbanner .ecap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.pbanner .bscrim{position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 62%)}
+.pbanner .bedit{position:absolute;right:var(--space-8);top:var(--space-8);height:var(--control-sm);min-width:var(--control-sm);
+  padding:0 var(--space-12);border-radius:var(--radius-full);border:0;cursor:pointer;
+  background:rgba(4,6,12,.6);backdrop-filter:blur(6px);color:#fff;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.phead{padding:0 var(--gutter);margin-top:calc(var(--space-32) * -1);position:relative}
+.pav{width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:3px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title);font-weight:800;color:#fff}
+.pav.empty{background:var(--surface-hv);color:var(--faint)}
+.pname-row{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:var(--space-8)}
+.pname{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+.phandle{font-family:var(--f-m);font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted)}
+.pbio{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:var(--space-12) 0 0;max-width:var(--measure)}
+.pbio.ph{color:var(--faint);font-style:italic}
+.pbtn{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--surface-hv);color:var(--text);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;
+  display:inline-flex;align-items:center;gap:var(--space-4);flex:0 0 auto}
+
+/* --- stat strip --- */
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--border-hair);margin:var(--space-20) var(--gutter) 0;
+  background:var(--bd-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.pstat{background:var(--bg-sub);padding:var(--space-8) var(--space-4);text-align:center}
+.pstat dt{font-family:var(--f-m);font-size:9px;line-height:var(--lh-micro);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.pstat dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.pstat dd small{font-size:var(--text-micro);color:var(--muted);font-weight:400}
+
+/* --- shelves --- */
+.shelf{margin-top:var(--section-gap)}
+.shelf-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-8);padding:0 var(--gutter);margin-bottom:var(--space-8)}
+.shelf-h h4{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;
+  letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none}
+.shelf-n{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);font-variant-numeric:tabular-nums}
+.rail{display:flex;gap:var(--space-8);overflow:hidden;padding:0 var(--gutter) var(--space-4)}
+.fti{flex:0 0 auto;width:78px}
+.fti .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden;position:relative}
+.fti .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fti .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.fpe{flex:0 0 auto;width:72px;text-align:center}
+.fpe .face{width:72px;height:72px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-6),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden}
+.fpe .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text)}
+.fpe .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+/* a character card is a face plus the two things that disambiguate it */
+.fch{flex:0 0 auto;width:96px}
+.fch .face{width:96px;aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(140deg,var(--mar-7),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fch .face .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;
+  font-family:var(--f-m);font-size:9px;line-height:1.3}
+.fch .nm{font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fch .sub{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.addcard{flex:0 0 auto;width:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-4);
+  aspect-ratio:2/3;border-radius:var(--radius-8);border:var(--border-hair) dashed var(--bd-str);background:none;
+  color:var(--muted);cursor:pointer;font-family:var(--f-s);font-size:var(--text-micro)}
+.addcard .plus{font-size:var(--text-title-sm);line-height:1;color:var(--acc-t)}
+.empty-shelf{margin:0 var(--gutter);padding:var(--space-16);border:var(--border-hair) dashed var(--bd-str);
+  border-radius:var(--radius-12);text-align:center}
+.empty-shelf p{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-8)}
+.empty-shelf button{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.callout{display:flex;gap:var(--space-8);margin-top:var(--space-8);padding:0 var(--gutter)}
+
+/* ---- components the benchmark added ---- */
+.ptabs{display:flex;gap:0;overflow:hidden;border-bottom:var(--border-hair) solid var(--bd-sub);padding:0 var(--gutter);margin-top:var(--space-12)}
+.ptabs button{flex:0 0 auto;background:none;border:0;cursor:pointer;padding:var(--space-8) var(--space-12) var(--space-8);
+  font-family:var(--f-s);font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--muted);
+  border-bottom:var(--border-focus) solid transparent;min-height:var(--control-h)}
+.ptabs button.on{color:var(--acc-t);border-bottom-color:var(--acc)}
+.pname-on-banner{position:absolute;left:var(--gutter);bottom:var(--space-12);z-index:2;
+  font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;color:#fff}
+.pbanner.tall{aspect-ratio:2/1}
+.pav-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--gutter) 0}
+.pav-sm{width:var(--space-48);height:var(--space-48);border-radius:var(--radius-full);flex:0 0 auto;
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:2px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:800;color:#fff}
+.pav-sm.empty{background:var(--surface-hv);color:var(--faint)}
+/* split stat block, one per medium */
+.sblock{margin:var(--space-16) var(--gutter) 0;background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);
+  border-radius:var(--radius-12);padding:var(--space-12)}
+.sblock-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
+.sblock-h b{font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text)}
+.sblock-h span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.snums{display:flex;gap:var(--space-16);margin-bottom:var(--space-8)}
+.snum-i{min-width:0}
+.snum-i dt{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.snum-i dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.snum-i dd.rate{color:var(--rate-t)}
+/* the distribution bar — six watch-state hues, already in the foundations */
+.dbar{display:flex;height:var(--space-8);border-radius:var(--radius-full);overflow:hidden;background:var(--surface-hv)}
+.dbar i{display:block;height:100%;font-style:normal}
+.dlegend{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-8)}
+.dlegend span{display:flex;align-items:center;gap:var(--space-4);font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.dlegend i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);font-style:normal;flex:0 0 auto}
+/* a ranked dimension card: count AND mean */
+.dimcard{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8);border-radius:var(--radius-8);
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub)}
+.dimcard .lbl{min-width:0;flex:1}
+.dimcard .lbl b{display:block;font-size:var(--text-caption);font-weight:600;color:var(--text)}
+.dimcard .lbl span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.dimcard .mean{font-family:var(--f-m);font-size:var(--text-body-sm);font-weight:600;color:var(--rate-t);
+  font-variant-numeric:tabular-nums;flex:0 0 auto}
+.dimgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);padding:0 var(--gutter);margin-top:var(--space-8)}
+/* chip row — the fix for 24 screens of scroll */
+.chips{display:flex;gap:var(--space-8);overflow:hidden;padding:var(--space-12) var(--gutter)}
+.chip{flex:0 0 auto;height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-full);
+  border:var(--border-hair) solid var(--bd);background:none;color:var(--muted);cursor:pointer;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.chip.on{background:var(--acc-bg);border-color:var(--acc-bd);color:var(--acc-t)}
+.chip em{font-family:var(--f-m);font-style:normal;font-size:9px;opacity:.8}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);padding:0 var(--gutter)}
+.fgrid .cell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fgrid .cell .art .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px;line-height:1.3}
+.fgrid .cell .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fgrid .cell .sub{font-family:var(--f-m);font-size:8px;color:var(--faint)}
+/* sheets */
+.sheetwrap{position:absolute;inset:0;background:var(--scrim-wash);display:flex;align-items:flex-end}
+.sheet{width:100%;background:var(--bg-sub);border-top:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16) var(--radius-16) 0 0;padding:var(--space-12) var(--space-20) var(--space-20)}
+.grab{width:var(--space-32);height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto var(--space-16)}
+.sh-t{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;letter-spacing:-.02em;margin:0 0 var(--space-4);color:var(--text)}
+.sh-b{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-12)}
+.fld{display:flex;flex-direction:column;gap:var(--field-gap);margin-bottom:var(--field-stack)}
+.fld>span{font-size:var(--text-label);font-weight:600;color:var(--muted)}
+.inp{height:var(--control-h);border-radius:var(--radius-control);background:var(--bg);color:var(--text);
+  border:0;box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);padding:0 var(--space-16);
+  font-family:var(--f-s);font-size:var(--text-body);display:flex;align-items:center}
+.inp.ta{height:auto;min-height:var(--space-64);padding:var(--space-12) var(--space-16);align-items:flex-start;line-height:var(--lh-body-sm);font-size:var(--text-body-sm)}
+.cnt{font-family:var(--f-m);font-size:9px;color:var(--faint);text-align:right}
+.btn{height:var(--control-h);border-radius:var(--radius-control);border:0;cursor:pointer;width:100%;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-label);font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center}
+.btn.q{background:var(--surface-hv);color:var(--text)}
+.skel{background:var(--surface-hv);border-radius:var(--radius-4);animation:none}
+/* desktop frames, drawn at true width then scaled to fit this page */
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px;height:700px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;height:700px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px;display:flex;flex-direction:column}
+.dtop{display:flex;align-items:center;gap:var(--space-24);padding:var(--space-12) var(--gutter);
+  border-bottom:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:var(--space-8);font-family:var(--f-d);font-weight:800;font-size:var(--text-title-sm);letter-spacing:-.03em}
+.dwm i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:var(--space-4)}
+.dnav a{padding:0 var(--space-12);height:var(--control-h);display:inline-flex;align-items:center;border-radius:var(--radius-8);
+  font-size:var(--text-body-sm);color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+.dbody{flex:1;overflow:hidden}
+.dcols{display:grid;grid-template-columns:320px 1fr;gap:var(--space-32);padding:var(--space-24) var(--gutter)}
+
+.invite{margin:var(--space-16) var(--gutter) 0;padding:var(--space-16);border-radius:var(--radius-12);
+  border:var(--border-hair) dashed var(--bd-str);background:var(--bg-sub)}
+.invite b{display:block;font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.invite p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-12)}
+.invite .go{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.waiting{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.ladder{margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.lrow{display:grid;grid-template-columns:96px 1fr;gap:var(--space-16);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd-sub);align-items:baseline}
+.lrow:last-child{border-bottom:0}
+.lrow .at{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc-t);font-variant-numeric:tabular-nums}
+.lrow .what{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted)}
+.lrow .what b{color:var(--text);font-weight:600}
+
+/* Icons in the mock screens are the shipped Lucide set, drawn inline. Sized
+   in em so each mock keeps its own scale, with the baseline nudge that puts
+   an inline SVG where the glyph used to sit — minus the glyph's drift. */
+.di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+<style>
+.lh{padding:var(--space-16) var(--gutter) 0}
+.lh h3{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;
+  letter-spacing:-.03em;margin:0;color:var(--text)}
+.ico-s{width:16px;height:16px;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+<style>
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px}
+.dtop{display:flex;align-items:center;gap:24px;padding:12px 40px;border-bottom:1px solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-weight:800;font-size:17px;letter-spacing:-.03em}
+.dwm i{width:8px;height:8px;border-radius:999px;background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:4px}
+.dnav a{padding:0 12px;height:44px;display:inline-flex;align-items:center;border-radius:8px;font-size:13px;color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+</style>
+
+<style>
+.coh{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--space-12);margin-top:var(--space-16)}
+.cohc{background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);padding:var(--space-16)}
+.cohc.no{border-style:dashed;opacity:.72}
+.cohc h5{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;margin:0 0 var(--space-4);color:var(--text)}
+.cohc .tag{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc-t);margin-bottom:var(--space-8)}
+.cohc.no .tag{color:var(--st-drop-11)}
+.cohc p{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-8)}
+.cohc code{font-size:9px}
+.cohc ul{margin:0;padding-left:var(--space-16);font-size:var(--text-caption);line-height:18px;color:var(--muted)}
+</style>
+
+
+<style>
+/* Find — frame parts. Everything else is inherited from the shared doc styles. */
+.fbox{display:flex;align-items:center;gap:var(--space-8);margin:var(--space-12) var(--gutter) 0;
+  height:var(--control-h);border-radius:var(--radius-control);background:var(--bg-sub);
+  box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);padding:0 var(--space-12);color:var(--faint)}
+.fbox.on{box-shadow:inset 0 0 0 var(--border-focus) var(--acc)}
+.fbox .q{flex:1;min-width:0;font-size:var(--text-body-sm);color:var(--text);white-space:nowrap;overflow:hidden}
+.fbox .q.ph{color:var(--faint)}
+.fbox .clr{width:var(--space-20);height:var(--space-20);border-radius:var(--radius-full);
+  background:var(--surface-hv);color:var(--muted);display:grid;place-items:center;flex:0 0 auto}
+.ffilt{width:var(--control-h);height:var(--control-h);flex:0 0 auto;border-radius:var(--radius-control);
+  background:var(--surface);color:var(--muted);display:grid;place-items:center}
+.ffilt.on{background:var(--acc-bg);color:var(--acc-t)}
+.frow{display:flex;gap:var(--space-8);align-items:center;margin:var(--space-12) var(--gutter) 0}
+.frow .fbox{margin:0;flex:1;min-width:0}
+/* the interpretation band — at most one, ever */
+.finterp{margin:var(--space-12) var(--gutter) 0;padding:var(--space-8) var(--space-12);border-radius:var(--radius-8);
+  background:var(--acc-bg);border-left:var(--border-focus) solid var(--acc-bd);
+  font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted)}
+.finterp b{color:var(--acc-t)}
+.finterp .alt{display:block;color:var(--faint);font-size:var(--text-micro);margin-top:var(--space-2)}
+.finterp.warn{background:var(--rate-bg);border-left-color:var(--rate-bd)}
+.finterp.warn b{color:var(--rate-t)}
+/* count + sort line above a grid */
+.fbar{display:flex;justify-content:space-between;align-items:center;margin:var(--space-12) var(--gutter) var(--space-8);
+  font-family:var(--f-m);font-size:9px;color:var(--faint);letter-spacing:.04em}
+.fbar b{color:var(--muted);font-weight:400}
+.fbar .srt{display:flex;align-items:center;gap:var(--space-4);color:var(--acc-t)}
+/* a person as the answer, not as an afterthought */
+.fperson{display:flex;align-items:center;gap:var(--space-12);margin:var(--space-12) var(--gutter) 0;
+  padding:var(--space-8);border-radius:var(--radius-12);background:var(--surface);
+  box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub)}
+.fperson .face{width:var(--space-48);height:var(--space-48);flex:0 0 auto;border-radius:var(--radius-full);
+  background:linear-gradient(140deg,var(--ink-6),var(--ink-4))}
+.fperson .who{min-width:0;flex:1}
+.fperson .who b{display:block;font-size:var(--text-caption);font-weight:600;color:var(--text)}
+.fperson .who span{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.5}
+.fperson .who i{font-style:normal;color:var(--acc-t)}
+/* a franchise, in order, with the number that matters */
+.fcoll{margin:var(--space-12) var(--gutter) 0;padding:var(--space-8) var(--space-12);border-radius:var(--radius-12);
+  background:var(--surface);box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub)}
+.fcoll .ch{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
+.fcoll .ch b{font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text)}
+.fcoll .ch span{font-family:var(--f-m);font-size:9px;color:var(--st-done-11)}
+.fcoll .strip{display:flex;gap:var(--space-4)}
+.fcoll .strip i{flex:1;height:var(--space-24);border-radius:var(--radius-4);background:var(--ink-5);
+  font-style:normal;font-family:var(--f-m);font-size:8px;color:var(--faint);display:grid;place-items:center}
+.fcoll .strip i.seen{background:var(--st-done-3);color:var(--st-done-11)}
+/* the zero-result screen — the most common screen in the module */
+.fzero{margin:var(--space-16) var(--gutter) 0;padding:var(--space-16);border-radius:var(--radius-12);
+  border:var(--border-hair) dashed var(--bd-str);text-align:center}
+.fzero b{display:block;font-family:var(--f-d);font-size:var(--text-body-sm);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.fzero p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-12)}
+/* A reason has two halves — what you would drop, and what it leaves. Centred
+   prose breaks them onto four lines; a row keeps each on one. */
+.fzero .why{display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-8);
+  text-align:left;padding:var(--space-4) 0;border-top:var(--border-hair) solid var(--bd-sub);
+  font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted)}
+.fzero .why b{display:inline;font-family:var(--f-s);font-size:var(--text-micro);color:var(--text);font-weight:600;margin:0}
+.fzero .why em{font-style:normal;font-family:var(--f-m);color:var(--acc-t);flex:0 0 auto}
+.fzero .why + .fgo{margin-top:var(--space-12)}
+.fsect{font-family:var(--f-m);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);
+  margin:var(--space-16) var(--gutter) var(--space-8)}
+.frecent{margin:0 var(--gutter);display:flex;flex-direction:column;gap:var(--space-2)}
+.frecent div{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8) 0;
+  font-size:var(--text-caption);color:var(--text);border-top:var(--border-hair) solid var(--bd-sub)}
+.frecent div:first-child{border-top:0}
+.frecent div span{color:var(--faint);flex:0 0 auto}
+.frecent div em{margin-left:auto;font-style:normal;color:var(--faint)}
+/* desktop: the facets are furniture, not a sheet */
+.dfilt{display:flex;gap:var(--space-12);padding:var(--space-16) var(--gutter) 0;align-items:flex-end}
+.dfilt .fl{flex:0 0 auto;min-width:118px}
+.dfilt .fl u{display:block;text-decoration:none;font-family:var(--f-m);font-size:9px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:var(--space-4)}
+.dfilt .fl div{height:var(--control-h);border-radius:var(--radius-control);background:var(--bg-sub);
+  box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);display:flex;align-items:center;justify-content:space-between;
+  padding:0 var(--space-12);font-size:var(--text-body-sm);color:var(--muted)}
+.dfilt .fl.set div{box-shadow:inset 0 0 0 var(--border-hair) var(--acc-bd);background:var(--acc-bg);color:var(--acc-t)}
+.dfilt .grow{flex:1}
+.dgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--space-16);padding:var(--space-16) var(--gutter)}
+.dgrid .cell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4)}
+.dgrid .cell .nm{font-size:var(--text-caption);color:var(--text)}
+.dgrid .cell .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.bnav{display:flex;border-top:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub);
+  position:absolute;left:0;right:0;bottom:0}
+.bnav div{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-2);
+  padding:var(--space-8) 0 var(--space-12);font-size:9px;color:var(--faint)}
+.bnav div.on{color:var(--acc-t)}
+.bnav div span{font-size:var(--icon-20);line-height:1;display:block}
+</style>
+
+<header class="mast"><div class="wrap">
+  <div class="eyebrow"><i></i>Projector &middot; module 5 &middot; discover + search</div>
+  <h1>Find</h1>
+  <p class="lede">There is a golden set in this repository of <b>120 things people actually type</b>. Run through the search that ships today, <b>62% of them come back with nothing at all</b> &mdash; and the reason is not the ranking. It is that the box is wired to one engine when the question needs the other. Everything below was measured against live TMDB this week, including one hypothesis of mine that the data killed.</p>
+</div></header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#typed">01 What people type</a>
+  <a href="#engines">02 Two engines</a>
+  <a href="#module">03 The module</a>
+  <a href="#rescue">04 The rescue ladder</a>
+  <a href="#facets">05 Facets and sorts</a>
+  <a href="#filters">06 The filter set</a>
+  <a href="#rails">07 Rails are queries</a>
+  <a href="#answers">08 Person and franchise</a>
+  <a href="#screens">09 Screens</a>
+  <a href="#states">10 States</a>
+  <a href="#open">11 Decisions</a>
+</div></nav>
+
+<section id="typed"><div class="wrap">
+  <div class="shead"><span class="snum">01</span><h2>What people type, and what comes back</h2></div>
+  <p><code>eval/queries.json</code> holds 120 queries in nine categories, built for this product and graded by hand. It is the best research asset the repository has, and <b>80 of the 120 have never been scored</b> &mdash; the one committed run covers exact titles, typos and partials, which are the three categories that already work.</p>
+  <p>So I ran all 120 through <code>/search/multi</code>, as they are typed, and then again through two normalisations. <b>Zero-result rate</b> is the column that matters: it is the share of queries that produce a screen with nothing on it.</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Category</th><th>n</th><th>Nothing, as typed</th><th>After stripping intent words</th><th>+ Hindi particles</th><th>Graded hit@5</th></tr></thead>
+    <tbody>
+      <tr><td class="num">exact_title</td><td class="num">15</td><td class="use">0%</td><td class="use">0%</td><td class="use">0%</td><td class="use">100%</td></tr>
+      <tr><td class="num">partial</td><td class="num">10</td><td class="use">0%</td><td class="use">0%</td><td class="use">0%</td><td class="use">88%</td></tr>
+      <tr><td class="num">typo</td><td class="num">20</td><td class="use"><b>75%</b></td><td class="use">75%</td><td class="use">75%</td><td class="use">5%</td></tr>
+      <tr><td class="num">person_led</td><td class="num">15</td><td class="use">40%</td><td class="use"><b>7%</b></td><td class="use">7%</td><td class="use"><span style="color:var(--faint)">ungraded</span></td></tr>
+      <tr><td class="num">franchise</td><td class="num">10</td><td class="use">80%</td><td class="use"><b>0%</b></td><td class="use">0%</td><td class="use"><span style="color:var(--faint)">ungraded</span></td></tr>
+      <tr><td class="num">hinglish</td><td class="num">15</td><td class="use">80%</td><td class="use">80%</td><td class="use"><b>60%</b></td><td class="use">100%</td></tr>
+      <tr><td class="num">mood</td><td class="num">20</td><td class="use"><b>95%</b></td><td class="use">60%</td><td class="use">60%</td><td class="use"><span style="color:var(--faint)">ungraded</span></td></tr>
+      <tr><td class="num">plot_recall</td><td class="num">10</td><td class="use"><b>100%</b></td><td class="use">100%</td><td class="use">100%</td><td class="use">0%</td></tr>
+      <tr><td class="num">attribute</td><td class="num">5</td><td class="use">100%</td><td class="use">60%</td><td class="use">60%</td><td class="use"><span style="color:var(--faint)">ungraded</span></td></tr>
+      <tr><td class="num"><b>All</b></td><td class="num"><b>120</b></td><td class="use"><b>62%</b></td><td class="use"><b>44%</b></td><td class="use"><b>42%</b></td><td class="use">48% &rarr; 48%</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note ok"><b>The last column is the one that makes the rest safe.</b> Stripping intent words changes hit@5 on the 50 graded queries by <b>nothing at all</b> &mdash; 48% before, 48% after. It rescues a third of the empty screens without touching a single query that already worked, which is the only kind of search change worth shipping unmeasured.</div>
+
+  <p>Read down the first column and the module writes itself. Three categories work. Six do not, and they fail for <b>three different reasons</b>:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Why it fails</th><th>Categories</th><th>Fixable by</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>The words around the name</b></td><td class="use">person_led, franchise, attribute, hinglish</td><td class="use">Text the search never needed. TMDB matches on a strict AND, so <code>christopher nolan movies</code> returns <b>0</b> and <code>christopher nolan</code> returns him at rank 1. &sect;04.</td></tr>
+      <tr><td class="num"><b>The spelling</b></td><td class="use">typo</td><td class="use">There is no fuzzy match in TMDB. Four rungs of rescue, three of them free. &sect;04.</td></tr>
+      <tr><td class="num"><b>The question itself</b></td><td class="use">mood, plot_recall, attribute</td><td class="use">&ldquo;Something light for a Sunday&rdquo; is not a name, and no name index will ever hold it. It is a <b>filter</b>, and TMDB has a whole engine for those. &sect;02, &sect;05.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>One category stays broken, and the design should say so rather than pretend.</b> <code>plot_recall</code> &mdash; <i>&ldquo;movie where guy loses his memory&rdquo;</i>, <i>&ldquo;kid alone at home christmas&rdquo;</i> &mdash; is 100% empty and none of the four rescue rungs touches it. Answering it needs a semantic index over synopses, which is a different product decision with a running cost. What this module owes it is an <b>honest exit</b>, not a guess. &sect;04, state FQ9.</div>
+</div></section>
+
+<section id="engines"><div class="wrap">
+  <div class="shead"><span class="snum">02</span><h2>Two engines, one box</h2></div>
+  <p>TMDB does not have a search endpoint with filters. It has <b>two separate engines that share nothing</b>, and almost every problem in this module is a consequence of that one fact.</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th></th><th><code>/search/multi</code> &mdash; the name engine</th><th><code>/discover/movie|tv</code> &mdash; the filter engine</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Answers</td><td class="use"><b>&ldquo;What is it called?&rdquo;</b></td><td class="use"><b>&ldquo;What kind of thing?&rdquo;</b></td></tr>
+      <tr><td class="num">Free text</td><td class="use">Yes &mdash; word-prefix, strict AND across every word</td><td class="use"><b>None. At all.</b></td></tr>
+      <tr><td class="num">Returns</td><td class="use">Films, series and people together, one call</td><td class="use">One medium at a time</td></tr>
+      <tr><td class="num">Filters</td><td class="use"><code>year</code>, <code>region</code>, <code>include_adult</code>. That is the whole list.</td><td class="use">Genre, language, runtime, date range, rating, vote floor, provider + region, cast, crew, company, keyword</td></tr>
+      <tr><td class="num">Sort</td><td class="use">None. Relevance, take it or leave it.</td><td class="use">Popularity, rating, release date, revenue, title</td></tr>
+      <tr><td class="num">Typo tolerance</td><td class="use">None</td><td class="use">Not applicable</td></tr>
+      <tr><td class="num">Depth</td><td class="use">Paged, 20 a page</td><td class="use">Paged, <b>hard ceiling at page 500</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note law"><b>L1 &mdash; a query and a facet never travel in the same request.</b> There is no endpoint that takes both, so any screen offering &ldquo;search <i>and</i> filter by genre&rdquo; is promising something that has to be faked client-side. We know what that costs, because v1 did it: <b>84 TMDB calls and 9.6 seconds</b> to build one filtered page five. The filter row is therefore not one row &mdash; it is <b>two rows that swap</b>, depending on whether the box has text in it.</div>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Facet</th><th>With text in the box</th><th>With the box empty</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="num">All / Films / Series / People</td><td class="use"><b>Offered</b></td><td class="use"><b>Offered</b></td><td class="use">Free either way. On a query it is a client-side split of <i>one response that already arrived</i>, not a second request.</td></tr>
+      <tr><td class="num">Year</td><td class="use"><b>Offered</b></td><td class="use">Offered (as a range)</td><td class="use">The one filter both engines support. Also how a pasted <i>&ldquo;Inception (2010)&rdquo;</i> is rescued &mdash; &sect;04.</td></tr>
+      <tr><td class="num">Genre, language, runtime, rating, provider, sort</td><td class="use"><span style="color:var(--st-drop-11)"><b>Not offered</b></span></td><td class="use"><b>Offered</b></td><td class="use">The name engine cannot do them, and faking them costs 84 calls. Picking one with text present <b>converts</b> the search into a browse, and says so.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note ok"><b>This is the whole design, in one sentence.</b> A person moves along a single axis &mdash; <i>how much do I already know?</i> &mdash; and the screen moves with them: <b>rails</b> when they know nothing, <b>facets</b> when they know a kind, <b>a name</b> when they know the thing. One module, three states of the same machine, and the box is the pivot between them.</div>
+
+<pre>          know nothing ───────────────────────────── know exactly
+             <b>Discover</b>              <b>Browse</b>              <b>Query</b>
+              rails                 facets              the name
+            <i>no request</i>        <i>/discover</i>          <i>/search/multi</i>
+               FD                     FB                   FQ</pre>
+</div></section>
+
+<section id="module"><div class="wrap">
+  <div class="shead"><span class="snum">03</span><h2>One module, three variations</h2></div>
+  <p>Discover and Search are two tabs in the app and two folders in the repository, and they are the same machine at two settings. Following the hierarchy the title module settled on &mdash; <b>module &rarr; variation &rarr; cohort</b> &mdash; Find has three variations, and the third one does not exist yet.</p>
+
+<pre>Find module &mdash; <i>every screen that ends in &ldquo;open this&rdquo;</i>
+ ├─ <b>Discover</b>  <b>FD</b>   ├─ guest
+ │                     ├─ new        <i>signed in, nothing logged</i>
+ │                     └─ active     <i>a library with something in it</i>
+ ├─ <b>Query</b>     <b>FQ</b>   ├─ named a title
+ │                     ├─ named a person
+ │                     ├─ named a franchise
+ │                     ├─ described a kind      <i>convertible to Browse</i>
+ │                     └─ named nothing we hold <i>the rescue ladder</i>
+ └─ <b>Browse</b>    <b>FB</b>   ├─ results
+                       ├─ too few    <i>and the screen names the chip that did it</i>
+                       └─ too many   <i>a sort is doing the work, not a filter</i></pre>
+
+  <div class="note law"><b>The same test as the title module.</b> A <b>cohort</b> may change the primary answer, change what the answer means, and <b>omit</b> bands. Only a <b>variation</b> may add or reorder them. So <i>named a person</i> may put a person where the grid usually starts &mdash; that is changing the answer, not adding a band &mdash; but only Browse may introduce a sort control, because only Browse has an engine that can sort.</div>
+
+  <h3>The spine</h3>
+  <p>Five bands, same order in all three variations. Anything with nothing to say is <b>absent</b>, never empty.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Band</th><th>FD</th><th>FQ</th><th>FB</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="num"><b>The box</b></td><td class="use">&mdash;</td><td class="use">yes</td><td class="use">yes</td><td class="use">One control, <code>--control-h</code>, with a clear inside it and the facet button beside it. On Discover it is a tab away, not a field on the page.</td></tr>
+      <tr><td class="num">2</td><td class="num">The chip row</td><td class="use">presets</td><td class="use">yes</td><td class="use">yes</td><td class="use">Everything currently constraining the list, each removable, plus <i>Clear all</i> past two. On Discover the same row carries the mood presets &mdash; the same component, offering instead of reporting.</td></tr>
+      <tr><td class="num">3</td><td class="num"><b>The interpretation</b></td><td class="use">&mdash;</td><td class="use">yes</td><td class="use">yes</td><td class="use"><b>At most one, ever.</b> What the app decided the question was: a correction, a person, a franchise, a converted filter. Two of these stacked is the app arguing with itself.</td></tr>
+      <tr><td class="num">4</td><td class="num">The answer</td><td class="use">rails</td><td class="use">grid</td><td class="use">grid</td><td class="use">Same tile, same state badge, same quick-add everywhere. <code>--grid-min</code> already steps 136&#8202;/&#8202;170&#8202;/&#8202;180&#8202;/&#8202;208 across the four bands; nothing new is needed.</td></tr>
+      <tr><td class="num">5</td><td class="num">The exit</td><td class="use">yes</td><td class="use">yes</td><td class="use">yes</td><td class="use">Never a dead end: <i>Load more</i>, a closer browse, or the presets. The zero-result screen is mostly band 5.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Four tabs stay four tabs</h3>
+  <p>The obvious move, having found one machine, is one tab. I do not recommend it, for three reasons and one of them is the product's.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Option</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Merge into one <b>Find</b> tab</td><td class="use"><b>No.</b> Discover is the app's front door and a tracker's front door should open onto <i>your</i> shelf, not a search field. Merging also costs a tab and buys nothing: Browse needs an address, not a tab.</td></tr>
+      <tr><td class="num">Add a fifth <b>Browse</b> tab</td><td class="use"><b>No.</b> Five tabs at 320px is 64px each. And browse is not a destination people go to cold &mdash; it is where a rail, a genre chip or a failed search <i>sends</i> them.</td></tr>
+      <tr><td class="num">Keep four; Browse is a state of Search</td><td class="use"><b>Yes.</b> <code>/search</code> with facets and no query <i>is</i> Browse. It gets a URL, a back button and a share, and it is reached from every rail header, every genre chip on a title page, and every empty result.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>One thing to delete on the way past.</b> <code>Discover.jsx</code> draws its own search icon, theme toggle and sign-in button in <code>.head-actions</code>, duplicating three controls the shell's top bar already owns at desktop. The module's own notes flag it. With the search box reachable by tab and by rail, the page-level copy has no job left.</div>
+</div></section>
+
+<section id="rescue"><div class="wrap">
+  <div class="shead"><span class="snum">04</span><h2>The rescue ladder</h2></div>
+  <p>Five rungs, measured one at a time against the golden set. Each rung runs only when the one above it came back empty, so a query that works never touches any of them. What matters for the design is not the mechanism but <b>what the screen says</b> at each rung &mdash; because a search that quietly answers a different question is a search nobody trusts twice.</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Rung</th><th>What it does</th><th>Measured</th><th>What the screen says</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>0</b></td><td class="use">Ask as typed</td><td class="use"><b>62%</b> of the golden set returns nothing</td><td class="use">Nothing. This is the happy path for 38%.</td></tr>
+      <tr><td class="num"><b>1</b></td><td class="use">Drop the words that are not part of a name &mdash; <code>movies, films, show, series, all parts, in order, trilogy, with, by, best</code></td><td class="use">62% &rarr; <b>44%</b>. Franchise 80&rarr;0, person-led 40&rarr;7, attribute 100&rarr;60. <b>hit@5 unchanged</b></td><td class="use"><b>Nothing.</b> The only silent rung, and it earns it: it removes words the index cannot hold and changes no result that already worked.</td></tr>
+      <tr><td class="num"><b>1b</b></td><td class="use">Split a trailing year off the name and pass it as <code>year</code></td><td class="use"><code>inception (2010)</code> &rarr; <b>0 results</b> today. <code>Inception 2010</code> &rarr; 0.</td><td class="use">Nothing &mdash; the year becomes a <b>chip</b>, visible and removable. Pasting a title with its year is the most natural paste there is, and today it is a dead end.</td></tr>
+      <tr><td class="num"><b>2</b></td><td class="use">Strip Hindi particles and honorifics &mdash; <code>ki, ka, ke, koi, bhai, ji, saab</code></td><td class="use">44% &rarr; <b>42%</b>. <i>salman bhai ki movie</i> &rarr; Salman Khan, rank 1</td><td class="use">Nothing. Same argument as rung 1.</td></tr>
+      <tr><td class="num"><b>3</b></td><td class="use">Truncate to the longest prefix that still matches, <b>never below six characters</b></td><td class="use"><b>9 of 18 typos</b>, at rank 1 in eight of the nine. <i>intersteller</i>&rarr;<i>interstell</i>, <i>pulp ficiton</i>&rarr;<i>pulp fic</i>, <i>game of thornes</i>&rarr;<i>game of th</i></td><td class="use"><b>Out loud.</b> &ldquo;Showing results for <b>interstellar</b>&rdquo;, with <i>search instead for &ldquo;intersteller&rdquo;</i> underneath it.</td></tr>
+      <tr><td class="num"><b>4</b></td><td class="use">Search each word alone, pool the results, rank by popularity</td><td class="use"><b>4 more</b>: <i>brekaing bad</i>&rarr;Breaking Bad, <i>stanger things</i>&rarr;Stranger Things, <i>jurrasic park</i>&rarr;Jurassic Park, <i>forest gump</i>&rarr;Forrest Gump</td><td class="use">Out loud, as a question rather than a claim: &ldquo;Nothing for <i>forest gump</i>. <b>Did you mean Forrest Gump?</b>&rdquo; &mdash; because two of the four land at rank 2, behind a wrong answer.</td></tr>
+      <tr><td class="num"><b>5</b></td><td class="use">Edit distance against a dictionary of popular titles</td><td class="use">The only rung that reaches the last five: <i>gladaitor, titanc, dangl, sholey</i></td><td class="use">Same as rung 4. <b>The only rung with a cost</b> &mdash; it needs a list we do not ship. Design says what the screen does; whether the list is worth it is a build call.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note warn"><b>Six characters is not a round number, it is where the evidence stops.</b> TMDB matches word prefixes, so truncation works &mdash; until the prefix stops being the word. <code>titan</code> returns 610 results and none of the first twenty is <i>Titanic</i>; it is Attack on Titan's, fairly. <code>shol</code> returns people called Sholto-Douglas. <code>dang</code> returns a film called <i>Dang!</i>. Below six characters a correction quietly becomes a different search, which is exactly the failure rung 3 exists to prevent.</div>
+
+  <div class="note warn"><b>A hypothesis of mine that the measurement killed.</b> I expected that re-ranking the truncated results by popularity would rescue the short ones &mdash; <i>Titanic</i> is far more popular than anything else matching <code>titan</code>. It rescued <b>nought of eight</b>. The reason is simple once you look: <i>Titanic</i> is not in the twenty results being re-ranked, so no ordering of them can find it. Re-ranking cannot add a result. Recorded because the wrong version of this is a plausible thing to build.</div>
+
+  <div class="note law"><b>L2 &mdash; the box never answers a different question silently.</b> Rungs 1, 1b and 2 remove words that are <i>not part of any name</i>, so nothing is being reinterpreted. Rungs 3, 4 and 5 change the name itself, and every one of them must print what it did and offer the original back in one tap. The band is <b>one line above the results</b> &mdash; never a toast, which disappears, and never a dialog, which interrupts.</div>
+
+  <h3>When nothing survives the ladder</h3>
+  <p>At 62% today and 42% after the free rungs, <b>the empty screen is the most-visited screen in this module</b> &mdash; more common than any single result. It is currently a heading, a sentence and a link to Discover.</p>
+  <div class="note ok"><b>The benchmark sets a low bar here, which is a gift.</b> AniList &mdash; the app this product is measured against &mdash; answers <code>attak on titan</code> with the words <b>&ldquo;No Results&rdquo;</b>, centred, and nothing else. No correction, no suggestion, no route out. This is the one screen where being better is cheap.</div>
+  <p>So it carries four things, in this order, and each is absent when it has nothing to give:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Part</th><th>Content</th><th>Present when</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1 &middot; What was understood</td><td class="use"><i>Nothing for &ldquo;<b>gladaitor</b>&rdquo;</i> &mdash; the query, quoted, exactly as typed</td><td class="use">Always</td></tr>
+      <tr><td class="num">2 &middot; The nearest name</td><td class="use"><b>Did you mean <i>Gladiator</i>?</b> &mdash; one candidate, not five. A list of guesses is a second failure.</td><td class="use">Rungs 4&ndash;5 found one</td></tr>
+      <tr><td class="num">3 &middot; The nearest browse</td><td class="use"><b>Browse Hindi comedies</b> &mdash; when the words parse as facets. <i>hindi comedy picture</i> returns 0 names and <b>394 films</b>, led by <i>Dilwale Dulhania Le Jayenge</i> and <i>3 Idiots</i>.</td><td class="use">The query contains a genre, language, decade or runtime word</td></tr>
+      <tr><td class="num">4 &middot; The way back</td><td class="use">Recent searches, then the mood presets. Never a bare link to Discover: that discards the intent instead of redirecting it.</td><td class="use">Always</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>L3 &mdash; nothing found is a screen, not a sentence.</b> It is the most common outcome in the module and it gets the most design, not the least.</div>
+</div></section>
+
+<section id="facets"><div class="wrap">
+  <div class="shead"><span class="snum">05</span><h2>Facets, sorts, and the floor that should not exist</h2></div>
+  <p>The filter engine is the half of the product that has never been built, and it answers the categories the name engine cannot. Three of its properties will decide whether it feels right, and all three are counter-intuitive enough to be worth stating as laws.</p>
+
+  <h3>L4 &mdash; a rating is a band, never a sort, and it is ordered by evidence</h3>
+  <p>Sort by rating with no minimum vote count and TMDB is perfectly happy to hand back four films rated <b>10.0 from a single vote</b>. The reflex is a floor &mdash; and the canon does appear, but not until the floor is high:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Minimum votes</th><th>Top of &ldquo;highest rated&rdquo;</th></tr></thead>
+    <tbody>
+      <tr><td class="num">none</td><td class="use"><i>Run Joey Run</i> &mdash; 10.0 from <b>1 vote</b></td></tr>
+      <tr><td class="num">300</td><td class="use"><i>Batman: Knightfall Part 1</i> &mdash; 9.2 from 328</td></tr>
+      <tr><td class="num">1,000</td><td class="use"><i>Avatar Aang: The Last Airbender</i> &mdash; 9.1 from 1,143</td></tr>
+      <tr><td class="num"><b>3,000</b></td><td class="use"><b><i>The Shawshank Redemption</i>, <i>The Godfather</i></b> &mdash; what a person means by &ldquo;highest rated&rdquo;</td></tr>
+    </tbody>
+  </table></div>
+  <p>Now hold that floor still and change the language. Films rated 8 or above, by minimum vote count:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Language</th><th>&ge;1000</th><th>&ge;300</th><th>&ge;100</th><th>&ge;50</th><th>&ge;20</th><th>&ge;5</th></tr></thead>
+    <tbody>
+      <tr><td class="num">English</td><td class="use">146</td><td class="use">184</td><td class="use">233</td><td class="use">284</td><td class="use">456</td><td class="use">1888</td></tr>
+      <tr><td class="num">Japanese</td><td class="use">26</td><td class="use">44</td><td class="use">65</td><td class="use">77</td><td class="use">94</td><td class="use">317</td></tr>
+      <tr><td class="num">Korean</td><td class="use">6</td><td class="use">16</td><td class="use">26</td><td class="use">32</td><td class="use">40</td><td class="use">83</td></tr>
+      <tr><td class="num">Hindi</td><td class="use"><b>3</b></td><td class="use">3</td><td class="use">4</td><td class="use">4</td><td class="use">6</td><td class="use">47</td></tr>
+      <tr><td class="num">Tamil</td><td class="use"><b>0</b></td><td class="use">0</td><td class="use">0</td><td class="use">3</td><td class="use">6</td><td class="use">23</td></tr>
+      <tr><td class="num">Telugu</td><td class="use"><b>0</b></td><td class="use">0</td><td class="use">0</td><td class="use">1</td><td class="use">2</td><td class="use">19</td></tr>
+      <tr><td class="num">Malayalam</td><td class="use"><b>0</b></td><td class="use">0</td><td class="use">1</td><td class="use">1</td><td class="use">2</td><td class="use">18</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>A fixed vote floor is an anglophone bias with a number on it.</b> The floor that makes English sensible &mdash; 1,000 votes &mdash; leaves <b>Telugu, Tamil and Malayalam with nothing at all</b> and Hindi with three. A person in India sorting by rating would be shown, by a product built for them, that their cinema does not exist.</div>
+
+  <h4>Two cleverer floors, both measured, both wrong</h4>
+  <p>The first draft of this section said the floor should be <i>derived from the language's own distribution</i> rather than fixed. That sounds right and is not, and the only way to find out was to build it:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Derivation</th><th>What it produces</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Search for the floor that keeps ~100 films</b></td><td class="use">English <b>5,000</b> votes &rarr; 96 films. Telugu <b>2 votes</b> &rarr; 121 films. Tamil 2, Hindi 4, Korean 7.</td><td class="use"><b>No.</b> &ldquo;Rated 8+ by two people&rdquo; is noise with a rosette on it. Cheap to compute &mdash; twelve calls, cacheable &mdash; and worthless.</td></tr>
+      <tr><td class="num"><b>Keep the top 10% of that language by vote count</b></td><td class="use">A floor of <b>2&ndash;4 votes for every language</b>, English included &mdash; because 20,001 English films are &ldquo;rated 8+&rdquo; once one-vote films count, so a tenth of them is 2,692.</td><td class="use"><b>No.</b> The tail is so long that any percentile of it lands in the noise. A percentile of a corpus that is mostly noise is noise.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note law"><b>So there is no floor. A rating is a band, and the band is ordered by how many people voted.</b> <code>vote_average.gte=8</code> with <code>sort_by=vote_count.desc</code> &mdash; nothing is excluded, and the films nobody has seen sit in the tail where they belong instead of being deleted from a catalogue. <b>One rule, no table, no derivation, no language to apologise to.</b> Verified, page one, six languages:</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Language</th><th>Rated 8+, ordered by votes &mdash; the first three</th></tr></thead>
+    <tbody>
+      <tr><td class="num">English</td><td class="use"><i>Interstellar</i> 8.5 (41,165) &middot; <i>Inception</i> 8.4 (40,188) &middot; <i>The Avengers</i> 8.1 (39,739)</td></tr>
+      <tr><td class="num">Korean</td><td class="use"><i>Parasite</i> 8.5 (21,312) &middot; <i>Oldboy</i> 8.2 (10,199) &middot; <i>Memories of Murder</i> 8.1 (4,807)</td></tr>
+      <tr><td class="num">Hindi</td><td class="use"><i>Dilwale Dulhania Le Jayenge</i> 8.5 (4,621) &middot; <i>3 Idiots</i> 8.0 (2,829) &middot; <i>My Name Is Khan</i> 8.0 (1,503)</td></tr>
+      <tr><td class="num">Tamil</td><td class="use"><i>Visaranai</i> 8.0 (85) &middot; <i>Pariyerum Perumal</i> 8.2 (78) &middot; <i>Meiyazhagan</i> 8.2 (63)</td></tr>
+      <tr><td class="num">Malayalam</td><td class="use"><i>Kumbalangi Nights</i> 8.1 (128) &middot; <i>Nadodikkattu</i> 8.0 (41)</td></tr>
+      <tr><td class="num">Telugu</td><td class="use"><i>Jersey</i> 8.0 (79) &middot; <i>Mayabazar</i> 8.0 (31) &middot; <i>Malli Raava</i> 8.2 (17)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>And the tile prints the vote count, wherever a rating is being sorted or filtered on.</b> <i>8.0 from 79 votes</i> and <i>8.5 from 41,165</i> are different claims and must not render identically. This is what makes the no-floor rule safe: the weak evidence is still visible <b>as weak evidence</b> rather than hidden by a threshold somebody chose on the reader's behalf. It is one number on a tile that already carries the score, and it is the whole defence.</div>
+  <div class="note ok"><b>What the failed derivations bought.</b> Nothing in the first two rows of that table is wasted: they are the reason the answer is allowed to be this simple. Without them, &ldquo;just sort by votes&rdquo; reads as the lazy option rather than the one that survived.</div>
+
+  <h3>L5 &mdash; genre is two vocabularies that happen to share eight words</h3>
+  <p>Films have 19 genres, series have 16, and <b>only eight exist in both</b> &mdash; with, usefully, identical ids: Animation, Comedy, Crime, Documentary, Drama, Family, Mystery, Western. <i>Action</i> is film-only; series call it <i>Action &amp; Adventure</i>. <i>Science Fiction</i> and <i>Fantasy</i> are two film genres and one series genre.</p>
+  <div class="note law"><b>So the genre row is not one row either.</b> With the medium set to <b>All</b> it offers the eight shared genres and nothing else &mdash; every one of them means the same thing on both sides. Choosing <b>Films</b> or <b>Series</b> unlocks that medium's full list. And switching medium with a medium-only genre selected <b>drops the genre and says so in the chip row</b> &mdash; silently mapping <i>Thriller</i> to <i>Action &amp; Adventure</i> would be inventing an answer.</div>
+
+  <h3>The rest of the facets, and what they cost</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Facet</th><th>Verified</th><th>Design note</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Language</b></td><td class="use">Hindi comedies rated 7+: <b>394 films</b>, led by <i>DDLJ</i>, <i>3 Idiots</i>, <i>Dangal</i></td><td class="use">First-class, not buried. It is the facet that answers a third of the hinglish category and it is one parameter.</td></tr>
+      <tr><td class="num"><b>Runtime</b></td><td class="use">&le;120 min: <b>more than 20,000</b> &mdash; see the cap, below</td><td class="use">Two rungs, not a slider: <i>under 90</i>, <i>under 2 hours</i>. A slider implies a precision nobody has.</td></tr>
+      <tr><td class="num"><b>Decade</b></td><td class="use">The 1990s: <b>20,001 films</b></td><td class="use">Decades as chips; the year field stays for exact years and for the pasted-year rescue.</td></tr>
+      <tr><td class="num"><b>Where to watch</b></td><td class="use">Netflix IN: <b>4,530</b> films. Prime Video IN: 5,396</td><td class="use">Needs <code>watch_region</code>. <b>Provider ids are per region and they move</b> &mdash; JioHotstar is 2336 in India, and the id a hardcoded list would have carried returns five films. Fetch the list, never type it.</td></tr>
+      <tr><td class="num">Keyword</td><td class="use">See the mood note in &sect;07</td><td class="use">Not offered as a facet. It is a vocabulary of 100,000 tags with no quality floor; it appears only inside a preset that has been measured.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Two ceilings to design against, not around.</b> TMDB refuses page 501 &mdash; <i>&ldquo;Pages start at 1 and max at 500&rdquo;</i> &mdash; while cheerfully reporting 1,001 pages for a decade browse. And PostgREST caps at 1,000 rows, which has already bitten the library once. A browse that can reach 20,000 results needs a <b>sort that makes the first page the answer</b>; <i>Load more</i> stops at the ceiling and says <i>&ldquo;that is as deep as TMDB goes &mdash; narrow it&rdquo;</i>, which is true and is not an error.</div>
+</div></section>
+
+<section id="filters"><div class="wrap">
+  <div class="shead"><span class="snum">06</span><h2>The filter set</h2></div>
+  <p>Filters existed before the Milestone 1 rebuild and they were not bad. I pulled the deleted component out of the history rather than working from memory &mdash; <code>src/components/Filters.jsx</code>, five facets:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>What it had</th><th>As</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Media type</td><td class="use">select</td><td class="use"><b>Keep the idea.</b> Wrong position &mdash; see the count below.</td></tr>
+      <tr><td class="num">Genre</td><td class="use">select, from TMDB's list</td><td class="use"><b>Keep.</b> The one facet everybody understands.</td></tr>
+      <tr><td class="num">Rating</td><td class="use">number input, 0&ndash;10</td><td class="use"><b>Keep as a band, coarsely.</b> A spinner invites 8.5, 11 and an empty screen.</td></tr>
+      <tr><td class="num">Release year</td><td class="use">number input</td><td class="use"><b>Replace with decades.</b> Nobody browses by 1997.</td></tr>
+      <tr><td class="num">Sort by + direction</td><td class="use">select + &uarr;&darr; toggle</td><td class="use"><b>Keep sorting, delete the direction.</b> The least popular Hindi film of all time is not a thing anybody wants, and rating-descending is the trap in &sect;05.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>What was actually wrong with it was not the facets, it was the modal.</b> It opened over the results, took an <i>Apply</i>, and closed &mdash; so you never saw a filter change anything while choosing it. You guessed, applied, and read the outcome. Acceptance criterion <b>1.3.4</b> already says the replacement expands in place and pushes results down, and it has been open since the rebuild.</div>
+
+  <h3>What the golden set actually asks to filter by</h3>
+  <p>Each of the 120 queries, tagged by the facet that would answer it. False positives removed by hand &mdash; <i>the family man</i> is a title, not a genre:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Facet</th><th>Queries</th><th>Where they come from</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Genre</b></td><td class="use"><b>15</b></td><td class="use">8 Hinglish, 7 mood. Genre is mostly how somebody describes <i>an evening</i>: <i>dark comedy</i>, <i>sad war movie</i>, <i>koi acchi thriller movie</i>.</td></tr>
+      <tr><td class="num"><b>Language</b></td><td class="use"><b>8</b></td><td class="use">Every one of them Hinglish. <i>purani hindi filme</i>, <i>tamil thriller padam</i>, <i>south ki action movie</i>.</td></tr>
+      <tr><td class="num">Rating</td><td class="use">4</td><td class="use"><i>koi acchi</i>, <i>best</i>, <i>rated above 8</i>.</td></tr>
+      <tr><td class="num">Decade</td><td class="use">3</td><td class="use"><i>movies from the 90s</i>, <i>purani</i>, <i>released this year</i>.</td></tr>
+      <tr><td class="num">Length</td><td class="use">1</td><td class="use"><i>movies under 2 hours</i>.</td></tr>
+      <tr><td class="num"><b>Media type</b></td><td class="use"><b>1</b></td><td class="use">The word appears 38 times and means the facet <b>once</b> &mdash; <i>tv shows with only one season</i>. The other 37 are the filler rung 1 strips, or a franchise: <i>john wick series</i> is a collection, not a medium.</td></tr>
+      <tr><td class="num">Where to watch</td><td class="use"><b>0</b></td><td class="use">Nobody types it. See the caveat.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>A typed corpus under-counts anything natural to click and unnatural to type.</b> Zero people typed &ldquo;netflix&rdquo;, and <i>what can I actually watch tonight</i> is still one of the most valuable questions this product can answer. The count orders the facets; it does not choose them. The one place it is decisive is <b>media type</b>: the control that led the old modal turns out to be the one people ask for least.</div>
+  <div class="note ok"><b>And the number that justifies the whole surface: 68 of the 120 queries are open-set.</b> <b>57% of what people type has no single right answer.</b> It wants a list, and a list is what a filter makes.</div>
+
+  <h3>Seven facets, one toggle, one sort</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Facet</th><th>Shown as</th><th>Where</th><th>Why it earns a row</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Kind</b></td><td class="use">All / Films / Series</td><td class="use"><b>First, always</b></td><td class="use">Asked for least, placed first &mdash; because it is a <b>precondition</b>, not a peer. It decides which genre vocabulary exists (&sect;05, L5). It is also the only facet that survives a query, where it lives beside the box as a segmented control and costs no request.</td></tr>
+      <tr><td class="num"><b>Genre</b></td><td class="use">chips, single-select</td><td class="use">Open</td><td class="use">15 queries, and the vocabulary everyone shares. Single-select to start: two genres is an AND, and an AND of two genres is usually four films.</td></tr>
+      <tr><td class="num"><b>Language</b></td><td class="use">chips</td><td class="use">Open</td><td class="use">8 queries, all Hinglish, and <b>the facet almost no Western tracker offers</b>. One parameter, 394 Hindi comedies behind it. For this audience it is not a long-tail filter, it is a primary one.</td></tr>
+      <tr><td class="num">Where to watch</td><td class="use">chips, per region</td><td class="use">More</td><td class="use">Never typed, highly acted-on. Behind <i>More</i> only because it is the one row that needs a region and a fetched provider list before it can draw &mdash; and because the presets already answer <i>tonight</i> on Discover.</td></tr>
+      <tr><td class="num">Decade</td><td class="use">chips &mdash; 2020s &hellip; 1970s</td><td class="use">More</td><td class="use">Replaces the year spinner. An exact year stays reachable through the box, which is also where a pasted <i>(2010)</i> lands.</td></tr>
+      <tr><td class="num">Length</td><td class="use">two chips</td><td class="use">More</td><td class="use"><i>Under 90</i>, <i>under 2 hours</i>. Not a slider: a slider implies a precision nobody has about a runtime.</td></tr>
+      <tr><td class="num">Rating</td><td class="use">two chips &mdash; 7+, 8+</td><td class="use">More</td><td class="use">A <b>band</b>, never a sort (&sect;05). Two rungs, because the difference between 7.4 and 7.6 is not a decision anybody makes.</td></tr>
+      <tr><td class="num"><b>Hide what I've seen</b></td><td class="use">a switch</td><td class="use"><b>Pinned, bottom</b></td><td class="use">The only filter that is not TMDB's, and <b>the only one a catalogue app cannot offer</b>. The library is already in memory, so it is exact and free. It is a switch rather than a chip because it is a lens on any result set, not a constraint within one.</td></tr>
+      <tr><td class="num">Sort</td><td class="use">on the results bar</td><td class="use">Right of the count</td><td class="use"><b>Not a filter</b> &mdash; it changes order, not membership, so it does not live in the panel. Three options: <i>Most popular</i>, <i>Most voted</i>, <i>Newest</i>. No direction toggle, and no <i>highest rated</i>: that is the Rating band plus <i>Most voted</i>, and offering it as a sort is how you get 10.0 from one vote.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What was left out, and why</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Rejected</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Age certification</td><td class="use"><b>Denser than I expected</b> &mdash; India has 8,367 U-rated and 4,650 UA films, so this was nearly a facet. It is not, because the vocabulary changes per country and India's own list has four overlapping U/A variants. It goes <b>into the &ldquo;With the parents&rdquo; preset instead</b>, where the mapping is written once and curated &mdash; which is a better answer than the genre guess that preset had before.</td></tr>
+      <tr><td class="num">Country of origin</td><td class="use">Language is the better proxy for what somebody means, and it is one parameter rather than two that disagree.</td></tr>
+      <tr><td class="num">Keyword</td><td class="use">100,000 tags with no quality floor &mdash; <i>feel good</i> has zero films. Presets only, and only when measured (&sect;07).</td></tr>
+      <tr><td class="num">Studio, cast, crew</td><td class="use">These are destinations, not filters. A director is a <b>person page</b>, which is already designed, and a studio was dropped from the title module for the same reason.</td></tr>
+      <tr><td class="num">Sort direction</td><td class="use">Ascending popularity is a joke and ascending rating is a punishment. Where a direction is meaningful the sort names it: <i>Newest</i>.</td></tr>
+      <tr><td class="num">Multi-select anything</td><td class="use">Not in the first pass. Each extra selection multiplies the ways to reach an empty screen, and FB2 shows how much work an empty screen costs.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>The clutter budget</h3>
+  <div class="note law"><b>At rest: one control.</b> The box, and a filter button beside it. No facet row, no chips, nothing to read. <b>Open: three rows and a switch</b> &mdash; Kind, Genre, Language, and <i>Hide what I've seen</i>. <b>Behind <i>More</i>: four more.</b> Eight facets exist; three are ever visible without a deliberate tap. On desktop the first five sit in the row permanently, because a 1120px band has the space a 320px one does not &mdash; the set does not change, only how much of it is already unfolded.</div>
+  <div class="note law"><b>L7 &mdash; a facet appears only when it can change the answer.</b> No <i>where to watch</i> before a region is known. No genre the current medium does not have. No <i>Series</i> in a result set that is all films. A control that cannot do anything is worse than a missing one: it is a promise the screen breaks when you touch it.</div>
+  <div class="note law"><b>L8 &mdash; no Apply.</b> Every change applies immediately and <b>the count above the grid is the feedback</b> &mdash; <i>394 films</i> becomes <i>41 films</i> as the chip goes on. That single number is what the old modal could not show, and it is the difference between choosing a filter and guessing one. The panel stays open while you work; the results move underneath it.</div>
+  <div class="note"><b>Two places show state, and they have different jobs.</b> The <b>chip row</b> above the results is the record &mdash; always visible, each chip removable, nothing hidden. The <b>panel</b> is the editor, and it is closed most of the time. The filter button carries the active count so a closed panel never conceals a constraint. This is the one duplication in the module and it is deliberate.</div>
+</div></section>
+
+<section id="rails"><div class="wrap">
+  <div class="shead"><span class="snum">07</span><h2>Discover: rails that are queries</h2></div>
+  <p>Four rails today, all global, none of them personal, none of them openable. The library exists now, so the first thing the front door should show is the thing you left unfinished.</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Rail</th><th>guest</th><th>new</th><th>active</th><th>Source, and what it opens</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="num"><b>Continue watching</b></td><td class="use">&mdash;</td><td class="use">&mdash;</td><td class="use">yes</td><td class="use">Library, <code>watching</code>, next unwatched episode. The habit loop, and the one rail that is not a query &mdash; it opens the Library.</td></tr>
+      <tr><td class="num">2</td><td class="num">Want to watch</td><td class="use">&mdash;</td><td class="use">&mdash;</td><td class="use">yes</td><td class="use">Library, <code>want</code>, most recently added. Opens the Library on that shelf.</td></tr>
+      <tr><td class="num">3</td><td class="num">Trending this week</td><td class="use">yes</td><td class="use">yes</td><td class="use">yes</td><td class="use"><code>/trending/all/week</code> &mdash; shipped. Opens a browse sorted by popularity.</td></tr>
+      <tr><td class="num">4</td><td class="num">In cinemas now</td><td class="use">yes</td><td class="use">yes</td><td class="use">yes</td><td class="use"><code>/movie/now_playing</code>, region-aware &mdash; shipped. Opens a browse: this month, this region.</td></tr>
+      <tr><td class="num">5</td><td class="num"><i>one sign-up card</i></td><td class="use">yes</td><td class="use">&mdash;</td><td class="use">&mdash;</td><td class="use">Unchanged: after two rails, once something has been given. Gone the moment you are in.</td></tr>
+      <tr><td class="num">6</td><td class="num"><b>Because you watched X</b></td><td class="use">&mdash;</td><td class="use">&mdash;</td><td class="use">yes</td><td class="use"><code>/movie/{id}/recommendations</code> on the most recent <code>watched</code> row. Names the film it came from &mdash; an unexplained recommendation is a guess with confidence.</td></tr>
+      <tr><td class="num">7</td><td class="num">On air now</td><td class="use">yes</td><td class="use">yes</td><td class="use">yes</td><td class="use">Shipped.</td></tr>
+      <tr><td class="num">8</td><td class="num">Coming soon</td><td class="use">yes</td><td class="use">yes</td><td class="use">yes</td><td class="use">Shipped.</td></tr>
+      <tr><td class="num">9</td><td class="num"><b>The presets</b></td><td class="use"><b>yes &middot; high</b></td><td class="use"><b>yes &middot; high</b></td><td class="use">yes</td><td class="use">A chip row, not a rail. <b>It moves up to position 2 for a guest or an empty library</b> &mdash; the person with nothing to continue gets the most help choosing, which is the same reasoning the profile module's cold start used.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note law"><b>L6 &mdash; every rail header is a link, and the link is a browse.</b> A rail shows twenty of four thousand and then stops; today that is where the journey ends. <i>Trending</i> &rarr; <code>/search?sort=popularity</code>, <i>In cinemas</i> &rarr; <code>/search?from=2026-09&amp;region=IN</code>. This is also how Browse gets discovered without a tab of its own: it is not somewhere you go, it is what happens when you ask a rail for more.</div>
+
+  <h3>Moods are facet bundles, not keywords</h3>
+  <p><b>Mood is the largest category in the golden set</b> &mdash; 20 of 120, and 95% of them return nothing. The tempting answer is TMDB's keyword vocabulary. It is a trap:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Keyword</th><th>Exists?</th><th>Films behind it</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><code>feel good</code></td><td class="use">Yes &mdash; id 383896</td><td class="use"><b>0</b></td></tr>
+      <tr><td class="num"><code>tearjerker</code></td><td class="use">Yes &mdash; id 156924</td><td class="use"><b>18</b></td></tr>
+      <tr><td class="num"><code>heist</code></td><td class="use">Yes</td><td class="use">200</td></tr>
+      <tr><td class="num"><code>time travel</code></td><td class="use">Yes</td><td class="use">336</td></tr>
+      <tr><td class="num"><code>coming of age</code></td><td class="use">Yes</td><td class="use">586</td></tr>
+      <tr><td class="num"><code>based on a true story</code></td><td class="use">Yes</td><td class="use">1,238</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>&ldquo;Feel good&rdquo; is a real TMDB keyword attached to no films at all.</b> A preset built on it would render an empty shelf on the home screen of a product whose whole job is suggesting something to watch. So a preset is a <b>bundle of facets</b> &mdash; genre, runtime, rating, language &mdash; and a keyword may only join one after its volume has been measured.</div>
+
+  <p>Six to start. Each definition is printed so it can be argued with, which is the point of writing them down:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Preset</th><th>Definition</th><th>Answers</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>Easy watch</b></td><td class="use">Comedy or Family &middot; &le;110 min &middot; rated 6.5+, most voted first</td><td class="use"><i>&ldquo;something light for a sunday&rdquo;</i>, <i>&ldquo;feel good movie&rdquo;</i></td></tr>
+      <tr><td class="num"><b>Edge of the seat</b></td><td class="use">Thriller or Mystery &middot; rated 7+ &middot; sorted by popularity</td><td class="use"><i>&ldquo;koi acchi thriller movie&rdquo;</i></td></tr>
+      <tr><td class="num"><b>Have a cry</b></td><td class="use">Drama &middot; rated 7.5+ &middot; <code>tearjerker</code> joined only where it has volume</td><td class="use"><i>&ldquo;movie to cry to&rdquo;</i>, <i>&ldquo;sad war movie&rdquo;</i></td></tr>
+      <tr><td class="num"><b>With the parents</b></td><td class="use"><b>Certified U or U/A 7+</b> in the viewer's country &middot; rated 7+ &middot; most voted first</td><td class="use"><i>&ldquo;watch with parents&rdquo;</i>, <i>&ldquo;bacchon ke liye movie&rdquo;</i> &mdash; 8,367 U-rated films in India, which is a better answer than guessing at genres</td></tr>
+      <tr><td class="num"><b>Under two hours</b></td><td class="use">&le;120 min &middot; rated 7+ &middot; most voted first</td><td class="use"><i>&ldquo;movies under 2 hours&rdquo;</i> &mdash; more than 20,000 of them</td></tr>
+      <tr><td class="num"><b>Closer to home</b></td><td class="use">Original language in hi, ta, te, ml, kn &middot; rated 7+ &middot; <b>most voted first, no floor</b></td><td class="use"><i>&ldquo;purani hindi filme&rdquo;</i>, <i>&ldquo;south ki action movie&rdquo;</i>, <i>&ldquo;tamil thriller padam&rdquo;</i></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>Every preset is a browse URL.</b> Tapping one lands on <code>/search</code> with its facets in the chip row, where they can be taken apart one at a time. That is the difference between a curated shelf and a starting point: the preset is a <b>guess at your question</b>, and the chips are how you correct it.</div>
+</div></section>
+
+<section id="answers"><div class="wrap">
+  <div class="shead"><span class="snum">08</span><h2>When the query names a person, or a franchise</h2></div>
+
+  <h3>The person rule, amended</h3>
+  <p>The search module carries a written rule: <i>people rank alongside titles, never above them</i> &mdash; so the person section sits after the grid. It was the right call when it was written, and the measurement says it is wrong for one specific case.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Measured on the 15 person-led queries</th><th></th></tr></thead>
+    <tbody>
+      <tr><td class="num">Right person at TMDB's rank 1, after rung 1</td><td class="use"><b>13 of 15</b> &mdash; Nolan, Tarantino, Scorsese, Gerwig, Villeneuve, SRK, Aamir Khan, Rajkumar Hirani, Anurag Kashyap, Deepika Padukone, Nawazuddin Siddiqui, Brad Pitt, DiCaprio</td></tr>
+      <tr><td class="num">The two failures</td><td class="use"><i>movies with tom hanks</i> and <i>films by wes anderson</i> &mdash; both fixed by adding <code>with</code> and <code>by</code> to rung 1, both then rank 1</td></tr>
+      <tr><td class="num">What sits above them today</td><td class="use">The title grid &mdash; which for <i>tarantino</i> is <i>Take Tarantino</i> (2006) and <i>Making Tarantino</i>, and for <i>shah rukh khan</i> is <i>Shah Rukh Khan Ki Maut</i></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>Amendment, not repeal.</b> When the query <b>names a person</b> &mdash; TMDB returns them at rank 1, they pass the existing plausibility gate of a photo and a pulse, and no title matches the words strongly &mdash; the person row goes <b>first</b>, and the grid below it is their work. In every other case the rule stands: people after titles. The old rule protected against &ldquo;dune&rdquo; surfacing an actress called Aggy Dune; this exception does not weaken it, because <i>dune</i> has a title that matches the words strongly and <i>tarantino</i> does not.</div>
+  <div class="note"><b>And the row already knows the interesting thing.</b> <code>PersonRow</code> carries <i>&ldquo;Director &middot; 6 of 10 seen&rdquo;</i> &mdash; collection progress against their body of work. That number is the wedge this product has and the others do not, and promoting the row surfaces it one screen earlier. The row opens the person page, which the title module already designed as its third variation; <b>the search does not build a second filmography</b>.</div>
+  <div class="note warn"><b>The collision case is real and already documented.</b> Two people can share a name &mdash; <code>person/151</code> is Roger Deakins the cinematographer, <code>person/4313</code> is Roger Deakins the makeup artist. When two plausible people match, neither is promoted: both appear as rows, each carrying the evidence line that tells them apart. State TP5 in the title module, FQ6 here.</div>
+
+  <h3>The franchise rule, and a tempting endpoint that ranks badly</h3>
+  <p><i>&ldquo;harry potter in order&rdquo;</i>, <i>&ldquo;avengers all parts&rdquo;</i>, <i>&ldquo;lord of the rings trilogy&rdquo;</i> &mdash; ten of the golden set, 80% empty today, all of them zero after rung 1 strips the three words at the end. The obvious next step is <code>/search/collection</code>. I checked it, and it should not be the primary path:</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Query</th><th><code>/search/collection</code> top hit</th><th>Top film's <code>belongs_to_collection</code></th></tr></thead>
+    <tbody>
+      <tr><td class="num">avengers</td><td class="use"><span style="color:var(--st-drop-11)"><i>Avengers Grimm Collection</i></span></td><td class="use"><b>The Avengers Collection</b></td></tr>
+      <tr><td class="num">lord of the rings</td><td class="use"><span style="color:var(--st-drop-11)"><i>The Making of The Lord of the Rings Collection</i></span></td><td class="use"><b>The Lord of the Rings Collection</b></td></tr>
+      <tr><td class="num">harry potter</td><td class="use">Harry Potter Collection</td><td class="use"><b>Harry Potter Collection</b></td></tr>
+      <tr><td class="num">toy story</td><td class="use">Toy Story Collection</td><td class="use"><b>Toy Story Collection</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>The franchise comes from the top film, not from a collection search.</b> Collection search found something for all ten &mdash; and led with the wrong thing twice out of four checked, including a making-of documentary. The top film's own collection was right four times out of four. So: the grid answers as normal, and <b>one band above it</b> reports the collection the top result belongs to &mdash; in release order, with the number that matters: <i>Harry Potter Collection &middot; 8 films &middot; 3 seen</i>.</div>
+  <div class="note"><b>A note on how this was nearly reported backwards.</b> My first pass at collection search recorded zeros for seven of ten queries and I almost wrote that the endpoint was useless. They were <b>connection resets</b> that my own probe was swallowing and reporting as &ldquo;no results&rdquo; &mdash; which is, precisely, the bug this module is about. A failed request and an empty answer look identical on screen and mean opposite things. The shipped people search already knows this and retries once; <b>every request in this module inherits that rule</b>, and a failure says <i>could not reach TMDB</i>, never <i>nothing found</i>. State FQ12.</div>
+</div></section>
+
+<style>
+.pgbar{height:var(--space-4);border-radius:var(--radius-full);background:var(--ink-5);overflow:hidden;margin-top:var(--space-4)}
+.pgbar i{display:block;height:100%;background:var(--acc)}
+.fti .badge{position:absolute;right:var(--space-4);top:var(--space-4);width:var(--space-16);height:var(--space-16);
+  border-radius:var(--radius-full);display:grid;place-items:center;background:rgba(4,6,12,.66);color:#fff;font-size:9px}
+.fti .badge.done{background:var(--st-done-9);color:var(--bg)}
+.fti .badge.want{background:var(--mar-9);color:#3D2D06}
+.fgrid .cell .art .badge{position:absolute;right:var(--space-4);top:var(--space-4);width:var(--space-16);height:var(--space-16);
+  border-radius:var(--radius-full);display:grid;place-items:center;background:rgba(4,6,12,.66);color:#fff}
+.fgrid .cell .art .badge.done{background:var(--st-done-9);color:var(--bg)}
+.fgrid .cell .art .badge.want{background:var(--mar-9);color:#3D2D06}
+.fgrid .cell .art .sc{position:absolute;left:var(--space-4);bottom:var(--space-4);display:flex;align-items:center;gap:2px;
+  font-family:var(--f-m);font-size:8px;color:#fff;background:rgba(4,6,12,.66);border-radius:var(--radius-4);padding:1px 3px}
+.fgo{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;
+  display:inline-flex;align-items:center;gap:var(--space-4)}
+.fgo.q{background:var(--surface-hv);color:var(--text)}
+.shelf-h a{font-family:var(--f-m);font-size:9px;color:var(--acc-t);text-decoration:none;display:flex;align-items:center;gap:2px}
+/* the filter panel — rows of chips, never dropdowns on a phone */
+.fpanel{margin:var(--space-8) var(--gutter) 0;padding:var(--space-12);border-radius:var(--radius-12);
+  background:var(--bg-sub);box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub)}
+.fpanel .lab{font-family:var(--f-m);font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);margin:var(--space-12) 0 var(--space-4)}
+.fpanel .lab:first-child{margin-top:0}
+.fpanel .row{display:flex;gap:var(--space-4);overflow:hidden}
+.fpanel .row .chip{height:var(--space-32);padding:0 var(--space-12);font-size:var(--text-micro)}
+.fpanel .more{display:flex;align-items:center;justify-content:center;gap:var(--space-4);width:100%;
+  margin-top:var(--space-12);padding-top:var(--space-8);border-top:var(--border-hair) solid var(--bd-sub);
+  background:none;border:0;color:var(--acc-t);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.fsw{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);
+  margin-top:var(--space-12);padding-top:var(--space-12);border-top:var(--border-hair) solid var(--bd-sub);
+  font-size:var(--text-caption);color:var(--text)}
+.fsw i{width:var(--space-32);height:var(--space-20);border-radius:var(--radius-full);background:var(--surface-hv);
+  flex:0 0 auto;position:relative;font-style:normal}
+.fsw i::after{content:"";position:absolute;top:2px;left:2px;width:var(--space-16);height:var(--space-16);
+  border-radius:var(--radius-full);background:var(--faint)}
+.fsw.on i{background:var(--acc)}
+.fsw.on i::after{left:14px;background:var(--bg)}
+/* The shared .desk box is 700px tall for a title page; this module's desktop
+   frame is shorter, and a transform does not shrink the space it reserves —
+   so both the frame and the scaled box are pinned to what this one needs. */
+.deskwrap .desk{height:560px}
+.deskwrap .deskscale{height:347px}
+</style>
+
+<section id="screens"><div class="wrap">
+  <div class="shead"><span class="snum">09</span><h2>Screens</h2></div>
+  <p>Drawn at 320 &mdash; the width everything has to survive &mdash; with one desktop frame at 1120. Mock scale, as ever: these show <b>order, hierarchy and wording</b>, and where a shipped component appears it keeps everything the frame has no room to draw.</p>
+
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>FD1</b> discover &middot; guest</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Discover</h3></div>
+        <div class="chips"><button class="chip on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg> Easy watch</button><button class="chip">Edge of the seat</button><button class="chip">Cry</button></div>
+        <div class="shelf" style="margin-top:var(--space-8)">
+          <div class="shelf-h"><h4>Trending this week</h4><a href="#screens">All <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></div>
+          <div class="rail">
+            <div class="fti"><div class="art"></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Severance</div><div class="sub">2022</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Oppenheimer</div><div class="sub">2023</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Poor Things</div><div class="sub">2023</div></div>
+          </div>
+        </div>
+        <div class="shelf">
+          <div class="shelf-h"><h4>In cinemas now</h4><a href="#screens">All <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></div>
+          <div class="rail">
+            <div class="fti"><div class="art"></div><div class="nm">Kantara Chapter 1</div><div class="sub">2026</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Homebound</div><div class="sub">2026</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">The Smashing Machine</div><div class="sub">2026</div></div>
+          </div>
+        </div>
+        <div class="invite" style="margin-top:var(--space-20)"><b>Keep track of what you watch</b>
+          <p>Your watchlist, ratings and episode progress &mdash; private by default.</p>
+          <button class="go">Create an account</button></div>
+        <div class="bnav"><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>Sign in</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>FD3</b> discover &middot; active library</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Discover</h3></div>
+        <div class="shelf" style="margin-top:var(--space-8)">
+          <div class="shelf-h"><h4>Continue watching</h4><a href="#screens">Library <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></div>
+          <div class="rail">
+            <div class="fti"><div class="art"></div><div class="nm">Severance</div><div class="sub">S2 E5 &middot; next</div><div class="pgbar"><i style="width:61%"></i></div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Shogun</div><div class="sub">S1 E3 &middot; next</div><div class="pgbar"><i style="width:28%"></i></div></div>
+            <div class="fti"><div class="art"></div><div class="nm">The Bear</div><div class="sub">S3 E1 &middot; next</div><div class="pgbar"><i style="width:9%"></i></div></div>
+          </div>
+        </div>
+        <div class="shelf">
+          <div class="shelf-h"><h4>Want to watch</h4><span class="shelf-n">18</span></div>
+          <div class="rail">
+            <div class="fti"><div class="art"><span class="badge want"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"/></svg></span></div><div class="nm">Anora</div><div class="sub">2024</div></div>
+            <div class="fti"><div class="art"><span class="badge want"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"/></svg></span></div><div class="nm">All We Imagine as Light</div><div class="sub">2024</div></div>
+            <div class="fti"><div class="art"><span class="badge want"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"/></svg></span></div><div class="nm">Nickel Boys</div><div class="sub">2024</div></div>
+          </div>
+        </div>
+        <div class="shelf">
+          <div class="shelf-h"><h4>Because you watched <i style="color:var(--acc-t);font-style:normal">Dune: Part Two</i></h4></div>
+          <div class="rail">
+            <div class="fti"><div class="art"></div><div class="nm">Arrival</div><div class="sub">2016</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Blade Runner 2049</div><div class="sub">2017</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Sicario</div><div class="sub">2015</div></div>
+          </div>
+        </div>
+        <div class="bnav"><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>FQ0</b> the box, before you type</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q ph">Films, series, people</span></div>
+          <div class="ffilt"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="fsect">Recent</div>
+        <div class="frecent">
+          <div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>severance<em><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></em></div>
+          <div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>denis villeneuve<em><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></em></div>
+          <div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>hindi comedy<em><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></em></div>
+        </div>
+        <div class="fsect">Or start from a mood</div>
+        <div class="chips" style="padding-top:0;flex-wrap:wrap"><button class="chip">Easy watch</button><button class="chip">Edge of the seat</button><button class="chip">Under two hours</button></div>
+        <div class="chips" style="padding-top:0"><button class="chip">Closer to home</button><button class="chip">With the parents</button></div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>FQ1</b> named a title</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q">dune</span><span class="clr"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></div>
+          <div class="ffilt"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="chips" style="padding-bottom:0"><button class="chip on">All</button><button class="chip">Films</button><button class="chip">Series</button><button class="chip">People</button></div>
+        <div class="fbar"><b>34 results</b></div>
+        <div class="fgrid">
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.1</span></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
+          <div class="cell"><div class="art"><span class="badge want"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"/></svg></span><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.8</span></div><div class="nm">Dune</div><div class="sub">2021</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 6.3</span></div><div class="nm">Dune</div><div class="sub">1984</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 6.9</span></div><div class="nm">Dune: Prophecy</div><div class="sub">2024</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 5.9</span></div><div class="nm">Children of Dune</div><div class="sub">2003</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 6.1</span></div><div class="nm">Jodorowsky's Dune</div><div class="sub">2013</div></div>
+        </div>
+        <div class="fsect">People</div>
+        <div class="fperson"><div class="face"></div><div class="who"><b>Denis Villeneuve</b><span>Director &middot; <i>6 of 25 seen</i></span></div><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>FQ3</b> named a person</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q">christopher nolan movies</span><span class="clr"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></div>
+          <div class="ffilt"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="fperson" style="margin-top:var(--space-12)"><div class="face"></div><div class="who"><b>Christopher Nolan</b><span>Director &middot; <i>9 of 12 seen</i></span></div><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
+        <div class="fbar"><b>Directed by Christopher Nolan</b><span class="srt">12 films</span></div>
+        <div class="fgrid">
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div><div class="nm">Oppenheimer</div><div class="sub">2023</div></div>
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div><div class="nm">Tenet</div><div class="sub">2020</div></div>
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div><div class="nm">Dunkirk</div><div class="sub">2017</div></div>
+          <div class="cell"><div class="art"><span class="badge want"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"/></svg></span></div><div class="nm">Interstellar</div><div class="sub">2014</div></div>
+          <div class="cell"><div class="art"></div><div class="nm">The Prestige</div><div class="sub">2006</div></div>
+          <div class="cell"><div class="art"></div><div class="nm">Insomnia</div><div class="sub">2002</div></div>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>FQ5</b> named a franchise</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q">harry potter in order</span><span class="clr"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></div>
+          <div class="ffilt"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="fcoll">
+          <div class="ch"><b>Harry Potter Collection</b><span>3 of 8 seen</span></div>
+          <div class="strip"><i class="seen">1</i><i class="seen">2</i><i class="seen">3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i></div>
+        </div>
+        <div class="fbar"><b>8 films &middot; in release order</b></div>
+        <div class="fgrid">
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div><div class="nm">Philosopher's Stone</div><div class="sub">2001</div></div>
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div><div class="nm">Chamber of Secrets</div><div class="sub">2002</div></div>
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div><div class="nm">Prisoner of Azkaban</div><div class="sub">2004</div></div>
+          <div class="cell"><div class="art"></div><div class="nm">Goblet of Fire</div><div class="sub">2005</div></div>
+          <div class="cell"><div class="art"></div><div class="nm">Order of the Phoenix</div><div class="sub">2007</div></div>
+          <div class="cell"><div class="art"></div><div class="nm">Half-Blood Prince</div><div class="sub">2009</div></div>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>FQ7</b> rescued &middot; rung 3</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q">intersteller</span><span class="clr"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></div>
+          <div class="ffilt"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="finterp">Showing results for <b>interstellar</b>
+          <span class="alt">Search instead for &ldquo;intersteller&rdquo;</span></div>
+        <div class="fbar"><b>30 results</b></div>
+        <div class="fgrid">
+          <div class="cell"><div class="art"><span class="badge want"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"/></svg></span><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.4</span></div><div class="nm">Interstellar</div><div class="sub">2014</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 6.6</span></div><div class="nm">Interstellar Ella</div><div class="sub">2022</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.1</span></div><div class="nm">Interstella 5555</div><div class="sub">2003</div></div>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>FQ9</b> nothing, with a candidate</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q">gladaitor</span><span class="clr"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></div>
+          <div class="ffilt"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="fzero">
+          <b>Nothing for &ldquo;gladaitor&rdquo;</b>
+          <p>No film or series by that name.</p>
+          <button class="fgo">Did you mean <b style="margin-left:3px">Gladiator</b>?</button>
+        </div>
+        <div class="fsect">Recent</div>
+        <div class="frecent">
+          <div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>severance<em><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></em></div>
+          <div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>denis villeneuve<em><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></em></div>
+        </div>
+        <div class="fsect">Or start from a mood</div>
+        <div class="chips" style="padding-top:0"><button class="chip">Easy watch</button><button class="chip">Under two hours</button></div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>FQ10</b> a kind, not a name</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q">hindi comedy picture</span><span class="clr"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></div>
+          <div class="ffilt"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="fzero">
+          <b>Nothing by that name</b>
+          <p>That reads like a kind of film rather than a title &mdash; and there are <b style="color:var(--text)">394</b> of them.</p>
+          <button class="fgo">Browse Hindi comedies <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        </div>
+        <div class="fsect">Which would look like this</div>
+        <div class="fgrid">
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.5</span></div><div class="nm">Dilwale Dulhania Le Jayenge</div><div class="sub">1995 &middot; 4,621 votes</div></div>
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.0</span></div><div class="nm">3 Idiots</div><div class="sub">2009 &middot; 2,829 votes</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.9</span></div><div class="nm">Dangal</div><div class="sub">2016 &middot; 1,219 votes</div></div>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>FB1</b> browse &middot; facets, no query</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q ph">Films, series, people</span></div>
+          <div class="ffilt on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="chips" style="padding-bottom:0;flex-wrap:wrap">
+          <button class="chip on">Hindi <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><button class="chip on">Comedy <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><button class="chip on">Rated 7+ <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><button class="chip">Clear all</button>
+        </div>
+        <div class="fbar"><b>394 films</b><span class="srt">Popularity <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        <div class="fgrid">
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.5</span></div><div class="nm">Dilwale Dulhania Le Jayenge</div><div class="sub">1995 &middot; 4,621 votes</div></div>
+          <div class="cell"><div class="art"><span class="badge done"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.0</span></div><div class="nm">3 Idiots</div><div class="sub">2009 &middot; 2,829 votes</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.9</span></div><div class="nm">Dangal</div><div class="sub">2016 &middot; 1,219 votes</div></div>
+          <div class="cell"><div class="art"><span class="badge want"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"/></svg></span><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.7</span></div><div class="nm">PK</div><div class="sub">2014 &middot; 1,209 votes</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.6</span></div><div class="nm">Andhadhun</div><div class="sub">2018 &middot; 652 votes</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.7</span></div><div class="nm">Kabhi Khushi Kabhie Gham</div><div class="sub">2001 &middot; 630 votes</div></div>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>FB2</b> browse &middot; empty, and which chip did it</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q ph">Films, series, people</span></div>
+          <div class="ffilt on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="chips" style="padding-bottom:0;flex-wrap:wrap">
+          <button class="chip on">Tamil <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><button class="chip on">Animation <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><button class="chip on">On Netflix <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><button class="chip">Clear all</button>
+        </div>
+        <div class="finterp warn">Nine Tamil animated films exist. <b>None of them is on Netflix.</b>
+          <span class="alt">Every other pair of these three has results.</span></div>
+        <div class="fzero">
+          <b>One chip is doing this</b>
+          <div class="why"><span>Without <b>On Netflix</b></span><em>9 films</em></div>
+          <div class="why"><span>Without <b>Animation</b></span><em>103 films</em></div>
+          <button class="fgo">Drop &ldquo;On Netflix&rdquo; <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+          <button class="fgo q" style="margin-top:var(--space-8)">Show all 9, wherever they are</button>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>FB0</b> the panel, open</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Search</h3></div>
+        <div class="frow">
+          <div class="fbox"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg><span class="q ph">Films, series, people</span></div>
+          <div class="ffilt on"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div>
+        </div>
+        <div class="fpanel">
+          <div class="lab">Kind</div>
+          <div class="row"><button class="chip on">All</button><button class="chip">Films</button><button class="chip">Series</button></div>
+          <div class="lab">Genre</div>
+          <div class="row"><button class="chip">Comedy</button><button class="chip on">Drama</button><button class="chip">Crime</button><button class="chip">Doc</button></div>
+          <div class="lab">Language</div>
+          <div class="row"><button class="chip">Any</button><button class="chip on">Malayalam</button><button class="chip">Tamil</button><button class="chip">Hindi</button></div>
+          <button class="more">More filters <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="fsw on"><span>Hide what I've seen</span><i></i></div>
+        </div>
+        <div class="fbar"><b>212 films</b><span class="srt">Most voted <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        <div class="fgrid">
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.1</span></div><div class="nm">Kumbalangi Nights</div><div class="sub">2019 &middot; 128 votes</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 7.9</span></div><div class="nm">Jallikattu</div><div class="sub">2019 &middot; 94 votes</div></div>
+          <div class="cell"><div class="art"><span class="sc"><svg class="di" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg> 8.0</span></div><div class="nm">Nadodikkattu</div><div class="sub">1987 &middot; 41 votes</div></div>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="note ok"><b>Three rows, and the count moves while you work.</b> The panel stays open, the grid moves underneath it, and <i>212 films</i> is the only feedback the old modal could never give &mdash; because it closed before you could see what you had done. <i>More filters</i> adds four rows; nothing else is ever on screen at rest.</div>
+frames written 5799
+
+  <h3>Desktop &mdash; the facets are furniture</h3>
+  <p>At 1120 the first five facets sit in the row permanently &mdash; the way the benchmark does it, and the way acceptance criterion 1.3.4 already asks for. The set is the same eight as the phone (&sect;06); a wide band simply has room to leave more of it unfolded. Below 600 the whole row collapses behind the one filter button beside the box and <b>expands in place, pushing results down</b> &mdash; never a sheet.</p>
+  <div class="deskwrap"><div class="deskscale">
+    <div class="desk">
+      <div class="dtop"><div class="dwm"><i></i>Cine Search</div>
+        <div class="dnav"><a href="#screens">Discover</a><a class="on" href="#screens">Search</a><a href="#screens">Library</a><a href="#screens">You</a></div>
+      </div>
+      <div class="dfilt">
+        <div class="fl grow"><u>Search</u><div><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg> <span style="flex:1;margin-left:8px;color:var(--faint)">Films, series, people</span></div></div>
+        <div class="fl"><u>Kind</u><div>All <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+        <div class="fl set"><u>Genre</u><div>Comedy <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+        <div class="fl set"><u>Language</u><div>Hindi <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+        <div class="fl"><u>Where to watch</u><div>Any <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+        <div class="fl" style="min-width:auto"><u>&nbsp;</u><div style="width:44px;justify-content:center"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h20"/><path d="M6 12h12"/><path d="M9 19h6"/></svg></div></div>
+      </div>
+      <div class="fbar" style="margin-top:var(--space-16)"><b>394 films &middot; rated 7+ &middot; most voted first</b><span class="srt">Popularity <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div class="dgrid">
+        <div class="cell"><div class="art"></div><div class="nm">Dilwale Dulhania Le Jayenge</div><div class="sub">1995 &middot; 8.5 &middot; 4,621 votes</div></div>
+        <div class="cell"><div class="art"></div><div class="nm">3 Idiots</div><div class="sub">2009 &middot; 8.0 &middot; 2,829 votes</div></div>
+        <div class="cell"><div class="art"></div><div class="nm">Dangal</div><div class="sub">2016 &middot; 7.9 &middot; 1,219 votes</div></div>
+        <div class="cell"><div class="art"></div><div class="nm">PK</div><div class="sub">2014 &middot; 7.7 &middot; 1,209 votes</div></div>
+        <div class="cell"><div class="art"></div><div class="nm">Andhadhun</div><div class="sub">2018 &middot; 7.6 &middot; 652 votes</div></div>
+            </div>
+    </div>
+  </div></div>
+  <div class="note ok"><b>The count line is the honest part of this screen.</b> <i>&ldquo;394 films &middot; rated 7+ &middot; most voted first&rdquo;</i> states the constraint <b>and the ordering</b>, because the ordering is doing the job a vote floor used to do badly. Every part of it is a chip you can remove &mdash; and past twenty thousand it reads <i>20,000+</i>, because that is a ceiling TMDB reports rather than a number it counted.</div>
+</div></section>
+
+<section id="states"><div class="wrap">
+  <div class="shead"><span class="snum">10</span><h2>States</h2></div>
+  <p>Every case the module has to survive. Prefixes are collision-free across the design documents &mdash; entry uses I/U/C/S, profile P/T/F/E/K/N/X/G/R, library L, title TM/TV/TP/TS.</p>
+
+  <h3>FD &mdash; Discover</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Id</th><th>Case</th><th>What the screen does</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">FD1</td><td class="use">Guest</td><td class="use">Presets at position 2. Two rails, then one sign-up card, then the rest. Everything browsable; nothing gated.</td></tr>
+      <tr><td class="tok">FD2</td><td class="use">Signed in, empty library</td><td class="use">Same as FD1 without the sign-up card. Presets stay high &mdash; the person with nothing logged is the one who most needs a way in.</td></tr>
+      <tr><td class="tok">FD3</td><td class="use">Active library</td><td class="use">Continue watching first, Want to watch second, presets drop below the feeds.</td></tr>
+      <tr><td class="tok">FD4</td><td class="use">One feed fails</td><td class="use">That rail shows its own error and retry. The others render. <b>Shipped.</b></td></tr>
+      <tr><td class="tok">FD5</td><td class="use">Every feed fails &mdash; offline</td><td class="use">One message for the page, not four stacked errors, and a retry that re-runs all of them.</td></tr>
+      <tr><td class="tok">FD6</td><td class="use">Nothing watched yet</td><td class="use"><i>Because you watched</i> is absent, not empty. No placeholder, no explanation.</td></tr>
+      <tr><td class="tok">FD7</td><td class="use">Region unknown</td><td class="use"><i>In cinemas</i> falls back to the global list and drops the region from its title rather than printing a country nobody chose.</td></tr>
+      <tr><td class="tok">FD8</td><td class="use">A rail returns fewer than four</td><td class="use">It still draws &mdash; a short rail is a fact. No padding with unrelated items.</td></tr>
+      <tr><td class="tok">FD9</td><td class="use">First visit ever</td><td class="use">The cover, once. <b>Shipped</b> &mdash; a shared link to a title never passes through it.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>FQ &mdash; Query</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Id</th><th>Case</th><th>What the screen does</th><th>Verified</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">FQ0</td><td class="use">Box empty, page open</td><td class="use">Recents, then presets. <b>Never</b> the current &ldquo;What are you looking for?&rdquo; &mdash; a question the person has already answered by arriving.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ1</td><td class="use">Titles found</td><td class="use">Count, then the grid. Each tile carries its library state and a quick-add.</td><td class="use">exact 100% hit@5</td></tr>
+      <tr><td class="tok">FQ2</td><td class="use">Titles found, people too</td><td class="use">People after the grid, at most three, gated on a photo <i>and</i> a pulse of popularity. <b>Shipped.</b></td><td class="use">&ldquo;dune&rdquo; &rarr; Aggy Dune rejected</td></tr>
+      <tr><td class="tok">FQ3</td><td class="use">The query names a person</td><td class="use">The person row goes <b>first</b> and the grid below is their work. &sect;08.</td><td class="use">13 of 15</td></tr>
+      <tr><td class="tok">FQ4</td><td class="use">Two people, same name</td><td class="use"><b>Neither is promoted.</b> Both rows, each with its evidence line.</td><td class="use">Roger Deakins &times;2</td></tr>
+      <tr><td class="tok">FQ5</td><td class="use">The query names a franchise</td><td class="use">One collection band above the grid, release order, <i>3 of 8 seen</i>.</td><td class="use">4 of 4 via top film</td></tr>
+      <tr><td class="tok">FQ6</td><td class="use">A person with no photo</td><td class="use">Excluded. TMDB finds somebody for almost any string. <b>Shipped.</b></td><td class="use">&ldquo;the matrix&rdquo; &rarr; a boxer</td></tr>
+      <tr><td class="tok">FQ7</td><td class="use">Rescued by truncation</td><td class="use">One line: <i>Showing results for <b>interstellar</b></i>, with the original one tap away.</td><td class="use">9 of 18 typos</td></tr>
+      <tr><td class="tok">FQ8</td><td class="use">Rescued by word retry</td><td class="use">Phrased as a <b>question</b>, not a claim &mdash; two of the four land at rank 2.</td><td class="use">4 more</td></tr>
+      <tr><td class="tok">FQ9</td><td class="use">Nothing, one candidate</td><td class="use">Query quoted, one <i>did you mean</i>, recents, presets. Never a list of five guesses.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ10</td><td class="use">Nothing by name, but it parses as facets</td><td class="use">Offers the browse, with three real results shown beneath so the offer is not abstract.</td><td class="use">hindi comedy &rarr; 394</td></tr>
+      <tr><td class="tok">FQ11</td><td class="use">Nothing, and nothing to suggest</td><td class="use">The honest exit: what was searched, that we search names not plots, recents, presets. <b>No fabricated guess.</b></td><td class="use">plot_recall 100% empty</td></tr>
+      <tr><td class="tok">FQ12</td><td class="use">The request <i>failed</i></td><td class="use"><i>Could not reach TMDB</i> + retry. <b>Never</b> &ldquo;nothing found&rdquo; &mdash; a failure and an empty answer look identical and mean opposites.</td><td class="use">bit my own probe</td></tr>
+      <tr><td class="tok">FQ13</td><td class="use">Titles arrived, people failed</td><td class="use">Grid renders; the people section retries once, then stays away. <b>Shipped.</b></td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ14</td><td class="use">In flight</td><td class="use">Six poster skeletons at the grid's own geometry. <b>Shipped.</b></td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ15</td><td class="use">A stale response lands last</td><td class="use">Discarded. Results are keyed to the query that asked for them, so &ldquo;inc&rdquo; arriving after &ldquo;inception&rdquo; never paints.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ16</td><td class="use">Box cleared mid-request</td><td class="use">Aborted, and the resting state returns immediately.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ17</td><td class="use">A title pasted with its year</td><td class="use">The year becomes a <b>chip</b>, the name goes to the box. <i>Inception (2010)</i> currently returns nothing.</td><td class="use">0 results today</td></tr>
+      <tr><td class="tok">FQ18</td><td class="use">A TMDB or IMDb URL pasted</td><td class="use">Resolved straight to that title. A pasted URL is not a search, it is a destination.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ19</td><td class="use">Media type switched</td><td class="use">A client-side split of the response already in hand. <b>No second request</b>, so it is instant.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ20</td><td class="use">People filter, no people</td><td class="use">&ldquo;No people match&nbsp;&mdash; 34 titles do&rdquo;, with the way back to All. An empty tab must name the tab that is not empty.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ21</td><td class="use">Four results with the same name</td><td class="use">Year and poster carry the difference; the year is never omitted on a search grid even when it is unknown (&mdash;).</td><td class="use">&ldquo;titanic&rdquo; &rarr; 4</td></tr>
+      <tr><td class="tok">FQ22</td><td class="use">A result with no poster</td><td class="use">Placeholder carrying the title in type. Never a broken image. <b>Shipped.</b></td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ23</td><td class="use">A very long title</td><td class="use">Two lines, then ellipsis. The tile never grows and the grid never goes ragged.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ24</td><td class="use">Adult results</td><td class="use">Excluded at the request, not filtered after. <code>include_adult=false</code>, always.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ25</td><td class="use">More than twenty results</td><td class="use"><i>Load more</i> &mdash; a button, not an auto-loading scroll, which would fight the tab bar and destroy the back button.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ26</td><td class="use">Back from a title</td><td class="use">Query, pages already loaded, and scroll position all restored. Coming back to page one of a list you had scrolled is the oldest bug in mobile search.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ27</td><td class="use">A guest taps +</td><td class="use">The sign-in sheet, naming the title it will save. <b>Shipped.</b></td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ28</td><td class="use">A result already in the library</td><td class="use">The badge reports the state; the control does not offer to add it again; the tile opens the title page, where a status can actually be changed. <b>Shipped.</b></td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ29</td><td class="use">One character typed</td><td class="use">No request. Two characters and 250&#8202;ms of quiet before anything is asked.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FQ30</td><td class="use">Emoji, RTL, or 300 characters</td><td class="use">Sent as typed and allowed to fail into FQ11. The box never validates what somebody is allowed to look for.</td><td class="use">&mdash;</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>FB &mdash; Browse</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Id</th><th>Case</th><th>What the screen does</th><th>Verified</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">FB1</td><td class="use">Facets set, results</td><td class="use">Chips, then a count line printing <b>every constraint and the ordering</b>, then the grid. Every tile carries its vote count beside its score.</td><td class="use">394 Hindi comedies</td></tr>
+      <tr><td class="tok">FB2</td><td class="use">Empty because the chips exclude each other</td><td class="use"><b>Names the chip responsible.</b> Each chip is dropped in turn &mdash; three or four count-only requests &mdash; and the one whose removal yields the <i>fewest</i> results is the culprit, because the rest of the query was nearly as narrow without it. Never a bare &ldquo;no results&rdquo;.</td><td class="use">Tamil + Animation + Netflix = 0; without Netflix, 9</td></tr>
+      <tr><td class="tok">FB3</td><td class="use">A combination that cannot exist</td><td class="use">Series + Horror is not a thin result, it is <b>not a TMDB genre</b>. The screen says which facet is impossible here rather than returning zero.</td><td class="use">19 vs 16 genres</td></tr>
+      <tr><td class="tok">FB4</td><td class="use">Twenty thousand results</td><td class="use">No warning &mdash; the sort is what makes page one useful. The count reads <b>20,000+</b>, never <i>20,001</i>: that figure is a ceiling, returned identically for the 1990s, for Drama, for English and for no filter at all.</td><td class="use">4 queries, same number</td></tr>
+      <tr><td class="tok">FB5</td><td class="use">The page ceiling</td><td class="use">At page 500 <i>Load more</i> retires with <i>&ldquo;that is as deep as TMDB goes &mdash; narrow it&rdquo;</i>. Not an error.</td><td class="use">TMDB refuses 501</td></tr>
+      <tr><td class="tok">FB6</td><td class="use">Medium switched with a medium-only genre set</td><td class="use">The genre is <b>dropped and named</b> in the chip row. Silently mapping Thriller to Action &amp; Adventure would be inventing an answer.</td><td class="use">8 shared of 19/16</td></tr>
+      <tr><td class="tok">FB7</td><td class="use">Provider list unavailable</td><td class="use">The facet is absent for that session, not empty. Ids are per-region and they move.</td><td class="use">JioHotstar 2336</td></tr>
+      <tr><td class="tok">FB8</td><td class="use">Region not set</td><td class="use">Asked for once, at the moment <i>where to watch</i> is first used, then remembered. Never guessed silently from an IP.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB9</td><td class="use">Sort changed</td><td class="use">Back to page one, scrolled to the top. Keeping the scroll after a re-sort shows a list nobody asked for.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB10</td><td class="use">More chips than fit</td><td class="use">They wrap to a second line; past two lines the row scrolls. <b>Never truncated</b> &mdash; a hidden filter is a wrong answer with no visible cause.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB11</td><td class="use">A browse shared or bookmarked</td><td class="use">Everything is in the URL, the way the query already is. That is what makes Browse a state of Search rather than a tab.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB12</td><td class="use">Arrived from a preset</td><td class="use">The preset's facets are shown as ordinary chips, and taking one off is how somebody discovers what the preset meant.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB14</td><td class="use">The panel is open</td><td class="use">It <b>stays</b> open while the grid moves underneath. Every change applies at once; the count above the grid is the feedback. No Apply, no Cancel, nothing to commit.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB15</td><td class="use"><i>More filters</i> tapped</td><td class="use">Four more rows unfold in place. The state is remembered for the session, so somebody who uses <i>where to watch</i> does not re-open it every time.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB16</td><td class="use"><i>Hide what I've seen</i> is on</td><td class="use">Applied against the library in memory, so it is exact &mdash; but it filters <b>what arrived</b>, so the count says both: <i>&ldquo;18 of 20 shown &middot; 2 already watched&rdquo;</i>. A page that silently returns twelve tiles looks broken.</td><td class="use">library is in memory</td></tr>
+      <tr><td class="tok">FB17</td><td class="use"><i>Hide what I've seen</i>, guest</td><td class="use">The switch is absent, not disabled. There is no library to hide.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB18</td><td class="use">A facet that cannot act</td><td class="use">Absent. No <i>where to watch</i> without a region, no genre the current medium lacks. <b>L7.</b></td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">FB13</td><td class="use">Arrived from a rail header</td><td class="use">Same: the rail's own query, as chips. <i>Trending</i> opens a popularity sort you can then narrow.</td><td class="use">&mdash;</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section id="open"><div class="wrap">
+  <div class="shead"><span class="snum">11</span><h2>Decisions, and what this hands over</h2></div>
+
+  <h3>Open &mdash; these are yours</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Id</th><th>Question</th><th>My recommendation</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">FD-1</td><td class="use"><b>Rung 5 &mdash; is the typo dictionary worth it?</b> The four free rungs reach 13 of 18 typos. The last five need a shipped list of popular titles and edit distance over it.</td><td class="use"><b>Not yet.</b> Do the free rungs, then look at what people actually mistype in the wild. Five of eighteen golden queries is not a case for new data with a maintenance cost; a month of real logs might be.</td></tr>
+      <tr><td class="tok">FD-2</td><td class="use"><b>Recent searches &mdash; stored where?</b> A search history is mildly sensitive and syncing it costs a table.</td><td class="use"><b>On the device, and clearable.</b> Local storage, last eight, a <i>Clear</i> in the header of that list. It never leaves the device, so there is nothing to explain in a privacy note.</td></tr>
+      <tr><td class="tok">FD-3</td><td class="use"><b>Does Browse deserve its own route</b> &mdash; <code>/browse</code> rather than <code>/search</code> with facets?</td><td class="use"><b>No.</b> One route keeps one back-stack and one mental model, and the URL already distinguishes them. A second route would need its own empty state, its own history and its own answer to &ldquo;what if someone types while browsing&rdquo;.</td></tr>
+      <tr><td class="tok">FD-4</td><td class="use"><b>Should the presets be editable?</b> Six is a guess at six moods.</td><td class="use"><b>Not in this pass.</b> Ship the six, and let the chip row teach people that a preset is just facets. If a saved-search feature is ever wanted, that is the shape it takes.</td></tr>
+      <tr><td class="tok">FD-6</td><td class="use"><b>Should <i>Hide what I've seen</i> default to on?</b> For a tracker it is arguably the point &mdash; you are looking for something new.</td><td class="use"><b>Off.</b> A filter nobody set, quietly removing results, is the same sin as a vote floor nobody set. It is one tap, it is remembered per session once used, and somebody who wants it will find it on their second search.</td></tr>
+      <tr><td class="tok">FD-7</td><td class="use"><b>Multi-select genres?</b> Two genres at once is a common ask.</td><td class="use"><b>Not in the first pass.</b> TMDB ANDs them, and an AND of two genres is usually a handful of films &mdash; every extra selection is another route to an empty screen. Ship single-select, watch whether people take a genre off and put another on in the same second, and add it if they do.</td></tr>
+      <tr><td class="tok">FD-5</td><td class="use"><b>Language default for an Indian region.</b> Tempting to pre-set Hindi when the region is IN.</td><td class="use"><b>No pre-set filter, ever.</b> A filter nobody chose produces results nobody can explain. Put <i>Closer to home</i> in the presets instead &mdash; offered, not applied.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Two things in the shipped code that this design assumes are fixed</h3>
+  <div class="note law"><b>The quick-add control is a typographic plus, not the icon.</b> <code>Tile.jsx</code> renders <code>{state ? state.icon : '+'}</code> &mdash; a text character sitting beside 33 Lucide icons drawn on a 24px grid. It is the last survivor of the glyph set the icon pass removed, it appears on <i>every tile in the product</i>, and it is one import. <b>Dev handoff.</b></div>
+  <div class="note law"><b>One new icon role, and only one: <code>filter</code> &rarr; Lucide <code>ListFilter</code>.</b> Everything else in this module is drawn from the 33 already shipped. Facet controls carry words, not pictures &mdash; a genre has no icon anybody can read. <b>Dev handoff.</b></div>
+
+  <h3>What this leaves for the build</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Piece</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td class="num">The normaliser (rungs 1, 1b, 2)</td><td class="use">The highest-value hour in the module: 62% &rarr; 42% empty, with hit@5 unchanged on the graded set. Word lists are in this document; they belong in one file with the golden set as its test.</td></tr>
+      <tr><td class="num">The eval harness</td><td class="use"><b>80 of the 120 queries have never been scored</b>, and they are the six categories that fail. Scoring them is how any of this stays honest &mdash; and it already exists, it just needs labels for the open sets.</td></tr>
+      <tr><td class="num">The filter engine</td><td class="use">Nothing in Browse is built. It is one endpoint, and acceptance criteria 1.3.1, 1.3.4 and 1.3.6 have been open since the Milestone 1 rebuild dropped filters and pagination.</td></tr>
+      <tr><td class="num">Rails as queries</td><td class="use">Each rail header needs the browse URL that reproduces it. Cheap, and it is what makes Browse discoverable without a fifth tab.</td></tr>
+      <tr><td class="num"><code>.head-actions</code></td><td class="use">Delete. Three controls duplicated from the shell's top bar, flagged by the module's own notes.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note ok"><b>Where this module ends.</b> Find hands off to three screens that are already designed: a title page (title module, variations 1 and 2), a person page (variation 3), and the library. It builds no filmography of its own, no second collection view, and no third place to change a watch status. The job is to end the search &mdash; and the measure of it is how rarely somebody has to type twice.</div>
+</div></section>
+
+<footer style="padding:var(--space-48) 0 var(--space-64)"><div class="wrap">
+  <p style="font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 var(--space-8)">Projector &middot; find &middot; discover + search</p>
+  <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure)">
+    Every number here was measured against live TMDB on 18 September 2026, using the repository's own 120-query golden set. The zero-result rates, the rescue rungs, the vote-count floors and the genre vocabularies are counts, not estimates. One hypothesis of mine &mdash; that re-ranking truncated results by popularity would rescue the short typos &mdash; was disproved at nought of eight and is recorded rather than removed. No new atoms were required; the grid, the tile, the chip and the control heights all come from <code>foundations.html</code>, and the one new icon role is named in &sect;10.</p>
+</div></footer>
+
+</body>
+</html>

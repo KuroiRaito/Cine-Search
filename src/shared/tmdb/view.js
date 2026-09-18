@@ -332,6 +332,14 @@ export function toSeasonView(raw) {
     return {
         seasonNumber: raw.season_number,
         name: raw.name,
+        /* TV9: the band header takes the season's identity, which is what a
+           season page would have been for. Seasons exist with no poster and no
+           air date — the header is a name and a count, and artwork is
+           decoration whose absence changes nothing. */
+        airDate: raw.air_date || null,
+        year: raw.air_date ? String(raw.air_date).slice(0, 4) : null,
+        overview: raw.overview?.trim() || null,
+        poster: posterUrl(raw.poster_path, 'w185'),
         episodes: (raw.episodes || []).map((e) => ({
             id: e.id,
             number: e.episode_number,
@@ -345,6 +353,12 @@ export function toSeasonView(raw) {
             voteAverage: e.vote_average ? Number(e.vote_average).toFixed(1) : null,
             still: stillUrl(e.still_path),
             overview: e.overview?.trim() || null,
+            /* For the episode sheet. Six is what fits before the sheet becomes
+               a cast list, and a guest star list longer than that is a crowd
+               scene rather than a fact about the episode. */
+            guests: (e.guest_stars || []).slice(0, 6).map((g) => ({
+                id: g.id, name: g.name, character: g.character || null,
+            })),
         })),
     };
 }

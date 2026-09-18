@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import './title.css';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { titleFull, season as fetchSeason } from '../../shared/tmdb/endpoints.js';
 import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
@@ -19,6 +19,7 @@ import {
     cohortOf, shows, leadsWithDate, longDate, yearsOf, primaryFor, seriesNote,
     NOT_PREMIERED, FINISHED,
 } from './cohort.js';
+import { orderTabs, tabLabel, tabCount, seasonTitle, episodeName } from './seasons.js';
 
 const displayName = (type, code) => {
     if (!code) return null;
@@ -57,10 +58,26 @@ export default function Title() {
     const { region } = useRegion();
     const [expanded, setExpanded] = useState(false);
     const [openCard, setOpenCard] = useState(null);
-    /* Null until somebody taps a tab. Until then the band follows progress —
-       §03b: landing on season 21 of 24 with the row showing S1–S4 is the
-       failure the tabs exist to prevent. */
-    const [picked, setPicked] = useState(null);
+    /* §03b: ?season=2 deep-links with that tab selected, which is most of what
+       a season page would have bought — for a query parameter rather than a
+       route, a layout and a back-stack entry. Replaced rather than pushed, so
+       tapping through six seasons does not bury the page somebody came from.
+
+       Absent until somebody picks. Until then the band follows progress:
+       landing on season 21 of 24 with the row showing S1–S4 is the failure the
+       tabs exist to prevent. */
+    const [params, setParams] = useSearchParams();
+    /* Read as a string first. Number(null) is 0, and 0 is a real season — the
+       specials — so treating "absent" as a number silently landed every arrival
+       on Specials, which §03b says must never be first. */
+    const raw = params.get('season');
+    const asked = raw === null ? null : Number(raw);
+    const picked = asked !== null && Number.isInteger(asked) && asked >= 0 ? asked : null;
+    const setPicked = (n) => {
+        const next = new URLSearchParams(params);
+        next.set('season', String(n));
+        setParams(next, { replace: true });
+    };
     const [jumpTo, setJumpTo] = useState(null);
     const [stores, setStores] = useState(false);
     const [prompt, setPrompt] = useState(null);
@@ -558,9 +575,21 @@ function StoreSheet({ region, stores, link, onClose }) {
 function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onTick, onMarkSeason }) {
     const { isSignedIn, authReady } = useAuth();
     const [prompt, setPrompt] = useState(null);
-    const tabs = [...title.seasons, ...(title.specials ? [title.specials] : [])];
+    const [open, setOpen] = useState(null);
+    const tabs = orderTabs(title.seasons, title.specials);
     const active = season;
     const { data, error, loading, retry } = state;
+    const row = useRef(null);
+
+    /* Grey's Anatomy has 24 seasons. Landing on season 21 with the row showing
+       S1–S4 is the failure the tabs exist to prevent, so the selected one is
+       brought into view on arrival — and never a dropdown, because a dropdown
+       hides how long the show is, and how long it is happens to be the most
+       useful fact on the page. */
+    useEffect(() => {
+        const el = row.current?.querySelector('[aria-pressed="true"]');
+        el?.scrollIntoView({ block: 'nearest', inline: 'center' });
+    }, [active, tabs.length]);
 
     /* Arriving by way of "Continue · S2 E5". The season has already changed by
        the time this runs; wait for its episodes, then put the row somewhere a
@@ -613,7 +642,7 @@ function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onT
                 is a label pretending to be a control. This is also TV5, the
                 miniseries, which needs no rule of its own to get it right. */}
             {tabs.length > 1 && (
-            <div className="seasonsw" role="tablist" aria-label="Seasons">
+            <div className="seasonsw" role="tablist" aria-label="Seasons" ref={row}>
                 {tabs.map((s) => (
                     <button
                         key={s.id ?? s.season_number}
@@ -623,28 +652,41 @@ function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onT
                         aria-pressed={active === s.season_number}
                         onClick={() => onSeason(s.season_number)}
                     >
-                        {s.season_number === 0 ? 'Specials' : `Season ${s.season_number}`}
-                        <em>{s.episode_count}</em>
+                        {tabLabel(s)}
+                        <em>{tabCount(s, watched)}</em>
                     </button>
                 ))}
             </div>
             )}
 
-            {aired.length > 0 && (
-                <div className="sect-h markrow">
-                    {/* Per season, counted against that season. The run total is
-                        already on the progress bar above; putting "5 of 62" next
-                        to a seven-episode season measures one thing with the
-                        other thing's ruler. */}
-                    <span>
-                        {active === 0 ? 'Specials' : `Season ${active}`}
-                        {' · '}
-                        {seenHere > 0 ? `${seenHere} of ${aired.length} watched` : `${aired.length} aired`}
-                    </span>
-                    {/* Per season, never per series. */}
-                    <button type="button" className="markall" onClick={markAll}>
-                        {allSeen ? 'Clear season' : 'Mark all'}
-                    </button>
+            {/* TV9. The band header becomes the season — which is what a season
+                page would have been for, and it costs a header rather than a
+                route. Counted against this season: the run total is on the line
+                under the primary, and putting "5 of 62" beside a seven-episode
+                season measures one thing with the other thing's ruler. */}
+            {data && (
+                <div className="shead">
+                    {data.poster && <img className="sposter" src={data.poster} alt="" loading="lazy" />}
+                    <div className="sbody">
+                        <div className="sect-h markrow">
+                            <span>
+                                {[
+                                    seasonTitle({ ...data, season_number: active }),
+                                    data.year,
+                                    aired.length > 0 && (seenHere > 0
+                                        ? `${seenHere} of ${aired.length}`
+                                        : `${aired.length} aired`),
+                                ].filter(Boolean).join(' · ')}
+                            </span>
+                            {/* Per season, never per series. */}
+                            {aired.length > 0 && (
+                                <button type="button" className="markall" onClick={markAll}>
+                                    {allSeen ? 'Clear season' : 'Mark all'}
+                                </button>
+                            )}
+                        </div>
+                        {data.overview && <p className="sov">{data.overview}</p>}
+                    </div>
                 </div>
             )}
 
@@ -657,7 +699,12 @@ function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onT
                         <div className={`eprow${e.aired ? '' : ' unaired'}`} key={e.id} id={`ep-${active}-${e.number}`}>
                             <div className="still">{e.still && <img src={e.still} alt="" loading="lazy" />}</div>
                             <div className="body">
-                                <div className="en">{e.number}. {e.name}</div>
+                                {/* Two targets, not one with a hotspot: the tick
+                                    marks it, the name opens it, and the rest of
+                                    the row does nothing. */}
+                                <button type="button" className="en" onClick={() => setOpen(e)}>
+                                    {e.number}. {episodeName(e)}
+                                </button>
                                 <div className="ed">
                                     {[e.airDate || 'TBA', e.runtime].filter(Boolean).join(' · ')}
                                     {e.voteAverage > 0 && <> · <span className="sc"><Icon name="star" size={12} /> {e.voteAverage}</span></>}
@@ -680,7 +727,67 @@ function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onT
                 {data && !data.episodes.length && <p className="prov-none">No episode information yet.</p>}
             </div>
 
+            {open && (
+                <EpisodeSheet
+                    episode={open}
+                    season={active}
+                    watched={isWatched(watched, active, open.number)}
+                    onTick={(on) => { tick(open, on); setOpen(null); }}
+                    onClose={() => setOpen(null)}
+                />
+            )}
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
+        </div>
+    );
+}
+
+/**
+ * TV10 — an episode is a sheet, not a page.
+ *
+ * You never arrive at an episode cold. You are always inside a list of
+ * sixty-two, and a page would take you out of it, costing your scroll position
+ * to show you a still and a paragraph.
+ *
+ * This is also where per-episode rating would go, and that is the point of
+ * choosing a sheet: we do not support it — rating is per title today — and it
+ * is a real product question rather than a layout one. A sheet leaves the room
+ * for it without committing to it, and without a route that would have to be
+ * un-built if the answer is no.
+ */
+function EpisodeSheet({ episode: e, season, watched, onTick, onClose }) {
+    useEffect(() => {
+        const opener = document.activeElement;
+        const onKey = (k) => { if (k.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            if (opener instanceof HTMLElement && document.contains(opener)) opener.focus();
+        };
+    }, [onClose]);
+
+    const facts = [e.airDate || 'Not aired yet', e.runtime].filter(Boolean).join(' · ');
+    return (
+        <div className="scrim" role="dialog" aria-modal="true" aria-label={episodeName(e)} onClick={onClose}>
+            <div className="sheet" onClick={(ev) => ev.stopPropagation()}>
+                <div className="grab" />
+                {e.still && <img className="epstill" src={e.still} alt="" />}
+                <h2 className="sheet-title">{episodeName(e)}</h2>
+                <p className="sheet-body">S{season} E{e.number} · {facts}</p>
+                {e.overview && <p className="epov">{e.overview}</p>}
+                {e.guests.length > 0 && (
+                    <div className="epguests">
+                        <div className="prov-l">Guest stars</div>
+                        {e.guests.map((g) => (
+                            <PersonRow key={g.id} person={g} sub={g.character} />
+                        ))}
+                    </div>
+                )}
+                {e.aired && (
+                    <button type="button" className="btn epmark" onClick={() => onTick(!watched)}>
+                        {watched ? 'Un-mark watched' : 'Mark watched'}
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

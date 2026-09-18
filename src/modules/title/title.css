@@ -158,8 +158,36 @@
 
 .skel-ep { height: var(--control-lg); margin-top: var(--space-8); }
 
-.seasonsw { display: flex; gap: var(--space-2); overflow-x: auto; margin: var(--space-12) 0 0; background: var(--bg-sub); border-radius: var(--radius-12); padding: var(--space-4); scrollbar-width: none; }
+/* §03d: pills, not tabs. A two-line tab in a scrolling row reads as a stack of
+   small boxes, which is what made the first version off-putting. One line,
+   fully round, and the count sits beside the number rather than under it.
+   No tray behind them either — the tray was the thing making them boxes. */
+.seasonsw { display: flex; gap: var(--space-8); overflow-x: auto; margin: var(--space-12) 0 0; padding: var(--space-2) 0; scrollbar-width: none; }
+/* Scoped rather than applied to .sw itself: the person page's role chips are
+   the same primitive doing a different job, and §03d's rule is about season
+   selectors. Styling a shared class inside one of its own is the one thing
+   MODULE.md allows here. */
+.seasonsw .sw { border-radius: var(--radius-full); background: var(--surface); }
+.seasonsw .sw[aria-pressed="true"] { background: var(--acc-bg); }
 .seasonsw::-webkit-scrollbar { height: 0; }
+
+/* TV9 — the band header is the season: its name, its year, its own fraction,
+   and its own overview. A season with no poster loses the thumbnail and
+   nothing else; artwork is decoration here. */
+.shead { display: flex; gap: var(--space-12); margin-top: var(--space-16); align-items: flex-start; }
+.sposter { width: var(--space-48); flex: 0 0 auto; aspect-ratio: 2/3; object-fit: cover; border-radius: var(--radius-4); border: var(--border-hair) solid var(--bd-sub); }
+.sbody { flex: 1; min-width: 0; }
+.sov {
+  margin-top: var(--space-4); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted);
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* The episode sheet. The still leads, because it is the one thing that says
+   which episode this is before the words do. */
+.epstill { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+.epov { margin: var(--space-12) var(--sheet-pad) 0; font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }
+.epguests { margin: var(--space-16) var(--sheet-pad) 0; }
+.epmark { margin: var(--space-16) var(--sheet-pad) 0; display: block; width: calc(100% - var(--sheet-pad) * 2); }
 
 .eplist { margin-top: var(--space-8); }
 .eprow { display: flex; gap: var(--space-8); padding: var(--space-8) 0; border-top: var(--border-hair) solid var(--bd-sub); align-items: flex-start; }
@@ -169,7 +197,12 @@
 .eprow .still img { width: 100%; height: 100%; object-fit: cover; }
 .eprow .body { flex: 1; min-width: 0; }
 /* Rows grow rather than truncate: a long episode title takes three lines at 320px. */
-.eprow .en { font-size: var(--text-body-sm); font-weight: 600; line-height: var(--lh-body-sm); }
+.eprow .en {
+  font-size: var(--text-body-sm); font-weight: 600; line-height: var(--lh-body-sm);
+  background: none; border: 0; padding: 0; margin: 0; color: var(--text);
+  font-family: var(--f-s); text-align: left; cursor: pointer; display: block; width: 100%;
+}
+.eprow .en:hover { color: var(--acc-t); }
 .eprow .ed { font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-2); }
 .eprow .ed .sc { color: var(--rate); }
 

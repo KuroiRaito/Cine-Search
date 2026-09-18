@@ -19,6 +19,9 @@ import {
     cohortOf, primaryFor, seriesNote, yearsOf, shows, leadsWithDate, longDate,
     RELEASED, UPCOMING, NOT_PREMIERED, SCHEDULED, UNSCHEDULED, FINISHED,
 } from '../src/modules/title/cohort.js';
+import {
+    orderTabs, tabLabel, tabCount, seasonTitle, seenIn, episodeName,
+} from '../src/modules/title/seasons.js';
 
 const film = (o) => ({ mediaType: 'movie', status: 'Released', year: '2024', ...o });
 const series = (o) => ({
@@ -152,6 +155,44 @@ is('years  one-year run       → not "2019–2019"',
     yearsOf(chernobyl, FINISHED), '2019');
 is('years  film               → just the year',
     yearsOf(dune2, RELEASED), '2024');
+
+/* ---- §03b · seasons, and the four things real series forced -------------- */
+
+console.log('');
+const greys = Array.from({ length: 24 }, (_, i) => ({ season_number: i + 1, name: `Season ${i + 1}`, episode_count: 22 }));
+const specials = { season_number: 0, name: 'Specials', episode_count: 68 };
+const tabs = orderTabs(greys, specials);
+
+is('seasons  specials are last, never first',
+    `${tabLabel(tabs[0])} … ${tabLabel(tabs[tabs.length - 1])}`, 'S1 … Specials');
+is('seasons  and are never called "Season 0"',
+    tabs.filter((t) => tabLabel(t) === 'Season 0').length, 0);
+is('seasons  a generic name becomes a pill you can fit 24 of',
+    tabLabel({ season_number: 12, name: 'Season 12', episode_count: 22 }), 'S12');
+is('seasons  a real name survives — Chernobyl calls its one season this',
+    tabLabel({ season_number: 1, name: 'Miniseries', episode_count: 5 }), 'Miniseries');
+is('seasons  and so does a named season on a long-running show',
+    tabLabel({ season_number: 4, name: 'The Final Season', episode_count: 10 }), 'The Final Season');
+is('seasons  no name at all still gets a pill',
+    tabLabel({ season_number: 7, name: '', episode_count: 9 }), 'S7');
+
+const watched = { 2: [1, 2, 3, 4], 3: [] };
+is('seasons  a pill with no progress carries its count',
+    tabCount({ season_number: 1, episode_count: 7 }, watched), '7');
+is('seasons  a pill with progress carries its own fraction',
+    tabCount({ season_number: 2, episode_count: 13 }, watched), '4/13');
+is('seasons  "11 of 62" tells you nothing; "4 of 13" tells you where you are',
+    `${seenIn(watched, 2)} of 13`, '4 of 13');
+
+is('seasons  the header has room for the long form',
+    seasonTitle({ season_number: 2, name: 'Season 2' }), 'Season 2');
+is('seasons  and specials keep their word there too',
+    seasonTitle({ season_number: 0, name: 'Specials' }), 'Specials');
+
+is('TV7      TMDB leaves the name blank for unaired runs',
+    episodeName({ number: 7, name: '' }), 'Episode 7');
+is('TV7      and a named one is left alone',
+    episodeName({ number: 7, name: 'Breakage' }), 'Breakage');
 
 /* ---- and the thing the whole system is for ---------------------------- */
 

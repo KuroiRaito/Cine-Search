@@ -14,6 +14,8 @@ const Auth = lazy(() => import('./modules/entry').then((m) => ({ default: m.Auth
 // Small, static, and always present: no reason to split these out.
 import About from './app/About.jsx';
 import NotFound from './app/NotFound.jsx';
+import Boundary from './app/Boundary.jsx';
+import Navigation from './app/Navigation.jsx';
 import { useAuth } from './shared/auth/AuthProvider.jsx';
 import { hasSeenCover } from './app/firstVisit.js';
 import ThemeToggle from './shared/theme/ThemeToggle.jsx';
@@ -31,7 +33,20 @@ const TABS = [
     { to: '/you', label: 'You', icon: 'you' },
 ];
 
-const isTopLevel = (pathname) => TABS.some((t) => t.to === pathname);
+/* The routes that are destinations rather than places you arrive at from one.
+   A title page is somewhere you came back from, so tabs there would offer four
+   ways to abandon what you just opened. */
+const KNOWN = ['/settings', '/about', '/title/', '/person/', '/welcome'];
+
+/**
+ * SH13 — an unknown path keeps the tab bar.
+ *
+ * A page that exists to recover from a wrong turn is the worst place to remove
+ * the navigation: the 404 used to arrive with no tabs and exactly one button.
+ * It gets the tabs, and keeps the button.
+ */
+const isTopLevel = (pathname) => TABS.some((t) => t.to === pathname)
+    || !KNOWN.some((k) => pathname.startsWith(k));
 
 function Shell({ children }) {
     const { pathname } = useLocation();
@@ -40,6 +55,10 @@ function Shell({ children }) {
 
     return (
         <div className="app">
+            {/* SH11 / SH12 — scroll, focus and the announcement that go with a
+                route change. Inside the shell so it survives a route boundary
+                catching, and so it is mounted for every route that has one. */}
+            <Navigation />
             <header className="topbar">
                 <div className="topbar-in">
                     <NavLink to="/" className="wordmark"><i />Cine Search</NavLink>
@@ -117,9 +136,42 @@ function RequireProfile({ children }) {
     return children;
 }
 
+/**
+ * SH1 — the shell never disappears while something loads.
+ *
+ * Every route is lazy and the fallback was `null`, so a route change painted
+ * literally nothing until its chunk arrived. On a slow connection that is
+ * indistinguishable from a crash, and the difference between the two is the
+ * only thing the person cares about.
+ *
+ * The skeleton is the shell's rather than the module's, because the shell
+ * cannot know which module is arriving: three blocks at the grid's own
+ * geometry, close enough to every screen in the product that nothing jumps
+ * more than a few pixels when the real thing lands.
+ */
+function RouteSkeleton() {
+    return (
+        <div className="page routewait" aria-busy="true">
+            <div className="skel skel-flat" />
+            <div className="skel skel-flat" />
+            <div className="skel skel-flat" />
+        </div>
+    );
+}
+
+/** Keyed to the pathname, or one broken screen becomes a permanently broken
+ *  tab. SH4. */
+function RouteBoundary({ children }) {
+    const { pathname } = useLocation();
+    return <Boundary resetKey={pathname}>{children}</Boundary>;
+}
+
 export default function App() {
     return (
-        <Suspense fallback={null}>
+        /* SH3 — the last resort. If the shell itself throws, nothing below can
+           be trusted: not the router, not the tabs, not a Link. */
+        <Boundary level="app">
+        <Suspense fallback={<RouteSkeleton />}>
         <Routes>
             <Route path="/welcome" element={<Cover />} />
             <Route path="/welcome/:mode" element={<Auth />} />
@@ -131,7 +183,13 @@ export default function App() {
                     <Shell>
                         {/* A module arrives with its own CSS; until it does the
                             shell holds the space rather than flashing a spinner. */}
-                        <Suspense fallback={null}>
+                        {/* SH2 — inside the Shell, so a module that throws
+                            replaces the content area and nothing else: tabs,
+                            top bar and every other route still work. That is
+                            the entire point of catching at the route, and the
+                            screen should prove it. */}
+                        <RouteBoundary>
+                        <Suspense fallback={<RouteSkeleton />}>
                         <Routes>
                             <Route path="/" element={<HomeOrCover />} />
                             <Route path="/search" element={<SearchPage />} />
@@ -144,11 +202,13 @@ export default function App() {
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                         </Suspense>
+                        </RouteBoundary>
                     </Shell>
                     </RequireProfile>
                 }
             />
         </Routes>
         </Suspense>
+        </Boundary>
     );
 }

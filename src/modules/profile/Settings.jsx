@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AccountCard } from '../entry';
-import { useRegion } from '../../shared/hooks/useRegion.js';
-import { activeTheme, applyTheme } from '../../shared/theme/theme.js';
+import { useRegion } from '../../shared/hooks/RegionProvider.jsx';
+import { themeSetting, applyTheme } from '../../shared/theme/theme.js';
 import './profile.css';
 import { Icon } from '../../shared/ui/index.js';
 
@@ -10,10 +10,13 @@ import { Icon } from '../../shared/ui/index.js';
  * Plain and conventional by decision, not by omission — settings has no bespoke
  * design because it does not need one. Standard rows and toggles.
  */
+const THEME_ICON = { system: 'settings', light: 'light', dark: 'dark' };
+const THEME_LABEL = { system: 'System', light: 'Light', dark: 'Dark' };
+
 export default function Settings() {
     const navigate = useNavigate();
     const { region, setRegion } = useRegion();
-    const [theme, setTheme] = useState(activeTheme);
+    const [theme, setTheme] = useState(themeSetting);
 
     const flip = (next) => { applyTheme(next); setTheme(next); };
 
@@ -35,8 +38,11 @@ export default function Settings() {
 
             <div className="setblock">
                 <div className="setlabel">Appearance</div>
-                <div className="segs two">
-                    {['dark', 'light'].map((t) => (
+                {/* Three segments, because the system has three states and the
+                    control had two. System is what everybody gets until their
+                    first tap; it was the one state nobody could return to. */}
+                <div className="segs">
+                    {['system', 'light', 'dark'].map((t) => (
                         <button
                             key={t}
                             type="button"
@@ -44,7 +50,7 @@ export default function Settings() {
                             aria-pressed={theme === t}
                             onClick={() => flip(t)}
                         >
-                            <Icon name={t === 'dark' ? 'dark' : 'light'} size={20} /><i>{t === 'dark' ? 'Dark' : 'Light'}</i>
+                            <Icon name={THEME_ICON[t]} size={20} /><i>{THEME_LABEL[t]}</i>
                         </button>
                     ))}
                 </div>

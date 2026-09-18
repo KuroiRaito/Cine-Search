@@ -59,6 +59,18 @@ export default async function handler(request, response) {
     return response.status(400).json({ error: pathError });
   }
 
+  /* SH7 — the country, from a header this function already receives.
+     Vercel attaches the requester's geolocation to every request an Edge or
+     Serverless Function gets, so the app can stop asking ipapi.co who the
+     visitor is: same technique, same accuracy, one request fewer, one company
+     fewer, and nothing leaving the product to be disclosed. Echoed on every
+     response because the app makes TMDB calls constantly and this rides them. */
+  const country = request.headers['x-vercel-ip-country'];
+  if (country) {
+    response.setHeader('x-cine-country', country);
+    response.setHeader('Access-Control-Expose-Headers', 'x-cine-country');
+  }
+
   const cacheKey = path + '?' + new URLSearchParams(queryParams).toString();
   const cached = getCached(cacheKey);
 

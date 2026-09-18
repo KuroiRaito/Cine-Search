@@ -5,7 +5,7 @@ import { titleFull, season as fetchSeason, collection as fetchCollection } from 
 import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { wikiSummary } from '../../shared/wiki/wiki.js';
-import { useRegion } from '../../shared/hooks/useRegion.js';
+import { useRegion } from '../../shared/hooks/RegionProvider.jsx';
 import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, Icon, initialsOf } from '../../shared/ui/index.js';
 import { TitleSkeleton } from './TitleSkeleton.jsx';
 import { SignInPrompt } from '../entry';

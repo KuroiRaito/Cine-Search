@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
+import { useToast } from '../../app/ToastProvider.jsx';
 import * as api from './library.js';
 import { statusMeta, statusTone } from './library.js';
 
@@ -240,12 +241,24 @@ export function useTileStates() {
 export function useQuickAdd(onGuest) {
     const { isSignedIn, authReady } = useAuth();
     const lib = useLibrary();
+    const { notify } = useToast();
     return useCallback((item) => {
         // Until the session question has an answer, a tap waits. Raising the
         // sign-in sheet at someone whose session is still being restored is the
         // same lie the Library screen used to tell, in a sheet.
         if (!isSignedIn) { if (authReady) onGuest?.(item); return; }
         if (lib.has(item.mediaType, item.id)) return;
-        lib.save(item, { status: 'want_to_watch' });
-    }, [isSignedIn, authReady, lib, onGuest]);
+        /* SH15 — the same action reports the same way wherever it is done.
+           A tap on a poster in Discover, in Search, in Browse or on a profile
+           shelf used to change the badge and say nothing, while the identical
+           tap in the Library or on a title page was named and undoable. */
+        lib.save(item, { status: 'want_to_watch' }).then((ok) => {
+            if (!ok) return;
+            notify({
+                message: `${item.title} · want to watch`,
+                actionLabel: 'Undo',
+                onAction: () => lib.drop(item),
+            });
+        });
+    }, [isSignedIn, authReady, lib, onGuest, notify]);
 }

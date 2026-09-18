@@ -8,9 +8,15 @@
 
 ## Verdict
 
+> **Read this as a second pass.** Grooming for this module was closed in
+> parallel (#72, seven rulings) and the golden set was labelled and scored
+> (#71) while this note was being written. Everything below has been re-checked
+> against the document as it stands after both. Nothing here blocks a build;
+> the rulings stand and I agree with all seven.
+
 **Buildable as drawn, and the numbers hold.** I re-measured the claims this module rests on rather than taking them on trust, and they reproduce. This is the best-evidenced design document in the repository.
 
-Eleven items to fix, none of them structural: two wrong cross-references, three counting errors, one contradiction with shipped code that is the only one I would call serious, and five build risks the handover should name.
+Eleven items to fix, none of them structural: two figures for the same measurement, two wrong cross-references, three counting errors, one contradiction with shipped code that is the only one I would call serious, and five build risks the handover should name.
 
 ---
 
@@ -31,6 +37,8 @@ All 120 golden-set queries, run through `/search/multi` on a fresh dev server, z
 | attribute | 5 | 100% | 100% |
 | **All** | **120** | **62%** | **63%** |
 
+The document's second table — added by the labelling pass — reports **66%** zero over the same 120 queries. My run agrees with the first table, not the second. See B1.
+
 Spot-checks, all exact:
 
 - **FQ17** — `inception (2010)` → 0 results, `Inception 2010` → 0 results, `inception` + `year=2010` → 3 results with Inception first. The dead end is real and rung 1b fixes it.
@@ -46,8 +54,8 @@ Code claims, all accurate: `.head-actions` duplicates three shell controls; `Til
 
 | # | Where | Problem |
 |---|---|---|
-| B1 | §01 | **"80 of the 120 have never been scored"** — it is **70**. 50 carry `expected` entries. |
-| B2 | §01 | **"the one committed run covers exact titles, typos and partials"** — it also covers hinglish (3) and plot_recall (7), and it is incomplete within the three named: 13 of 15 exact, 19 of 20 typo, 8 of 10 partial. The document's own table gives graded figures for hinglish and plot_recall, so the prose contradicts the table beside it. |
+| B1 | §01 | **Two zero-result figures, both called zero, never reconciled.** The narrative table reads 62% as typed; the harness table below it reads **66%**, and FD-1's ruling quotes the 66%. They also disagree by category — typo 75% against 80%, person_led 40% against 60%. My own run lands on the first table (63%, typo 75%, person_led 40%), so the second is measuring something different and the document should say what. |
+| B2 | §01 | **The narrative table still marks person_led, franchise, mood and attribute "ungraded"** — two lines below a sentence that reads "All 120 are now labelled and scored". The labelling pass updated the prose and the new table, not the old one. |
 | B3 | §01 | Cross-reference: plot_recall's honest exit points at **state FQ9**, which is "nothing, with a candidate". plot_recall has no candidate — the state is **FQ11**, which the table verifies with "plot_recall 100% empty". |
 | B4 | §08 | Cross-reference: the two-people collision points at **FQ6**, which is "a person with no photo". It is **FQ4**. |
 | B5 | §01 / §04 | The rescue ladder is counted three ways: "Five rungs" (§04), "Four rungs of rescue, three of them free" (§01 table), "none of the four rescue rungs touches it" (§01 prose) — over a table with six rescue rows (1, 1b, 2, 3, 4, 5). Pick one and use it everywhere. |
@@ -89,7 +97,7 @@ That leaves a real question for this module: **TP5** wants department and top jo
 
 | # | Risk |
 |---|---|
-| E1 | **"Word lists" is the wrong name, and it costs the module's best result.** The strip list contains two phrases — `all parts` and `in order`. I built rung 1 as a token filter first and franchise came out **20% empty instead of 0%**, because a word-split filter can never match a phrase. Everything else reproduced; this one thing did not. The highest-value hour in the module has a trap in how it is described, and §11 should say **phrase-aware**, with `avengers all parts` as the test case. |
+| E1 | **"Word lists" is the wrong name, and it costs the module's best result.** The strip list contains two phrases — `all parts` and `in order`. I built rung 1 as a token filter first and franchise came out **20% empty instead of 0%**, because a word-split filter can never match a phrase. Everything else reproduced; this one thing did not. The highest-value hour in the module has a trap in how it is described, and §11 should say **phrase-aware**, with `avengers all parts` as the test case. Still unstated after the labelling pass, which simulated rungs 1–4 and would have hit this had it built the list by tokens. |
 | E2 | **FB2's chip-blame costs N extra requests, at the worst moment.** Dropping each chip in turn to find the culprit is three or four count-only calls, fired exactly when somebody is already looking at an empty screen. Worth a stated budget and a fallback for when it is slow. |
 | E3 | **FQ18 needs an endpoint §02's table does not list.** An IMDb URL resolves through `/find/{imdb_id}?external_source=imdb_id`, which is a third engine alongside the two the section is built around. Small, but it is currently invisible in the handover. |
 | E4 | **`Tile.jsx`'s `+` passes `verify` and should not.** Check 14 exists to stop an icon being a character, but its glyph ranges are non-ASCII, so `'+'` sails through — on every tile in the product. The design already flags the fix; the check should be widened at the same time so it cannot come back. |

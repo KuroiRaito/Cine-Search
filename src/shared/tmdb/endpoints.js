@@ -40,6 +40,11 @@ export const personCredits = (personId, opts) =>
 export const collection = (collectionId, opts) =>
     get(`/collection/${collectionId}`, {}, opts).then((d) => toItems(d.parts, 'movie'));
 
+/** "Because you watched X" — TMDB's own neighbours for one title. */
+export const recommendations = (id, mediaType, opts) =>
+    get(`/${mediaType === 'tv' ? 'tv' : 'movie'}/${id}/recommendations`, {}, opts)
+        .then((d) => toItems(d.results, mediaType));
+
 export const discoverMovies = (params = {}, opts) =>
     get('/discover/movie', params, opts).then((d) => withPage(d, 'movie'));
 

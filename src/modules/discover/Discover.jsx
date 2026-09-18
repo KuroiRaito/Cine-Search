@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { trending, nowPlaying, upcoming, onTheAir } from '../../shared/tmdb/endpoints.js';
+import {
+    trending, nowPlaying, upcoming, onTheAir, recommendations,
+} from '../../shared/tmdb/endpoints.js';
 import { fromItem } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { useRegion } from '../../shared/hooks/useRegion.js';
 import { Rail, Skeleton, ErrorBox, Icon } from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
-import { useTileStates, useQuickAdd } from '../library';
+import {
+    useLibrary, useTileStates, useQuickAdd, loadShelf, shapeRow,
+} from '../library';
 import { SignInPrompt } from '../entry';
 import { presetsFor, facetsFor, toParams, readRegion } from '../search';
 import './discover.css';
@@ -69,9 +73,83 @@ function FeedRail({ title, load, deps, onAdd, stateFor, more }) {
     );
 }
 
+/**
+ * The rails that come from the library rather than from TMDB.
+ *
+ * Four rails shipped today, all global, none personal, none openable. The
+ * library exists now, so the first thing the front door shows should be the
+ * thing you left unfinished — that is the habit loop, and it is the one rail
+ * that is not a query: it opens the Library.
+ *
+ * FD6 — with nothing watched, "Because you watched" is absent rather than
+ * empty. No placeholder and no explanation; a rail that apologises for having
+ * nothing to say is worse than one that is not there.
+ *
+ * FD8 — a rail with fewer than four still draws. A short rail is a fact.
+ */
+function LibraryRails({ onAdd, stateFor }) {
+    const { ready, entries } = useLibrary();
+    const shelves = useAsync(
+        () => Promise.all([loadShelf('watching'), loadShelf('want_to_watch'), loadShelf('watched', 1)])
+            .then(([watching, want, watched]) => ({
+                watching: (watching || []).map((r) => shapeRow(r, entries[`${r.media_type}:${r.tmdb_id}`] || {})),
+                want: (want || []).map((r) => shapeRow(r)),
+                lastWatched: (watched || []).map((r) => shapeRow(r))[0] || null,
+            })),
+        [ready],
+        { skip: !ready },
+    ).data;
+
+    const because = useAsync(
+        ({ signal }) => recommendations(shelves.lastWatched.id, shelves.lastWatched.mediaType, { signal })
+            .then((rows) => rows.map(fromItem)),
+        [shelves?.lastWatched?.id, shelves?.lastWatched?.mediaType],
+        { skip: !shelves?.lastWatched },
+    ).data;
+
+    if (!shelves) return null;
+
+    return (
+        <>
+            {shelves.watching.length > 0 && (
+                <Rail
+                    title="Continue watching"
+                    items={shelves.watching}
+                    onAdd={onAdd}
+                    stateFor={stateFor}
+                    action={<Link className="railmore" to="/library?status=watching">Library</Link>}
+                />
+            )}
+            {shelves.want.length > 0 && (
+                <Rail
+                    title="Want to watch"
+                    items={shelves.want}
+                    onAdd={onAdd}
+                    stateFor={stateFor}
+                    action={<Link className="railmore" to="/library?status=want_to_watch">Library</Link>}
+                />
+            )}
+            {/* Names the film it came from — an unexplained recommendation is a
+                guess with confidence. */}
+            {because?.length > 0 && (
+                <Rail
+                    title={`Because you watched ${shelves.lastWatched.title}`}
+                    items={because}
+                    onAdd={onAdd}
+                    stateFor={stateFor}
+                />
+            )}
+        </>
+    );
+}
+
 export default function Discover() {
     const { region } = useRegion();
     const { isSignedIn, authReady } = useAuth();
+    const { entries } = useLibrary();
+    /* FD2 — signed in with nothing logged is the guest layout minus the
+       sign-up card, because help is what that person needs, not the pitch. */
+    const hasLibrary = isSignedIn && Object.keys(entries).length > 0;
     const [prompt, setPrompt] = useState(null);
 
     // Tapping + on any tile is how a guest discovers what the product is for.
@@ -90,10 +168,15 @@ export default function Discover() {
                     copy has no job left. */}
             </div>
 
-            {/* A chip row, not a rail. It moves up for a guest or an empty
-                library — the person with nothing to continue is the one who
-                most needs a way in. */}
-            <Presets />
+            {/* FD3 — Continue watching first, Want to watch second. The first
+                thing the front door shows is the thing you left unfinished. */}
+            {isSignedIn && <LibraryRails onAdd={onAdd} stateFor={stateFor} />}
+
+            {/* FD1 / FD2 — a chip row, not a rail, and it sits high for a guest
+                or an empty library: the person with nothing to continue is the
+                one who most needs a way in. With a library it drops below the
+                feeds. */}
+            {!hasLibrary && <Presets />}
 
             <FeedRail
                 title="Trending this week"
@@ -139,6 +222,8 @@ export default function Discover() {
                 load={({ signal }) => upcoming(region, { signal }).then((r) => r.map(fromItem))}
                 deps={[region]}
             />
+
+            {hasLibrary && <Presets />}
 
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
         </div>

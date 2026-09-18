@@ -88,7 +88,21 @@
   font-family: var(--f-s); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 500;
 }
 .plogo { width: var(--icon-20); height: var(--icon-20); border-radius: var(--radius-4); }
-.prov-none { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); }
+.prov-none { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); margin-top: var(--space-8); }
+
+/* "free" and "with ads" ride the chip they qualify. Quiet, because the point of
+   the tier is that none of them charges for this title — the note says which
+   kind of free, not whether. */
+.pchip .pnote { font-style: normal; color: var(--muted); font-size: var(--text-micro); line-height: var(--lh-micro); margin-left: var(--space-4); }
+
+/* The second tier is one control, not a row. It is a chip so that it sits on
+   the same line as the streaming row reads on, and a button because it opens
+   something. */
+.pchip.paid { margin-top: var(--space-8); cursor: pointer; gap: var(--space-4); padding-right: var(--space-4); }
+.pchip.paid:hover { background: var(--ink-4); }
+
+.storelist { display: flex; flex-wrap: wrap; gap: var(--space-8); padding: 0 var(--sheet-pad); }
+.storelink { margin: var(--space-16) var(--sheet-pad) 0; display: block; text-align: center; }
 .prov-none a { color: var(--acc-t); font-weight: 600; }
 
 

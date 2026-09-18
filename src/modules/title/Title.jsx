@@ -62,6 +62,7 @@ export default function Title() {
        failure the tabs exist to prevent. */
     const [picked, setPicked] = useState(null);
     const [jumpTo, setJumpTo] = useState(null);
+    const [stores, setStores] = useState(false);
     const [prompt, setPrompt] = useState(null);
     const [editing, setEditing] = useState(false);
     const [toast, setToast] = useState(null);
@@ -278,20 +279,39 @@ export default function Title() {
 
             {note && <p className="snote">{note}</p>}
 
+            {/* §03c. Two rows, not six: the three-tier draft pushed the scores,
+                your rating and the synopsis below the fold on a 320px screen,
+                which is the richest data on the page losing its place to a
+                list of shops. Streaming is one row; rent is one chip. */}
             {shows(cohort, 'providers') && (
             <div className="prov">
                 <div className="prov-l">Where to watch · {countryName(t.providers.region)}</div>
                 {t.providers.any ? (
-                    <div className="provrow">
-                        {[...t.providers.flatrate, ...t.providers.rent, ...t.providers.buy]
-                            .filter((p, i, all) => all.findIndex((x) => x.id === p.id) === i)
-                            .slice(0, 6)
-                            .map((p) => (
-                                <span className="pchip" key={p.id}>
-                                    {p.logo && <img className="plogo" src={p.logo} alt="" loading="lazy" />}{p.name}
-                                </span>
-                            ))}
-                    </div>
+                    <>
+                        {t.providers.streaming.length > 0 && (
+                            <div className="provrow">
+                                {t.providers.streaming.map((p) => (
+                                    <span className="pchip" key={p.id}>
+                                        {p.logo && <img className="plogo" src={p.logo} alt="" loading="lazy" />}
+                                        {p.name}
+                                        {p.note && <i className="pnote">{p.note}</i>}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                        {/* Seven storefronts for Oppenheimer in the US, and the
+                            same seven for nearly everything. A list adds nothing
+                            a count does not. */}
+                        {t.providers.paid.length > 0 && (
+                            <button type="button" className="pchip paid" onClick={() => setStores(true)}>
+                                Rent or buy · {t.providers.paid.length}
+                                <Icon name="forward" size={16} />
+                            </button>
+                        )}
+                        {t.providers.streaming.length === 0 && (
+                            <p className="prov-none">Not streaming in {countryName(t.providers.region)}.</p>
+                        )}
+                    </>
                 ) : (
                     <p className="prov-none">
                         Not available in {countryName(t.providers.region)}.
@@ -472,6 +492,14 @@ export default function Title() {
                 <aside className="tside">{actions}</aside>
             </div>
 
+            {stores && (
+                <StoreSheet
+                    region={countryName(t.providers.region)}
+                    stores={t.providers.paid}
+                    link={t.providers.link}
+                    onClose={() => setStores(false)}
+                />
+            )}
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
             {editing && <Editor title={t} onClose={() => setEditing(false)} />}
             <Toast
@@ -480,6 +508,49 @@ export default function Title() {
                 onAction={() => { toast?.onAction?.(); setToast(null); }}
                 onDismiss={dismissToast}
             />
+        </div>
+    );
+}
+
+/**
+ * The storefronts, behind a count.
+ *
+ * §03c keeps this off the page because the list is the same nearly everywhere —
+ * and because putting it inline is what pushed the scores and the synopsis
+ * below the fold at 320. No prices: TMDB does not carry them, and a made-up
+ * "from £3.49" on a page somebody acts on is the one failure here that costs
+ * them money.
+ */
+function StoreSheet({ region, stores, link, onClose }) {
+    useEffect(() => {
+        const opener = document.activeElement;
+        const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', onKey);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            if (opener instanceof HTMLElement && document.contains(opener)) opener.focus();
+        };
+    }, [onClose]);
+
+    return (
+        <div className="scrim" role="dialog" aria-modal="true" aria-label="Rent or buy" onClick={onClose}>
+            <div className="sheet" onClick={(e) => e.stopPropagation()}>
+                <div className="grab" />
+                <h2 className="sheet-title">Rent or buy</h2>
+                <p className="sheet-body">{stores.length} places in {region}. Prices are not ours to quote.</p>
+                <div className="storelist">
+                    {stores.map((p) => (
+                        <span className="pchip" key={p.id}>
+                            {p.logo && <img className="plogo" src={p.logo} alt="" loading="lazy" />}{p.name}
+                        </span>
+                    ))}
+                </div>
+                {link && (
+                    <a className="btn quiet storelink" href={link} target="_blank" rel="noreferrer noopener">
+                        See them on TMDB
+                    </a>
+                )}
+            </div>
         </div>
     );
 }

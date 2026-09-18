@@ -449,6 +449,40 @@ for (const f of jsx) {
 
 // Aggregate last, after every check has run — a map built before a check
 // reports into it is a check that can never fail.
+/* ---------------------------------------------------------------
+   16. An icon names a role the set actually has.
+
+   Check 14 stops an icon being a character and check 15 stops it being
+   used without an import. Neither notices <Icon name="right" />, where
+   the role is simply not in the map — the component renders nothing and
+   the page looks fine until somebody goes looking for the chevron that
+   is not there. The set calls that one `forward`.
+
+   Roles are a small closed vocabulary, so a typo is the likeliest way to
+   get one wrong, and a silently empty box is the worst way to find out.
+   --------------------------------------------------------------- */
+const iconSrc = readFileSync(join(ROOT, 'src/shared/ui/Icon.jsx'), 'utf8');
+const mapBody = iconSrc.match(/const\s+ICONS\s*=\s*\{([\s\S]*?)\n\};/);
+const ROLES = new Set(
+    [...(mapBody?.[1] ?? '').matchAll(/(?:^|[,{\s])([a-zA-Z][\w-]*)\s*:/g)].map((m) => m[1]),
+);
+/* A check that cannot find what it checks must say so. The first version of
+   this guarded on `if (ROLES.size)` and named the map wrong, so it read zero
+   roles, skipped every file, and reported ok — which is precisely the silent
+   pass it was written to stop. */
+if (!ROLES.size) {
+    fail('icon-name', 'could not read the role map out of src/shared/ui/Icon.jsx');
+}
+for (const f of jsx) {
+    const rel = relative(ROOT, f);
+    if (rel.endsWith('shared/ui/Icon.jsx')) continue;
+    for (const m of readFileSync(f, 'utf8').matchAll(/<Icon\b[^>]*?\bname=\{?["']([\w-]+)["']/g)) {
+        if (ROLES.size && !ROLES.has(m[1])) {
+            fail('icon-name', `${rel}: <Icon name="${m[1]}" /> — no such role in the set`);
+        }
+    }
+}
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -468,6 +502,7 @@ const CHECKS = [
     ['layer-token', 'Five layers, and nothing between them'],
     ['icon-component', 'An icon is a component, never a character'],
     ['component-import', 'A component used is a component imported'],
+    ['icon-name', 'An icon names a role the set actually has'],
 ];
 
 let failed = 0;

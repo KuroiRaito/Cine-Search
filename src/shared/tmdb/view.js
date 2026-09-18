@@ -65,18 +65,42 @@ export function certificationFor(raw, region, mediaType) {
 }
 
 /** Streaming / rent / buy for one region, plus the JustWatch link TMDB requires we honour. */
+/**
+ * Two tiers, not six buckets — §03c.
+ *
+ * TMDB separates flatrate, free, ads, rent and buy, and the separation answers
+ * a question a row of logos does not: what will this cost me? Everything in
+ * `streaming` is watchable without paying for this title; everything in
+ * `paid` is not. That is the only distinction worth two rows.
+ *
+ * Deduplicated upward, because the buckets overlap. Apple TV Store is in both
+ * rent and buy for Oppenheimer, and a provider already shown as streaming is
+ * never repeated below — so "Rent or buy · 5" counts five places, not five
+ * offers.
+ *
+ * No prices, ever. TMDB does not carry them, and inventing one on a page
+ * somebody acts on is the single failure here that costs them money.
+ */
 export function providersFor(raw, region) {
     const r = raw['watch/providers']?.results?.[region];
-    if (!r) return { region, link: null, flatrate: [], rent: [], buy: [], any: false };
-    const map = (list) => (list || []).map((p) => ({
+    const empty = { region, link: null, streaming: [], paid: [], any: false };
+    if (!r) return empty;
+    const map = (list, note) => (list || []).map((p) => ({
         id: p.provider_id,
         name: p.provider_name,
         logo: p.logo_path ? `${IMG}/w92${p.logo_path}` : null,
+        note: note || null,
     }));
-    const flatrate = map(r.flatrate);
-    const rent = map(r.rent);
-    const buy = map(r.buy);
-    return { region, link: r.link || null, flatrate, rent, buy, any: Boolean(flatrate.length || rent.length || buy.length) };
+
+    const seen = new Set();
+    const once = (list) => list.filter((p) => !seen.has(p.id) && seen.add(p.id));
+
+    /* Order within the tier is the order of certainty about the cost: a
+       subscription you may already have, then free, then free with ads. */
+    const streaming = once([...map(r.flatrate), ...map(r.free, 'free'), ...map(r.ads, 'with ads')]);
+    const paid = once([...map(r.rent), ...map(r.buy)]);
+
+    return { region, link: r.link || null, streaming, paid, any: Boolean(streaming.length || paid.length) };
 }
 
 /**

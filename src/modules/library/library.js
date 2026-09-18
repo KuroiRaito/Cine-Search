@@ -1,6 +1,6 @@
 import { supabase } from '../../shared/auth/supabaseClient.js';
 import { titleFull } from '../../shared/tmdb/endpoints.js';
-import { toCatalog } from '../../shared/tmdb/view.js';
+import { toCatalog, yearOf, posterUrl } from '../../shared/tmdb/view.js';
 
 /**
  * Every write to the library goes through a Postgres function, never straight
@@ -207,6 +207,61 @@ export async function loadAll() {
         .from('user_library')
         .select('tmdb_id, media_type, status, rating, is_favourite, favourite_order, watched_episodes, rewatch_count, recommended_by, recommended_at, notes, added_at, started_at, completed_at, updated_at')
         .order('updated_at', { ascending: false }));
+}
+
+/**
+ * One shelf, newest first, for a rail rather than for the Library screen.
+ *
+ * Limited rather than paged: a rail shows twenty and Discover is the screen a
+ * person opens most. loadAll() — what the provider keeps in memory — carries no
+ * title and no poster, so it cannot draw a tile; this is the smallest join that
+ * can.
+ */
+export async function loadShelf(status, limit = 20) {
+    return supabase
+        .from('user_library')
+        .select(`
+            tmdb_id, media_type, status, rating, watched_episodes,
+            added_at, updated_at, completed_at,
+            catalog_titles!inner ( title, release_date, poster_path, number_of_episodes, seasons )
+        `)
+        .eq('status', status)
+        .order(status === 'want_to_watch' ? 'added_at' : 'updated_at', { ascending: false })
+        .limit(limit)
+        .then(unwrap);
+}
+
+/**
+ * One saved row: the catalogue half from the join, the person's half from the
+ * provider. Two sources because they change on different clocks — a poster does
+ * not move while you are looking at it, and a tick has to.
+ *
+ * Lives here rather than in the Library screen because Discover's rails draw
+ * the same rows, and two shapers would drift.
+ */
+export function shapeRow(r, entry = {}) {
+    const cat = r.catalog_titles || {};
+    const total = cat.number_of_episodes || 0;
+    const order = r.media_type === 'tv' ? runningOrder(cat.seasons, total) : [];
+    const watched = entry.watched_episodes || r.watched_episodes || {};
+    return {
+        key: `${r.media_type}-${r.tmdb_id}`,
+        id: r.tmdb_id,
+        mediaType: r.media_type,
+        title: cat.title || 'Untitled',
+        year: yearOf(cat.release_date),
+        poster: posterUrl(cat.poster_path, 'w342'),
+        posterPath: cat.poster_path,
+        voteAverage: null,
+        status: entry.status ?? r.status,
+        rating: entry.rating ?? r.rating,
+        updatedAt: r.updated_at,
+        addedAt: r.added_at,
+        watched,
+        seen: episodesWatched(watched),
+        total,
+        next: order.length ? nextUnwatched(order, watched) : null,
+    };
 }
 
 /** The saved rows joined to the catalogue, for the Library screen itself.

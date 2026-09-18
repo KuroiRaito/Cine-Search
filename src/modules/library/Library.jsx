@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 import { Poster, Tile, Skeleton, Empty, Toast, Icon } from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from './LibraryProvider.jsx';
-import { posterUrl, yearOf } from '../../shared/tmdb/view.js';
 import {
-    statusMeta, episodesWatched, runningOrder, nextUnwatched, epLabel, loadEntries, keyOf,
+    statusMeta, epLabel, loadEntries, keyOf, shapeRow,
 } from './library.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { matches, isFinding } from './find.js';
@@ -73,7 +72,7 @@ export default function Library() {
         () => (data || [])
             .map((r) => [r, lib.entries[keyOf(r.media_type, r.tmdb_id)]])
             .filter(([, entry]) => entry)
-            .map(([r, entry]) => shape(r, entry)),
+            .map(([r, entry]) => shapeRow(r, entry)),
         [data, lib.entries],
     );
 
@@ -461,34 +460,4 @@ function SeriesRow({ row, onBump }) {
             <span className="track" aria-hidden="true"><i style={{ width: `${pct}%` }} /></span>
         </div>
     );
-}
-
-/**
- * One saved row: the catalogue half from the join, the person's half from the
- * provider. Two sources because they change on different clocks — a poster does
- * not move while you are looking at it, and a tick has to.
- */
-function shape(r, entry) {
-    const cat = r.catalog_titles || {};
-    const total = cat.number_of_episodes || 0;
-    const order = r.media_type === 'tv' ? runningOrder(cat.seasons, total) : [];
-    const watched = entry.watched_episodes || {};
-    return {
-        key: `${r.media_type}-${r.tmdb_id}`,
-        id: r.tmdb_id,
-        mediaType: r.media_type,
-        title: cat.title || 'Untitled',
-        year: yearOf(cat.release_date),
-        poster: posterUrl(cat.poster_path, 'w342'),
-        posterPath: cat.poster_path,
-        voteAverage: null,
-        status: entry.status,
-        rating: entry.rating,
-        updatedAt: r.updated_at,
-        addedAt: r.added_at,
-        watched,
-        seen: episodesWatched(watched),
-        total,
-        next: order.length ? nextUnwatched(order, watched) : null,
-    };
 }

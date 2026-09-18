@@ -44,9 +44,15 @@ export const PRESETS = [
     {
         key: 'edge',
         label: 'Edge of the seat',
-        definition: 'Thriller or Mystery · rated 7+, most popular',
+        definition: 'Thriller or Mystery · rated 7+, most voted',
         answers: 'koi acchi thriller movie',
-        facets: { kind: 'movie', genre: [THRILLER, MYSTERY], rating: 7, sort: 'popular' },
+        /* Sorted by votes, not popularity — the one change from the printed
+           definition, and it was measured rather than argued. Popularity is a
+           recency-weighted signal, so "Thriller or Mystery, 7+, most popular"
+           returned Zip Wire, Ghost in the Cell and Obsession where every other
+           preset returned canon. A shelf on the home screen that nobody
+           recognises is the same failure as an empty one, in better clothes. */
+        facets: { kind: 'movie', genre: [THRILLER, MYSTERY], rating: 7, sort: 'voted' },
     },
     {
         key: 'cry',

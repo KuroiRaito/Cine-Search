@@ -11,3 +11,31 @@
 
 .searchbox-wrap { margin-top: 12px; }
 .grid.results { margin-top: 16px; }
+/* ---- what the app decided the question was ----
+
+   §03 band 3: at most one of these, ever. Two stacked is the app arguing with
+   itself. One line above the results — never a toast, which disappears, and
+   never a dialog, which interrupts. */
+.said {
+  margin: var(--space-12) var(--gutter) 0;
+  font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted);
+}
+.said b { color: var(--text); font-weight: 600; }
+/* The original, one tap away. A button rather than a link: it changes what this
+   screen is showing, it does not go anywhere. */
+.said-undo {
+  display: inline; background: none; border: 0; padding: 0 0 0 var(--space-4);
+  font-family: var(--f-s); font-size: inherit; line-height: inherit;
+  color: var(--acc-t); font-weight: 600; cursor: pointer; text-align: left;
+}
+
+/* L3 — nothing found is a screen, not a sentence. */
+.nothing { margin: var(--section-gap) var(--gutter) 0; max-width: var(--measure); }
+.nothing h2 {
+  font-family: var(--f-d); font-size: var(--text-title); line-height: var(--lh-title);
+  font-weight: 800; letter-spacing: -.02em;
+}
+.said-ask { margin-top: var(--space-12); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }
+.nothing-why { margin-top: var(--space-8); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }
+.nothing .btn { margin-top: var(--space-16); }
+.saidchips { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-top: var(--space-8); }

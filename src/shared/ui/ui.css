@@ -195,6 +195,28 @@
 }
 .ibtn:hover { background: var(--ink-5); color: var(--text); }
 .ibtn.like:hover { color: var(--like-9); }
+/* ---------------- the chip ----------------
+
+   Library introduced it, search needs it, and Browse is made of it — the whole
+   filter row is chips, and the chip row above the results is how somebody
+   takes a filter back off. foundations names it as an atom, so it lives here
+   rather than in whichever module happened to draw it first.
+
+   Converted on the way across: shared is always on the scale, and this arrived
+   carrying 12.5px, 13px and a 99px radius. */
+.chips { display: flex; gap: var(--space-8); overflow-x: auto; padding: var(--space-12) var(--gutter) 0; scrollbar-width: none; }
+.chips::-webkit-scrollbar { height: 0; }
+.chip {
+  flex: 0 0 auto; font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 500;
+  padding: var(--space-8) var(--space-12); border-radius: var(--radius-full); border: 0; cursor: pointer;
+  background: var(--ink-3); color: var(--muted); white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.chip em { font-style: normal; opacity: .5; margin-left: var(--space-4); font-variant-numeric: tabular-nums; }
+.chip:hover { background: var(--ink-4); color: var(--text); }
+.chip[aria-pressed="true"] { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
+.chip[aria-pressed="true"] em { opacity: .65; }
+
 .sw {
   flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);

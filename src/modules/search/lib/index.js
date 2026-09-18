@@ -7,11 +7,16 @@
 
 import { search as searchV1 } from './v1.js';
 import { search as searchV2 } from './v2/index.js';
+import { search as searchLadder } from './ladder.js';
 import { DEFAULT_SEARCH_OPTS } from './types.js';
 
 export { DEFAULT_SEARCH_OPTS };
 
 export async function search(query, opts = {}, { variant, signal } = {}) {
     if (variant === 'v1' || variant === 'v1-baseline') return searchV1(query, opts, { signal });
-    return searchV2(query, opts, { signal });
+    if (variant === 'v2') return searchV2(query, opts, { signal });
+    // The app runs the ladder. v2 is still the thing it wraps, and still
+    // nameable, so the harness can score the rungs against the search without
+    // them.
+    return searchLadder(query, opts, { signal });
 }

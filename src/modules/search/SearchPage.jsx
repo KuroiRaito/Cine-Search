@@ -4,11 +4,14 @@ import { search } from './lib/index.js';
 import { fromItem } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { Tile, Skeleton, Empty, ErrorBox, Icon } from '../../shared/ui/index.js';
-import { discoverMovies, discoverTV, genres as fetchGenres } from '../../shared/tmdb/endpoints.js';
+import {
+    discoverMovies, discoverTV, genres as fetchGenres, providerList,
+} from '../../shared/tmdb/endpoints.js';
 import FilterPanel from './FilterPanel.jsx';
 import {
     fromParams, toParams, activeCount, toQuery, readCount, canLoadMore,
-    reconcile, SORTS, KINDS, LENGTHS, RATINGS, genresFor,
+    reconcile, SORTS, KINDS, LENGTHS, RATINGS, genresFor, blame, blameTrials,
+    providerName, rememberProviders,
 } from './browse.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from '../library';
@@ -58,6 +61,16 @@ export default function SearchPage() {
             .then(([movie, tv]) => ({ movie, tv })),
         [],
     ).data || { movie: [], tv: [] };
+
+    /* A browse can arrive by link with a provider nobody on this device has
+       ever picked, and a chip reading "8" is not a filter anybody can decide to
+       remove. One request, only when the name is missing. */
+    useAsync(
+        ({ signal }) => providerList(facets.kind === 'tv' ? 'tv' : 'movie', facets.region, { signal })
+            .then(rememberProviders),
+        [facets.provider, facets.region, facets.kind],
+        { skip: !facets.provider || !facets.region || providerName(facets.provider) !== 'that service' },
+    );
 
     /* FB3 / FB6 — a genre the current medium does not have is dropped and
        named. Silently mapping Thriller to Action & Adventure would invent an
@@ -260,6 +273,7 @@ export default function SearchPage() {
             {browsing && <BrowseResults
                 state={browse}
                 facets={live}
+                vocab={vocab}
                 page={page}
                 onPage={setPage}
                 onSort={(sort) => setFacets({ ...live, sort })}
@@ -283,6 +297,7 @@ function ChipRow({ facets, vocab, notice, onChange }) {
         facets.decade && { key: 'decade', label: `${facets.decade}s`, off: { decade: null } },
         facets.length && { key: 'len', label: LENGTHS.find((l) => l.value === facets.length)?.label, off: { length: null } },
         facets.rating && { key: 'rated', label: RATINGS.find((r) => r.value === facets.rating)?.label, off: { rating: null } },
+        facets.provider && { key: 'on', label: providerName(facets.provider), off: { provider: null } },
         facets.unseen && { key: 'unseen', label: 'Not seen', off: { unseen: false } },
     ].filter((c) => c && c.label);
 
@@ -312,7 +327,55 @@ function ChipRow({ facets, vocab, notice, onChange }) {
  * FB1 — chips, then a count line printing every constraint and the ordering,
  * then the grid. Every tile carries its vote count beside its score.
  */
-function BrowseResults({ state, facets, page, onPage, onSort, lib, onAdd, stateFor }) {
+/**
+ * FB2 — empty because the chips exclude each other.
+ *
+ * Never a bare "no results". Each chip is dropped in turn and the one whose
+ * removal yields the fewest results is the culprit: the rest of the browse was
+ * nearly as narrow without it, so it is the constraint that did the excluding.
+ *
+ * Three or four count-only requests, fired exactly when somebody is already
+ * looking at an empty screen — so it only runs when there is more than one chip
+ * to blame, and it says the plain thing while it works rather than nothing.
+ */
+function WhyEmpty({ facets, vocab }) {
+    const labels = {
+        kind: KINDS.find((k) => k.key === facets.kind)?.label,
+        genre: genresFor(facets.kind, vocab).find((g) => g.id === facets.genre)?.name,
+        language: facets.language?.toUpperCase(),
+        decade: facets.decade && `${facets.decade}s`,
+        length: LENGTHS.find((l) => l.value === facets.length)?.label,
+        rating: RATINGS.find((r) => r.value === facets.rating)?.label,
+        provider: providerName(facets.provider),
+    };
+    const trials = blameTrials(facets, labels);
+
+    const { data } = useAsync(
+        async ({ signal }) => {
+            const media = facets.kind === 'tv' ? 'tv' : 'movie';
+            const call = media === 'tv' ? discoverTV : discoverMovies;
+            const counted = [];
+            for (const t of trials) {
+                const r = await call({ ...toQuery(t.facets, media), page: 1 }, { signal });
+                counted.push({ chip: t.chip, count: r.totalResults });
+            }
+            return blame(counted);
+        },
+        [JSON.stringify(facets)],
+        { skip: trials.length < 2 },
+    );
+
+    return (
+        <Empty
+            title="Nothing matches all of those"
+            body={data
+                ? `${data.chip} is the one doing it — without it there are ${readCount(data.count)}.`
+                : 'Take a filter off to widen it.'}
+        />
+    );
+}
+
+function BrowseResults({ state, facets, vocab, page, onPage, onSort, lib, onAdd, stateFor }) {
     const { data, error, loading, retry } = state;
     if (error) return <ErrorBox what="this browse" onRetry={retry} />;
 
@@ -352,9 +415,7 @@ function BrowseResults({ state, facets, page, onPage, onSort, lib, onAdd, stateF
 
             {loading && <div className="pad"><Skeleton h={40} /></div>}
 
-            {data && !rows.length && (
-                <Empty title="Nothing matches all of those" body="Take a filter off to widen it." />
-            )}
+            {data && !rows.length && <WhyEmpty facets={facets} vocab={vocab} />}
 
             {/* FB5 — Load more retires at TMDB's own last page. Not an error. */}
             {data && rows.length > 0 && (

@@ -66,7 +66,7 @@ export function genresFor(kind, { movie = [], tv = [] } = {}) {
 /** The facets a browse carries, with nothing set. */
 export const EMPTY = {
     kind: 'all', genre: null, language: null, decade: null,
-    length: null, rating: null, provider: null, unseen: false, sort: DEFAULT_SORT,
+    length: null, rating: null, provider: null, region: null, unseen: false, sort: DEFAULT_SORT,
 };
 
 const asNumber = (v) => (v === null || v === '' || v === undefined ? null : Number(v));
@@ -86,6 +86,11 @@ export function fromParams(params) {
         length: asNumber(get('len')),
         rating: asNumber(get('rated')),
         provider: asNumber(get('on')),
+        /* A provider id means nothing without the region it was chosen in —
+           Amazon Prime Video is 119 in India and 9 in the United States. It
+           rides the URL beside the id, or a browse shared from Mumbai quietly
+           runs against American services. */
+        region: get('in') || null,
         unseen: get('unseen') === '1',
         sort: SORTS.some((s) => s.key === get('sort')) ? get('sort') : DEFAULT_SORT,
     };
@@ -105,6 +110,7 @@ export function toParams(f, base = {}) {
     set('len', f.length);
     set('rated', f.rating);
     set('on', f.provider);
+    set('in', f.provider ? f.region : null);
     set('unseen', f.unseen ? '1' : null);
     set('sort', f.sort, DEFAULT_SORT);
     return out;
@@ -139,9 +145,9 @@ export function toQuery(f, mediaType) {
     if (f.language) params.with_original_language = Array.isArray(f.language) ? f.language.join('|') : f.language;
     if (f.rating) params['vote_average.gte'] = String(f.rating);
     if (f.length) params['with_runtime.lte'] = String(f.length);
-    if (f.provider) {
+    if (f.provider && f.region) {
         params.with_watch_providers = String(f.provider);
-        params.watch_region = f.region || 'US';
+        params.watch_region = f.region;
     }
     if (f.decade) {
         const [from, to] = [`${f.decade}-01-01`, `${f.decade + 9}-12-31`];
@@ -219,4 +225,65 @@ export function blame(trials) {
     const rescued = (trials || []).filter((t) => t.count > 0);
     if (!rescued.length) return null;
     return rescued.reduce((best, t) => (t.count < best.count ? t : best));
+}
+
+/**
+ * FB8 — the region a "where to watch" browse is about.
+ *
+ * Asked for once, at the moment the facet is first used, and then remembered.
+ * Never guessed silently from an IP: a filter nobody chose produces results
+ * nobody can explain, and this one would also be quietly telling a third party
+ * where somebody is.
+ *
+ * Its own key rather than the app's `user_region`, because that one is filled
+ * in by an IP lookup the design forbids here — so reusing it would be obeying
+ * the letter of FB8 while breaking it.
+ */
+export const REGION_KEY = 'cine_watch_region';
+export const readRegion = () => {
+    try { return localStorage.getItem(REGION_KEY) || null; } catch { return null; }
+};
+export const writeRegion = (code) => {
+    try { localStorage.setItem(REGION_KEY, code); } catch { /* private mode */ }
+};
+
+/* Offered, not applied. The browser's own locale is a suggestion at the top of
+   a list somebody still has to choose from. */
+export const REGIONS = ['IN', 'US', 'GB', 'CA', 'AU', 'DE', 'FR', 'JP', 'KR', 'BR'];
+
+/* The names behind the ids, remembered as the list is fetched.
+ *
+ * The URL carries an id because that is what TMDB takes, but a chip reading
+ * "8" is not a filter anybody can recognise or decide to remove. This is the
+ * one place the app needs the name after the panel that fetched it has closed,
+ * and holding it here is cheaper than threading the list through every screen
+ * that might mention a provider. Empty until something fetches, which is why
+ * the fallback is a word rather than a blank. */
+const providerNames = new Map();
+export const rememberProviders = (list) => {
+    for (const p of list || []) providerNames.set(p.id, p.name);
+};
+export const providerName = (id) => providerNames.get(id) || 'that service';
+export function regionChoices(locale) {
+    const mine = String(locale || '').split('-')[1]?.toUpperCase();
+    return mine && !REGIONS.includes(mine) ? [mine, ...REGIONS] : REGIONS;
+}
+
+/**
+ * FB2 — which chip is to blame for an empty browse.
+ *
+ * The trials to run: each chip dropped in turn, so the caller can count what
+ * each removal rescues. Three or four count-only requests, fired exactly when
+ * somebody is already looking at an empty screen — which is why it only runs
+ * when there is more than one chip to blame.
+ */
+export function blameTrials(f, labels) {
+    const each = [
+        ['genre', { genre: null }], ['language', { language: null }],
+        ['decade', { decade: null }], ['length', { length: null }],
+        ['rating', { rating: null }], ['provider', { provider: null }],
+    ].filter(([key]) => f[key]);
+    if (f.kind !== 'all') each.push(['kind', { kind: 'all' }]);
+    if (each.length < 2) return [];
+    return each.map(([key, off]) => ({ chip: labels[key] || key, facets: { ...f, ...off } }));
 }

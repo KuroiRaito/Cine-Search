@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { Icon } from '../../shared/ui/index.js';
-import { KINDS, LENGTHS, RATINGS, DECADES, genresFor } from './browse.js';
+import { useAsync } from '../../shared/hooks/useAsync.js';
+import { providerList } from '../../shared/tmdb/endpoints.js';
+import {
+    KINDS, LENGTHS, RATINGS, DECADES, genresFor, readRegion, writeRegion, regionChoices,
+    rememberProviders,
+} from './browse.js';
 
 /**
  * The panel is the editor. The chip row above the results is the record.
@@ -48,6 +53,68 @@ function Row({ label, options, value, onPick }) {
                         aria-pressed={value === o.value}
                         onClick={() => onPick(value === o.value ? null : o.value)}
                     >{o.label}</button>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+/**
+ * The one row that needs two things before it can draw: a region, and a list
+ * fetched for it.
+ *
+ * FB8 — the region is asked for once, at the moment this facet is first used,
+ * and then remembered. Never guessed from an IP.
+ *
+ * FB7 — if the list cannot be fetched, the facet is absent for that session
+ * rather than empty. An empty row of providers reads as "nothing streams this",
+ * which is a different and wrong answer.
+ */
+function WhereToWatch({ facets, onPick }) {
+    // The browse's own region when it has one — a shared link brings its own —
+    // otherwise whatever was chosen here before.
+    const [region, setRegion] = useState(() => facets.region || readRegion());
+    const { data, error } = useAsync(
+        ({ signal }) => providerList(facets.kind === 'tv' ? 'tv' : 'movie', region, { signal })
+            .then((list) => { rememberProviders(list); return list; }),
+        [region, facets.kind],
+        { skip: !region },
+    );
+
+    if (!region) {
+        return (
+            <div className="frow">
+                <div className="frow-l">Where to watch</div>
+                <p className="frow-ask">Streaming services differ by country. Which is yours?</p>
+                <div className="chips flush">
+                    {regionChoices(navigator.language).map((code) => (
+                        <button
+                            key={code}
+                            type="button"
+                            className="chip"
+                            onClick={() => { writeRegion(code); setRegion(code); }}
+                        >{code}</button>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    // FB7 — absent, not empty.
+    if (error || !data?.length) return null;
+
+    return (
+        <div className="frow">
+            <div className="frow-l">Where to watch · {region}</div>
+            <div className="chips flush">
+                {data.slice(0, 12).map((p) => (
+                    <button
+                        key={p.id}
+                        type="button"
+                        className="chip"
+                        aria-pressed={facets.provider === p.id}
+                        onClick={() => onPick(facets.provider === p.id ? null : p.id, region)}
+                    >{p.name}</button>
                 ))}
             </div>
         </div>
@@ -102,6 +169,7 @@ export default function FilterPanel({ facets, vocab, onChange, canHide }) {
 
             {more && (
                 <>
+                    <WhereToWatch facets={facets} onPick={(v, region) => set({ provider: v, region })} />
                     <Row
                         label="Decade"
                         options={DECADES.map((d) => ({ value: d, label: `${d}s` }))}

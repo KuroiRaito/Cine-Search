@@ -58,6 +58,21 @@ export const credits = (id, mediaType, opts) =>
 export const season = (tvId, seasonNumber, opts) =>
     get(`/tv/${tvId}/season/${seasonNumber}`, {}, opts);
 
+/**
+ * Every provider a region has, in TMDB's own display order.
+ *
+ * Fetched, never typed. Ids are per region and they move: Amazon Prime Video is
+ * 119 in India and 9 in the United States, and JioHotstar — the most-used
+ * service in the country this product is built for — is 2336, an id no
+ * hardcoded list written a year ago would carry.
+ */
+export const providerList = (mediaType, region, opts) =>
+    get(`/watch/providers/${mediaType === 'tv' ? 'tv' : 'movie'}`, { watch_region: region }, opts)
+        .then((d) => (d.results || [])
+            .slice()
+            .sort((a, b) => (a.display_priority ?? 99) - (b.display_priority ?? 99))
+            .map((p) => ({ id: p.provider_id, name: p.provider_name })));
+
 export const watchProviders = (id, mediaType, opts) =>
     get(`/${mediaType}/${id}/watch/providers`, {}, opts).then((d) => d.results || {});
 

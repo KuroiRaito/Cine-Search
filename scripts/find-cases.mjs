@@ -25,6 +25,7 @@ import { parseFacets, isBrowse, chipsOf } from '../src/modules/search/facets.js'
 import {
     SORTS, KINDS, SHARED_GENRE_IDS, genresFor, EMPTY, fromParams, toParams,
     activeCount, toQuery, readCount, canLoadMore, CEILING, MAX_PAGE, reconcile, blame,
+    blameTrials, regionChoices,
 } from '../src/modules/search/browse.js';
 
 /* TMDB's film list, which is what a search with no medium chosen offers. Fixed
@@ -253,6 +254,21 @@ is('FB3     the same rule arriving by URL — horror series is not a thin result
 is('FB6     a shared genre survives the switch',
     reconcile({ ...EMPTY, kind: 'tv', genre: 35 }, VOCAB).dropped.length, 0);
 
+is('FB8     a provider id travels with the region it was chosen in',
+    toParams({ ...EMPTY, provider: 8, region: 'IN' }).toString(), 'on=8&in=IN');
+is('FB8     because 119 is Prime Video in India and 9 is Prime Video in the US',
+    toQuery({ ...EMPTY, provider: 119, region: 'IN' }, 'movie').watch_region, 'IN');
+is('FB8     and a provider without a region asks for nothing',
+    'with_watch_providers' in toQuery({ ...EMPTY, provider: 8 }, 'movie'), false);
+is('FB8     the locale is a suggestion at the top of a list, not an answer',
+    regionChoices('en-NZ')[0], 'NZ');
+is('FB8     and a locale already on the list does not appear twice',
+    regionChoices('en-IN').filter((r) => r === 'IN').length, 1);
+
+is('FB2     one chip is nobody to blame — the browse is simply empty',
+    blameTrials({ ...EMPTY, genre: 35 }, {}).length, 0);
+is('FB2     three chips are three count-only requests',
+    blameTrials({ ...EMPTY, kind: 'movie', genre: 16, language: 'ta' }, {}).length, 3);
 is('FB2     the chip whose removal rescues the fewest is the culprit',
     blame([
         { chip: 'Tamil', count: 41 }, { chip: 'Animation', count: 120 }, { chip: 'Netflix', count: 9 },

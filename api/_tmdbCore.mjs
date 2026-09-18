@@ -23,6 +23,11 @@ const ALLOWED = [
     /^(movie|tv)\/\d+$/,
     /^(movie|tv)\/\d+\/(credits|aggregate_credits|keywords|videos|recommendations|similar|release_dates|content_ratings|external_ids)$/,
     /^(movie|tv)\/\d+\/watch\/providers$/,
+    // The provider list for a region. Browse's "where to watch" fetches it
+    // rather than carrying one: ids are per region and they move — JioHotstar
+    // is 2336 in India, and the id a hardcoded list would have carried returns
+    // five films.
+    /^watch\/providers\/(movie|tv)$/,
     /^tv\/\d+\/season\/\d+$/,
     /^person\/\d+(\/combined_credits)?$/,
     // One credit_id rehydrates a whole favourite-character card: the character

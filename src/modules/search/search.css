@@ -99,3 +99,9 @@
   border-radius: var(--radius-8); padding: var(--space-4) var(--space-8);
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); min-height: var(--control-sm);
 }
+
+/* FB8 — asked for once, and offered rather than applied. */
+.frow-ask {
+  font-size: var(--text-caption); line-height: var(--lh-caption);
+  color: var(--muted); margin-bottom: var(--space-8);
+}

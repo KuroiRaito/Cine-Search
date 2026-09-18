@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Shell Module</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Projector — the shell: the frame every screen sits in. Built on the tokens in docs/foundations.html;
+   no loose numbers here either. */
+:root{
+  color-scheme:dark;
+  --ink-1:#0A0F1B;--ink-2:#0E1421;--ink-3:#141B2B;--ink-4:#182032;--ink-5:#1D2639;
+  --ink-6:#242E44;--ink-7:#2C3752;--ink-8:#3A4766;--ink-9:#4A5878;--ink-10:#56658A;
+  --ink-11:#94A0BC;--ink-12:#EDF0F7;
+  --beam-3:#0A2530;--beam-7:#155A72;--beam-9:#25BADF;--beam-11:#6FDCF5;
+  --mar-3:#2B210B;--mar-7:#6B5316;--mar-9:#F5C45C;--mar-11:#F0C468;
+  --st-done-3:#07241F;--st-done-9:#2ABFA0;--st-done-11:#6FE0C8;
+  --st-drop-3:#26100C;--st-drop-9:#B5594A;--st-drop-11:#DC8E7F;
+  --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
+  --on-beam-9:#06333F;
+  --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
+  --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);
+  --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);
+  --grid-line:rgba(111,220,245,.13);
+  --space-0:0px;--space-2:2px;--space-4:4px;--space-8:8px;--space-12:12px;
+  --space-16:16px;--space-20:20px;--space-24:24px;--space-32:32px;--space-40:40px;
+  --space-48:48px;--space-64:64px;--space-80:80px;
+  --radius-4:4px;--radius-8:8px;--radius-12:12px;--radius-16:16px;--radius-full:999px;
+  --border-hair:1px;--border-focus:2px;
+  --control-sm:36px;--control-md:44px;--control-lg:52px;
+  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+  --f-d:'Archivo',system-ui,sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',ui-monospace,monospace;
+  --dur-fast:120ms;--dur-base:200ms;--ease-out:cubic-bezier(.2,0,0,1);
+  --shadow-raised:0 6px 16px -4px rgba(0,0,0,.6);--scrim-wash:rgba(4,6,12,.62);
+  --z-nav:40;--z-scrim:60;
+  --gutter:var(--space-16);--control-h:var(--control-md);--radius-control:var(--radius-12);
+  --field-gap:var(--space-8);--field-stack:var(--space-16);--section-gap:var(--space-24);
+  --form-max:420px;--measure:65ch;--shell-max:none;
+  --text-micro:11px;--lh-micro:16px;--text-caption:12px;--lh-caption:16px;
+  --text-body-sm:13px;--lh-body-sm:20px;--text-label:13px;--lh-label:16px;
+  --text-body:15px;--lh-body:24px;--text-title-sm:17px;--lh-title-sm:24px;
+  --text-title:21px;--lh-title:28px;--text-display-sm:27px;--lh-display-sm:32px;
+  --text-display:40px;--lh-display:44px;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --ink-1:#FCFCFD;--ink-2:#F7F8FB;--ink-3:#EFF1F6;--ink-4:#E8EBF2;--ink-5:#E0E4ED;
+  --ink-6:#D6DBE7;--ink-7:#C7CEDE;--ink-8:#B0BACF;--ink-9:#6B7694;--ink-10:#5F6A87;
+  --ink-11:#5A6480;--ink-12:#171B26;
+  --beam-3:#E1F6FB;--beam-7:#7EC9E0;--beam-9:#25BADF;--beam-11:#0B6B84;
+  --mar-3:#FBF3E0;--mar-7:#E4BF78;--mar-9:#F5C45C;--mar-11:#7A5A0B;
+  --st-done-3:#E2F6F1;--st-done-9:#159E82;--st-done-11:#0A6152;
+  --st-drop-3:#FAE9E6;--st-drop-9:#A0453A;--st-drop-11:#752D24;
+  --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
+  --grid-line:rgba(37,186,223,.16);--shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--f-s);font-size:var(--text-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:var(--border-focus) solid var(--acc);outline-offset:3px;border-radius:var(--radius-4)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 var(--space-24)}
+.mast{border-bottom:var(--border-hair) solid var(--bd-sub);padding:var(--space-64) 0 var(--space-40);position:relative;overflow:hidden}
+.mast::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to right,var(--grid-line) 0 1px,transparent 1px var(--space-4)),
+             repeating-linear-gradient(to bottom,var(--grid-line) 0 1px,transparent 1px var(--space-4));
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%);
+  -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.5),transparent 70%)}
+.mast .wrap{position:relative}
+.eyebrow{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--acc-t);display:flex;align-items:center;gap:var(--space-8);margin-bottom:var(--space-16)}
+.eyebrow i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal;flex:0 0 auto}
+h1{font-family:var(--f-d);font-size:var(--text-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.04em;margin:0 0 var(--space-16);text-wrap:balance}
+.lede{font-size:var(--text-body);line-height:var(--lh-body);color:var(--muted);max-width:62ch;margin:0}
+.lede b{color:var(--text);font-weight:600}
+nav.toc{border-bottom:var(--border-hair) solid var(--bd-sub);position:sticky;top:0;z-index:var(--z-nav);
+  background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px)}
+nav.toc .wrap{display:flex;gap:var(--space-4);overflow-x:auto;padding-top:var(--space-8);padding-bottom:var(--space-8)}
+nav.toc a{flex:0 0 auto;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);
+  letter-spacing:.04em;color:var(--muted);text-decoration:none;padding:var(--space-8) var(--space-12);border-radius:var(--radius-8)}
+nav.toc a:hover{background:var(--surface);color:var(--text)}
+section{padding:var(--space-64) 0;border-bottom:var(--border-hair) solid var(--bd-sub)}
+.shead{display:flex;align-items:baseline;gap:var(--space-12);margin-bottom:var(--space-8)}
+.snum{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc);flex:0 0 auto}
+h2{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+h3{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;letter-spacing:-.02em;margin:var(--space-40) 0 var(--space-12)}
+h4{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:var(--space-24) 0 var(--space-12)}
+section > .wrap > p,.prose{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure);margin:0 0 var(--space-12)}
+section > .wrap > p b,.prose b{color:var(--text);font-weight:600}
+code{font-family:var(--f-m);font-size:.92em;background:var(--surface);padding:var(--space-2) var(--space-4);border-radius:var(--radius-4);color:var(--acc-t)}
+.tbl-wrap{overflow-x:auto;margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12)}
+table{width:100%;border-collapse:collapse;font-size:var(--text-body-sm);line-height:var(--lh-body-sm)}
+th{text-align:left;font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd);background:var(--bg-sub);white-space:nowrap}
+td{padding:var(--space-12) var(--space-16);border-bottom:var(--border-hair) solid var(--bd-sub);vertical-align:top;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+td.tok,td.num{font-family:var(--f-m);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.tok{color:var(--acc-t)}td.num{color:var(--text)}
+tbody tr:hover td{background:color-mix(in srgb,var(--surface) 55%,transparent)}
+.note{border-left:var(--border-focus) solid var(--acc-bd);background:var(--acc-bg);padding:var(--space-12) var(--space-16);
+  border-radius:0 var(--radius-8) var(--radius-8) 0;margin:var(--space-16) 0;font-size:var(--text-body-sm);
+  line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure)}
+.note b{color:var(--acc-t);font-weight:600}
+.note.warn{border-left-color:var(--rate-bd);background:var(--rate-bg)}
+.note.warn b{color:var(--rate-t)}
+.note.law{border-left-color:var(--st-drop-9);background:var(--st-drop-3)}
+.note.law b{color:var(--st-drop-11)}
+.note.ok{border-left-color:var(--st-done-9);background:var(--st-done-3)}
+.note.ok b{color:var(--st-done-11)}
+pre{background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);
+  padding:var(--space-16);overflow-x:auto;margin:var(--space-16) 0;font-family:var(--f-m);
+  font-size:var(--text-caption);line-height:var(--lh-body-sm);color:var(--muted)}
+pre b{color:var(--acc-t);font-weight:500}pre i{color:var(--faint);font-style:normal}
+pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11);text-decoration:none}
+</style>
+<style>
+.phones{display:flex;flex-wrap:wrap;gap:var(--space-24);margin-top:var(--space-16);align-items:flex-start}
+.phone{flex:0 0 auto;width:320px;max-width:100%}
+.phone-cap{font-family:var(--f-m);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--faint);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:var(--space-8);display:flex;gap:var(--space-8)}
+.phone-cap b{color:var(--acc-t);font-weight:600}
+.screen{width:320px;max-width:100%;height:600px;overflow:hidden;position:relative;background:var(--bg);
+  border:var(--border-hair) solid var(--bd);border-radius:var(--radius-16);--gutter:var(--space-16)}
+.screen *{box-sizing:border-box}
+.scroll{height:100%;overflow:hidden}
+
+/* --- banner + avatar --- */
+.pbanner{position:relative;aspect-ratio:3/1;background:linear-gradient(115deg,var(--ink-5),var(--beam-7) 55%,var(--mar-7));overflow:hidden}
+.pbanner.empty{background:repeating-linear-gradient(45deg,var(--ink-3) 0 6px,var(--ink-2) 6px 12px);display:grid;place-items:center}
+.pbanner .ecap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase}
+.pbanner .bscrim{position:absolute;inset:0;background:linear-gradient(to top,var(--bg),transparent 62%)}
+.pbanner .bedit{position:absolute;right:var(--space-8);top:var(--space-8);height:var(--control-sm);min-width:var(--control-sm);
+  padding:0 var(--space-12);border-radius:var(--radius-full);border:0;cursor:pointer;
+  background:rgba(4,6,12,.6);backdrop-filter:blur(6px);color:#fff;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.phead{padding:0 var(--gutter);margin-top:calc(var(--space-32) * -1);position:relative}
+.pav{width:var(--space-64);height:var(--space-64);border-radius:var(--radius-full);
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:3px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title);font-weight:800;color:#fff}
+.pav.empty{background:var(--surface-hv);color:var(--faint)}
+.pname-row{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:var(--space-8)}
+.pname{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;margin:0}
+.phandle{font-family:var(--f-m);font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted)}
+.pbio{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);margin:var(--space-12) 0 0;max-width:var(--measure)}
+.pbio.ph{color:var(--faint);font-style:italic}
+.pbtn{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--surface-hv);color:var(--text);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;
+  display:inline-flex;align-items:center;gap:var(--space-4);flex:0 0 auto}
+
+/* --- stat strip --- */
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--border-hair);margin:var(--space-20) var(--gutter) 0;
+  background:var(--bd-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.pstat{background:var(--bg-sub);padding:var(--space-8) var(--space-4);text-align:center}
+.pstat dt{font-family:var(--f-m);font-size:9px;line-height:var(--lh-micro);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.pstat dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.pstat dd small{font-size:var(--text-micro);color:var(--muted);font-weight:400}
+
+/* --- shelves --- */
+.shelf{margin-top:var(--section-gap)}
+.shelf-h{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-8);padding:0 var(--gutter);margin-bottom:var(--space-8)}
+.shelf-h h4{font-family:var(--f-d);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:700;
+  letter-spacing:-.02em;color:var(--text);margin:0;text-transform:none}
+.shelf-n{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);font-variant-numeric:tabular-nums}
+.rail{display:flex;gap:var(--space-8);overflow:hidden;padding:0 var(--gutter) var(--space-4)}
+.fti{flex:0 0 auto;width:78px}
+.fti .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden;position:relative}
+.fti .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fti .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.fpe{flex:0 0 auto;width:72px;text-align:center}
+.fpe .face{width:72px;height:72px;border-radius:var(--radius-full);background:linear-gradient(140deg,var(--ink-6),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);overflow:hidden}
+.fpe .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text)}
+.fpe .sub{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+/* a character card is a face plus the two things that disambiguate it */
+.fch{flex:0 0 auto;width:96px}
+.fch .face{width:96px;aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(140deg,var(--mar-7),var(--ink-4));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fch .face .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;
+  font-family:var(--f-m);font-size:9px;line-height:1.3}
+.fch .nm{font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fch .sub{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.addcard{flex:0 0 auto;width:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-4);
+  aspect-ratio:2/3;border-radius:var(--radius-8);border:var(--border-hair) dashed var(--bd-str);background:none;
+  color:var(--muted);cursor:pointer;font-family:var(--f-s);font-size:var(--text-micro)}
+.addcard .plus{font-size:var(--text-title-sm);line-height:1;color:var(--acc-t)}
+.empty-shelf{margin:0 var(--gutter);padding:var(--space-16);border:var(--border-hair) dashed var(--bd-str);
+  border-radius:var(--radius-12);text-align:center}
+.empty-shelf p{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-8)}
+.empty-shelf button{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.callout{display:flex;gap:var(--space-8);margin-top:var(--space-8);padding:0 var(--gutter)}
+
+/* ---- components the benchmark added ---- */
+.ptabs{display:flex;gap:0;overflow:hidden;border-bottom:var(--border-hair) solid var(--bd-sub);padding:0 var(--gutter);margin-top:var(--space-12)}
+.ptabs button{flex:0 0 auto;background:none;border:0;cursor:pointer;padding:var(--space-8) var(--space-12) var(--space-8);
+  font-family:var(--f-s);font-size:var(--text-caption);line-height:var(--lh-caption);font-weight:600;color:var(--muted);
+  border-bottom:var(--border-focus) solid transparent;min-height:var(--control-h)}
+.ptabs button.on{color:var(--acc-t);border-bottom-color:var(--acc)}
+.pname-on-banner{position:absolute;left:var(--gutter);bottom:var(--space-12);z-index:2;
+  font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;color:#fff}
+.pbanner.tall{aspect-ratio:2/1}
+.pav-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--gutter) 0}
+.pav-sm{width:var(--space-48);height:var(--space-48);border-radius:var(--radius-full);flex:0 0 auto;
+  background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:2px solid var(--bg);
+  display:grid;place-items:center;font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:800;color:#fff}
+.pav-sm.empty{background:var(--surface-hv);color:var(--faint)}
+/* split stat block, one per medium */
+.sblock{margin:var(--space-16) var(--gutter) 0;background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);
+  border-radius:var(--radius-12);padding:var(--space-12)}
+.sblock-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--space-8)}
+.sblock-h b{font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text)}
+.sblock-h span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.snums{display:flex;gap:var(--space-16);margin-bottom:var(--space-8)}
+.snum-i{min-width:0}
+.snum-i dt{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.snum-i dd{margin:0;font-family:var(--f-m);font-size:var(--text-title-sm);line-height:var(--lh-title-sm);font-weight:600;
+  color:var(--text);font-variant-numeric:tabular-nums}
+.snum-i dd.rate{color:var(--rate-t)}
+/* the distribution bar — six watch-state hues, already in the foundations */
+.dbar{display:flex;height:var(--space-8);border-radius:var(--radius-full);overflow:hidden;background:var(--surface-hv)}
+.dbar i{display:block;height:100%;font-style:normal}
+.dlegend{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-8)}
+.dlegend span{display:flex;align-items:center;gap:var(--space-4);font-family:var(--f-m);font-size:9px;color:var(--muted)}
+.dlegend i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);font-style:normal;flex:0 0 auto}
+/* a ranked dimension card: count AND mean */
+.dimcard{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8);border-radius:var(--radius-8);
+  background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub)}
+.dimcard .lbl{min-width:0;flex:1}
+.dimcard .lbl b{display:block;font-size:var(--text-caption);font-weight:600;color:var(--text)}
+.dimcard .lbl span{font-family:var(--f-m);font-size:9px;color:var(--faint)}
+.dimcard .mean{font-family:var(--f-m);font-size:var(--text-body-sm);font-weight:600;color:var(--rate-t);
+  font-variant-numeric:tabular-nums;flex:0 0 auto}
+.dimgrid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);padding:0 var(--gutter);margin-top:var(--space-8)}
+/* chip row — the fix for 24 screens of scroll */
+.chips{display:flex;gap:var(--space-8);overflow:hidden;padding:var(--space-12) var(--gutter)}
+.chip{flex:0 0 auto;height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-full);
+  border:var(--border-hair) solid var(--bd);background:none;color:var(--muted);cursor:pointer;
+  font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;display:inline-flex;align-items:center;gap:var(--space-4)}
+.chip.on{background:var(--acc-bg);border-color:var(--acc-bd);color:var(--acc-t)}
+.chip em{font-family:var(--f-m);font-style:normal;font-size:9px;opacity:.8}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);padding:0 var(--gutter)}
+.fgrid .cell .art{aspect-ratio:2/3;border-radius:var(--radius-8);background:linear-gradient(150deg,var(--ink-5),var(--ink-3));
+  border:var(--border-hair) solid var(--bd-sub);margin-bottom:var(--space-4);position:relative;overflow:hidden}
+.fgrid .cell .art .tag{position:absolute;left:0;right:0;bottom:0;padding:var(--space-4);
+  background:linear-gradient(to top,rgba(4,6,12,.85),transparent);color:#fff;font-family:var(--f-m);font-size:8px;line-height:1.3}
+.fgrid .cell .nm{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--text);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fgrid .cell .sub{font-family:var(--f-m);font-size:8px;color:var(--faint)}
+/* sheets */
+.sheetwrap{position:absolute;inset:0;background:var(--scrim-wash);display:flex;align-items:flex-end}
+.sheet{width:100%;background:var(--bg-sub);border-top:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16) var(--radius-16) 0 0;padding:var(--space-12) var(--space-20) var(--space-20)}
+.grab{width:var(--space-32);height:var(--space-4);border-radius:var(--radius-full);background:var(--bd-str);margin:0 auto var(--space-16)}
+.sh-t{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;letter-spacing:-.02em;margin:0 0 var(--space-4);color:var(--text)}
+.sh-b{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-12)}
+.fld{display:flex;flex-direction:column;gap:var(--field-gap);margin-bottom:var(--field-stack)}
+.fld>span{font-size:var(--text-label);font-weight:600;color:var(--muted)}
+.inp{height:var(--control-h);border-radius:var(--radius-control);background:var(--bg);color:var(--text);
+  border:0;box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);padding:0 var(--space-16);
+  font-family:var(--f-s);font-size:var(--text-body);display:flex;align-items:center}
+.inp.ta{height:auto;min-height:var(--space-64);padding:var(--space-12) var(--space-16);align-items:flex-start;line-height:var(--lh-body-sm);font-size:var(--text-body-sm)}
+.cnt{font-family:var(--f-m);font-size:9px;color:var(--faint);text-align:right}
+.btn{height:var(--control-h);border-radius:var(--radius-control);border:0;cursor:pointer;width:100%;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-label);font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center}
+.btn.q{background:var(--surface-hv);color:var(--text)}
+.skel{background:var(--surface-hv);border-radius:var(--radius-4);animation:none}
+/* desktop frames, drawn at true width then scaled to fit this page */
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px;height:700px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;height:700px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px;display:flex;flex-direction:column}
+.dtop{display:flex;align-items:center;gap:var(--space-24);padding:var(--space-12) var(--gutter);
+  border-bottom:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:var(--space-8);font-family:var(--f-d);font-weight:800;font-size:var(--text-title-sm);letter-spacing:-.03em}
+.dwm i{width:var(--space-8);height:var(--space-8);border-radius:var(--radius-full);background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:var(--space-4)}
+.dnav a{padding:0 var(--space-12);height:var(--control-h);display:inline-flex;align-items:center;border-radius:var(--radius-8);
+  font-size:var(--text-body-sm);color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+.dbody{flex:1;overflow:hidden}
+.dcols{display:grid;grid-template-columns:320px 1fr;gap:var(--space-32);padding:var(--space-24) var(--gutter)}
+
+.invite{margin:var(--space-16) var(--gutter) 0;padding:var(--space-16);border-radius:var(--radius-12);
+  border:var(--border-hair) dashed var(--bd-str);background:var(--bg-sub)}
+.invite b{display:block;font-family:var(--f-d);font-size:var(--text-caption);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.invite p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-12)}
+.invite .go{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;cursor:pointer;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600}
+.waiting{font-family:var(--f-m);font-size:9px;color:var(--faint);line-height:1.4}
+.ladder{margin-top:var(--space-16);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);overflow:hidden}
+.lrow{display:grid;grid-template-columns:96px 1fr;gap:var(--space-16);padding:var(--space-12) var(--space-16);
+  border-bottom:var(--border-hair) solid var(--bd-sub);align-items:baseline}
+.lrow:last-child{border-bottom:0}
+.lrow .at{font-family:var(--f-m);font-size:var(--text-caption);font-weight:600;color:var(--acc-t);font-variant-numeric:tabular-nums}
+.lrow .what{font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted)}
+.lrow .what b{color:var(--text);font-weight:600}
+
+/* Icons in the mock screens are the shipped Lucide set, drawn inline. Sized
+   in em so each mock keeps its own scale, with the baseline nudge that puts
+   an inline SVG where the glyph used to sit — minus the glyph's drift. */
+.di{width:1em;height:1em;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+<style>
+.lh{padding:var(--space-16) var(--gutter) 0}
+.lh h3{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;
+  letter-spacing:-.03em;margin:0;color:var(--text)}
+.ico-s{width:16px;height:16px;display:inline-block;vertical-align:-.125em;flex:0 0 auto}
+</style>
+<style>
+.deskwrap{overflow-x:auto;margin-top:var(--space-16);padding-bottom:var(--space-8)}
+.deskscale{transform-origin:top left;transform:scale(.62);width:1120px}
+.deskcap{font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:var(--space-8)}
+.deskcap b{color:var(--acc-t)}
+.desk{width:1120px;background:var(--bg);border:var(--border-hair) solid var(--bd);
+  border-radius:var(--radius-16);overflow:hidden;--gutter:40px}
+.dtop{display:flex;align-items:center;gap:24px;padding:12px 40px;border-bottom:1px solid var(--bd-sub);background:var(--bg-sub)}
+.dwm{display:flex;align-items:center;gap:8px;font-family:var(--f-d);font-weight:800;font-size:17px;letter-spacing:-.03em}
+.dwm i{width:8px;height:8px;border-radius:999px;background:var(--acc);font-style:normal}
+.dnav{display:flex;gap:4px}
+.dnav a{padding:0 12px;height:44px;display:inline-flex;align-items:center;border-radius:8px;font-size:13px;color:var(--muted);text-decoration:none}
+.dnav a.on{background:var(--acc-bg);color:var(--acc-t);font-weight:600}
+</style>
+
+<style>
+.coh{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--space-12);margin-top:var(--space-16)}
+.cohc{background:var(--bg-sub);border:var(--border-hair) solid var(--bd-sub);border-radius:var(--radius-12);padding:var(--space-16)}
+.cohc.no{border-style:dashed;opacity:.72}
+.cohc h5{font-family:var(--f-d);font-size:var(--text-title-sm);font-weight:700;margin:0 0 var(--space-4);color:var(--text)}
+.cohc .tag{font-family:var(--f-m);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc-t);margin-bottom:var(--space-8)}
+.cohc.no .tag{color:var(--st-drop-11)}
+.cohc p{font-size:var(--text-caption);line-height:var(--lh-caption);color:var(--muted);margin:0 0 var(--space-8)}
+.cohc code{font-size:9px}
+.cohc ul{margin:0;padding-left:var(--space-16);font-size:var(--text-caption);line-height:18px;color:var(--muted)}
+</style>
+
+
+<style>
+/* Shell — frame parts. Phone mocks reuse .phones/.screen from the shared block. */
+.bnav{display:flex;border-top:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub);
+  position:absolute;left:0;right:0;bottom:0}
+.bnav div{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--space-2);
+  padding:var(--space-8) 0 var(--space-12);font-size:9px;color:var(--faint)}
+.bnav div.on{color:var(--acc-t)}
+.bnav div span{font-size:var(--icon-20);line-height:1;display:block}
+.lh{padding:var(--space-16) var(--gutter) 0}
+.lh h3{font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;
+  letter-spacing:-.03em;margin:0;color:var(--text)}
+/* the banner the shell owns */
+.snote{display:flex;align-items:center;gap:var(--space-8);margin:var(--space-8) var(--gutter) 0;
+  padding:var(--space-8) var(--space-12);border-radius:var(--radius-8);background:var(--rate-bg);
+  border-left:var(--border-focus) solid var(--rate-bd);font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted)}
+.snote b{color:var(--rate-t)}
+.snote .x{margin-left:auto;color:var(--faint);flex:0 0 auto}
+/* the whole-route failure */
+.sfail{margin:var(--space-32) var(--gutter) 0;padding:var(--space-20);border-radius:var(--radius-12);
+  border:var(--border-hair) solid var(--bd);background:var(--bg-sub);text-align:center}
+.sfail b{display:block;font-family:var(--f-d);font-size:var(--text-body);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.sfail p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-16)}
+.sfail .row{display:flex;gap:var(--space-8);justify-content:center}
+.sbtn{height:var(--control-sm);padding:0 var(--space-12);border-radius:var(--radius-control);border:0;
+  background:var(--acc);color:var(--on-beam-9);font-family:var(--f-s);font-size:var(--text-caption);font-weight:600;
+  display:inline-flex;align-items:center;gap:var(--space-4)}
+.sbtn.q{background:var(--surface-hv);color:var(--text)}
+.scode{font-family:var(--f-m);font-size:9px;color:var(--faint);margin-top:var(--space-12)}
+/* the route-change skeleton */
+.sskel{padding:var(--space-16) var(--gutter) 0}
+.sskel i{display:block;background:var(--surface-hv);border-radius:var(--radius-4);font-style:normal}
+/* the region ask */
+.sask{position:absolute;left:0;right:0;bottom:var(--space-64);margin:0 var(--gutter);padding:var(--space-16);
+  border-radius:var(--radius-12);background:var(--bg-sub);box-shadow:inset 0 0 0 var(--border-hair) var(--bd),var(--shadow-raised)}
+.sask b{display:block;font-family:var(--f-d);font-size:var(--text-body-sm);font-weight:700;color:var(--text);margin-bottom:var(--space-4)}
+.sask p{font-size:var(--text-micro);line-height:var(--lh-micro);color:var(--muted);margin:0 0 var(--space-12)}
+.sask .row{display:flex;gap:var(--space-8)}
+.sask select,.sask .fake{flex:1;height:var(--control-h);border-radius:var(--radius-control);background:var(--bg);
+  box-shadow:inset 0 0 0 var(--border-hair) var(--bd-sub);color:var(--text);font-size:var(--text-body-sm);
+  display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-12)}
+/* the toast, drawn where the shell puts it */
+.stoast{position:absolute;left:var(--gutter);right:var(--gutter);bottom:calc(var(--space-64) + var(--space-8));
+  display:flex;align-items:center;gap:var(--space-8);padding:var(--space-8) var(--space-12);
+  border-radius:var(--radius-8);background:var(--ink-5);box-shadow:var(--shadow-raised);
+  font-size:var(--text-caption);color:var(--text)}
+.stoast button{margin-left:auto;background:none;border:0;color:var(--acc-t);font-family:var(--f-s);
+  font-size:var(--text-caption);font-weight:600;flex:0 0 auto}
+/* the desktop bar */
+.dbar2{display:flex;align-items:center;gap:var(--space-24);padding:var(--space-12) var(--gutter);
+  border-bottom:var(--border-hair) solid var(--bd-sub);background:var(--bg-sub)}
+.dbar2 .sp{flex:1}
+</style>
+
+<header class="mast"><div class="wrap">
+  <div class="eyebrow"><i></i>Projector &middot; module 6 &middot; the frame</div>
+  <h1>Shell</h1>
+  <p class="lede">The five designed modules each own a screen. <b>Nobody owns what is around them</b> &mdash; the tabs, the top bar, the banner that says your session ended, the moment between two routes, and what happens when a screen throws. This is the last surface without a document, it is on every screen in the product, and auditing it turned up <b>eight things</b>, two of which are the kind you only find by reading the code.</p>
+</div></header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#owns">01 What it owns</a>
+  <a href="#chrome">02 The chrome gap</a>
+  <a href="#nav">03 Navigation</a>
+  <a href="#broken">04 When a screen throws</a>
+  <a href="#waiting">05 Waiting</a>
+  <a href="#region">06 Region, theme, privacy</a>
+  <a href="#say">07 Saying what happened</a>
+  <a href="#screens">08 Screens</a>
+  <a href="#states">09 States</a>
+  <a href="#open">10 Decisions</a>
+</div></nav>
+
+<section id="owns"><div class="wrap">
+  <div class="shead"><span class="snum">01</span><h2>What the shell owns, and what it got wrong</h2></div>
+  <p>Read from the code rather than from a description of it: <code>App.jsx</code>, <code>app/shell.css</code>, <code>NotFound</code>, <code>About</code>, <code>Toast</code>, <code>ThemeToggle</code>, <code>useRegion</code>, and <code>Settings</code>.</p>
+
+  <h3>What is already right, and should survive this document</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Piece</th><th>Why it is right</th></tr></thead>
+    <tbody>
+      <tr><td class="num">One container for the top bar and the page</td><td class="use">They used to cap at 1280 and 1200, which put the wordmark 56px left of the page heading at every desktop width &mdash; a drift nobody could name and everybody could see. Now both use <code>--shell-max</code>.</td></tr>
+      <tr><td class="num">Safe areas</td><td class="use">The tab bar, the toast and every sheet already clear <code>env(safe-area-inset-bottom)</code>. This is the detail that is invisible until it is missing, and it is not missing.</td></tr>
+      <tr><td class="num"><code>prefers-reduced-motion</code></td><td class="use">Honoured globally, once, at the bottom of <code>shell.css</code>.</td></tr>
+      <tr><td class="num">Focus rings with an offset</td><td class="use"><code>:focus-visible</code> with <code>outline-offset: 3px</code> &mdash; because an outline flush against a filled button disappears into it.</td></tr>
+      <tr><td class="num">The session-ended banner</td><td class="use">A revoked or expired refresh token is not a sign-out. Dropping somebody onto a guest screen without a word reads as the app losing their library rather than their session.</td></tr>
+      <tr><td class="num">Tabs only on top-level routes</td><td class="use">A title page is somewhere you arrive at and come back from. Tabs there would offer four ways to abandon what you just opened.</td></tr>
+      <tr><td class="num">The 44px law</td><td class="use"><code>.circ</code> is 44&times;44 at every breakpoint, with the comment <i>&ldquo;a finger does not get smaller on a tablet&rdquo;</i>.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>And the eight</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Found</th><th>Consequence</th><th>&sect;</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="use"><b>There is no error boundary anywhere in the app.</b> <code>componentDidCatch</code> and <code>getDerivedStateFromError</code> appear zero times.</td><td class="use">Any module that throws while rendering unmounts <b>the whole tree</b>. A white page, no tabs, no way back, and a refresh is the only recovery.</td><td class="use">&sect;04</td></tr>
+      <tr><td class="num">2</td><td class="use"><b>Below 1120px the shell draws no chrome at all</b> &mdash; <code>.topbar</code> is <code>display:none</code> until the expanded band.</td><td class="use">No wordmark, no theme control, no sign-in, on every phone and tablet. Discover papers over it with its own <code>.head-actions</code>, which is why the find document's instruction to delete that was <b>wrong as written</b>.</td><td class="use">&sect;02</td></tr>
+      <tr><td class="num">3</td><td class="use"><code>&lt;Suspense fallback={null}&gt;</code></td><td class="use">Every route is lazy, so every route change paints <b>literally nothing</b> until its chunk arrives. On a slow connection the app looks like it crashed.</td><td class="use">&sect;05</td></tr>
+      <tr><td class="num">4</td><td class="use"><b>No scroll restoration and no focus management on route change.</b></td><td class="use">Open a title from halfway down Discover and you arrive halfway down the title. Go back and you are at the top of a list you had scrolled. And focus never moves, so a screen reader is never told the page changed.</td><td class="use">&sect;03</td></tr>
+      <tr><td class="num">5</td><td class="use"><b>The region is fetched from <code>ipapi.co</code></b> &mdash; a third-party IP geolocation service &mdash; on first load, before any interaction.</td><td class="use">The visitor's IP address goes to a company this product has no relationship with, with no consent and no mention anywhere in the interface.</td><td class="use">&sect;06</td></tr>
+      <tr><td class="num">6</td><td class="use"><b>Region is not shared state.</b> <code>useRegion</code> is a hook with its own <code>useState</code>, called in three places.</td><td class="use">Change your region in Settings and Discover keeps the old one until it remounts. Two screens, two answers, same question.</td><td class="use">&sect;06</td></tr>
+      <tr><td class="num">7</td><td class="use"><b>The theme has no &ldquo;System&rdquo;.</b> Dark and light only, and the toggle writes a permanent stamp.</td><td class="use">Following the OS is the default until you touch the control once &mdash; after which there is no way back to it.</td><td class="use">&sect;06</td></tr>
+      <tr><td class="num">8</td><td class="use"><b>The toast is owned by two modules,</b> not by the shell &mdash; title and library each render their own.</td><td class="use">The same action reports differently depending on where you did it. Saving from the library is named and undoable; saving from a poster on Discover is silent.</td><td class="use">&sect;07</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>Seven of the eight are one mistake repeated: the shell has no opinion about anything that is not layout.</b> It sizes the page beautifully &mdash; four bands, one container, a gutter that steps twice &mdash; and then leaves failure, waiting, identity, region and feedback to whichever module happens to hit them first. Everything below is the same move applied seven times: <b>if it appears on more than one screen, the shell owns it</b>.</div>
+</div></section>
+
+<section id="chrome"><div class="wrap">
+  <div class="shead"><span class="snum">02</span><h2>The chrome gap, and why the obvious fix is wrong</h2></div>
+  <p>At 1120 and above there is a top bar: wordmark, four nav links, theme toggle, and either a username or <i>Sign in</i>. Below 1120 there is none of it. The tab bar is the entire shell.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Band</th><th>Top bar</th><th>Tabs</th><th>Where sign-in and theme live</th></tr></thead>
+    <tbody>
+      <tr><td class="num">compact &middot; 320&ndash;599</td><td class="use">none</td><td class="use">bottom, four across</td><td class="use"><b>Only in Discover's own header.</b></td></tr>
+      <tr><td class="num">medium &middot; 600&ndash;1119</td><td class="use">none</td><td class="use">bottom, centred</td><td class="use"><b>Only in Discover's own header.</b></td></tr>
+      <tr><td class="num">expanded &middot; 1120+</td><td class="use">sticky, full</td><td class="use">hidden</td><td class="use">The top bar &mdash; <i>and</i> Discover's header, both at once</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>So the find document is wrong where it says &ldquo;<code>.head-actions</code> &mdash; delete&rdquo;.</b> That instruction is correct about the duplication at desktop and catastrophic below it: deleting those three controls today would remove <b>the only sign-in affordance and the only theme control from every phone</b>. The instruction is retracted here and replaced by the ruling below. This is exactly the sort of thing grooming is for, and it took reading the shell to find it.</div>
+
+  <h3>The obvious fix is a mobile header. I do not recommend it.</h3>
+  <p>A sticky 56px bar with a wordmark and two controls would close the gap and cost the top 9% of a 600px-tall screen on every single page, permanently, to hold two things almost nobody touches twice.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Control</th><th>Who needs it, and how often</th><th>Where it should live</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Wordmark</td><td class="use">Nobody, on a phone. The app is the whole screen and the tab bar names where you are.</td><td class="use"><b>Nowhere below 1120.</b> It is branding on a surface that needs no branding.</td></tr>
+      <tr><td class="num">Theme</td><td class="use">Once, ever, for most people.</td><td class="use"><b>Settings</b> &mdash; where it already is, reachable from the You tab in two taps.</td></tr>
+      <tr><td class="num">Sign in</td><td class="use">Once per device. Critical when needed and invisible the rest of the time.</td><td class="use"><b>The You tab</b>, which is a permanent, labelled, always-visible destination that already exists.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>The ruling: the You tab is the account surface below 1120; the top bar is the account surface above it. Neither duplicates the other, and there is no mobile header.</b> Then <code>.head-actions</code> can be deleted for the right reason rather than the wrong one &mdash; not because the top bar duplicates it, but because <b>the tab bar already carries the only two things it held</b>.</div>
+  <div class="note warn"><b>One condition attaches to that, and it is checkable.</b> The You tab's guest state currently offers <i>Create an account</i> and nothing else. A returning person on a new device wants <b>Sign in</b>, and today Discover's header is the only place that word appears below 1120. <b>Before <code>.head-actions</code> is deleted, the You tab's guest state must offer both</b> &mdash; create, and sign in &mdash; as two distinct controls. That is one line of design and it is the whole price of the ruling.</div>
+</div></section>
+
+<section id="nav"><div class="wrap">
+  <div class="shead"><span class="snum">03</span><h2>Navigation, and the two things it forgets</h2></div>
+  <p>Four tabs &mdash; Discover, Search, Library, You &mdash; shown only on those four routes. That much is right and stays. What is missing is everything that should happen <i>between</i> two routes.</p>
+
+  <div class="note law"><b>L1 &mdash; a push scrolls to the top; a pop restores where you were.</b> Today neither happens, so opening a title from halfway down Discover lands you halfway down the title page, and coming back puts you at the top of a list you had scrolled through. Both halves matter and they are different mechanisms: <b>new destination, new scroll position</b>; <b>back, the position you left</b>. The library and the search grid are the two screens where the second one is felt, and the find document already requires it as state FQ26.</div>
+
+  <div class="note law"><b>L2 &mdash; a route change moves focus and says the name of the page.</b> Today focus stays wherever it was, which for somebody using a screen reader means a tab press that silently replaces the page. On navigation, focus moves to the page's <code>h1</code> (made programmatically focusable, never a tab stop) and a polite live region announces the route's name. This is the single largest accessibility gap in the product and it is about fifteen lines.</div>
+
+  <div class="note"><b>The 404 keeps its tabs.</b> Today <code>isTopLevel</code> is false for an unknown path, so the not-found page has no tab bar and exactly one button. A page that exists to recover from a wrong turn is the worst place to remove the navigation &mdash; it gets the tabs, and keeps the button.</div>
+
+  <h3>What About is for</h3>
+  <p>A 52-line static page carrying the TMDB attribution, which the terms require, and the JustWatch credit that watch-provider data requires. It is linked from Settings and nowhere else. <b>That is enough</b> &mdash; it is a legal obligation with a link, not a destination, and giving it a nav entry would be the app talking about itself on a screen where somebody is trying to find a film.</p>
+</div></section>
+
+<section id="broken"><div class="wrap">
+  <div class="shead"><span class="snum">04</span><h2>When a screen throws</h2></div>
+  <p>Today: the whole application unmounts. React's default for an uncaught render error is to tear the tree down, and with nothing catching it the person is left on a white page with no tabs, no wordmark and no route &mdash; the app has not crashed <i>visibly</i>, it has simply stopped existing. Only a refresh brings it back, and a refresh returns to the same route and the same crash.</p>
+
+  <div class="note law"><b>L3 &mdash; a failure is contained by the smallest thing that can contain it.</b> Three levels, and the product already has the third.</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Level</th><th>Catches</th><th>What survives</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1 &middot; <b>Section</b></td><td class="use">A failed request inside one band &mdash; a rail, the people row, a season</td><td class="use">Everything. The band shows its own retry.</td><td class="use"><b style="color:var(--st-done-11)">Shipped</b> &mdash; <code>ErrorBox</code>, used well</td></tr>
+      <tr><td class="num">2 &middot; <b>Route</b></td><td class="use">A module that throws while rendering</td><td class="use"><b>The shell.</b> Tabs, top bar and every other route still work; only the content area is replaced.</td><td class="use"><b style="color:var(--st-drop-11)">Missing</b></td></tr>
+      <tr><td class="num">3 &middot; <b>App</b></td><td class="use">A throw in the shell itself</td><td class="use">Nothing, but the person is told, and given a reload rather than a blank page.</td><td class="use"><b style="color:var(--st-drop-11)">Missing</b></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What the route-level screen says</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Part</th><th>Content</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="num">The line</td><td class="use"><b>&ldquo;This screen stopped working.&rdquo;</b></td><td class="use">Not &ldquo;Something went wrong&rdquo;, which is true of everything and useful for nothing. It says <i>which</i> thing: this screen, not your data, not the app.</td></tr>
+      <tr><td class="num">The reassurance</td><td class="use"><i>&ldquo;Nothing you saved is affected.&rdquo;</i></td><td class="use">The first fear on a tracker is the library. Answer it before it is asked.</td></tr>
+      <tr><td class="num">Two actions</td><td class="use"><b>Try again</b> &middot; <b>Go to Discover</b></td><td class="use">Retry re-mounts the route, which fixes a transient throw. The second is the way out when it does not, and it is a route the shell knows is safe.</td></tr>
+      <tr><td class="num">A reference</td><td class="use">A short error id in mono, small, at the bottom</td><td class="use">So a report can name the failure. Never the stack &mdash; a stack trace on screen tells a person nothing and tells them loudly.</td></tr>
+      <tr><td class="num">The tabs</td><td class="use"><b>Still there.</b></td><td class="use">This is the entire point of catching at the route: the rest of the product is fine, and the screen should prove it.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>The boundary must reset on navigation.</b> An error boundary that keeps its error after the route changes turns one broken screen into a permanently broken tab &mdash; you tap Library, get the failure, tap Discover, and get the same failure. Keying it to the pathname is the whole fix, and forgetting it is the classic way this feature ships broken.</div>
+</div></section>
+
+<section id="waiting"><div class="wrap">
+  <div class="shead"><span class="snum">05</span><h2>Waiting</h2></div>
+  <p>There are three waits in this product and the shell currently designs none of them.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Wait</th><th>How long</th><th>Today</th><th>Design</th></tr></thead>
+    <tbody>
+      <tr><td class="num"><b>The route's code</b></td><td class="use">One network round trip, once per module per session</td><td class="use"><code>fallback={null}</code> &mdash; <b>nothing at all</b></td><td class="use">The shell stays &mdash; tabs, top bar, and the page's own heading where it is known &mdash; and the content area carries three skeleton blocks. <b>Never a spinner in an empty page.</b></td></tr>
+      <tr><td class="num">The route's data</td><td class="use">One or two TMDB calls</td><td class="use">Skeletons, per module, well done</td><td class="use">Unchanged. This is the one that already works.</td></tr>
+      <tr><td class="num"><b>The session</b></td><td class="use">Milliseconds, usually; seconds on a cold start</td><td class="use">Handled: <code>authReady</code> gates the account control so nobody is offered <i>Sign in</i> for a second before their name appears</td><td class="use">Unchanged, and worth naming as the model the other two should copy: <b>three states, never two.</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>L4 &mdash; the shell never disappears while something loads.</b> A lazy route that paints nothing is indistinguishable from a crash, and the difference between the two is the only thing the person cares about. Whatever else is happening, the tabs stay on screen: they are the proof that the app is still there and the way out if it is not.</div>
+  <div class="note"><b>And the skeleton is the shell's, not the module's.</b> One fallback for every lazy route, because the shell cannot know which module is arriving &mdash; three blocks at the grid's own geometry, which is close enough to every screen in the product that nothing jumps more than a few pixels when the real thing lands.</div>
+</div></section>
+
+<section id="region"><div class="wrap">
+  <div class="shead"><span class="snum">06</span><h2>Region, theme, and a third party nobody agreed to</h2></div>
+
+  <h3>The region</h3>
+  <p><code>useRegion</code> runs on first load and, before anybody has tapped anything, does this:</p>
+<pre>const res = await fetch('<b>https://ipapi.co/json/</b>');
+…
+const browserLang = navigator.language;        <i>// only if that fails</i></pre>
+  <div class="note law"><b>The visitor's IP address is sent to a company this product has no relationship with.</b> No consent, no mention anywhere in the interface, no entry in any document. The Settings hint says the region was <i>&ldquo;detected from your connection&rdquo;</i>, which is true about the effect and silent about the means.</div>
+
+  <h3>Keep the accuracy. Drop the stranger.</h3>
+  <p><b>Where-to-watch needs a country, and IP is the best signal for one.</b> A device's language says what somebody reads, not where they are, and plenty of phones in India are set to English (United States). So this is not an argument for a weaker guess &mdash; it is the observation that <b>we are already holding the answer</b>.</p>
+  <p>Every TMDB call goes through <code>/api/tmdb</code>, a Vercel Function on the platform this app already deploys to. Vercel attaches the requester's geolocation to <b>every request that function receives</b>:</p>
+<pre><i>api/tmdb.js — the function that already runs on every call</i>
+export default async function handler(<b>request</b>, response) {
+  const country = request.headers['<b>x-vercel-ip-country</b>'];   <i>// "IN"</i>
+  …</pre>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th></th><th><code>ipapi.co</code> &mdash; today</th><th><code>x-vercel-ip-country</code> &mdash; proposed</th></tr></thead>
+    <tbody>
+      <tr><td class="num">How it decides</td><td class="use">The visitor's IP</td><td class="use">The visitor's IP. <b>Identical technique.</b></td></tr>
+      <tr><td class="num">Extra network request</td><td class="use">One, on every first load</td><td class="use"><b>None.</b> It rides a call the app already makes.</td></tr>
+      <tr><td class="num">Who sees the IP</td><td class="use">A third party</td><td class="use"><b>Our own function, on our own deployment.</b></td></tr>
+      <tr><td class="num">Blocked by a tracker blocker</td><td class="use">Frequently</td><td class="use">No &mdash; it is a header on a first-party request</td></tr>
+      <tr><td class="num">Can it hang or fail</td><td class="use">Yes, and it is awaited before the fallback runs</td><td class="use">No. It is already in the response path.</td></tr>
+      <tr><td class="num">Anything to disclose</td><td class="use">Arguably yes, and there is nothing</td><td class="use">No &mdash; nothing leaves the product</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>So this is not a trade-off. It is a strictly better version of the same feature.</b> Same accuracy, one request fewer, one company fewer, and nothing to disclose. Checked against Vercel's own request-header reference: <code>x-vercel-ip-country</code> is a two-character ISO 3166-1 code sent to every Vercel Function, alongside <code>x-vercel-ip-timezone</code>.</div>
+  <div class="note warn"><b>Two cases the header does not cover, and both already have an answer.</b> In local development there is no Vercel edge, so the header is absent &mdash; fall back to the device's time zone (<code>Asia/Kolkata</code> &rarr; IN), which is local, free, and a far better locator than language. And a <b>VPN still lies</b>, exactly as it does today &mdash; which is why the correction below matters whichever signal is used.</div>
+  <h3>Guess quietly, ask at the point of use</h3>
+  <p>A guess is fine when it is cheap and correctable. A guess is not fine when it silently decides what a person is told they can watch.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Moment</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="num">First load</td><td class="use">The country arrives with the first TMDB call, from our own function. <b>Nothing is asked, and nothing leaves the product.</b></td></tr>
+      <tr><td class="num">First time a region-dependent thing is drawn</td><td class="use">Where-to-watch on a title, or the find module's provider facet. The block appears <b>with the country named</b> and a one-tap <i>Not in India?</i> beside it. This is the find document's FB8, and this is where it lives.</td></tr>
+      <tr><td class="num">Ever after</td><td class="use">Settings. The current behaviour, minus the hint's claim about connections.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>L5 &mdash; region is one value, held by the shell.</b> <code>useRegion</code> is a hook with its own <code>useState</code>, and three screens call it, so three screens each hold their own copy synchronised by nothing but <code>localStorage</code> at mount. Change it in Settings and Discover keeps showing the old country until it happens to remount. One provider at the top, one value, every reader updated the moment it changes.</div>
+
+  <h3>The theme is missing its default</h3>
+  <p>The implementation is careful: dark is the product's default, nothing is stamped unless you choose, the OS preference decides when nothing is stamped, and <code>restoreTheme()</code> runs before first paint so a stored choice never flashes the other theme. All correct.</p>
+  <div class="note warn"><b>But the control offers two options and the system has three states.</b> Dark, light &mdash; and <i>follow the OS</i>, which is what everybody gets until the first tap and nobody can get back to afterwards. On a phone that switches at sunset this is the difference between an app that behaves like the others and one that does not. <b>Three segments: System · Light · Dark</b>, with System as the default selection, and choosing it removes the stamp rather than writing a third value.</div>
+</div></section>
+
+<section id="say"><div class="wrap">
+  <div class="shead"><span class="snum">07</span><h2>Saying what happened</h2></div>
+  <p>The toast component is good &mdash; named rather than generic, six seconds, the timer restarting when the message changes so a run of quick actions never flashes the last one. Its own comment states the rule: <i>&ldquo;Breaking Bad · S2 E4 watched&rdquo; is worth reading; &ldquo;Saved&rdquo; is not.</i></p>
+  <p><b>Two modules render it. Five screens can perform the action it describes.</b></p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Where you tap <code>+</code></th><th>What you are told</th><th>Can you undo it there?</th></tr></thead>
+    <tbody>
+      <tr><td class="num">Library</td><td class="use">A named toast with an undo</td><td class="use"><b>Yes</b></td></tr>
+      <tr><td class="num">Title page</td><td class="use">A named toast with an undo</td><td class="use"><b>Yes</b></td></tr>
+      <tr><td class="num">Discover</td><td class="use">The tile's badge changes. Nothing else.</td><td class="use">No</td></tr>
+      <tr><td class="num">Search &middot; Browse</td><td class="use">The tile's badge changes. Nothing else.</td><td class="use">No</td></tr>
+      <tr><td class="num">Profile shelves</td><td class="use">The tile's badge changes. Nothing else.</td><td class="use">No</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note law"><b>L6 &mdash; the toast belongs to the shell, and there is exactly one.</b> Any screen can raise one; the shell decides where it sits and how long it lives. It already knows where: <code>ui.css</code> positions it above the tab bar and clears the safe area. Two modules owning one piece of furniture is how the same action ends up meaning two things.</div>
+  <div class="note"><b>The badge is not the problem &mdash; it is better than a toast.</b> A poster that changes state under your thumb is feedback in exactly the right place. What is missing is the <b>undo</b>: today a mis-tap on a poster can only be corrected by opening the title or going to the library, because <code>Tile</code> deliberately ignores a second tap on a saved tile. The rule the title module already uses &mdash; <i>tapping a ticked episode un-ticks it, so the control is its own undo</i> &mdash; should hold here too, and then the toast is a courtesy rather than the only escape.</div>
+</div></section>
+
+<section id="screens"><div class="wrap">
+  <div class="shead"><span class="snum">08</span><h2>Screens</h2></div>
+  <p>The shell has no screen of its own, so these are the moments where it is the only thing on screen. Drawn at 320 &mdash; mock scale, as ever.</p>
+
+  <div class="phones">
+    <div class="phone">
+      <div class="phone-cap"><b>SH2</b> a route that threw</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="sfail">
+          <b>This screen stopped working</b>
+          <p>Nothing you saved is affected.</p>
+          <div class="row">
+            <button class="sbtn"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Try again</button>
+            <button class="sbtn q">Go to Discover</button>
+          </div>
+          <div class="scode">reference 7f3a2c</div>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>SH3</b> the route's code, arriving</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Library</h3></div>
+        <div class="sskel">
+          <i style="height:var(--control-h);border-radius:var(--radius-control)"></i>
+          <i style="height:var(--space-32);width:70%;margin-top:var(--space-12);border-radius:var(--radius-full)"></i>
+          <i style="height:180px;margin-top:var(--space-16)"></i>
+          <i style="height:180px;margin-top:var(--space-12)"></i>
+        </div>
+        <div class="bnav"><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>SH5</b> the session ended by itself</div>
+      <div class="screen"><div class="scroll">
+        <div class="snote">Session ended &mdash; <b>sign in</b> to see your library.<span class="x"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></div>
+        <div class="lh"><h3>Discover</h3></div>
+        <div class="shelf" style="margin-top:var(--space-8)">
+          <div class="shelf-h"><h4>Trending this week</h4></div>
+          <div class="rail">
+            <div class="fti"><div class="art"></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Severance</div><div class="sub">2022</div></div>
+            <div class="fti"><div class="art"></div><div class="nm">Oppenheimer</div><div class="sub">2023</div></div>
+          </div>
+        </div>
+        <div class="bnav"><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-cap"><b>SH7</b> the region, asked once</div>
+      <div class="screen"><div class="scroll">
+        <div class="lh"><h3>Dune: Part Two</h3></div>
+        <div class="sskel"><i style="height:120px"></i></div>
+        <div class="sask">
+          <b>Showing what's streaming in India</b>
+          <p>Based on where you are connecting from. Change it any time in Settings.</p>
+          <div class="row">
+            <div class="fake">India <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div>
+            <button class="sbtn">Keep</button>
+          </div>
+        </div>
+        <div class="bnav"><div class="on"><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg></span>Discover</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>Search</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span>Library</div><div><span><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></span>You</div></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="note ok"><b>Every one of these keeps the tab bar.</b> That is the whole design in four frames: whatever has gone wrong, whatever is still loading, whatever is being asked, <b>the way out is still on screen</b>.</div>
+
+  <h3>Desktop &mdash; one bar, and nothing repeated</h3>
+  <div class="deskwrap"><div class="deskscale">
+    <div class="desk">
+      <div class="dbar2">
+        <div class="dwm"><i></i>Cine Search</div>
+        <div class="dnav"><a class="on" href="#screens">Discover</a><a href="#screens">Search</a><a href="#screens">Library</a><a href="#screens">You</a></div>
+        <span class="sp"></span>
+        <button class="sbtn q"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M22 12h-2"/><path d="m17.66 17.66 1.41 1.41"/><path d="M12 20v2"/><path d="m6.34 17.66-1.41 1.41"/><path d="M4 12H2"/><path d="m6.34 6.34-1.41-1.41"/></svg> System</button>
+        <button class="sbtn q">raman</button>
+      </div>
+      <div class="dfilt" style="padding-top:var(--space-24)">
+        <div class="fl grow"><u>&nbsp;</u><div style="border:0;background:none;box-shadow:none;padding:0;font-family:var(--f-d);font-size:27px;font-weight:800;color:var(--text)">Discover</div></div>
+      </div>
+      <div class="dgrid">
+        <div class="cell"><div class="art"></div><div class="nm">Dune: Part Two</div><div class="sub">2024</div></div>
+        <div class="cell"><div class="art"></div><div class="nm">Severance</div><div class="sub">2022</div></div>
+        <div class="cell"><div class="art"></div><div class="nm">Oppenheimer</div><div class="sub">2023</div></div>
+        <div class="cell"><div class="art"></div><div class="nm">Poor Things</div><div class="sub">2023</div></div>
+        <div class="cell"><div class="art"></div><div class="nm">Anora</div><div class="sub">2024</div></div>
+      </div>
+    </div>
+  </div></div>
+  <div class="note"><b>The page heading stays even though the nav names the route.</b> They are different jobs: the nav says where you can go and marks where you are; the heading is the top of the document, the thing a screen reader announces, and the anchor focus moves to on every navigation. Removing it because the tab is highlighted would take the page's name away from the people who need it most.</div>
+</div></section>
+
+<section id="states"><div class="wrap">
+  <div class="shead"><span class="snum">09</span><h2>States</h2></div>
+  <p>Prefix <code>SH</code>, collision-free against entry (I/U/C/S), profile (C/D/E/G/N/P/S/X), library (L), title (TM/TV/TP/TS) and find (FD/FQ/FB).</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Id</th><th>Case</th><th>What the shell does</th><th>Today</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">SH1</td><td class="use">A route's chunk is loading</td><td class="use">Shell stays, three skeleton blocks in the content area. <b>Never a blank page.</b></td><td class="use"><span style="color:var(--st-drop-11)">paints nothing</span></td></tr>
+      <tr><td class="tok">SH2</td><td class="use">A route throws while rendering</td><td class="use">Route-level boundary: the message, two actions, a reference, tabs intact.</td><td class="use"><span style="color:var(--st-drop-11)">white page</span></td></tr>
+      <tr><td class="tok">SH3</td><td class="use">The shell itself throws</td><td class="use">Last-resort screen with a reload. Nothing else can be trusted at this point.</td><td class="use"><span style="color:var(--st-drop-11)">white page</span></td></tr>
+      <tr><td class="tok">SH4</td><td class="use">A boundary is showing and the route changes</td><td class="use"><b>The boundary resets.</b> Keyed to the pathname, or one broken screen becomes a permanently broken tab.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">SH5</td><td class="use">The session ended on its own</td><td class="use">A banner above the page, dismissible, naming sign-in. Not a redirect &mdash; the person did not ask to leave.</td><td class="use"><b style="color:var(--st-done-11)">shipped</b></td></tr>
+      <tr><td class="tok">SH6</td><td class="use">The session question is unanswered</td><td class="use">The account control shows neither a name nor <i>Sign in</i>. Three states, never two.</td><td class="use"><b style="color:var(--st-done-11)">shipped</b></td></tr>
+      <tr><td class="tok">SH7</td><td class="use">A region-dependent block is drawn for the first time</td><td class="use">Named country, one-tap correction, no request to anybody to work it out.</td><td class="use"><span style="color:var(--st-drop-11)">third-party IP call</span></td></tr>
+      <tr><td class="tok">SH8</td><td class="use">Region changed in Settings</td><td class="use">Every mounted screen updates. One value, held once.</td><td class="use"><span style="color:var(--st-drop-11)">three copies</span></td></tr>
+      <tr><td class="tok">SH9</td><td class="use">Theme set to System</td><td class="use">The stamp is removed and the OS decides again. A reachable state, not just a starting one.</td><td class="use"><span style="color:var(--st-drop-11)">no way back</span></td></tr>
+      <tr><td class="tok">SH10</td><td class="use">A stored theme, first paint</td><td class="use">Applied before React mounts, so the other theme never flashes.</td><td class="use"><b style="color:var(--st-done-11)">shipped</b></td></tr>
+      <tr><td class="tok">SH11</td><td class="use">Navigating to a new route</td><td class="use">Scroll to top, focus to the heading, the route's name announced.</td><td class="use"><span style="color:var(--st-drop-11)">none of the three</span></td></tr>
+      <tr><td class="tok">SH12</td><td class="use">Going back</td><td class="use">The scroll position you left, restored &mdash; including the pages a grid had loaded.</td><td class="use"><span style="color:var(--st-drop-11)">top of the list</span></td></tr>
+      <tr><td class="tok">SH13</td><td class="use">An unknown path</td><td class="use">Not-found, <b>with the tab bar</b>, and the one button.</td><td class="use"><span style="color:var(--rate-t)">no tabs</span></td></tr>
+      <tr><td class="tok">SH14</td><td class="use">Offline</td><td class="use">Each section's own error and retry &mdash; the existing mechanism, which is right. The shell adds nothing, because a global &ldquo;you are offline&rdquo; bar is wrong the moment one request succeeds from cache.</td><td class="use">&mdash;</td></tr>
+      <tr><td class="tok">SH15</td><td class="use">Any screen reports an action</td><td class="use">One toast, raised through the shell, above the tab bar, clear of the safe area.</td><td class="use"><span style="color:var(--rate-t)">two modules own one</span></td></tr>
+      <tr><td class="tok">SH16</td><td class="use">A guest on a phone wants to sign in</td><td class="use">The You tab, offering <b>both</b> create and sign in.</td><td class="use"><span style="color:var(--rate-t)">create only</span></td></tr>
+      <tr><td class="tok">SH17</td><td class="use">First visit ever</td><td class="use">The cover, once. A shared link to a title never passes through it.</td><td class="use"><b style="color:var(--st-done-11)">shipped</b></td></tr>
+      <tr><td class="tok">SH18</td><td class="use">An account with no profile row</td><td class="use">Redirected to choose a username, from wherever they are.</td><td class="use"><b style="color:var(--st-done-11)">shipped</b></td></tr>
+      <tr><td class="tok">SH19</td><td class="use">Tabs on a non-top-level route</td><td class="use">Absent. A title page is somewhere you came back from.</td><td class="use"><b style="color:var(--st-done-11)">shipped</b></td></tr>
+      <tr><td class="tok">SH20</td><td class="use">Reduced motion</td><td class="use">Every animation and transition collapses to 0.01ms, once, globally.</td><td class="use"><b style="color:var(--st-done-11)">shipped</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>Eight shipped, twelve to build, and none of the twelve is large.</b> The heaviest is scroll restoration; the rest are a boundary, a fallback, a provider, a third segment on a toggle, and a deletion.</div>
+</div></section>
+
+<section id="open"><div class="wrap">
+  <div class="shead"><span class="snum">10</span><h2>Decisions</h2></div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Id</th><th>Question</th><th>My recommendation</th></tr></thead>
+    <tbody>
+      <tr><td class="tok">S1</td><td class="use"><b>Is dropping <code>ipapi.co</code> a decision, or just a fix?</b> Where-to-watch needs a country, and the concern was that removing the IP lookup would weaken it.</td><td class="use"><b>A fix, and it makes the feature better rather than worse.</b> The country still comes from the visitor's IP &mdash; it just comes from <code>x-vercel-ip-country</code> on our own function instead of from a third party, so it costs no request, cannot be blocked, cannot hang, and there is nothing to disclose. The only way this is a trade-off is if the app leaves Vercel, and then the fallback chain (time zone, then language) is the same one already in the file.</td></tr>
+      <tr><td class="tok">S2</td><td class="use"><b>No mobile header &mdash; agreed?</b> The alternative is a sticky 56px bar on every phone screen.</td><td class="use"><b>No header.</b> It would cost 9% of a 600px screen permanently to hold two controls people touch once. The You tab carries the account, Settings carries the theme, and <code>.head-actions</code> goes &mdash; once the You tab offers <i>Sign in</i> as well as <i>Create an account</i>.</td></tr>
+      <tr><td class="tok">S3</td><td class="use"><b>How much scroll restoration?</b> Position alone is cheap; position plus the pages a grid had loaded is not.</td><td class="use"><b>Position everywhere, loaded pages on the two grids that page</b> &mdash; search results and the library. Everywhere else a restored position on a re-fetched list is close enough, and pretending otherwise costs a cache nobody asked for.</td></tr>
+      <tr><td class="tok">S4</td><td class="use"><b>Does the error reference go anywhere?</b> A code on screen with nothing behind it is theatre.</td><td class="use"><b>Show it anyway, log it locally.</b> There is no error service and adding one is a real decision with a real bill. A short id the person can quote in a message is worth the four lines even with nothing behind it &mdash; and when a service does arrive, the id is already the thing it keys on.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>And one retraction, which belongs here rather than buried in &sect;02.</b> The find document tells the build to delete <code>.head-actions</code>. <b>That instruction is wrong as written</b> &mdash; below 1120 those three controls are the only sign-in and the only theme control in the product. It is replaced by S2: delete them <i>after</i> the You tab offers both account actions, and not before.</div>
+</div></section>
+
+<footer style="padding:var(--space-48) 0 var(--space-64)"><div class="wrap">
+  <p style="font-family:var(--f-m);font-size:var(--text-micro);color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin:0 0 var(--space-8)">Projector &middot; shell &middot; the frame</p>
+  <p style="font-size:var(--text-body-sm);line-height:var(--lh-body-sm);color:var(--muted);max-width:var(--measure)">
+    Every finding here was read out of the code on 18 September 2026 and checked in a running build at 390, 768 and 1280 &mdash; the missing boundary, the empty Suspense fallback, the chrome that stops at 1120, the third-party IP call, the three copies of the region, the theme with no way back to the system, and the toast that two modules own. Eight of the twenty states already ship and are named as such, because a document that only lists faults is not an audit, it is a complaint.</p>
+</div></footer>
+
+</body>
+</html>

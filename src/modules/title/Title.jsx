@@ -442,8 +442,10 @@ export default function Title() {
 
     return (
         <div className="page">
-            <div className="hero">
-                {t.backdrop && <img src={t.backdrop} alt="" fetchPriority="high" />}
+            <div className={`hero${!t.backdrop && !t.poster ? ' noart' : ''}`}>
+                {t.backdrop
+                    ? <img src={t.backdrop} alt="" fetchPriority="high" />
+                    : t.poster && <img className="fromposter" src={t.poster} alt="" fetchPriority="high" />}
                 <div className="hero-nav">
                     <button type="button" className="circ on-image" onClick={() => navigate(-1)} aria-label="Back"><Icon name="back" size={24} /></button>
                 </div>
@@ -456,7 +458,7 @@ export default function Title() {
                 </div>
 
                 <div className="thead">
-                    <h1>{t.title}</h1>
+                    <h1 title={t.title}>{t.title}</h1>
                     <div className="metaline">
                         {t.certification && <span className="cert">{t.certification}</span>}{meta}
                     </div>

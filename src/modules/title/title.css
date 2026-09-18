@@ -16,12 +16,22 @@
    the clearance that keeps the title off the poster. They step with the bands,
    so they are named where they are used and redeclared in each band, the same
    category as --rail-tile and --grid-min in shell.css. */
-.hero { --hero-h: 190px; position: relative; height: var(--hero-h); }
+/* overflow: hidden because the poster stand-in below is scaled past the band's
+   own width to hide the blur's soft edge — without it, 1.3x of a 320px hero is
+   48px of sideways scroll on every title that has no backdrop. */
+.hero { --hero-h: 190px; position: relative; height: var(--hero-h); overflow: hidden; }
 /* A 16:9 backdrop cropped into a 4:1 desktop hero loses most of its height, and
    centring that crop cuts faces in half — subjects sit above the midline far
    more often than below it. Biasing the crop upward keeps the part of the image
    that carries the meaning. */
 .hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 38%; }
+/* TS8 — no backdrop, which is most older and most non-English titles. The
+   poster stands in for it: blurred past legibility and scaled past its own
+   edges, so what is left is the film's own colour rather than a grey box. The
+   scale is what hides the blur's soft border. */
+.hero .fromposter { filter: blur(24px) saturate(1.25); transform: scale(1.3); object-position: center 30%; }
+/* TS9 — no artwork at all. A gradient the theme owns, not a hole. */
+.hero.noart { background: linear-gradient(150deg, var(--ink-5), var(--ink-3) 60%, var(--bg)); }
 .hero::after {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(to top, var(--bg), transparent 70%);
@@ -46,7 +56,15 @@
 .tposter { aspect-ratio: 2/3; border-radius: var(--radius-8); overflow: hidden; border: var(--border-hair) solid var(--bd-sub); box-shadow: var(--sh); }
 .tposter img { width: 100%; height: 100%; object-fit: cover; }
 .thead { --head-clear: 56px; min-width: 0; padding-top: var(--head-clear); }
-.thead h1 { font-size: var(--text-title); line-height: var(--lh-title); font-weight: 800; letter-spacing: -.03em; margin-bottom: var(--space-4); }
+/* TS10 — two lines then clamp. Untruncated, the longest real title on TMDB
+   takes six lines at 320 and pushes the primary action 140px down the page,
+   which puts band 2 below the fold on the frame §03 says it must be above.
+   The full title stays in the tooltip and in the accessible name. */
+.thead h1 {
+  font-size: var(--text-title); line-height: var(--lh-title); font-weight: 800;
+  letter-spacing: -.03em; margin-bottom: var(--space-4);
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
 /* Everything below the title runs the full width of the phone, rather than
    staying trapped in the narrow column beside the poster. */
 .tbody { grid-column: 1 / -1; min-width: 0; }
@@ -292,8 +310,16 @@
   background: none; border: 0; cursor: pointer; padding: 0;
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 600; color: var(--acc-t);
 }
-/* Loading shimmer. Stays after the rules it overrides, as it did in base.css. */
-.hero, .eprow .still, .title-head .poster {
+/* Loading shimmer. Stays after the rules it overrides, as it did in base.css.
+
+   .hero used to be in this list, so a title with no backdrop — which is most
+   older and most non-English titles — showed a grey bar animating for ever. A
+   loading animation that never stops is worse than the grey rectangle TS8
+   already forbids, because it also claims the page is still working.
+
+   It was never doing anything either: the page returns TitleSkeleton while it
+   loads, so .hero only exists once there is something to draw. */
+.eprow .still, .title-head .poster {
   background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
   background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
 }

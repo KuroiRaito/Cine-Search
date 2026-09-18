@@ -68,11 +68,27 @@ export default function You() {
                     be asserting an account that does not exist. G1 sends them
                     to the sign-in sheet from the control they reached for. */}
                 <div className="page-head"><h1>You</h1></div>
+                {/* SH16 — both account actions, as two distinct controls.
+                    Below 1120 there is no top bar, so this tab is the only
+                    account surface in the product: a returning person on a new
+                    device has nowhere else to say "I already have one". The
+                    shell document makes this the condition on deleting
+                    Discover's own header, and that header is already gone. */}
                 <Empty
                     title="Nothing to work from yet"
                     body="Your taste is worked out from what you’ve watched and rated — and only ever shown to you."
-                    action={<Link className="btn" to="/welcome/signup" state={{ from: '/you' }}>Create an account</Link>}
+                    action={(
+                        <div className="guest-actions">
+                            <Link className="btn" to="/welcome/signup" state={{ from: '/you' }}>Create an account</Link>
+                            <Link className="btn quiet" to="/welcome/signin" state={{ from: '/you' }}>Sign in</Link>
+                        </div>
+                    )}
                 />
+                {/* And the way to the theme. Settings is where it lives, and
+                    for a guest below 1120 this is the only door to it. */}
+                <p className="guest-settings">
+                    <Link to="/settings">Settings</Link>
+                </p>
             </div>
         );
     }

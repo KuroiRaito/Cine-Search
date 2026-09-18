@@ -285,3 +285,27 @@ img { max-width: 100%; display: block; }
 @media (min-width: 1440px) {
   :root { --shell-max: 1600px; --grid-min: 208px; }
 }
+
+/* ---- SH1 / SH2 / SH3 — waiting, and failing ----
+
+   The shell never disappears while something loads, and it never disappears
+   because a module threw. Both of these draw inside it. */
+
+/* Three blocks at the grid's own geometry: close enough to every screen in the
+   product that nothing jumps more than a few pixels when the real one lands. */
+.routewait { padding: var(--space-24) var(--gutter) 0; }
+.routewait .skel-flat { height: var(--space-80); border-radius: var(--radius-12); }
+.routewait .skel-flat + .skel-flat { margin-top: var(--space-12); }
+
+.broke { padding: var(--space-48) var(--gutter) 0; max-width: var(--measure); }
+.broke h1 {
+  font-family: var(--f-d); font-size: var(--text-title); line-height: var(--lh-title);
+  font-weight: 800; letter-spacing: -.02em;
+}
+.broke p { margin-top: var(--space-8); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }
+.broke-do { display: flex; gap: var(--space-8); margin-top: var(--space-24); flex-wrap: wrap; }
+/* Small, quiet, and quotable. It is a reference, not a diagnosis. */
+.broke-id {
+  margin-top: var(--space-40); font-family: var(--f-m);
+  font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--ink-9);
+}

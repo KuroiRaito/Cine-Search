@@ -423,3 +423,9 @@
   font-family: var(--f-s); font-size: var(--text-body-sm); font-weight: 600; color: var(--acc-t);
 }
 .undo .dismiss-x { margin-left: auto; color: var(--muted); font-size: var(--text-title-sm); line-height: 1; }
+
+/* SH16 — two account actions, not one. Stacked at 320 because two buttons side
+   by side at that width are two half-buttons. */
+.guest-actions { display: flex; flex-direction: column; gap: var(--space-8); align-items: center; }
+.guest-settings { margin-top: var(--section-gap); text-align: center; font-size: var(--text-body-sm); line-height: var(--lh-body-sm); }
+.guest-settings a { color: var(--muted); font-weight: 600; }

@@ -560,15 +560,34 @@ pre u{color:var(--st-done-11);text-decoration:none}pre s{color:var(--st-drop-11)
 <pre>const res = await fetch('<b>https://ipapi.co/json/</b>');
 …
 const browserLang = navigator.language;        <i>// only if that fails</i></pre>
-  <div class="note law"><b>The visitor's IP address is sent to a company this product has no relationship with, to answer a question the browser can already answer.</b> There is no consent, no mention of it anywhere in the interface, and no entry for it in any document. The Settings hint says the region was <i>&ldquo;detected from your connection&rdquo;</i>, which is true about the effect and silent about the means.
-  <br><br>It is also the weaker signal. <code>navigator.language</code> returns <code>en-IN</code> for the audience this product is built for &mdash; it costs no request, cannot hang, cannot fail, is not blocked by a tracker blocker, and is <b>already in the code as the fallback</b>. The third-party call should be deleted, not reordered.</div>
+  <div class="note law"><b>The visitor's IP address is sent to a company this product has no relationship with.</b> No consent, no mention anywhere in the interface, no entry in any document. The Settings hint says the region was <i>&ldquo;detected from your connection&rdquo;</i>, which is true about the effect and silent about the means.</div>
 
+  <h3>Keep the accuracy. Drop the stranger.</h3>
+  <p><b>Where-to-watch needs a country, and IP is the best signal for one.</b> A device's language says what somebody reads, not where they are, and plenty of phones in India are set to English (United States). So this is not an argument for a weaker guess &mdash; it is the observation that <b>we are already holding the answer</b>.</p>
+  <p>Every TMDB call goes through <code>/api/tmdb</code>, a Vercel Function on the platform this app already deploys to. Vercel attaches the requester's geolocation to <b>every request that function receives</b>:</p>
+<pre><i>api/tmdb.js — the function that already runs on every call</i>
+export default async function handler(<b>request</b>, response) {
+  const country = request.headers['<b>x-vercel-ip-country</b>'];   <i>// "IN"</i>
+  …</pre>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th></th><th><code>ipapi.co</code> &mdash; today</th><th><code>x-vercel-ip-country</code> &mdash; proposed</th></tr></thead>
+    <tbody>
+      <tr><td class="num">How it decides</td><td class="use">The visitor's IP</td><td class="use">The visitor's IP. <b>Identical technique.</b></td></tr>
+      <tr><td class="num">Extra network request</td><td class="use">One, on every first load</td><td class="use"><b>None.</b> It rides a call the app already makes.</td></tr>
+      <tr><td class="num">Who sees the IP</td><td class="use">A third party</td><td class="use"><b>Our own function, on our own deployment.</b></td></tr>
+      <tr><td class="num">Blocked by a tracker blocker</td><td class="use">Frequently</td><td class="use">No &mdash; it is a header on a first-party request</td></tr>
+      <tr><td class="num">Can it hang or fail</td><td class="use">Yes, and it is awaited before the fallback runs</td><td class="use">No. It is already in the response path.</td></tr>
+      <tr><td class="num">Anything to disclose</td><td class="use">Arguably yes, and there is nothing</td><td class="use">No &mdash; nothing leaves the product</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note ok"><b>So this is not a trade-off. It is a strictly better version of the same feature.</b> Same accuracy, one request fewer, one company fewer, and nothing to disclose. Checked against Vercel's own request-header reference: <code>x-vercel-ip-country</code> is a two-character ISO 3166-1 code sent to every Vercel Function, alongside <code>x-vercel-ip-timezone</code>.</div>
+  <div class="note warn"><b>Two cases the header does not cover, and both already have an answer.</b> In local development there is no Vercel edge, so the header is absent &mdash; fall back to the device's time zone (<code>Asia/Kolkata</code> &rarr; IN), which is local, free, and a far better locator than language. And a <b>VPN still lies</b>, exactly as it does today &mdash; which is why the correction below matters whichever signal is used.</div>
   <h3>Guess quietly, ask at the point of use</h3>
   <p>A guess is fine when it is cheap and correctable. A guess is not fine when it silently decides what a person is told they can watch.</p>
   <div class="tbl-wrap"><table>
     <thead><tr><th>Moment</th><th>Behaviour</th></tr></thead>
     <tbody>
-      <tr><td class="num">First load</td><td class="use">Region is <code>navigator.language</code>'s country, or <code>US</code> if it has none. <b>Nothing is asked and nothing is sent anywhere.</b></td></tr>
+      <tr><td class="num">First load</td><td class="use">The country arrives with the first TMDB call, from our own function. <b>Nothing is asked, and nothing leaves the product.</b></td></tr>
       <tr><td class="num">First time a region-dependent thing is drawn</td><td class="use">Where-to-watch on a title, or the find module's provider facet. The block appears <b>with the country named</b> and a one-tap <i>Not in India?</i> beside it. This is the find document's FB8, and this is where it lives.</td></tr>
       <tr><td class="num">Ever after</td><td class="use">Settings. The current behaviour, minus the hint's claim about connections.</td></tr>
     </tbody>
@@ -658,7 +677,7 @@ const browserLang = navigator.language;        <i>// only if that fails</i></pre
         <div class="sskel"><i style="height:120px"></i></div>
         <div class="sask">
           <b>Showing what's streaming in India</b>
-          <p>Guessed from your device's language. Nothing was sent anywhere to work it out.</p>
+          <p>Based on where you are connecting from. Change it any time in Settings.</p>
           <div class="row">
             <div class="fake">India <svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div>
             <button class="sbtn">Keep</button>
@@ -731,7 +750,7 @@ const browserLang = navigator.language;        <i>// only if that fails</i></pre
   <div class="tbl-wrap"><table>
     <thead><tr><th>Id</th><th>Question</th><th>My recommendation</th></tr></thead>
     <tbody>
-      <tr><td class="tok">S1</td><td class="use"><b>Is deleting the third-party IP lookup a decision, or just a fix?</b> It sends visitors' IPs to <code>ipapi.co</code> with no consent, and <code>navigator.language</code> already answers the same question locally.</td><td class="use"><b>A fix, and an urgent one.</b> I have written it as a ruling rather than an option because I do not think there is a second side: the product gains nothing it cannot get for free, and it is the only place in the codebase that hands a visitor's data to a third party. If you disagree, the alternative is to disclose it &mdash; but then it needs a privacy note, which costs more than deleting it.</td></tr>
+      <tr><td class="tok">S1</td><td class="use"><b>Is dropping <code>ipapi.co</code> a decision, or just a fix?</b> Where-to-watch needs a country, and the concern was that removing the IP lookup would weaken it.</td><td class="use"><b>A fix, and it makes the feature better rather than worse.</b> The country still comes from the visitor's IP &mdash; it just comes from <code>x-vercel-ip-country</code> on our own function instead of from a third party, so it costs no request, cannot be blocked, cannot hang, and there is nothing to disclose. The only way this is a trade-off is if the app leaves Vercel, and then the fallback chain (time zone, then language) is the same one already in the file.</td></tr>
       <tr><td class="tok">S2</td><td class="use"><b>No mobile header &mdash; agreed?</b> The alternative is a sticky 56px bar on every phone screen.</td><td class="use"><b>No header.</b> It would cost 9% of a 600px screen permanently to hold two controls people touch once. The You tab carries the account, Settings carries the theme, and <code>.head-actions</code> goes &mdash; once the You tab offers <i>Sign in</i> as well as <i>Create an account</i>.</td></tr>
       <tr><td class="tok">S3</td><td class="use"><b>How much scroll restoration?</b> Position alone is cheap; position plus the pages a grid had loaded is not.</td><td class="use"><b>Position everywhere, loaded pages on the two grids that page</b> &mdash; search results and the library. Everywhere else a restored position on a re-fetched list is close enough, and pretending otherwise costs a cache nobody asked for.</td></tr>
       <tr><td class="tok">S4</td><td class="use"><b>Does the error reference go anywhere?</b> A code on screen with nothing behind it is theatre.</td><td class="use"><b>Show it anyway, log it locally.</b> There is no error service and adding one is a real decision with a real bill. A short id the person can quote in a message is worth the four lines even with nothing behind it &mdash; and when a service does arrive, the id is already the thing it keys on.</td></tr>

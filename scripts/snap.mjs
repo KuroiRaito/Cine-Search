@@ -318,7 +318,7 @@ try {
                 // Signing in is the app's own flow, not a fixture: the snapshot
                 // should show what a signed-in person sees.
                 if (!screen.guest && process.env.SNAP_EMAIL) {
-                    await page.goto(`${base}/welcome/signin`, { waitUntil: 'networkidle' });
+                    await page.goto(`${base}/welcome/signin`, { waitUntil: 'domcontentloaded' });
                     await page.fill('input[type=email]', process.env.SNAP_EMAIL);
                     await page.fill('input[type=password]', process.env.SNAP_PASSWORD ?? '');
                     await page.click('button[type=submit]');
@@ -331,7 +331,18 @@ try {
 
                 for (const width of WIDTHS) {
                     await page.setViewportSize({ width, height: 900 });
-                    await page.goto(base + screen.path, { waitUntil: 'networkidle' });
+                    /* Not networkidle. Vite 8's dev server holds a connection
+                       open, so "no network for 500ms" never becomes true and
+                       every navigation times out at thirty seconds — the whole
+                       sweep died on its first screen. Playwright discourages it
+                       anyway. The wait below is what was actually doing the
+                       work, and it waits for content rather than for silence. */
+                    await page.goto(base + screen.path, { waitUntil: 'domcontentloaded' });
+                    await page.waitForFunction(
+                        () => document.querySelector('#root')?.children.length > 0,
+                        null,
+                        { timeout: 30000 },
+                    ).catch(() => {});
                     /* The signed-in screens make two round trips before they
                        have anything to draw — the profile, then the library —
                        so the settle is longer than the 600ms a guest needed. A

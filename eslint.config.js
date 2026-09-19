@@ -1,7 +1,6 @@
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
   {
@@ -11,7 +10,6 @@ export default [
     files: ['src/**/*.{js,jsx}', 'api/**/*.{js,jsx}'],
     plugins: {
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
     },
     languageOptions: {
       ecmaVersion: 2020,

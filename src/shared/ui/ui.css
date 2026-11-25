@@ -145,7 +145,7 @@
   bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); z-index: var(--z-toast);
   width: calc(100% - (var(--gutter) * 2)); max-width: var(--form-max);
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
-  background: var(--ink-5); border-radius: var(--radius-12); padding: var(--space-12);
+  background: var(--raised); border-radius: var(--radius-12); padding: var(--space-12);
   font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--text); box-shadow: var(--sh);
 }
 .toast button {
@@ -318,7 +318,10 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
      is 460px wide. --sheet-pad is its one number, and it lives in tokens.css
      with the rest of the role layer. */
   width: 100%; max-width: 460px;
-  background: var(--bg-sub); border-top: var(--border-hair) solid var(--bd);
+  /* `--raised`, not `--bg-sub`: a sheet floats over the page, and --bg-sub is
+     DARKER than the page in the light theme (L .939 against .974) while
+     --shadow-sheet below draws a shadow under it. Lighter in both themes now. */
+  background: var(--raised); border-top: var(--border-hair) solid var(--bd);
   border-radius: var(--radius-16) var(--radius-16) 0 0;
   padding: var(--space-12) var(--sheet-pad) max(var(--sheet-pad), env(safe-area-inset-bottom));
   box-shadow: var(--shadow-sheet);

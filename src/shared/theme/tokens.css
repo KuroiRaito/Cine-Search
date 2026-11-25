@@ -5,6 +5,14 @@
 
    Do not hand-edit values here. Change them in the design system
    and re-extract, so the two cannot drift apart.
+
+   EXCEPTION, 2026-11-09 — `--raised`. The successor design system
+   (https://claude.ai/artifact/R1Cj7gWM6gCHitbbn5mDJG) found that every
+   floating surface in this file reads as sunken in the light theme, and
+   no existing token could express it: see the note on `--raised` below.
+   It is declared here rather than re-extracted because the two systems
+   have not been reconciled yet. Reconciling them is the open task; until
+   then this is the only token in this file with no upstream twin.
    ============================================================ */
 
 :root{
@@ -30,6 +38,15 @@
   --st-drop-9:#B5594A;--st-drop-11:#DC8E7F;--st-drop-3:#26100C;
 
   --bg:var(--ink-1);--bg-sub:var(--ink-2);--surface:var(--ink-3);--surface-hv:var(--ink-4);
+  /* A surface that FLOATS over the page -- a sheet, a toast, a menu -- as
+     opposed to `--surface`, which is an inline card sitting IN the page.
+     It cannot alias the ink scale, because the two themes lift in opposite
+     directions: dark gets lighter as it rises, light gets darker, so any
+     single alias is wrong in one of them. In light it is pure white, one
+     step brighter than the #FCFCFD page, because a panel drawn darker than
+     its page with a drop shadow underneath says "above" and "below" at the
+     same time. */
+  --raised:var(--ink-5);
   --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
   --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
   --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
@@ -141,6 +158,7 @@
   --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
   --like-9:#DC3D43;--like-11:#B02A30;--like-3:#FDEBEC;
   --hl:rgba(255,255,255,.7);
+  --raised:#FFFFFF;
   --shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
   --shadow-sheet:0 -8px 32px -8px rgba(23,27,38,.16);
   --sh:var(--shadow-raised);
@@ -163,6 +181,7 @@
   --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
   --st-hold-9:#B0642A;--st-hold-11:#7A4415;--st-hold-3:#FBEDE0;
   --st-drop-9:#A0453A;--st-drop-11:#752D24;--st-drop-3:#FAE9E6;
+  --raised:#FFFFFF;
   --shadow-raised:0 6px 16px -4px rgba(23,27,38,.13);
   --shadow-sheet:0 -8px 32px -8px rgba(23,27,38,.16);
   --sh:var(--shadow-raised);

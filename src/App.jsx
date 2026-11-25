@@ -61,7 +61,7 @@ function Shell({ children }) {
             <Navigation />
             <header className="topbar">
                 <div className="topbar-in">
-                    <NavLink to="/" className="wordmark"><i />Cine Search</NavLink>
+                    <NavLink to="/" className="wordmark"><i />Bingecon</NavLink>
                     <nav className="topnav">
                         {TABS.map((t) => (
                             <NavLink key={t.to} to={t.to} end={t.to === '/'}

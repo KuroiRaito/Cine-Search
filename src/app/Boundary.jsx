@@ -85,7 +85,7 @@ export default class Boundary extends Component {
 function AppDead({ id }) {
     return (
         <div className="page broke">
-            <h1>Cine Search stopped working.</h1>
+            <h1>Bingecon stopped working.</h1>
             <p>Nothing you saved is affected.</p>
             <div className="broke-do">
                 <button type="button" className="btn" onClick={() => window.location.assign('/')}>Reload</button>

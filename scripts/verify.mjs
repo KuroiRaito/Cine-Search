@@ -483,6 +483,142 @@ for (const f of jsx) {
     }
 }
 
+/* ---------------------------------------------------------------
+   17. A box that holds an icon beside something else lays it out.
+
+   `.icon` is `display: block`, deliberately — it is what gives every
+   icon a predictable box instead of a baseline to argue with. The
+   cost is that a block child inside a block or inline parent takes a
+   line of its own and pushes its sibling onto the next one. Nothing
+   warns you: the markup reads fine, the stylesheet reads fine, and
+   the two are only wrong together.
+
+   That shipped three times. `.chip` put the close cross under the
+   word the moment you applied a filter and grew the chip from 32px
+   to 48px. `.score-badge` put the number under the star on every
+   poster in the product, 36px tall where 20 was drawn. `.sc` did the
+   same to an episode's score. One of them had already been noticed
+   and answered in the module layer with `vertical-align: middle`,
+   which cannot move a block box and never did — a fix that reads
+   like a fix is worse than no fix, because it closes the question.
+
+   This does not ban stacking. `.tab-item` stacks its icon over its
+   label and says so with `flex-direction: column`. It bans stacking
+   that nobody chose: hold an icon next to other content and you
+   declare a flex or grid context, and thereby say which way you
+   meant it to run.
+   --------------------------------------------------------------- */
+const FLEXY = new Set(['flex', 'inline-flex', 'grid', 'inline-grid']);
+const VOID_TAGS = new Set(['br', 'hr', 'img', 'input', 'meta', 'link', 'source', 'path', 'circle', 'rect', 'use']);
+
+/* Every display a class is ever given, by the last element of each selector —
+   `.eprow .ed .sc { display: inline-flex }` is what gives `.sc` its row. All of
+   them, not the last one seen, so a rule inside a media query cannot make a
+   class look shapeless to this check. */
+const displaysOf = new Map();
+for (const m of css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    const d = /(?:^|[;{\s])display\s*:\s*([a-z-]+)/.exec(m[2]);
+    if (!d) continue;
+    for (const sel of m[1].split(',')) {
+        const parts = sel.trim().split(/[\s>+~]+/).filter(Boolean);
+        const name = /^\.([A-Za-z0-9_-]+)/.exec(parts[parts.length - 1] || '');
+        if (!name) continue;
+        if (!displaysOf.has(name[1])) displaysOf.set(name[1], new Set());
+        displaysOf.get(name[1]).add(d[1]);
+    }
+}
+
+/* A tag stack rather than a regex: the question is which element an <Icon> is a
+   DIRECT child of, and a regex cannot tell that from an icon six levels down.
+   Attribute scanning tracks quotes and brace depth, because `onClick={() =>
+   onChange({ ...facets })}` carries both a nested brace and no `>` of its own. */
+function directChildren(src) {
+    const done = [];
+    const stack = [];
+    const addText = (t) => {
+        if (!stack.length) return;
+        const clean = t.replace(/\{\/\*[\s\S]*?\*\/\}/g, '').trim();
+        if (clean && !/^[{}()?:&|\s]*$/.test(clean)) stack[stack.length - 1].text += ' ' + clean;
+    };
+    let i = 0;
+    while (i < src.length) {
+        const lt = src.indexOf('<', i);
+        if (lt < 0) break;
+        const open = /^<(\/?)([A-Za-z][\w.]*)/.exec(src.slice(lt, lt + 64));
+        if (!open) { i = lt + 1; continue; }
+        addText(src.slice(i, lt));
+        let j = lt + open[0].length, depth = 0, quote = null, selfClose = false;
+        for (; j < src.length; j++) {
+            const ch = src[j];
+            if (quote) { if (ch === quote) quote = null; continue; }
+            if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
+            if (ch === '{') depth++;
+            else if (ch === '}') depth--;
+            else if (ch === '>' && depth === 0) { selfClose = src[j - 1] === '/'; break; }
+        }
+        const tag = open[2];
+        if (open[1]) {
+            for (let k = stack.length - 1; k >= 0; k--) {
+                if (stack[k].tag !== tag) continue;
+                while (stack.length > k + 1) done.push(stack.pop());
+                const node = stack.pop();
+                done.push(node);
+                if (stack.length) stack[stack.length - 1].kids.push(tag);
+                break;
+            }
+        } else {
+            const attrs = src.slice(lt + open[0].length, selfClose ? j - 1 : j);
+            if (selfClose || VOID_TAGS.has(tag)) {
+                if (stack.length) stack[stack.length - 1].kids.push(tag);
+            } else {
+                stack.push({ tag, attrs, kids: [], text: '', at: src.slice(0, lt).split('\n').length });
+            }
+        }
+        i = j + 1;
+    }
+    while (stack.length) done.push(stack.pop());
+    return done;
+}
+
+/* Only string literals: `{finding ? 'chips aside' : 'chips'}` names two classes
+   and an identifier, and the identifier is not one. */
+function classesOf(attrs) {
+    const k = attrs.indexOf('className=');
+    if (k < 0) return [];
+    let p = k + 'className='.length;
+    if (attrs[p] === '"' || attrs[p] === "'") {
+        const end = attrs.indexOf(attrs[p], p + 1);
+        return attrs.slice(p + 1, end).split(/\s+/).filter(Boolean);
+    }
+    if (attrs[p] !== '{') return [];
+    let d = 0, q = null, e = p;
+    for (; e < attrs.length; e++) {
+        const ch = attrs[e];
+        if (q) { if (ch === q) q = null; continue; }
+        if (ch === '"' || ch === "'" || ch === '`') { q = ch; continue; }
+        if (ch === '{') d++;
+        else if (ch === '}' && --d === 0) break;
+    }
+    const inner = attrs.slice(p + 1, e).replace(/\$\{[^}]*\}/g, ' ');
+    return [...inner.matchAll(/['"`]([^'"`]*)['"`]/g)]
+        .flatMap((m) => m[1].split(/\s+/)).filter(Boolean);
+}
+
+for (const f of jsx) {
+    const rel = relative(ROOT, f);
+    if (rel.endsWith('shared/ui/Icon.jsx')) continue;
+    for (const node of directChildren(readFileSync(f, 'utf8'))) {
+        if (!node.kids.includes('Icon')) continue;
+        const besideIt = node.text.trim() || node.kids.filter((k) => k !== 'Icon').join(', ');
+        if (!besideIt) continue;                       // an icon on its own has nothing to collide with
+        const classes = classesOf(node.attrs);
+        if (!classes.length) continue;                 // no class, no rule this check can name
+        const laysOut = classes.some((c) => [...(displaysOf.get(c) || [])].some((d) => FLEXY.has(d)));
+        if (laysOut) continue;
+        fail('icon-row', `${rel}:${node.at}: .${classes[0]} holds <Icon> beside other content but declares no flex or grid context`);
+    }
+}
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -503,6 +639,7 @@ const CHECKS = [
     ['icon-component', 'An icon is a component, never a character'],
     ['component-import', 'A component used is a component imported'],
     ['icon-name', 'An icon names a role the set actually has'],
+    ['icon-row', 'An icon beside content sits in a row that was declared'],
 ];
 
 let failed = 0;

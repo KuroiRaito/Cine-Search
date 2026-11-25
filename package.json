@@ -21,6 +21,7 @@
     "check": "npm run verify && npm run states && npm run gallery && npm run gallery:audit && npm run lint && npm run build",
     "states": "node scripts/states.mjs",
     "gallery": "vite-node scripts/gallery.mjs",
+    "shot": "node scripts/shot.mjs",
     "gallery:audit": "node scripts/gallery-audit.mjs",
     "snap": "node scripts/snap.mjs",
     "auth": "node --env-file=.env scripts/auth-cases.mjs",

@@ -26,6 +26,7 @@ A control is unfinished until every line below is answered for it. "Answered" in
 States are half of it. The other half is content, and it is the half that broke twice this month.
 
 - **C2.1** **With an icon and without one.** `.icon` is `display: block`. A control that holds an icon beside anything else declares a flex or grid context, and thereby says which direction it runs. Enforced: `verify` check 17.
+- **C2.1a** **An icon *alone* in a box is not covered by that check**, which only fires when the icon has a sibling. A lone glyph needs a correctly *sized* box as well as a correctly declared one, and it passed all 17 checks while sitting 2px right of centre. Geometry is not checkable by reading CSS — it is checkable by measuring a rendered control, which is C9.
 - **C2.2** **The longest label it will really get.** Not "Action" — "Science Fiction & Fantasy", and the Hindi for it.
 - **C2.3** **One child and several.** A chip with a count, a chip with a count and a cross.
 - **C2.4** **Both themes.** Light is not dark with the numbers flipped: a floating surface gets *lighter* as it rises in dark and *darker* in light, which is why `--raised` exists and cannot alias the ink scale.
@@ -67,4 +68,21 @@ Selection is written two ways today: `aria-pressed` on some controls, an `.on` c
 - **C7.3** `npm run snap` — 72 screenshots, 7 screens × 3 bands × 2 themes. **It photographs the default state only.** None of this month's three bugs would ever appear in it, because states do not show up in screenshots of pages.
 - **C7.4** `npm run gallery` — `docs/as-built.html`, every control drawn in every state it owes. Two things keep it from drifting away from the product, which is how every gallery dies: the CSS is the product's own, inlined verbatim and never restated; and `:hover`, `:focus-visible`, `:active` and `:disabled`, which markup cannot force, are *derived* — each rule that styles one is duplicated with the pseudo-class swapped for `[data-force~="…"]`. A control with no rule for a state draws the same as rest, so the gap is visible rather than inferred. Icons come from the real `Icon` component through vite-node, so one dropped from the role map disappears from the gallery too.
 - **C7.5** `npm run gallery:audit` — reads back the computed style of all 60 cells in both themes and reports any state whose paint is identical to rest. It found six on the first run, and it found two false positives in `npm run states`: a state styled only on a variant (`.circ.sm:disabled`) or behind another pseudo-class (`.searchbox:-webkit-autofill:hover`) was being credited to the bare control. Two tools that disagree are worth more than one that is confident.
-- **C7.6** A new check is proved by reverting the bug and watching it fire. A check that has only ever seen a clean tree has not been tested.
+- **C7.6** `npm run shot -- <control>` — pulls one row out of the gallery at 3×. The gallery is 18,000px tall; a 24px control cannot be judged at the size it ships at, and "looks fine" at 1× is how a 2px offset survives. `--list` names every row, `--light` switches theme.
+- **C7.7** A new check is proved by reverting the bug and watching it fire. A check that has only ever seen a clean tree has not been tested. The geometry check in C9 was proved this way: with the reset removed it reported `quickadd 2.0px right`, which is the figure measured by hand before the fix.
+
+## C8 — Artwork has no theme
+
+A control that lands on a poster or a still cannot borrow the page's surfaces, because what is underneath it is a photograph in light mode and a photograph in dark mode. It carries its own ground.
+
+- **C8.1** **That ground is one material, named once.** `--glass`, `--glass-hv`, `--glass-line`, `--glass-blur`, `--on-glass`, in `tokens.css`, outside both theme blocks on purpose.
+- **C8.2** It was seven controls inventing it separately: rest opacities `.55 .6 .6 .62 .68 .72`, hovers `.72` and `.78`, and two different base colours — `rgba(8,12,20)` for `.quickadd` and `rgba(4,6,12)` for the other six. The top-right and bottom-left corners of the same poster were built out of different glass, which is a thing nobody can see as a bug and everybody can see as cheapness.
+- **C8.3** **The hairline is not trim.** A dark control on a dark poster has no edge of its own. `--glass-line` is what stops it dissolving into the artwork, and it belongs to every glass control, not just the one that happened to have it.
+- **C8.4** `--scrim-wash` is a different job — the full-screen dim behind a sheet — and keeps its own name even at the same value. `.tplay-b` was using it as a control ground; it now uses `--glass`.
+
+## C9 — A glyph alone in a control is centred, and that is measured
+
+- **C9.1** A control whose entire content is one glyph is making a promise that the glyph is in the middle. `gallery:audit` measures it in a real browser: glyph rect against control rect, both axes, every state, both themes. Over half a pixel is a finding.
+- **C9.2** **It fails the run.** The rest of that audit reports — which states a stylesheet never answered is a design decision — but a crooked glyph has no defence, so this one exits non-zero.
+- **C9.3** It checks the outcome, not the cause. The cause this time was the UA's `padding: 1px 6px` on `<button>`, never reset anywhere in the product, which leaves a `width: 24px` control with a 12px content box. The padding is symmetric, so it only breaks when the glyph is wider than `width - 12px` and overflow resolves to the start edge: eight of the nine affected controls were drawn correctly and were one icon-size change from not being. A check written against *that* cause would have passed on all nine.
+- **C9.4** The reset is `button { padding: 0 }` in `shell.css`, beside the `font-family` reset that was already there. A button that wants padding declares it; a class declaration beats an element one.

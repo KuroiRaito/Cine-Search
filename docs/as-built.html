@@ -84,7 +84,10 @@
   --control-sm:36px;--control-md:44px;--control-lg:52px;
 
   /* Icon box. Square and fixed; the glyph inside is sized by eye. */
-  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+  /* 12 is the glyph that annotates a line of text rather than standing on its
+     own -- the star beside a score. The episode row already drew it at 12 by
+     hand; naming it is what stops the next one being drawn at 16. */
+  --icon-12:12px;--icon-16:16px;--icon-20:20px;--icon-24:24px;
 
   /* Type. Every line-height sits on the 4px grid, which is what keeps
      two columns of different type aligned down the page. */
@@ -110,6 +113,24 @@
   --shadow-raised:0 6px 16px -4px rgba(0,0,0,.6);
   --shadow-sheet:0 -8px 32px -8px rgba(0,0,0,.7);
   --scrim-wash:rgba(4,6,12,.62);
+
+  /* Artwork has no theme. A control that lands on a poster or a still cannot
+     borrow the page's surfaces -- what is underneath it is a photograph in
+     light mode and a photograph in dark mode -- so it carries its own ground.
+     One material, named once, used by every control that sits on an image.
+
+     It was seven controls inventing it separately: rest opacities .55 .6 .6
+     .62 .68 .72, hovers .72 and .78, and two different base colours for what
+     the eye reads as one thing. Two corners of the same poster were built out
+     of different glass.
+
+     The hairline is not trim. A dark control on a dark poster has no edge of
+     its own; the inset line is what stops it dissolving into the artwork. */
+  --glass:rgba(4,6,12,.62);
+  --glass-hv:rgba(4,6,12,.78);
+  --glass-line:rgba(255,255,255,.16);
+  --glass-blur:blur(6px);
+  --on-glass:#fff;
 
   /* ============================================================
      COMPONENT TOKENS — roles that alias atoms. A component asks for
@@ -234,7 +255,31 @@ body {
 h1, h2, h3, h4, h5 { font-family: var(--f-d); margin: 0; letter-spacing: -.022em; line-height: 1.14; }
 p { margin: 0; }
 a { color: inherit; text-decoration: none; }
-button { font-family: inherit; }
+/* Two things every <button> inherits from the browser that it should not.
+   font-family is the obvious one. padding is the costly one: the UA ships
+   `padding: 1px 6px`, so with box-sizing: border-box a control sized
+   `width: 24px` has a content box only 12px wide.
+
+   The padding is symmetric, which is why this hid for so long -- a centred
+   content box keeps a glyph centred, and eight of the nine sized controls
+   that inherit it are still drawn correctly today. It breaks at exactly one
+   point: when the glyph is WIDER than `width - 12px` it cannot fit, grid
+   overflow resolves to the start edge rather than the centre, and the glyph
+   slides right.
+
+   Only .quickadd was over that line -- a 16px icon in a 12px content box,
+   2px right of centre, on every poster in the product. The other eight
+   (.circ .ibtn .stp .cadd .plus .lbtn .lfind-x .epmark) were one icon-size
+   change away from joining it: .stp at 32px has exactly 20px to spare, so a
+   20px icon fits by nothing at all and a 24px one does not.
+
+   Resetting it once here removes the cliff rather than stepping back from
+   it, and it is safe by construction: a button that wants padding declares
+   it, and a class declaration beats an element one. The 18 classes and 5
+   descendant rules that declare their own padding are untouched, and nothing
+   in the product relies on the UA value. gallery:audit measures the outcome
+   -- it reports any glyph off-centre in its own control, and fails on it. */
+button { font-family: inherit; padding: 0; }
 img { max-width: 100%; display: block; }
 
 /* The offset matters: an outline flush to a filled button disappears into it.
@@ -350,7 +395,11 @@ img { max-width: 100%; display: block; }
 .circ:hover { background: var(--surface-hv); color: var(--text); }
 /* Artwork has no theme: a control over a poster keeps its own dark ground
    and white glyph in both light and dark. */
-.circ.on-image { background: rgba(4, 6, 12, .6); backdrop-filter: blur(6px); color: #fff; }
+.circ.on-image {
+  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+}
+.circ.on-image:hover { background: var(--glass-hv); color: var(--on-glass); }
 
 /* A button and an input are the same object to the eye when stacked, so they
    share a height and a radius. This is what removes the 1px drift that was
@@ -589,8 +638,8 @@ img { max-width: 100%; display: block; }
   width: var(--icon-24); height: var(--icon-24);
   border-radius: var(--radius-full); border: 0; cursor: pointer;
   display: grid; place-items: center; line-height: 1; font-weight: 500;
-  color: #fff; background: rgba(8, 12, 20, .62); backdrop-filter: blur(6px);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+  color: var(--on-glass); background: var(--glass); backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
   transition: background .13s, color .13s, box-shadow .13s;
 }
 .quickadd:hover { background: var(--acc); color: var(--on-acc); box-shadow: none; }
@@ -607,11 +656,29 @@ img { max-width: 100%; display: block; }
    between the two; a whitespace-only flex item is not rendered, so the 4px is
    `gap`'s and nothing depends on a space surviving a refactor. */
 .score-badge {
-  position: absolute; left: var(--space-4); bottom: var(--space-4);
+  position: absolute; left: var(--space-8); bottom: var(--space-8);
   display: flex; align-items: center; gap: var(--space-4);
-  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600; color: var(--mar-9);
-  background: rgba(4,6,12,.68); padding: var(--space-2) var(--space-4); border-radius: var(--radius-4);
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600;
+  /* The number is data and reads white; the star is the mark that says what
+     kind of number it is, and only the star carries the rating colour. Both
+     in amber made the pair read as a warning sticker rather than a score. */
+  color: var(--on-glass);
+  background: var(--glass); backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+  /* Asymmetric: a star has visual air on its left that a digit does not, so
+     equal padding sits it too far in. */
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
   font-variant-numeric: tabular-nums;
+}
+/* A 16px outline star against 11px digits is half again as tall as the thing
+   it annotates, and lucide's 2px stroke blunts the points at that size, so it
+   read as a cheap glyph. 12px matches the digits' height -- the size the
+   episode row had already arrived at by hand -- and filling it drops the
+   stroke's weight out of the silhouette entirely. */
+.score-badge svg {
+  width: var(--icon-12); height: var(--icon-12);
+  color: var(--rate); fill: currentColor; stroke-width: 1.5;
 }
 
 .grid {
@@ -1518,7 +1585,8 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 .tplay::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(4,6,12,.78), transparent 58%); }
 .tplay-b {
   position: absolute; inset: 0; margin: auto; width: var(--control-lg); height: var(--control-lg);
-  border-radius: var(--radius-full); background: var(--scrim-wash); color: var(--mar-9);
+  border-radius: var(--radius-full); background: var(--glass); backdrop-filter: var(--glass-blur);
+  color: var(--mar-9); box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
   display: grid; place-items: center; z-index: 2;
 }
 .tplay-l {
@@ -1755,6 +1823,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 }
 :where([tabindex="-1"])[data-force~="focus"] { outline: none; }
 .circ[data-force~="hover"] { background: var(--surface-hv); color: var(--text); }
+.circ.on-image[data-force~="hover"] { background: var(--glass-hv); color: var(--on-glass); }
 .btn[data-force~="hover"] { filter: brightness(1.06); }
 .btn[data-force~="disabled"] { opacity: .55; cursor: not-allowed; filter: none; }
 .btn.quiet[data-force~="hover"] { background: var(--ink-5); filter: none; }
@@ -2150,6 +2219,30 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
         <div class="g-cells g-tokens"><div class="g-tok">
         <div class="g-chip" style="background:var(--scrim-wash)"></div>
         <code>scrim-wash</code></div></div>
+      </div>
+      <div class="g-row g-wide">
+        <div class="g-name"><code>--glass-*</code><span>1 token</span></div>
+        <div class="g-cells g-tokens"><div class="g-tok">
+        <div class="g-chip" style="background:var(--glass)"></div>
+        <code>glass</code></div></div>
+      </div>
+      <div class="g-row g-wide">
+        <div class="g-name"><code>--glass-hv-*</code><span>1 token</span></div>
+        <div class="g-cells g-tokens"><div class="g-tok">
+        <div class="g-chip" style="background:var(--glass-hv)"></div>
+        <code>glass-hv</code></div></div>
+      </div>
+      <div class="g-row g-wide">
+        <div class="g-name"><code>--glass-line-*</code><span>1 token</span></div>
+        <div class="g-cells g-tokens"><div class="g-tok">
+        <div class="g-chip" style="background:var(--glass-line)"></div>
+        <code>glass-line</code></div></div>
+      </div>
+      <div class="g-row g-wide">
+        <div class="g-name"><code>--on-glass-*</code><span>1 token</span></div>
+        <div class="g-cells g-tokens"><div class="g-tok">
+        <div class="g-chip" style="background:var(--on-glass)"></div>
+        <code>on-glass</code></div></div>
       </div></section>
 <section class="g-group"><h2>Foundations — length</h2>
       <div class="g-row g-wide">
@@ -2231,8 +2324,10 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
         <code>control-lg</code><span>52px</span></div></div>
       </div>
       <div class="g-row g-wide">
-        <div class="g-name"><code>--icon-*</code><span>3 tokens</span></div>
+        <div class="g-name"><code>--icon-*</code><span>4 tokens</span></div>
         <div class="g-cells g-tokens"><div class="g-tok">
+        <div class="g-bar" style="width:var(--icon-12);min-width:1px"></div>
+        <code>icon-12</code><span>12px</span></div><div class="g-tok">
         <div class="g-bar" style="width:var(--icon-16);min-width:1px"></div>
         <code>icon-16</code><span>16px</span></div><div class="g-tok">
         <div class="g-bar" style="width:var(--icon-20);min-width:1px"></div>
@@ -2500,6 +2595,11 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
         <code>z-top</code><span>80</span></div></div>
       </div>
       <div class="g-row g-wide">
+        <div class="g-name"><code>--glass-blur-*</code><span>1 token</span></div>
+        <div class="g-cells g-tokens"><div class="g-tok g-tok-wide">
+        <code>glass-blur</code><span>blur(6px)</span></div></div>
+      </div>
+      <div class="g-row g-wide">
         <div class="g-name"><code>--measure-*</code><span>1 token</span></div>
         <div class="g-cells g-tokens"><div class="g-tok g-tok-wide">
         <code>measure</code><span>65ch</span></div></div>
@@ -2714,12 +2814,12 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
         <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage g-surface"><p class="whynot">Nothing matched every filter. Try dropping one.</p></div></div></div>
       </div>
       <div class="g-row g-wide">
-        <div class="g-name"><code>toast</code><span>.toast</span></div>
-        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage g-surface"><div class="toast"><span>Added to your library</span><button>Undo</button></div></div></div></div>
+        <div class="g-name"><code>toast, after an add</code><span>.toast</span></div>
+        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage g-surface"><div class="toast"><span>Added to your library</span><button aria-label="Dismiss"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div></div></div>
       </div>
       <div class="g-row g-wide">
-        <div class="g-name"><code>toast, dismissible</code><span>.toast</span></div>
-        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage g-surface"><div class="toast"><span>Removed from your library</span><button aria-label="Dismiss"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div></div></div>
+        <div class="g-name"><code>toast, after a remove</code><span>.toast</span></div>
+        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage g-surface"><div class="toast"><span>Removed from your library</span><button>Undo</button></div></div></div></div>
       </div>
       <div class="g-row g-wide">
         <div class="g-name"><code>empty</code><span>.empty</span></div>

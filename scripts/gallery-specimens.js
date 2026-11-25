@@ -153,10 +153,15 @@ export const SPECIMENS = [
         html: 'Nothing matched every filter. Try dropping one.' },
 
     /* ---------------- feedback ---------------- */
-    { group: 'Feedback', name: 'toast', cls: 'toast', tag: 'div', surface: true, states: ['rest'],
-        html: '<span>Added to your library</span><button>Undo</button>' },
-    { group: 'Feedback', name: 'toast, dismissible', cls: 'toast', tag: 'div', surface: true, states: ['rest'],
-        html: '<span>Removed from your library</span><button aria-label="Dismiss">{icon:close}</button>' },
+    // Which button a toast carries is decided by what the action DID, not by
+    // the component. An add is its own undo — tap the thing again — so the
+    // button is a dismiss. A remove cannot be undone by repeating it, so it
+    // owes an Undo. Toast.jsx encodes this as: actionLabel present -> action
+    // button, absent -> cross. Both specimens below are the same component.
+    { group: 'Feedback', name: 'toast, after an add', cls: 'toast', tag: 'div', surface: true, states: ['rest'],
+        html: '<span>Added to your library</span><button aria-label="Dismiss">{icon:close}</button>' },
+    { group: 'Feedback', name: 'toast, after a remove', cls: 'toast', tag: 'div', surface: true, states: ['rest'],
+        html: '<span>Removed from your library</span><button>Undo</button>' },
     { group: 'Feedback', name: 'empty', cls: 'empty', tag: 'div', surface: true, states: ['rest'],
         html: '<h2>Nothing here yet</h2><p>Titles you add will show up on this shelf.</p>'
             + '<a class="btn" href="#">Find something</a>' },

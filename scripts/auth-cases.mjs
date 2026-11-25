@@ -132,7 +132,20 @@ async function install(ctx, o) {
 
     await ctx.addInitScript(([k, v]) => {
         localStorage.setItem('cine_seen_cover', '1');
-        if (v) localStorage.setItem(k, v);
+        /* Seeded once per context, never again.
+        
+           addInitScript runs on every document load, so writing the token here
+           unconditionally put it back after the app had removed it — which made
+           signing out unobservable to any case that then navigated by URL. Two
+           cases were failing on exactly this and the symptom read as a product
+           bug: sign out, go to /you, and there is the profile you just left.
+        
+           Every case gets its own context below, so once per context is once
+           per case, and a token the app has deliberately cleared stays cleared. */
+        if (v && !localStorage.getItem('cine_harness_seeded')) {
+            localStorage.setItem(k, v);
+            localStorage.setItem('cine_harness_seeded', '1');
+        }
     }, [`sb-${REF}-auth-token`, o.stored ? JSON.stringify(o.stored()) : '']);
 }
 
@@ -402,11 +415,22 @@ const CASES = [
             await page.getByRole('button', { name: 'Sign out' }).first().click();
             await page.waitForTimeout(200);
             await page.getByRole('button', { name: 'Sign out' }).last().click();
+            /* Where sign-in lives depends on the width, so this must not assert
+               the chrome. The top bar holds it from 1120px up; below that there
+               is no top bar at all (S2 — no mobile header), and SH16 puts it on
+               the You tab instead. Asserting "the top bar says so" passed at
+               1280px and failed at 420px while the product was correct at both.
+               Assert the route a person can reach, not the furniture it sits in. */
+            await page.waitForTimeout(600);
+            const landed = new URL(page.url()).pathname;
+            await page.goto(`${base}/you`);
             await page.getByRole('link', { name: 'Sign in' }).first()
                 .waitFor({ timeout: 8000 }).catch(() => {});
-            return `${new URL(page.url()).pathname} ${await read(page)}`;
+            return `landed[${landed}] ${await read(page)}`;
         },
-        expect: ['Sign in'], reject: ['Your session ended'],
+        // landed[/] is new: where signing out puts you was returned but never
+        // asserted, so a redirect to the wrong place would have passed.
+        expect: ['landed[/]', 'Sign in'], reject: ['Your session ended'],
     },
     {
         n: 25, name: 'Signing out in one tab signs out the other',
@@ -660,15 +684,19 @@ const CASES = [
             const asked = await read(page);
 
             await page.getByRole('button', { name: 'Sign out' }).last().click();
-            // Wait for the signed-out shell, not for a stopwatch: `read` returns
-            // as soon as there is any text, which after a sign-out is the tab
-            // bar — a beat before the session question has settled and the
-            // "Sign in" link appears.
+            await page.waitForTimeout(600);
+            const end = new URL(page.url()).pathname;
+            /* Then the walk continues to where sign-in actually is at this
+               width. See case 24: below 1120px there is no top bar, so the You
+               tab is the account surface (SH16), and `read` returns as soon as
+               there is any text — which after a sign-out is the tab bar, a beat
+               before the session question has settled. */
+            await page.goto(`${base}/you`);
             await page.getByRole('link', { name: 'Sign in' }).first()
                 .waitFor({ timeout: 8000 }).catch(() => {});
             return `landed[${landed.slice(0, 300)}] settings[${settings.slice(0, 900)}]`
                 + ` asked[${asked.includes('library stays exactly as it is')}]`
-                + ` end[${new URL(page.url()).pathname}] ${await read(page)}`;
+                + ` end[${end}] ${await read(page)}`;
         },
         expect: [
             'Nothing watched yet',      // the state a new account is actually in
@@ -676,7 +704,7 @@ const CASES = [
             'qa@cinesearch.test',       // and it says who you are signed in as
             'asked[true]',              // the reassurance before the scary button
             'end[/]',
-            'Sign in',                  // signed out, and the top bar says so
+            'Sign in',                  // signed out, and the account surface says so
         ],
         reject: ['Your session ended'],
     },

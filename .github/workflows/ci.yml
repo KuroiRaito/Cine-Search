@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ main, master ]
 
+# What belongs in the merge gate: checks that are fast and that catch a
+# regression a reviewer would not see. Measured on 25 Nov 2026 — the whole set
+# below is about four seconds of work, against an npm ci that takes thirty.
+#
+# Deliberately NOT here:
+#   npm run auth      38 session cases · 80s + a browser download. Real cost on
+#                     every merge, and sessions change rarely. Run it before a
+#                     release, and after anything touching auth or the shell.
+#   npm run snap      72 screens · 3-4 min. Once before a PR, by hand.
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,8 +27,23 @@ jobs:
           cache: 'npm'
       - name: Install Dependencies
         run: npm ci
+
+      # Cheapest first, so an obvious break reports in seconds.
       - name: Verify design system
         run: npm run verify
+      # 2.5s, and it has already earned its place: an anchored edit once clipped
+      # the arrow off discoverMovies (`=` for `=>`), which would have shipped
+      # Browse dead on arrival. Lint caught it before anything ran.
+      - name: Lint
+        run: npm run lint
+
+      # The behavioural rules. Both are pure logic — no network, no browser, no
+      # credentials — so they cost nothing and were only ever run by hand.
+      - name: Search rules
+        run: npm run find
+      - name: Title cohorts
+        run: npm run cohorts
+
       - name: Build Project
         run: npm run build
       - name: Smoke-test serverless API

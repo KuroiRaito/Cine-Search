@@ -46,13 +46,18 @@ const layerOf = (rel) =>
                 : rel.includes('app/') ? 'app' : '?';
 
 /* ---------- 1. what each class styles, and where ---------- */
-const styled = new Map();   // class -> { states:Set, layers:Set, file }
+/* `states` is what the BARE class answers for. `variantOnly` is what only a
+   variant answers for: `.circ.sm:disabled` in profile.css styles the small
+   back button and nothing else, so a plain disabled `.circ` still looks
+   clickable. Crediting the base class for it reported a state the product
+   does not have -- which the gallery audit caught by rendering it. */
+const styled = new Map();   // class -> { states:Set, variantOnly:Set, layers:Set, file }
 const conventions = new Map();
 const conventionOf = (c) => { if (!conventions.has(c)) conventions.set(c, new Set()); return conventions.get(c); };
-const note = (cls, state, rel) => {
-    if (!styled.has(cls)) styled.set(cls, { states: new Set(), layers: new Set(), file: rel });
+const note = (cls, state, rel, variantOnly) => {
+    if (!styled.has(cls)) styled.set(cls, { states: new Set(), variantOnly: new Set(), layers: new Set(), file: rel });
     const e = styled.get(cls);
-    if (state) e.states.add(state);
+    if (state) (variantOnly ? e.variantOnly : e.states).add(state);
     e.layers.add(layerOf(rel));
 };
 
@@ -88,11 +93,27 @@ for (const f of cssFiles) {
                so record which one each control uses rather than only whether
                the state is drawn at all. */
             const compound = [...last.matchAll(/\.([A-Za-z0-9_-]+)/g)].map((c) => c[1]).slice(1);
-            if (compound.some((c) => ['on', 'active', 'selected', 'current'].includes(c))) {
+            const SELECTED = ['on', 'active', 'selected', 'current'];
+            if (compound.some((c) => SELECTED.includes(c))) {
                 note(cls[1], 'selected', rel);
                 conventionOf(cls[1]).add('class');
             }
-            note(cls[1], state, rel);
+            /* A state only belongs to the bare control if nothing else has to
+               be true for the rule to apply. Two things disqualify it:
+
+                 a second class  -- `.btn.quiet:hover` is the quiet variant's
+                                    hover, and `.circ.sm:disabled` is the small
+                                    one's, so a plain disabled `.circ` still
+                                    looks clickable;
+                 a second pseudo -- `.searchbox:-webkit-autofill:hover` is a
+                                    hover the browser only ever shows over an
+                                    autofilled field, which is not a hover
+                                    state in any sense a designer means it.
+
+               Both were counted as the real thing until the gallery audit
+               rendered them and found the cell identical to rest. */
+            const conditional = compound.some((c) => !SELECTED.includes(c)) || pseudos.length > 1;
+            note(cls[1], state, rel, conditional);
         }
     }
 }
@@ -178,18 +199,20 @@ for (const [cls, k] of kind) {
         })(),
         crossesLayers: [...st.layers].length > 1,
         on: ([...k.tags].join('/') || 'onClick').slice(0, 15),
-        hover: has('hover') ? 'yes' : 'MISSING',
+        hover: has('hover') ? 'yes' : st.variantOnly.has('hover') ? 'variant only' : 'MISSING',
         focus: focusOwn ? 'own'
             : has('focus') ? 'BARE :focus'
                 : GLOBAL_RING ? 'global' : 'MISSING',
-        disabled: !k.disabled ? '-' : has('disabled') ? 'yes' : 'MISSING',
+        disabled: !k.disabled ? '-'
+            : has('disabled') ? 'yes'
+                : st.variantOnly.has('disabled') ? 'variant only' : 'MISSING',
         selected: !(k.toggle || st.states.has('selected')) ? '-'
             : has('selected') ? [...(conventions.get(cls) || ['?'])].join('+') : 'MISSING',
     });
 }
 rows.sort((a, b) => a.layer.localeCompare(b.layer) || a.cls.localeCompare(b.cls));
 
-const W = [18, 18, 16, 9, 13, 10, 11];
+const W = [18, 18, 16, 14, 13, 14, 11];
 const head = ['control', 'layer', 'rendered on', 'hover', 'focus', 'disabled', 'selected'];
 const line = (c) => c.map((v, n) => String(v).padEnd(W[n])).join('');
 console.log('\nSTATE COVERAGE — every class the markup puts on something you can interact with\n');
@@ -198,9 +221,11 @@ console.log('-'.repeat(W.reduce((a, b) => a + b, 0)));
 for (const r of rows) console.log(line([r.cls, r.layer, r.on, r.hover, r.focus, r.disabled, r.selected]));
 
 const miss = (key) => rows.filter((r) => r[key].startsWith('MISSING')).length;
+const variantOnly = rows.filter((r) => r.hover === 'variant only' || r.disabled === 'variant only').length;
 console.log(`\n  ${rows.length} controls`);
 console.log(`  ${rows.filter((r) => r.crossesLayers).length} are defined in one layer and restyled from another`);
 console.log(`  ${miss('hover')} style no hover`);
+console.log(`  ${variantOnly} answer a state on a variant only, so the bare control does not have it`);
 console.log(`  ${rows.filter((r) => r.focus === 'BARE :focus').length} use bare :focus (fires on a mouse click, and stays)`);
 console.log(`  ${rows.filter((r) => r.focus === 'global').length} lean on the one global ring`);
 console.log(`  ${miss('disabled')} can be disabled but do not say so`);

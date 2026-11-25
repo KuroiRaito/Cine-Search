@@ -76,9 +76,13 @@
   font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--text); cursor: pointer;
 }
 
-/* A chip in the record carries its own removal. */
+/* A chip in the record carries its own removal. The cross is quieter than the
+   label: you read what the filter is first, then that you can drop it.
+   Position is not this rule's business -- `.chip` is a flex line and owns both
+   the alignment and the 4px. This rule used to carry `vertical-align: middle`
+   and a margin, which could not work against a block-level icon and did not. */
 .chip.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
-.chip.on svg { vertical-align: middle; margin-left: var(--space-4); opacity: .7; }
+.chip.on svg { opacity: .7; }
 
 /* A facet that was dropped says so. Silence would be the screen answering a
    question nobody asked. */

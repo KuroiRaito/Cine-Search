@@ -275,7 +275,11 @@
 }
 .eprow .en:hover { color: var(--acc-t); }
 .eprow .ed { font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-2); }
-.eprow .ed .sc { color: var(--rate); }
+/* Same star-beside-a-number as `.score-badge`, inside a running meta line, so
+   `inline-flex`: it keeps its place in the sentence and still gives the star a
+   row to sit on. A bare inline span would be split around the block-level icon
+   and drop the score onto a second line. */
+.eprow .ed .sc { display: inline-flex; align-items: center; gap: var(--space-4); color: var(--rate); }
 
 /* The number never shortens, and now neither do the words: one label, sized to
    fit the narrowest screen we support. */

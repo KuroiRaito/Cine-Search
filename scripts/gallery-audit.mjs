@@ -27,7 +27,7 @@ import { fileURLToPath } from 'node:url';
 import process from 'node:process';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const PAGE = join(ROOT, 'docs/controls.html');
+const PAGE = join(ROOT, 'docs/as-built.html');
 
 /* Everything that can make one state look different from another. If a state
    changes none of these and moves no box, it changed nothing. */

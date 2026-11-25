@@ -173,8 +173,46 @@ for (const f of jsxFiles) {
 }
 
 /* ---------- 3. the table ---------- */
-const GLOBAL_RING = cssFiles.some((f) =>
-    /(^|\})\s*:focus-visible\s*\{/.test(readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')));
+/* The global ring used to be a bare `:focus-visible {}`, and asking whether
+   it existed was enough. It is now scoped to things that are actually
+   controls -- that is what stopped it painting a box around the page
+   heading -- so "does it exist" is the wrong question and answering it
+   reported MISSING for forty controls it covers perfectly well.
+
+   The right question is per control: is this class rendered on anything the
+   rule matches? A class that is only ever put on a <div> with an onClick is
+   not covered, cannot be tabbed to, and has no focus state at all -- which
+   is worth seeing in this column rather than hiding behind a global yes. */
+const ringSel = (() => {
+    for (const f of cssFiles) {
+        const css = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+        const m = css.match(/([^{}]*:focus-visible)\s*\{/);
+        if (m && !/^\s*\./.test(m[1])) return m[1];
+    }
+    return null;
+})();
+
+/* What the markup calls a thing is not what the browser sees: react-router's
+   Link and NavLink both render <a href>. */
+const AS = { Link: 'a', NavLink: 'a', Group: 'div' };
+const ringTags = new Set();
+let ringAttrs = [];
+if (ringSel) {
+    for (const part of ringSel.split(',')) {
+        /* The rule is wrapped in :is(...), so the first part arrives as
+           ":is(a[href]" and the last as "[tabindex=\"0\"]):focus-visible". */
+        const t = part.trim()
+            .replace(/:focus-visible$/, '')
+            .replace(/^:(?:is|where)\(/, '')
+            .replace(/\)$/, '')
+            .trim();
+        const tag = t.match(/^([a-z]+)/);
+        if (tag) ringTags.add(tag[1]);
+        const attr = t.match(/^\[([a-z-]+)=["']?([^\]"']+)/);
+        if (attr) ringAttrs.push(`${attr[1]}=${attr[2]}`);
+    }
+}
+const coveredByRing = (k) => [...k.tags].some((t) => ringTags.has(AS[t] || t.toLowerCase()));
 
 const rows = [];
 for (const [cls, k] of kind) {
@@ -202,7 +240,8 @@ for (const [cls, k] of kind) {
         hover: has('hover') ? 'yes' : st.variantOnly.has('hover') ? 'variant only' : 'MISSING',
         focus: focusOwn ? 'own'
             : has('focus') ? 'BARE :focus'
-                : GLOBAL_RING ? 'global' : 'MISSING',
+                : !ringSel ? 'NO RING AT ALL'
+                    : coveredByRing(k) ? 'global' : 'NOT FOCUSABLE',
         disabled: !k.disabled ? '-'
             : has('disabled') ? 'yes'
                 : st.variantOnly.has('disabled') ? 'variant only' : 'MISSING',
@@ -228,6 +267,13 @@ console.log(`  ${miss('hover')} style no hover`);
 console.log(`  ${variantOnly} answer a state on a variant only, so the bare control does not have it`);
 console.log(`  ${rows.filter((r) => r.focus === 'BARE :focus').length} use bare :focus (fires on a mouse click, and stays)`);
 console.log(`  ${rows.filter((r) => r.focus === 'global').length} lean on the one global ring`);
+{
+    const unreachable = rows.filter((r) => r.focus === 'NOT FOCUSABLE');
+    if (unreachable.length) {
+        console.log(`  ${unreachable.length} cannot be focused at all -- not a missing style, a missing control:`);
+        for (const r of unreachable) console.log(`      .${r.cls}  (rendered on ${r.on})`);
+    }
+}
 console.log(`  ${miss('disabled')} can be disabled but do not say so`);
 console.log(`  ${miss('selected')} can be selected but do not say so`);
 const byConv = (c) => rows.filter((r) => r.selected === c).length;

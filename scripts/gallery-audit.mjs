@@ -47,6 +47,8 @@ const url = `http://127.0.0.1:${server.address().port}/`;
 
 const browser = await chromium.launch();
 const findings = [];
+const offCentre = [];
+let geometryFailed = false;
 
 for (const theme of ['dark', 'light']) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
@@ -62,8 +64,29 @@ for (const theme of ['dark', 'light']) {
                 if (!el) return { label, sig: null };
                 const cs = getComputedStyle(el);
                 const r = el.getBoundingClientRect();
+
+                /* Geometry. A control whose whole content is one glyph is
+                   making a promise -- that the glyph is in the middle -- and
+                   the promise is checkable. Anything with text in it is not
+                   making that promise, so it is skipped. */
+                let centring = null;
+                const svgs = el.querySelectorAll('svg');
+                const text = el.textContent.replace(/\s+/g, '');
+                if (svgs.length === 1 && !text) {
+                    const g = svgs[0].getBoundingClientRect();
+                    if (g.width && g.height) {
+                        centring = {
+                            dx: (g.left - r.left) - (r.right - g.right),
+                            dy: (g.top - r.top) - (r.bottom - g.bottom),
+                            box: `${r.width.toFixed(0)}x${r.height.toFixed(0)}`,
+                            glyph: `${g.width.toFixed(0)}x${g.height.toFixed(0)}`,
+                        };
+                    }
+                }
+
                 return {
                     label,
+                    centring,
                     sig: paint.map((p) => cs.getPropertyValue(p)).join('|')
                         + `|${r.width.toFixed(1)}x${r.height.toFixed(1)}`,
                 };
@@ -74,6 +97,17 @@ for (const theme of ['dark', 'light']) {
     }, PAINT);
 
     for (const { name, cells } of rows) {
+        for (const c of cells) {
+            if (!c.centring) continue;
+            const { dx, dy } = c.centring;
+            /* Half a pixel. Below that it is a subpixel rounding artefact of
+               the layout engine; at or above it, something in the box is
+               pushing the glyph off and a person can see it. */
+            if (Math.abs(dx) >= 0.5 || Math.abs(dy) >= 0.5) {
+                offCentre.push({ theme, name, state: c.label, ...c.centring });
+            }
+        }
+
         const rest = cells.find((c) => c.label === 'rest');
         if (!rest?.sig) continue;
         for (const c of cells) {
@@ -92,6 +126,33 @@ for (const f of findings) {
     byName.set(k, [...(byName.get(k) || []), f.theme]);
 }
 
+/* Reported first, because it fails rather than informs. A state the
+   stylesheet never answered is a design decision somebody can defend; a glyph
+   sitting off-centre inside its own button is not. */
+console.log('\nGLYPHS THAT ARE NOT CENTRED IN THEIR OWN CONTROL\n');
+{
+    const seen = new Map();
+    for (const f of offCentre) {
+        const k = `${f.name}\u0000${f.state}`;
+        if (!seen.has(k)) seen.set(k, f);
+    }
+    if (!seen.size) {
+        console.log('  none. Every icon-only control centres its glyph on both axes.\n');
+    } else {
+        console.log(`  ${'control'.padEnd(22)}${'state'.padEnd(12)}${'box'.padEnd(10)}${'glyph'.padEnd(10)}off by`);
+        console.log('  ' + '-'.repeat(72));
+        for (const [, f] of [...seen].sort()) {
+            const off = [
+                Math.abs(f.dx) >= 0.5 ? `${(f.dx / 2).toFixed(1)}px ${f.dx > 0 ? 'right' : 'left'}` : '',
+                Math.abs(f.dy) >= 0.5 ? `${(f.dy / 2).toFixed(1)}px ${f.dy > 0 ? 'down' : 'up'}` : '',
+            ].filter(Boolean).join(', ');
+            console.log(`  ${f.name.padEnd(22)}${f.state.padEnd(12)}${f.box.padEnd(10)}${f.glyph.padEnd(10)}${off}`);
+        }
+        console.log(`\n  ${seen.size} control(s). This is never intentional.\n`);
+        geometryFailed = true;
+    }
+}
+
 console.log('\nSTATES THAT RENDER IDENTICALLY TO REST — the stylesheet never answered them\n');
 if (!byName.size) {
     console.log('  none. Every state drawn in the gallery changes something.\n');
@@ -105,4 +166,5 @@ if (!byName.size) {
     console.log(`\n  ${byName.size} gap(s). Which of them matter is a design decision —`);
     console.log('  see docs/CONTROLS.md C1. This reports; it does not fail.\n');
 }
-process.exit(0);
+/* Paint gaps report. Geometry fails: a crooked glyph has no defence. */
+process.exit(geometryFailed ? 1 : 0);

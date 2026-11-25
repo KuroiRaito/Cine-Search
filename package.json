@@ -18,6 +18,7 @@
     "eval:bench": "vite-node eval/bench.mjs --",
     "test:api": "node scripts/smoke-api.mjs",
     "verify": "node scripts/verify.mjs",
+    "states": "node scripts/states.mjs",
     "snap": "node scripts/snap.mjs",
     "auth": "node --env-file=.env scripts/auth-cases.mjs",
     "cohorts": "node scripts/title-cohorts.mjs",

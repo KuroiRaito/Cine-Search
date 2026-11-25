@@ -19,3 +19,9 @@ supabase/.temp/
 # The images are for looking at locally — regenerate with `npm run snap`.
 # A full sweep is >100 full-page PNGs; only the fingerprints are committed.
 snapshots/**/*.png
+
+# Playwright MCP scratch — console logs, page dumps and ad-hoc screenshots.
+.playwright-mcp/
+
+# Ad-hoc review screenshots taken while designing. Regenerate with `npm run snap`.
+/*.png

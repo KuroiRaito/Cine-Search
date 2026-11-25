@@ -237,5 +237,8 @@
 
 /* Artwork has no theme: the control over the poster keeps its own dark
    ground and white glyph in both. */
-.cover-theme .circ { background: rgba(4, 6, 12, .55); backdrop-filter: blur(6px); color: #fff; }
-.cover-theme .circ:hover { background: rgba(4, 6, 12, .72); color: #fff; }
+.cover-theme .circ {
+  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+}
+.cover-theme .circ:hover { background: var(--glass-hv); color: var(--on-glass); }

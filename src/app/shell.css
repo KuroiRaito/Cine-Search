@@ -176,7 +176,11 @@ img { max-width: 100%; display: block; }
 .circ:hover { background: var(--surface-hv); color: var(--text); }
 /* Artwork has no theme: a control over a poster keeps its own dark ground
    and white glyph in both light and dark. */
-.circ.on-image { background: rgba(4, 6, 12, .6); backdrop-filter: blur(6px); color: #fff; }
+.circ.on-image {
+  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+}
+.circ.on-image:hover { background: var(--glass-hv); color: var(--on-glass); }
 
 /* A button and an input are the same object to the eye when stacked, so they
    share a height and a radius. This is what removes the 1px drift that was

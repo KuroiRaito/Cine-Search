@@ -102,6 +102,24 @@
   --shadow-sheet:0 -8px 32px -8px rgba(0,0,0,.7);
   --scrim-wash:rgba(4,6,12,.62);
 
+  /* Artwork has no theme. A control that lands on a poster or a still cannot
+     borrow the page's surfaces -- what is underneath it is a photograph in
+     light mode and a photograph in dark mode -- so it carries its own ground.
+     One material, named once, used by every control that sits on an image.
+
+     It was seven controls inventing it separately: rest opacities .55 .6 .6
+     .62 .68 .72, hovers .72 and .78, and two different base colours for what
+     the eye reads as one thing. Two corners of the same poster were built out
+     of different glass.
+
+     The hairline is not trim. A dark control on a dark poster has no edge of
+     its own; the inset line is what stops it dissolving into the artwork. */
+  --glass:rgba(4,6,12,.62);
+  --glass-hv:rgba(4,6,12,.78);
+  --glass-line:rgba(255,255,255,.16);
+  --glass-blur:blur(6px);
+  --on-glass:#fff;
+
   /* ============================================================
      COMPONENT TOKENS — roles that alias atoms. A component asks for
      the role; the role decides which atom applies at this width.

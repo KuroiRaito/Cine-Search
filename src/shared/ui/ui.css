@@ -297,7 +297,14 @@
   transition: box-shadow var(--dur-fast) var(--ease-out);
 }
 .searchbox::placeholder { color: var(--faint); }
-.searchbox:focus { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
+/* `:focus-visible`, not `:focus` -- for one spelling across the system, not
+   for a change in behaviour. Measured: a text field matches `:focus-visible`
+   on a mouse click too, because the browser assumes somebody who clicks into
+   a field is about to type. So this ring appears exactly when it did before,
+   and that is right: a focused text field should say so however it was
+   reached. The spelling still matters, because the next person to copy this
+   rule onto a button would have copied a ring that sticks after a click. */
+.searchbox:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .searchbox[aria-invalid="true"] { box-shadow: inset 0 0 0 var(--border-focus) var(--st-drop-9); }
 /* Notes are the one multi-line field, so it is the one that may grow. */
 textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--space-12) var(--space-16); line-height: var(--lh-body); }
@@ -422,7 +429,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-family: var(--f-s); transition: box-shadow .12s;
 }
 .inp:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
-.inp:focus { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
+.inp:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .inp.dim { color: var(--muted); }
 .hint { font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-4); }
 /* ---------------- settings blocks ----------------

@@ -39,12 +39,47 @@ a { color: inherit; text-decoration: none; }
 button { font-family: inherit; }
 img { max-width: 100%; display: block; }
 
-/* The offset matters: an outline flush to a filled button disappears into it. */
-:focus-visible {
+/* The offset matters: an outline flush to a filled button disappears into it.
+
+   Two things this rule used to get wrong, both of them visible on the live
+   site:
+
+   It set `border-radius: var(--radius-4)` -- meant, clearly, to shape the
+   ring. But `outline` has followed the element's own border-radius in every
+   browser we support for years, so the declaration was never needed, and what
+   it actually did was overwrite the control's real shape for as long as it
+   held focus. The circular back button became a rounded square. A pill chip
+   became a rounded rectangle. Measured across the gallery, every focusable
+   control in the product collapsed from its own radius -- 999px, 12px, 8px --
+   to 4px on focus.
+
+   And it matched ANYTHING focusable. `Navigation.jsx` focuses the page <h1>
+   on every route change so a screen reader announces the new screen; the
+   heading carries tabindex="-1" and is a destination, not a control. It was
+   being drawn as one: a blue box around "Search" or "Library" that appeared
+   whenever the last input had been the keyboard, and not otherwise, which is
+   why it looked random. The list below is natural controls plus anything
+   deliberately put in the tab order -- tabindex="-1" is excluded precisely
+   because it means "focusable, but not a stop". A control that wants a
+   different ring styles its own `:focus-visible`, as `.form-error` does. */
+:is(a[href], button, input, select, textarea, summary,
+    [role="button"], [role="tab"], [tabindex="0"]):focus-visible {
   outline: var(--border-focus) solid var(--acc);
   outline-offset: 3px;
-  border-radius: var(--radius-4);
 }
+
+/* And the destination draws no ring at all. Narrowing the rule above stopped
+   the ACCENT box appearing around the page heading, but the browser's own
+   default ring took its place the moment ours stopped overriding it -- an
+   `outline: auto 1px` box around "Search", which is the same bug in a duller
+   colour. tabindex="-1" means "focusable, but not a tab stop", which is
+   exactly the set of things that take focus without a person having aimed at
+   them. Nothing is lost: focus still moves, the screen reader still announces
+   the new screen, and only the picture of a control around something that is
+   not one goes away. `:where()` so this carries no specificity and any element
+   that genuinely wants a ring -- `.form-error`, the alert banner that takes
+   focus to be read out -- overrides it without a fight. */
+:where([tabindex="-1"]):focus { outline: none; }
 
 .about-h { font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 700; margin-bottom: var(--space-8); }
 .about-p { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }

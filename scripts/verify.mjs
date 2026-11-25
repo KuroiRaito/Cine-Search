@@ -351,6 +351,14 @@ for (const f of cssFiles) {
         // An inset box-shadow ring is the replacement pattern here — .searchbox
         // swaps its outline for one so the control does not change size on focus.
         if (/box-shadow\s*:/.test(props) || /border\s*:/.test(props)) continue;
+        /* This check exists for CONTROLS: a keyboard user who cannot see which
+           button they are on cannot use the form. `tabindex="-1"` is the
+           opposite case -- focusable but not a tab stop, which is what a page
+           heading is given so a route change can be announced. You never
+           arrive there by aiming, so a ring says "you are on a control" about
+           something that is not one. Suppressing it is the fix, not the
+           violation. */
+        if (/\[tabindex=["']?-1/.test(sel)) continue;
         fail('focus-ring', `${rel}: \`${sel.trim()}\` removes the outline and draws nothing in its place`);
     }
 }

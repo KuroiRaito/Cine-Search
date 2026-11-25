@@ -75,7 +75,10 @@
   --control-sm:36px;--control-md:44px;--control-lg:52px;
 
   /* Icon box. Square and fixed; the glyph inside is sized by eye. */
-  --icon-16:16px;--icon-20:20px;--icon-24:24px;
+  /* 12 is the glyph that annotates a line of text rather than standing on its
+     own -- the star beside a score. The episode row already drew it at 12 by
+     hand; naming it is what stops the next one being drawn at 16. */
+  --icon-12:12px;--icon-16:16px;--icon-20:20px;--icon-24:24px;
 
   /* Type. Every line-height sits on the 4px grid, which is what keeps
      two columns of different type aligned down the page. */

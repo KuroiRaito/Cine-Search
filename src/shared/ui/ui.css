@@ -62,11 +62,29 @@
    between the two; a whitespace-only flex item is not rendered, so the 4px is
    `gap`'s and nothing depends on a space surviving a refactor. */
 .score-badge {
-  position: absolute; left: var(--space-4); bottom: var(--space-4);
+  position: absolute; left: var(--space-8); bottom: var(--space-8);
   display: flex; align-items: center; gap: var(--space-4);
-  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600; color: var(--mar-9);
-  background: rgba(4,6,12,.68); padding: var(--space-2) var(--space-4); border-radius: var(--radius-4);
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600;
+  /* The number is data and reads white; the star is the mark that says what
+     kind of number it is, and only the star carries the rating colour. Both
+     in amber made the pair read as a warning sticker rather than a score. */
+  color: var(--on-glass);
+  background: var(--glass); backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+  /* Asymmetric: a star has visual air on its left that a digit does not, so
+     equal padding sits it too far in. */
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
   font-variant-numeric: tabular-nums;
+}
+/* A 16px outline star against 11px digits is half again as tall as the thing
+   it annotates, and lucide's 2px stroke blunts the points at that size, so it
+   read as a cheap glyph. 12px matches the digits' height -- the size the
+   episode row had already arrived at by hand -- and filling it drops the
+   stroke's weight out of the silhouette entirely. */
+.score-badge svg {
+  width: var(--icon-12); height: var(--icon-12);
+  color: var(--rate); fill: currentColor; stroke-width: 1.5;
 }
 
 .grid {

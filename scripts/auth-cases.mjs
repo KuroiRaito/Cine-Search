@@ -297,7 +297,7 @@ const CASES = [
             await page.click('button[type=submit]'); await page.waitForTimeout(900);
             return read(page);
         },
-        expect: ['by invitation'], reject: ['Can’t reach the server'],
+        expect: ['invite-only'], reject: ['Can’t reach the server'],
     },
     {
         n: 14, name: 'Email already has an account — sends them to sign in',

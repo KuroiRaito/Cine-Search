@@ -62,7 +62,7 @@ export default function Cover() {
             <div className="cover-theme"><ThemeToggle /></div>
 
             <div className="cover-in">
-                <div className="cover-mark"><i />Cine Search</div>
+                <div className="cover-mark"><i />Bingecon</div>
 
                 <h1>Everything you&apos;ve watched.<br />Everything you will.</h1>
                 <p>Track films and series, see where to watch them, and keep the whole lot in one place.</p>

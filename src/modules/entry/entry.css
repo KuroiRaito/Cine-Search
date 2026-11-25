@@ -138,6 +138,10 @@
    committing, and burying the skip loses them at the door. */
 .cover-skip { margin-top: var(--space-12); text-align: center; }
 .cover-skip button {
+  /* The icon is an svg that computes to display:block, which put the arrow on
+     a line of its own — on the phone as well as the desktop. A flex line keeps
+     the label and its arrow as one thing. */
+  display: inline-flex; align-items: center; gap: var(--space-4);
   min-height: var(--control-h); padding: var(--space-8) var(--space-12);
   background: none; border: 0; cursor: pointer;
   color: var(--acc-t); font-family: var(--f-s);
@@ -196,6 +200,16 @@
     max-width: 560px; margin-inline: auto; text-align: center;
     padding-bottom: var(--space-32);
   }
+  /* Auth is the one screen rendered outside the Shell, so it owns the whole
+     viewport — and anchored to the top it left two thirds of a desktop window
+     empty, which reads as a page that stopped loading rather than a short
+     form. Scoped by :has so the shared .page is untouched everywhere else. */
+  .page:has(> .auth-body) {
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column;
+  }
+  .page:has(> .auth-body) .auth-body { margin-block: auto; padding-bottom: var(--space-64); }
+
   .cover-mark { justify-content: center; }
   .cover-in > p { margin-inline: auto; }
   .cover-cta { flex-direction: row; }
@@ -203,6 +217,10 @@
 }
 
 @media (min-width: 1120px) {
+  /* The column is sized for the headline, not the other way round: at
+     --text-display the first sentence needs ~520px, and 560 minus the gutter
+     gave it 480 — so "Everything you've watched." broke mid-phrase. */
+  .cover-in { max-width: 680px; }
   .cover-in h1 { font-size: var(--text-display); line-height: var(--lh-display); }
   .mosaic { grid-template-columns: repeat(8, 1fr); }
 }

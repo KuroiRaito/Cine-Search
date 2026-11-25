@@ -20,7 +20,7 @@ export function humanError(error) {
     // would otherwise answer "check your connection" to a person whose
     // connection is fine and whose email simply isn't on the list.
     if (m.includes('database error saving new user') || m.includes('by invitation')) {
-        return 'Sign-ups are by invitation. Ask Raman to add your email.';
+        return 'Sign-ups are invite-only while Bingecon is private. If you were sent demo details, sign in with those instead.';
     }
 
     // No network at all. supabase-js wraps a failed fetch rather than giving it

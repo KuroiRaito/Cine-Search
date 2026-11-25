@@ -19,6 +19,8 @@
     "test:api": "node scripts/smoke-api.mjs",
     "verify": "node scripts/verify.mjs",
     "states": "node scripts/states.mjs",
+    "gallery": "vite-node scripts/gallery.mjs",
+    "gallery:audit": "node scripts/gallery-audit.mjs",
     "snap": "node scripts/snap.mjs",
     "auth": "node --env-file=.env scripts/auth-cases.mjs",
     "cohorts": "node scripts/title-cohorts.mjs",

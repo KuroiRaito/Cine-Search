@@ -13,9 +13,9 @@ Numbers are from `npm run states`, which reads the markup and the stylesheets an
 A control is unfinished until every line below is answered for it. "Answered" includes *deliberately nothing* — but written down, not left out.
 
 - **C1.1** **Rest.** How it looks doing nothing.
-- **C1.2** **Hover.** Pointer feedback. **19 of 42 controls style no hover at all.**
+- **C1.2** **Hover.** Pointer feedback. Was 19 of 42 styling none; now 5, and all five are answered by an ancestor — `.bd` and `.th` sit inside `.srow`, `.lfind-in` inside `.lfind`, and `.scrim`/`.sheet` are `<div>` containers rather than controls. A state drawn on a subtree counts: `.tile:hover .art` is a hover.
 - **C1.3** **Focus.** Keyboard feedback. See C3.
-- **C1.4** **Active.** The moment of the press. Nothing in the product styles this.
+- **C1.4** **Active.** The moment of the press. Answered once, product-wide, scoped the way the focus ring is: `:is(button, [role="button"], a[href]):not(:disabled):active { transform: scale(.97) }`. A control that must not move overrides that one rule. `transform` rather than a colour step because it is the only answer that works on a filled button, a ghost button, a chip and a poster without knowing what any of them look like.
 - **C1.5** **Selected / pressed**, if it is a toggle. See C4.
 - **C1.6** **Disabled**, if it can ever be disabled. Not "greyed out by opacity" — opacity on a filled control also fades its border and its shadow, and the result reads as a rendering fault.
 - **C1.7** **Busy**, if it can be waiting on the network.
@@ -64,7 +64,7 @@ Selection is written two ways today: `aria-pressed` on some controls, an `.on` c
 ## C7 — How this is held
 
 - **C7.1** `npm run verify` — 17 machine checks, CI-gated. Check 17 is C2.1.
-- **C7.2** `npm run states` — the coverage table. Not a gate: the gaps are design decisions and which ones matter is not a machine's call.
+- **C7.2** `npm run states` — the coverage table. Not a gate: the gaps are design decisions and which ones matter is not a machine's call. It has been wrong twice, both times by reading too narrowly — once reporting MISSING focus for 40 controls the scoped global ring covers, once reporting MISSING hover for every control that answers on its subtree, and once filing `:hover:not(:disabled)` as a variant's hover because it counted the pseudos inside `:not()`. A tool that under-reports is worse than no tool, because the clean rows are believed.
 - **C7.3** `npm run snap` — 72 screenshots, 7 screens × 3 bands × 2 themes. **It photographs the default state only.** None of this month's three bugs would ever appear in it, because states do not show up in screenshots of pages.
 - **C7.4** `npm run gallery` — `docs/as-built.html`, every control drawn in every state it owes. Two things keep it from drifting away from the product, which is how every gallery dies: the CSS is the product's own, inlined verbatim and never restated; and `:hover`, `:focus-visible`, `:active` and `:disabled`, which markup cannot force, are *derived* — each rule that styles one is duplicated with the pseudo-class swapped for `[data-force~="…"]`. A control with no rule for a state draws the same as rest, so the gap is visible rather than inferred. Icons come from the real `Icon` component through vite-node, so one dropped from the role map disappears from the gallery too.
 - **C7.5** `npm run gallery:audit` — reads back the computed style of all 60 cells in both themes and reports any state whose paint is identical to rest. It found six on the first run, and it found two false positives in `npm run states`: a state styled only on a variant (`.circ.sm:disabled`) or behind another pseudo-class (`.searchbox:-webkit-autofill:hover`) was being credited to the bare control. Two tools that disagree are worth more than one that is confident.

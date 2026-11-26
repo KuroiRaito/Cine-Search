@@ -19,7 +19,7 @@
 /* overflow: hidden because the poster stand-in below is scaled past the band's
    own width to hide the blur's soft edge — without it, 1.3x of a 320px hero is
    48px of sideways scroll on every title that has no backdrop. */
-.hero { --hero-h: 190px; position: relative; height: var(--hero-h); overflow: hidden; }
+.hero { --hero-h: 240px; position: relative; height: var(--hero-h); overflow: hidden; }
 /* A 16:9 backdrop cropped into a 4:1 desktop hero loses most of its height, and
    centring that crop cuts faces in half — subjects sit above the midline far
    more often than below it. Biasing the crop upward keeps the part of the image
@@ -46,30 +46,30 @@
    data arrived. Same geometry as .tgrid below, which is what it is standing in
    for. */
 .title-head {
-  --head-lift: 52px;
+  --head-lift: 64px;
   display: flex; gap: var(--space-12); padding-inline: var(--gutter);
   margin-top: calc(var(--head-lift) * -1); position: relative; z-index: 2;
 }
 .title-head .skel-art { flex: 0 0 auto; }
 
-.tgrid { --head-lift: 52px; display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 0 var(--space-12); padding-inline: var(--gutter); margin-top: calc(var(--head-lift) * -1); position: relative; z-index: 2; align-items: start; }
+.tgrid { --head-lift: 64px; display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 0 var(--space-12); padding-inline: var(--gutter); margin-top: calc(var(--head-lift) * -1); position: relative; z-index: 2; align-items: start; }
 .tposter { aspect-ratio: 2/3; border-radius: var(--radius-8); overflow: hidden; border: var(--border-hair) solid var(--bd-sub); box-shadow: var(--sh); }
 .tposter img { width: 100%; height: 100%; object-fit: cover; }
-.thead { --head-clear: 56px; min-width: 0; padding-top: var(--head-clear); }
+.thead { --head-clear: 70px; min-width: 0; padding-top: var(--head-clear); }
 /* TS10 — two lines then clamp. Untruncated, the longest real title on TMDB
    takes six lines at 320 and pushes the primary action 140px down the page,
    which puts band 2 below the fold on the frame §03 says it must be above.
    The full title stays in the tooltip and in the accessible name. */
 .thead h1 {
-  font-size: var(--text-title); line-height: var(--lh-title); font-weight: 800;
+  font-size: var(--text-display-sm); line-height: var(--lh-display-sm); font-weight: 800;
   letter-spacing: -.03em; margin-bottom: var(--space-4);
   display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 /* Everything below the title runs the full width of the phone, rather than
    staying trapped in the narrow column beside the poster. */
 .tbody { grid-column: 1 / -1; min-width: 0; }
-.metaline { font-family: var(--f-m); font-size: var(--text-micro); color: var(--muted); line-height: var(--lh-micro); }
-.cert { border: var(--border-hair) solid var(--bd-str); border-radius: var(--radius-4); padding: 0 var(--space-4); margin-right: var(--space-4); }
+.metaline { font-family: var(--f-m); font-size: var(--text-caption); color: var(--muted); line-height: var(--lh-caption); }
+.cert { border: var(--border-hair) solid var(--bd-str); border-radius: var(--radius-4); padding: var(--space-2) var(--space-8); margin-right: var(--space-8); letter-spacing: .04em; }
 .tagline { margin-top: var(--space-8); font-size: var(--text-caption); line-height: var(--lh-caption); font-style: italic; color: var(--muted); }
 
 /* §04: the one line a human wrote. It sits under the title because it answers
@@ -108,10 +108,10 @@
 .provrow { display: flex; gap: var(--space-8); align-items: center; flex-wrap: wrap; }
 .pchip {
   display: inline-flex; align-items: center; gap: var(--space-8); background: var(--ink-3); border: 0;
-  color: var(--text); border-radius: var(--radius-8); padding: var(--space-4) var(--space-8) var(--space-4) var(--space-4);
-  font-family: var(--f-s); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 500;
+  color: var(--text); border-radius: var(--radius-8); padding: var(--space-4) var(--space-12) var(--space-4) var(--space-4);
+  font-family: var(--f-s); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 500;
 }
-.plogo { width: var(--icon-20); height: var(--icon-20); border-radius: var(--radius-4); }
+.plogo { width: var(--space-32); height: var(--space-32); border-radius: var(--radius-4); background: #fff; }
 .prov-none { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); margin-top: var(--space-8); }
 
 /* "free" and "with ads" ride the chip they qualify. Quiet, because the point of
@@ -145,6 +145,7 @@
 .wbg .prov-l { margin-bottom: var(--space-8); }
 .wbg .more { display: inline-block; text-decoration: none; }
 
+.more:hover { color: var(--acc-t-hv); }
 .more {
   background: none; border: 0; color: var(--acc-t); cursor: pointer;
   font-family: var(--f-s); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 600;
@@ -155,6 +156,7 @@
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); margin-top: var(--section-gap); align-items: start; }
 .pc { border: var(--border-hair) solid var(--bd); border-radius: var(--radius-12); background: var(--surface); padding: var(--space-12); }
 .pc.open { grid-column: 1 / -1; }
+.pc-top:hover .pc-h b { color: var(--acc-t); }
 .pc-top {
   display: block; width: 100%; background: none; border: 0; padding: 0; cursor: pointer;
   text-align: left; font-family: var(--f-s);
@@ -186,15 +188,27 @@
    itself. 16:9 because that is the shape every trailer is. */
 .trailer { margin-top: var(--space-16); border-radius: var(--radius-12); overflow: hidden; background: var(--ink-4); }
 .trailer iframe { display: block; width: 100%; aspect-ratio: 16/9; border: 0; }
+.tplay img { transition: filter var(--dur-fast) var(--ease-out); }
+.tplay:hover img { filter: brightness(1.08); }
 .tplay {
   display: block; position: relative; width: 100%; aspect-ratio: 16/9;
   padding: 0; border: 0; background: none; cursor: pointer; overflow: hidden;
 }
+/* NOT a layout bug, though it looks like one on a scope title. Measured at
+   900: .trailer, .tplay and this img are all exactly 811x456, a true 16:9.
+   hqdefault.jpg is 480x360, and `cover` crops its 4:3 padding precisely --
+   45px of baked bar each side, scaled by 811/480, is the 76px that `cover`
+   removes. Any black left after that belongs to the FILM: Inception's trailer
+   is 2.39:1, so YouTube's own 16:9 frame carries bands, and the thumbnail
+   inherits them. Cropping them away would mean cropping the picture, so the
+   card leaves them alone. Verified against a 16:9 clip from the same title,
+   which fills this box edge to edge with no bands at all. */
 .tplay img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .tplay::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(4,6,12,.78), transparent 58%); }
 .tplay-b {
   position: absolute; inset: 0; margin: auto; width: var(--control-lg); height: var(--control-lg);
-  border-radius: var(--radius-full); background: var(--scrim-wash); color: var(--mar-9);
+  border-radius: var(--radius-full); background: var(--glass); backdrop-filter: var(--glass-blur);
+  color: var(--mar-9); box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
   display: grid; place-items: center; z-index: 2;
 }
 .tplay-l {
@@ -266,7 +280,11 @@
 }
 .eprow .en:hover { color: var(--acc-t); }
 .eprow .ed { font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-2); }
-.eprow .ed .sc { color: var(--rate); }
+/* Same star-beside-a-number as `.score-badge`, inside a running meta line, so
+   `inline-flex`: it keeps its place in the sentence and still gives the star a
+   row to sit on. A bare inline span would be split around the block-level icon
+   and drop the score onto a second line. */
+.eprow .ed .sc { display: inline-flex; align-items: center; gap: var(--space-4); color: var(--rate); }
 
 /* The number never shortens, and now neither do the words: one label, sized to
    fit the narrowest screen we support. */
@@ -306,6 +324,7 @@
 .epchk:hover { background: var(--ink-5); color: var(--muted); }
 .epchk.on { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
 .epchk:disabled { opacity: .4; cursor: default; }
+.sect-h .markall:hover { color: var(--acc-t-hv); }
 .sect-h .markall {
   background: none; border: 0; cursor: pointer; padding: 0;
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 600; color: var(--acc-t);
@@ -355,7 +374,6 @@
   .tgrid { --head-lift: 72px; grid-template-columns: 132px minmax(0, 1fr); gap: 0 var(--space-20); }
   .thead { --head-clear: 80px; }
   .thead h1 { font-size: var(--text-display-sm); line-height: var(--lh-display-sm); letter-spacing: -.032em; margin-bottom: var(--space-8); }
-  .metaline { font-size: var(--text-micro); }
   .tagline { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); }
 
   /* A 700px-wide primary button is not more tappable than a 440px one, only
@@ -403,7 +421,6 @@
   .thead h1 { font-size: var(--text-display-sm); line-height: var(--lh-display-sm); letter-spacing: -.035em; margin-bottom: var(--space-8); }
   .tbody { grid-column: 2; grid-row: 2; }
   .tside { grid-column: 3; grid-row: 1 / span 2; }
-  .metaline { font-size: var(--text-micro); }
   .tside-inline { display: none; }
   .tside {
     display: block; position: sticky; top: var(--space-80);

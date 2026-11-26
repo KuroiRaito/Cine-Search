@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { person as fetchPerson } from '../../shared/tmdb/endpoints.js';
 import { toPersonView } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
-import { Tile, Skeleton, Empty, initialsOf } from '../../shared/ui/index.js';
+import { Tile, Skeleton, Empty, initialsOf, Button} from '../../shared/ui/index.js';
 import { SignInPrompt } from '../entry';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { usePersonFavourite } from '../profile';
@@ -67,8 +67,8 @@ export default function Person() {
                 title={gone ? 'We couldn’t find that person' : 'Something went wrong'}
                 body={gone ? 'They may have been removed from TMDB, or the link may be wrong.' : 'The Movie Database didn’t answer.'}
                 action={gone
-                    ? <Link className="btn" to="/">Go to Discover</Link>
-                    : <button type="button" className="btn" onClick={retry}>Try again</button>}
+                    ? <Button as={Link} to="/">Go to Discover</Button>
+                    : <Button onClick={retry}>Try again</Button>}
             />
         );
     }

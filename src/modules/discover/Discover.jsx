@@ -6,7 +6,7 @@ import {
 import { fromItem } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { useRegion } from '../../shared/hooks/RegionProvider.jsx';
-import { Rail, Skeleton, ErrorBox, Icon } from '../../shared/ui/index.js';
+import { Rail, Skeleton, ErrorBox, Icon, Chip, Button} from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import {
     useLibrary, useTileStates, useQuickAdd, loadShelf, shapeRow,
@@ -202,7 +202,7 @@ export default function Discover() {
                 <div className="card signup">
                     <h2>Keep track of what you watch</h2>
                     <p>Your watchlist, ratings and episode progress — private by default.</p>
-                    <Link className="btn" to="/welcome/signup" state={{ from: '/' }}>Create an account</Link>
+                    <Button as={Link} to="/welcome/signup" state={{ from: '/' }}>Create an account</Button>
                 </div>
             )}
 
@@ -243,9 +243,9 @@ function Presets() {
     return (
         <div className="chips presets">
             {offered.map((p) => (
-                <Link key={p.key} className="chip" to={browseTo(facetsFor(p, region))} title={p.definition}>
+                <Chip key={p.key} as={Link} to={browseTo(facetsFor(p, region))} title={p.definition}>
                     {p.label}
-                </Link>
+                </Chip>
             ))}
         </div>
     );

@@ -22,7 +22,7 @@ import ThemeToggle from './shared/theme/ThemeToggle.jsx';
 import './shared/theme/tokens.css';
 import './app/shell.css';
 import './shared/ui/ui.css';
-import { Icon } from './shared/ui/index.js';
+import { Icon, Button} from './shared/ui/index.js';
 
 // Tabs appear only on top-level destinations — never on a title or person page,
 // which are places you arrive at and come back from.
@@ -76,10 +76,10 @@ function Shell({ children }) {
                         question has an answer. Offering a signed-in person a
                         sign-in button for a second is the app telling them it
                         has forgotten who they are. */}
-                    {!authReady ? <span className="btn quiet is-waiting" aria-hidden="true" />
+                    {!authReady ? <Button as="span" variant="quiet" busy aria-hidden="true" />
                         : isSignedIn
-                            ? <NavLink to="/you" className="btn quiet">{profile?.username || 'You'}</NavLink>
-                            : <NavLink to="/welcome/signin" state={{ from: pathname }} className="btn quiet">Sign in</NavLink>}
+                            ? <Button as={NavLink} variant="quiet" to="/you">{profile?.username || 'You'}</Button>
+                            : <Button as={NavLink} variant="quiet" to="/welcome/signin" state={{ from: pathname }}>Sign in</Button>}
                 </div>
             </header>
 

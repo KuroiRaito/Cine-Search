@@ -6,7 +6,7 @@ import { markSeen } from '../../app/firstVisit.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import ThemeToggle from '../../shared/theme/ThemeToggle.jsx';
 import './entry.css';
-import { Icon } from '../../shared/ui/index.js';
+import { Icon, Button} from '../../shared/ui/index.js';
 
 /**
  * First visit only. Skippable, and it never comes back.
@@ -68,8 +68,8 @@ export default function Cover() {
                 <p>Track films and series, see where to watch them, and keep the whole lot in one place.</p>
 
                 <div className="cover-cta">
-                    <button type="button" className="btn btn-lg" onClick={() => go('/welcome/signup')}>Create account</button>
-                    <button type="button" className="btn btn-lg ghost" onClick={() => go('/welcome/signin')}>Sign in</button>
+                    <Button size="lg" onClick={() => go('/welcome/signup')}>Create account</Button>
+                    <Button size="lg" variant="ghost" onClick={() => go('/welcome/signin')}>Sign in</Button>
                 </div>
 
                 {/* A real, visible action — the whole point of this persona is

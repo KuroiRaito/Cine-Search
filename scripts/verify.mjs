@@ -9,7 +9,7 @@
  * referenced in five places with no rule behind it, so every card in the app
  * lost its background, padding, radius and margin at once.
  */
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, extname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
@@ -351,6 +351,14 @@ for (const f of cssFiles) {
         // An inset box-shadow ring is the replacement pattern here — .searchbox
         // swaps its outline for one so the control does not change size on focus.
         if (/box-shadow\s*:/.test(props) || /border\s*:/.test(props)) continue;
+        /* This check exists for CONTROLS: a keyboard user who cannot see which
+           button they are on cannot use the form. `tabindex="-1"` is the
+           opposite case -- focusable but not a tab stop, which is what a page
+           heading is given so a route change can be announced. You never
+           arrive there by aiming, so a ring says "you are on a control" about
+           something that is not one. Suppressing it is the fix, not the
+           violation. */
+        if (/\[tabindex=["']?-1/.test(sel)) continue;
         fail('focus-ring', `${rel}: \`${sel.trim()}\` removes the outline and draws nothing in its place`);
     }
 }
@@ -437,6 +445,12 @@ for (const f of jsx) {
     }
     for (const m of body.matchAll(/(?:function|class)\s+([A-Z][\w$]*)/g)) known.add(m[1]);
     for (const m of body.matchAll(/(?:const|let|var)\s+([A-Z][\w$]*)\s*=/g)) known.add(m[1]);
+    /* A polymorphic component takes its tag as a prop: `{ as: As = 'button' }`
+       renders <As>, which is a destructured local, not a missing import. The
+       alias is what makes it capitalised, because JSX reads a lowercase tag
+       as an HTML element. Only the renaming form counts -- a bare `{ As }`
+       would already be caught by the import scan above. */
+    for (const m of body.matchAll(/\b[a-z][\w$]*\s*:\s*([A-Z][\w$]*)\s*(?:=|[,}])/g)) known.add(m[1]);
 
     const seen = new Set();
     for (const m of body.matchAll(/<([A-Z][\w$]*)[\s/>]/g)) {
@@ -483,8 +497,322 @@ for (const f of jsx) {
     }
 }
 
+/* ---------------------------------------------------------------
+   17. A box that holds an icon beside something else lays it out.
+
+   `.icon` is `display: block`, deliberately — it is what gives every
+   icon a predictable box instead of a baseline to argue with. The
+   cost is that a block child inside a block or inline parent takes a
+   line of its own and pushes its sibling onto the next one. Nothing
+   warns you: the markup reads fine, the stylesheet reads fine, and
+   the two are only wrong together.
+
+   That shipped three times. `.chip` put the close cross under the
+   word the moment you applied a filter and grew the chip from 32px
+   to 48px. `.score-badge` put the number under the star on every
+   poster in the product, 36px tall where 20 was drawn. `.sc` did the
+   same to an episode's score. One of them had already been noticed
+   and answered in the module layer with `vertical-align: middle`,
+   which cannot move a block box and never did — a fix that reads
+   like a fix is worse than no fix, because it closes the question.
+
+   This does not ban stacking. `.tab-item` stacks its icon over its
+   label and says so with `flex-direction: column`. It bans stacking
+   that nobody chose: hold an icon next to other content and you
+   declare a flex or grid context, and thereby say which way you
+   meant it to run.
+   --------------------------------------------------------------- */
+const FLEXY = new Set(['flex', 'inline-flex', 'grid', 'inline-grid']);
+const VOID_TAGS = new Set(['br', 'hr', 'img', 'input', 'meta', 'link', 'source', 'path', 'circle', 'rect', 'use']);
+
+/* Every display a class is ever given, by the last element of each selector —
+   `.eprow .ed .sc { display: inline-flex }` is what gives `.sc` its row. All of
+   them, not the last one seen, so a rule inside a media query cannot make a
+   class look shapeless to this check. */
+const displaysOf = new Map();
+for (const m of css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    const d = /(?:^|[;{\s])display\s*:\s*([a-z-]+)/.exec(m[2]);
+    if (!d) continue;
+    for (const sel of m[1].split(',')) {
+        const parts = sel.trim().split(/[\s>+~]+/).filter(Boolean);
+        const name = /^\.([A-Za-z0-9_-]+)/.exec(parts[parts.length - 1] || '');
+        if (!name) continue;
+        if (!displaysOf.has(name[1])) displaysOf.set(name[1], new Set());
+        displaysOf.get(name[1]).add(d[1]);
+    }
+}
+
+/* A tag stack rather than a regex: the question is which element an <Icon> is a
+   DIRECT child of, and a regex cannot tell that from an icon six levels down.
+   Attribute scanning tracks quotes and brace depth, because `onClick={() =>
+   onChange({ ...facets })}` carries both a nested brace and no `>` of its own. */
+function directChildren(src) {
+    const done = [];
+    const stack = [];
+    const addText = (t) => {
+        if (!stack.length) return;
+        const clean = t.replace(/\{\/\*[\s\S]*?\*\/\}/g, '').trim();
+        if (clean && !/^[{}()?:&|\s]*$/.test(clean)) stack[stack.length - 1].text += ' ' + clean;
+    };
+    let i = 0;
+    while (i < src.length) {
+        const lt = src.indexOf('<', i);
+        if (lt < 0) break;
+        const open = /^<(\/?)([A-Za-z][\w.]*)/.exec(src.slice(lt, lt + 64));
+        if (!open) { i = lt + 1; continue; }
+        addText(src.slice(i, lt));
+        let j = lt + open[0].length, depth = 0, quote = null, selfClose = false;
+        for (; j < src.length; j++) {
+            const ch = src[j];
+            if (quote) { if (ch === quote) quote = null; continue; }
+            if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
+            if (ch === '{') depth++;
+            else if (ch === '}') depth--;
+            else if (ch === '>' && depth === 0) { selfClose = src[j - 1] === '/'; break; }
+        }
+        const tag = open[2];
+        if (open[1]) {
+            for (let k = stack.length - 1; k >= 0; k--) {
+                if (stack[k].tag !== tag) continue;
+                while (stack.length > k + 1) done.push(stack.pop());
+                const node = stack.pop();
+                done.push(node);
+                if (stack.length) stack[stack.length - 1].kids.push(tag);
+                break;
+            }
+        } else {
+            const attrs = src.slice(lt + open[0].length, selfClose ? j - 1 : j);
+            if (selfClose || VOID_TAGS.has(tag)) {
+                if (stack.length) stack[stack.length - 1].kids.push(tag);
+            } else {
+                stack.push({ tag, attrs, kids: [], text: '', at: src.slice(0, lt).split('\n').length });
+            }
+        }
+        i = j + 1;
+    }
+    while (stack.length) done.push(stack.pop());
+    return done;
+}
+
+/* Only string literals: `{finding ? 'chips aside' : 'chips'}` names two classes
+   and an identifier, and the identifier is not one. */
+function classesOf(attrs) {
+    const k = attrs.indexOf('className=');
+    if (k < 0) return [];
+    let p = k + 'className='.length;
+    if (attrs[p] === '"' || attrs[p] === "'") {
+        const end = attrs.indexOf(attrs[p], p + 1);
+        return attrs.slice(p + 1, end).split(/\s+/).filter(Boolean);
+    }
+    if (attrs[p] !== '{') return [];
+    let d = 0, q = null, e = p;
+    for (; e < attrs.length; e++) {
+        const ch = attrs[e];
+        if (q) { if (ch === q) q = null; continue; }
+        if (ch === '"' || ch === "'" || ch === '`') { q = ch; continue; }
+        if (ch === '{') d++;
+        else if (ch === '}' && --d === 0) break;
+    }
+    const inner = attrs.slice(p + 1, e).replace(/\$\{[^}]*\}/g, ' ');
+    return [...inner.matchAll(/['"`]([^'"`]*)['"`]/g)]
+        .flatMap((m) => m[1].split(/\s+/)).filter(Boolean);
+}
+
+for (const f of jsx) {
+    const rel = relative(ROOT, f);
+    if (rel.endsWith('shared/ui/Icon.jsx')) continue;
+    for (const node of directChildren(readFileSync(f, 'utf8'))) {
+        if (!node.kids.includes('Icon')) continue;
+        const besideIt = node.text.trim() || node.kids.filter((k) => k !== 'Icon').join(', ');
+        if (!besideIt) continue;                       // an icon on its own has nothing to collide with
+        const classes = classesOf(node.attrs);
+        if (!classes.length) continue;                 // no class, no rule this check can name
+        const laysOut = classes.some((c) => [...(displaysOf.get(c) || [])].some((d) => FLEXY.has(d)));
+        if (laysOut) continue;
+        fail('icon-row', `${rel}:${node.at}: .${classes[0]} holds <Icon> beside other content but declares no flex or grid context`);
+    }
+}
+
+/* ---------------------------------------------------------------
+   18. The specification and the code agree on every token.
+
+   docs/design-system.html is the Projector specification -- what the design
+   SAYS. src/shared/theme/tokens.css is what the product DOES. They share 84
+   custom properties, and as of today every one of them matches.
+
+   That is worth a check rather than a note, because the failure is silent and
+   expensive: a developer agent reads the spec, builds to a value the code no
+   longer holds, and nobody finds out until it is on screen. Neither file is
+   wrong in that situation -- they just stopped being the same file, and no
+   human reads 162 tokens across two documents to notice.
+
+   One level of `var()` is resolved before comparing, because the code
+   legitimately aliases where the spec states a literal: `--sh: var(
+   --shadow-raised)` and `--sh: 0 6px 16px -4px rgba(0,0,0,.6)` are the same
+   shadow said two ways. Inline `style="--c: ..."` in the spec's own demo
+   markup is not a token and is not read -- only its <style> blocks are. */
+{
+    const specFile = join(ROOT, 'docs/design-system.html');
+    if (existsSync(specFile)) {
+        const html = readFileSync(specFile, 'utf8');
+        /* <style> blocks only. An inline style attribute in a demo is local
+           to that demo, not a declaration about the system. */
+        const styles = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
+        const tokensCss = readFileSync(join(ROOT, 'src/shared/theme/tokens.css'), 'utf8');
+
+        const declsOf = (css) => {
+            const out = new Map();
+            for (const m of css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/(--[a-z0-9-]+)\s*:\s*([^;}]+)/gi)) {
+                if (!out.has(m[1])) out.set(m[1], m[2].trim());
+            }
+            return out;
+        };
+        const deref = (map, v, depth = 0) => {
+            if (depth > 4) return v;
+            const m = /^var\(\s*(--[a-z0-9-]+)\s*\)$/i.exec(v.trim());
+            return m && map.has(m[1]) ? deref(map, map.get(m[1]), depth + 1) : v.trim();
+        };
+
+        const S = declsOf(styles);
+        const T = declsOf(tokensCss);
+        let compared = 0;
+        for (const [name, rawSpec] of S) {
+            if (!T.has(name)) continue;
+            compared++;
+            const a = deref(S, rawSpec).replace(/\s+/g, ' ');
+            const b = deref(T, T.get(name)).replace(/\s+/g, ' ');
+            if (a !== b) {
+                fail('spec-drift', `${name}: the specification says ${a}, the code says ${b}`
+                    + ' -- docs/design-system.html vs src/shared/theme/tokens.css');
+            }
+        }
+        if (!compared) {
+            fail('spec-drift', 'docs/design-system.html declares no token this check could compare'
+                + ' -- the check has stopped reading the specification, which is worse than a drift');
+        }
+    }
+}
+
+
+/* ---------------------------------------------------------------
+   19. Nothing hand-applies a shared control's class name.
+
+   `.btn` was written by hand at 45 call sites across 19 files, `.chip` at 8
+   and `.seg` at 3. That is the single mechanism behind most of C1 and C2: a
+   class name is not an owner. Nothing knew which cases existed, so the one
+   chip that added a close cross was the first to do so and had no way of
+   finding that out; the one segment that set `aria-pressed` without the `on`
+   class looked unselected for as long as it existed; and `.chip` had two
+   selected appearances in two layers that painted a third thing when both
+   were present.
+
+   Button.jsx, Chip.jsx and Segment.jsx now own that markup, so the class
+   names are theirs. A `className="btn"` written anywhere else is a 46th
+   definition of the button that no measurement in this repo can see, and it
+   is how the next case gets solved in one file and stays broken in the other
+   eighteen.
+
+   The components themselves are exempt -- they are where the class is
+   supposed to be written. A control's own name as a MODIFIER (`chips`,
+   `pchip`, `fchip`, `filterbtn`) is a different class and is not matched. */
+{
+    const OWNED = {
+        btn: 'shared/ui/Button.jsx  -- <Button variant="quiet|ghost" size="lg" block busy as={Link}>',
+        chip: 'shared/ui/Chip.jsx   -- <Chip selected count onRemove> / <RemovableChip>',
+        seg: 'shared/ui/Segment.jsx -- <Segment selected tone>',
+    };
+    const OWNERS = ['shared/ui/Button.jsx', 'shared/ui/Chip.jsx', 'shared/ui/Segment.jsx'];
+
+    for (const f of jsx) {
+        const rel = relative(ROOT, f);
+        if (OWNERS.some((o) => rel.endsWith(o))) continue;
+        const src = readFileSync(f, 'utf8');
+        const lines = src.split('\n');
+        lines.forEach((line, i) => {
+            /* Only a className. A `.btn` inside a comment or a selector string
+               is prose, not markup. */
+            for (const m of line.matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\}|\{[^}]*?['"]([^'"]*)['"])/g)) {
+                const classes = (m[1] || m[2] || m[3] || '')
+                    .replace(/\$\{[^}]*\}/g, ' ').split(/\s+/).filter(Boolean);
+                for (const c of classes) {
+                    if (OWNED[c]) {
+                        fail('owned-class', `${rel}:${i + 1}: className has "${c}" by hand -- use ${OWNED[c]}`);
+                    }
+                }
+            }
+        });
+    }
+    /* A check that cannot see the thing it forbids passes forever. Three
+       checks in this repo have already done exactly that (C7.7), so this one
+       states what it managed to read. */
+    const owners = jsx.filter((f) => OWNERS.some((o) => relative(ROOT, f).endsWith(o)));
+    if (owners.length !== OWNERS.length) {
+        fail('owned-class', `expected ${OWNERS.length} component files to own these classes, found ${owners.length}`
+            + ' -- the component layer has moved and this check is looking at nothing');
+    }
+}
+
+
+/* ---------------------------------------------------------------
+   20. The toast is mounted once, and raised one way.
+
+   SH15 says there is exactly one toast and the shell owns it, because the
+   same action reporting differently depending on where it was done is how one
+   piece of furniture owned by two modules comes to mean two things.
+   `ToastProvider` was built to settle that -- and then Library and Title went
+   on rendering their own, so three <Toast> elements were mounted at once.
+
+   They do not queue. `.toast` is `position: fixed` at one coordinate:
+   measured, two of them land in the same 358x48 box at (16, 732) on a 390px
+   screen, with the same `--z-toast`. So the later one in the DOM is drawn
+   over the earlier, and `elementFromPoint` at the centre returns the later
+   one -- the provider's, because it renders after its children. You read one
+   message and your tap undid the other action.
+
+   Library also spelled the action `undo:` where everything else said
+   `actionLabel` + `onAction`, translated at its own call site. Two spellings
+   for one prop, which is the C6.3 defect one level up: a prop contract that
+   nothing enforces.
+
+   So: one mount point, and every other screen goes through `useToast`. */
+{
+    const PROVIDER = 'app/ToastProvider.jsx';
+    const mounts = [];
+    for (const f of jsx) {
+        const rel = relative(ROOT, f);
+        const src = readFileSync(f, 'utf8')
+            .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+        src.split('\n').forEach((line, i) => {
+            /* Not `[\s/>]` -- `<Toast` is the whole line where the props are
+               indented below it, so there is no following character to match.
+               The first draft used that and found nothing; the "counting
+               nothing" guard below is what caught it on the first run. */
+            if (/<Toast(?![A-Za-z])/.test(line)) mounts.push({ rel, line: i + 1 });
+        });
+        /* The old spelling, wherever a toast is raised. */
+        for (const m of src.matchAll(/\bundo\s*:/g)) {
+            const line = src.slice(0, m.index).split('\n').length;
+            fail('one-toast', `${rel}:${line}: a toast raised with \`undo:\``
+                + ' -- Toast reads `actionLabel` and `onAction`, so this renders a dismiss cross');
+        }
+    }
+    for (const m of mounts) {
+        if (!m.rel.endsWith(PROVIDER)) {
+            fail('one-toast', `${m.rel}:${m.line}: a second <Toast> is mounted here`
+                + ` -- there is one, in ${PROVIDER}; raise this through useToast()`);
+        }
+    }
+    /* A check that cannot find the thing it counts passes forever (C7.7). */
+    if (!mounts.some((m) => m.rel.endsWith(PROVIDER))) {
+        fail('one-toast', `no <Toast> found in ${PROVIDER}`
+            + ' -- the shell has stopped mounting one, and this check is counting nothing');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
+
 
 const CHECKS = [
     ['undefined-class', 'Every class in the markup has a CSS rule'],
@@ -503,6 +831,10 @@ const CHECKS = [
     ['icon-component', 'An icon is a component, never a character'],
     ['component-import', 'A component used is a component imported'],
     ['icon-name', 'An icon names a role the set actually has'],
+    ['icon-row', 'An icon beside content sits in a row that was declared'],
+    ['spec-drift', 'The specification and the code agree on every token'],
+    ['owned-class', 'A shared control\'s class is written by its component, not by hand'],
+    ['one-toast', 'One toast, mounted by the shell, raised one way'],
 ];
 
 let failed = 0;

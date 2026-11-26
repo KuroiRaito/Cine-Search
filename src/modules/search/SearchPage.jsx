@@ -3,7 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { search } from './lib/index.js';
 import { fromItem } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
-import { Tile, Skeleton, Empty, ErrorBox, Icon } from '../../shared/ui/index.js';
+import { Tile, Skeleton, Empty, ErrorBox, Icon, Chip, RemovableChip, Button} from '../../shared/ui/index.js';
 import {
     discoverMovies, discoverTV, genres as fetchGenres, providerList,
 } from '../../shared/tmdb/endpoints.js';
@@ -157,9 +157,10 @@ export default function SearchPage() {
                 No facet row, no chips, nothing to read. */}
             {!q.trim() && (
                 <div className="pad">
-                    <button
-                        type="button"
-                        className="btn quiet filterbtn"
+                    <Button
+                        variant="quiet"
+                        className="filterbtn"
+
                         aria-expanded={open}
                         onClick={() => setOpen((v) => !v)}
                     >
@@ -168,7 +169,7 @@ export default function SearchPage() {
                         {/* The button carries the active count so a closed
                             panel never conceals a constraint. */}
                         {activeCount(live) > 0 && <em>{activeCount(live)}</em>}
-                    </button>
+                    </Button>
                 </div>
             )}
 
@@ -255,7 +256,7 @@ export default function SearchPage() {
                         <p className="said-ask">
                             That reads like a kind of thing rather than a name.
                             <span className="saidchips">
-                                {said.chips.map((c) => <span className="chip" key={c.kind}>{c.label}</span>)}
+                                {said.chips.map((c) => <Chip as="span" key={c.kind}>{c.label}</Chip>)}
                             </span>
                         </p>
                     )}
@@ -266,7 +267,7 @@ export default function SearchPage() {
                         <p className="nothing-why">We search names, not plots.</p>
                     )}
 
-                    <Link className="btn quiet" to="/">Browse instead</Link>
+                    <Button as={Link} variant="quiet" to="/">Browse instead</Button>
                 </div>
             )}
 
@@ -328,17 +329,17 @@ function ChipRow({ facets, vocab, notice, onChange }) {
             {notice && <p className="dropped">{notice}, so it came off.</p>}
             <div className="chips">
                 {chips.map((c) => (
-                    <button key={c.key} type="button" className="chip on" onClick={() => onChange({ ...facets, ...c.off })}>
-                        {c.label}<Icon name="close" size={16} />
-                    </button>
+                    <RemovableChip
+                        key={c.key}
+                        label={c.label}
+                        onRemove={() => onChange({ ...facets, ...c.off })}
+                    />
                 ))}
                 {/* Past two, one control takes them all off. */}
                 {chips.length > 2 && (
-                    <button
-                        type="button"
-                        className="chip"
+                    <Chip
                         onClick={() => onChange(chips.reduce((f, c) => ({ ...f, ...c.off }), facets))}
-                    >Clear all</button>
+                    >Clear all</Chip>
                 )}
             </div>
         </>
@@ -442,7 +443,7 @@ function BrowseResults({ state, facets, vocab, page, onPage, onSort, lib, onAdd,
             {/* FB5 — Load more retires at TMDB's own last page. Not an error. */}
             {data && rows.length > 0 && (
                 canLoadMore(page, data.totalPages)
-                    ? <div className="pad"><button type="button" className="btn quiet" onClick={() => onPage(page + 1)}>Load more</button></div>
+                    ? <div className="pad"><Button variant="quiet" onClick={() => onPage(page + 1)}>Load more</Button></div>
                     : page >= 500 && <p className="dropped">That is as deep as TMDB goes — narrow it.</p>
             )}
         </>

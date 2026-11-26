@@ -86,6 +86,7 @@
   font-size: var(--text-body); line-height: var(--lh-body);
 }
 .lfind-in::placeholder { color: var(--faint); }
+.lfind:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
 /* The UA's own clear button is a second, differently-shaped affordance beside
    ours, at a size the 44-pixel law would not allow. */
 .lfind-in::-webkit-search-cancel-button { display: none; }
@@ -160,6 +161,11 @@
   border-bottom: var(--border-hair) solid var(--bd-sub);
 }
 .crow:last-child { border-bottom: 0; }
+/* Two targets in one row -- the body opens the title, the button marks an
+   episode -- so the row gives the zone and the link gives the precision.
+   .srow above already works this way. */
+.crow:hover { background: var(--surface-hv); }
+.cbody:hover { color: var(--acc-t); }
 
 /* The status, kept as colour rather than dropped with the artwork. */
 .cstripe {

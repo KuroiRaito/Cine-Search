@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Skeleton, Empty, initialsOf } from '../../shared/ui/index.js';
+import { Skeleton, Empty, initialsOf, Button} from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from '../library';
 import { useAsync } from '../../shared/hooks/useAsync.js';
@@ -79,8 +79,8 @@ export default function You() {
                     body="Your taste is worked out from what you’ve watched and rated — and only ever shown to you."
                     action={(
                         <div className="guest-actions">
-                            <Link className="btn" to="/welcome/signup" state={{ from: '/you' }}>Create an account</Link>
-                            <Link className="btn quiet" to="/welcome/signin" state={{ from: '/you' }}>Sign in</Link>
+                            <Button as={Link} to="/welcome/signup" state={{ from: '/you' }}>Create an account</Button>
+                            <Button as={Link} variant="quiet" to="/welcome/signin" state={{ from: '/you' }}>Sign in</Button>
                         </div>
                     )}
                 />
@@ -118,7 +118,7 @@ export default function You() {
                 <Empty
                     title="Couldn’t work out your taste"
                     body="Your records are safe — this screen just couldn’t reach them."
-                    action={<button type="button" className="btn" onClick={retry}>Try again</button>}
+                    action={<Button onClick={retry}>Try again</Button>}
                 />
             </div>
         );
@@ -137,7 +137,7 @@ export default function You() {
                 <Empty
                     title="Nothing watched yet"
                     body="Mark something watched and this fills in — genres, decades and the people whose work you keep coming back to."
-                    action={<Link className="btn" to="/">Find something to watch</Link>}
+                    action={<Button as={Link} to="/">Find something to watch</Button>}
                 />
             </div>
         );

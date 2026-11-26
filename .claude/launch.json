@@ -7,6 +7,15 @@
       "runtimeArgs": ["run", "dev"],
       "port": 5174,
       "autoPort": true
+    },
+    {
+      "name": "ds-previews",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": [
+        "-c",
+        "cd /private/tmp/claude-501/-Users-raman-Documents-Cine-Search--claude-worktrees-design-system-exploration-c125fd/d38d098a-5267-4700-8af8-9d2e5063dc7f/scratchpad/ds && exec python3 -m http.server 8731 --bind 127.0.0.1"
+      ],
+      "port": 8731
     }
   ]
 }

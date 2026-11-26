@@ -130,9 +130,11 @@
 .cover-cta { display: flex; flex-direction: column; gap: var(--space-8); }
 
 /* The only place --control-lg appears in the product. */
-.btn-lg { width: 100%; height: var(--control-lg); padding: 0 var(--space-20); font-size: var(--text-body); }
-.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 var(--border-hair) var(--bd-str); }
-.btn.ghost:hover { background: var(--surface-hv); filter: none; }
+/* `.btn-lg` and `.btn.ghost` were declared here -- a module restyling a
+   shared control, which is the C5.2 rule. Both are variants OF the button,
+   so they now live with the button in ui.css. The cover is still the only
+   screen that uses them; where a variant is used is not where it is
+   declared. */
 
 /* A real, visible action — the whole point of this persona is browsing before
    committing, and burying the skip loses them at the door. */
@@ -255,5 +257,8 @@
 
 /* Artwork has no theme: the control over the poster keeps its own dark
    ground and white glyph in both. */
-.cover-theme .circ { background: rgba(4, 6, 12, .55); backdrop-filter: blur(6px); color: #fff; }
-.cover-theme .circ:hover { background: rgba(4, 6, 12, .72); color: #fff; }
+.cover-theme .circ {
+  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+}
+.cover-theme .circ:hover { background: var(--glass-hv); color: var(--on-glass); }

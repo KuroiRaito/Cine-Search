@@ -10,6 +10,26 @@
 .rail::-webkit-scrollbar { height: 0; }
 .rail > * { flex: 0 0 auto; }
 
+/* ---------------- hover ----------------
+
+   19 controls styled no hover at all. The product has three conventions for
+   it already and they cover everything; none of this is a new idea, it is
+   the existing three applied to the controls that were skipped:
+
+     muted furniture   ->  color: var(--text)
+     a surface         ->  background: var(--surface-hv)
+     filled or artwork ->  filter: brightness(1.0x)
+
+   Accent text had no convention because nothing had ever needed one, so
+   --acc-t-hv was added for it: one step up the beam ramp, which inverts
+   with the theme the way every other pair on that ramp does. */
+/* Every poster in the product was inert under the pointer. The lift is on
+   the art rather than the whole card: brightness on a card brightens its
+   label too, which in light mode means dark text on its way to grey. */
+.tile .art { transition: filter var(--dur-fast) var(--ease-out); }
+.tile:hover .art { filter: brightness(1.08); }
+.tile:hover .name { color: var(--acc-t); }
+
 .tile { width: var(--tile-w); }
 
 /* Rails show about two and a half posters. The artwork is the thing being
@@ -44,8 +64,8 @@
   width: var(--icon-24); height: var(--icon-24);
   border-radius: var(--radius-full); border: 0; cursor: pointer;
   display: grid; place-items: center; line-height: 1; font-weight: 500;
-  color: #fff; background: rgba(8, 12, 20, .62); backdrop-filter: blur(6px);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+  color: var(--on-glass); background: var(--glass); backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
   transition: background .13s, color .13s, box-shadow .13s;
 }
 .quickadd:hover { background: var(--acc); color: var(--on-acc); box-shadow: none; }
@@ -53,11 +73,38 @@
    pseudo-element rather than by growing the visible box. 24 + 2×10 = 44. */
 .quickadd::after { content: ""; position: absolute; inset: calc(var(--space-8) * -1 - var(--space-2)); }
 
+/* A star and a number, and the star must sit beside the number rather than on
+   top of it. `.icon` is `display:block`, so without a flex context here the
+   number was pushed into a block of its own and the badge stood 36px tall over
+   the poster instead of 20. `flex` rather than `inline-flex` because the badge
+   is already out of flow -- an absolutely positioned box blockifies either way,
+   and saying `flex` is saying what it computes to. The JSX writes a space
+   between the two; a whitespace-only flex item is not rendered, so the 4px is
+   `gap`'s and nothing depends on a space surviving a refactor. */
 .score-badge {
-  position: absolute; left: var(--space-4); bottom: var(--space-4);
-  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600; color: var(--mar-9);
-  background: rgba(4,6,12,.68); padding: var(--space-2) var(--space-4); border-radius: var(--radius-4);
+  position: absolute; left: var(--space-8); bottom: var(--space-8);
+  display: flex; align-items: center; gap: var(--space-4);
+  font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 600;
+  /* The number is data and reads white; the star is the mark that says what
+     kind of number it is, and only the star carries the rating colour. Both
+     in amber made the pair read as a warning sticker rather than a score. */
+  color: var(--on-glass);
+  background: var(--glass); backdrop-filter: var(--glass-blur);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+  /* Asymmetric: a star has visual air on its left that a digit does not, so
+     equal padding sits it too far in. */
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
   font-variant-numeric: tabular-nums;
+}
+/* A 16px outline star against 11px digits is half again as tall as the thing
+   it annotates, and lucide's 2px stroke blunts the points at that size, so it
+   read as a cheap glyph. 12px matches the digits' height -- the size the
+   episode row had already arrived at by hand -- and filling it drops the
+   stroke's weight out of the silhouette entirely. */
+.score-badge svg {
+  width: var(--icon-12); height: var(--icon-12);
+  color: var(--rate); fill: currentColor; stroke-width: 1.5;
 }
 
 .grid {
@@ -145,7 +192,7 @@
   bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); z-index: var(--z-toast);
   width: calc(100% - (var(--gutter) * 2)); max-width: var(--form-max);
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
-  background: var(--ink-5); border-radius: var(--radius-12); padding: var(--space-12);
+  background: var(--raised); border-radius: var(--radius-12); padding: var(--space-12);
   font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--text); box-shadow: var(--sh);
 }
 .toast button {
@@ -165,11 +212,17 @@
   background: var(--stl); color: var(--bg);
   box-shadow: none; cursor: default; backdrop-filter: none;
 }
-.quickadd.saved:hover { background: var(--stl); color: var(--bg); }
+/* This rule existed and did nothing. It sets `background`, and the .st-*
+   tone class that carries the watch-state colour sets `background` too at
+   the same specificity and later in the file, so the hover always lost.
+   `filter` is not a property any tone class sets, so it survives all six
+   of them without the rule having to know which one is on. */
+.quickadd.saved:hover { filter: brightness(1.12); }
 
 /* A control that navigates within the screen rather than to a URL. It reads as
    a link because that is what it does; it is a button because there is nothing
    to link to. */
+.linkish:hover { color: var(--acc-t-hv); }
 .linkish {
   background: none; border: 0; padding: 0; cursor: pointer;
   font-family: var(--f-s); font-weight: 600; color: var(--acc-t);
@@ -187,6 +240,51 @@
 /* ---- Controls and state tones used on more than one screen. The six
         watch-state hues carry a tone into whatever they are applied to:
         a pill, a segment, a chip, a library row. ---- */
+
+/* ---------------- the button ----------------
+
+   The most reused control in the product: 45 call sites across 19 files
+   before `Button.jsx` took ownership of the markup. It was declared in three
+   different layers -- the base in `src/app/shell.css` (journeys), and
+   `.btn-lg` and `.btn.ghost` in `src/modules/entry/entry.css` (one module) --
+   so the full set of appearances it could produce was not written down
+   anywhere. Collected here, where a control used by more than one module
+   belongs, because `Button` can emit every one of them from any screen.
+
+   A button and an input are the same object to the eye when stacked, so they
+   share a height and a radius. This is what removes the 1px drift that was
+   visible on the sign-up form. */
+.btn {
+  font-family: var(--f-s);
+  font-size: var(--text-label); line-height: var(--lh-label); font-weight: 600;
+  height: var(--control-h); padding: 0 var(--space-16);
+  border-radius: var(--radius-control); border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
+  background: var(--acc); color: var(--on-acc);
+  box-shadow: inset 0 1px 0 var(--hl);
+  transition: filter var(--dur-fast) var(--ease-out);
+}
+.btn:hover { filter: brightness(1.06); }
+.btn:disabled { opacity: .55; cursor: not-allowed; filter: none; }
+.btn.quiet { background: var(--surface-hv); color: var(--text); box-shadow: none; }
+.btn.quiet:hover { background: var(--ink-5); filter: none; }
+.btn.block { width: 100%; }
+/* `size="lg"`. Unprefixed, as it was in entry.css, because the specificity
+   is what lets it raise the height past the base rule. */
+.btn-lg { width: 100%; height: var(--control-lg); padding: 0 var(--space-20); font-size: var(--text-body); }
+/* `variant="ghost"`. The second action on a screen whose first action is the
+   whole point -- it has to be reachable without competing. */
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 var(--border-hair) var(--bd-str); }
+.btn.ghost:hover { background: var(--surface-hv); filter: none; }
+/* `busy`. The gap where the sign-in button or the username will go, once the
+   session question has an answer. Holding the space is the difference between
+   a bar that is thinking and a bar that jumps. Must stay after `.btn.quiet`:
+   it is 0,3,0 against 0,2,0 and wins on specificity, but the background and
+   box-shadow it overrides are declared there. */
+.btn.quiet.is-waiting {
+  display: inline-block; min-width: var(--space-64); height: var(--control-sm);
+  background: var(--surface); box-shadow: none; pointer-events: none;
+}
 
 .ibtn {
   width: var(--control-h); min-height: var(--control-h); border: 0; background: var(--ink-4); color: var(--muted);
@@ -206,25 +304,75 @@
    carrying 12.5px, 13px and a 99px radius. */
 .chips { display: flex; gap: var(--space-8); overflow-x: auto; padding: var(--space-12) var(--gutter) 0; scrollbar-width: none; }
 .chips::-webkit-scrollbar { height: 0; }
+/* A collection with nothing in it is still a box with padding. SearchPage
+   renders `<div className="chips">` whether or not any filter is on, so with
+   none the results sat under 12px of nothing -- and applying the first filter
+   shoved them down by the height of a chip. Collapsing the empty case here
+   rather than at each call site means it is true of every instance, including
+   the ones nobody has written yet.
+
+   `:empty` is exact: it matches an element with no children AND no text, so a
+   collection holding a single chip is untouched. It is not an empty STATE --
+   `.empty` is a component somebody renders on purpose, and this is only the
+   container getting out of the way. */
+.chips:empty, .rail:empty, .grid:empty { display: none; }
+/* `display` is load-bearing, not decoration. A chip carries a label and, in
+   two places, something after it: a count in <em>, or the close cross that
+   takes the filter off. `.icon` is `display:block` (one line down, so every
+   icon has a predictable box), and a block child inside a block parent puts
+   the label in an anonymous block of its own -- so the cross landed on a
+   second line and the chip grew from 32px to 48px the moment you applied a
+   filter. `search.css` tried to answer that with `vertical-align: middle`,
+   which is inert against a block box and had never done anything.
+   `inline-flex` is what the rule needed in the first place, and it is what
+   `.sw` below and `.morefilters` already use. `inline-` rather than `flex`
+   because a chip is also used inline, in the sentence the search results
+   print back; as a child of `.chips` it blockifies to `flex` anyway.
+   `gap` owns the spacing from here -- one mechanism, not a margin per child. */
 .chip {
   flex: 0 0 auto; font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 500;
   padding: var(--space-8) var(--space-12); border-radius: var(--radius-full); border: 0; cursor: pointer;
   background: var(--ink-3); color: var(--muted); white-space: nowrap;
+  display: inline-flex; align-items: center; gap: var(--space-4);
   transition: background .12s, color .12s;
 }
-.chip em { font-style: normal; opacity: .5; margin-left: var(--space-4); font-variant-numeric: tabular-nums; }
+/* `as={Link}` makes a chip a link, and a link is underlined. Discover
+   stripped that from its own row (`.chips.presets .chip`), which meant
+   the next module to render a chip as a link would have had to discover
+   the same thing. A chip is a pill in every layer, so it says so here. */
+.chip { text-decoration: none; }
+.chip em { font-style: normal; opacity: .5; font-variant-numeric: tabular-nums; }
 .chip:hover { background: var(--ink-4); color: var(--text); }
 .chip[aria-pressed="true"] { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
 .chip[aria-pressed="true"] em { opacity: .65; }
+/* The chip has TWO selected looks, and they are two different ideas:
+   `aria-pressed` is a filter option you turned ON -- it fills solid, because
+   it is the thing you just did. `.applied` is a filter already in force in
+   the row above the results, which you can take OFF -- it is a record, so it
+   tints rather than shouts.
+
+   They lived in two layers and were measured to collide: both are 0,2,0, so
+   which one won was decided by CSS chunk order, and an element carrying both
+   painted as neither (the tint, plus the solid look's inset highlight). One
+   prop per role in Chip.jsx now makes writing both unreachable; this is the
+   half that used to be `.chip.on` in search.css. */
+.chip.applied { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+/* The cross is quieter than the label: you read what the filter IS first,
+   then that you can drop it. Position is not this rule's business -- `.chip`
+   is a flex line and owns both the alignment and the 4px gap. This rule used
+   to carry `vertical-align: middle` and a margin, which could not work
+   against a block-level icon and did not. */
+.chip.applied svg { opacity: .7; }
 
 .sw {
   flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
   font-weight: 500; padding: 0 var(--space-12);
-  min-height: var(--control-sm); display: inline-flex; align-items: center;
+  min-height: var(--control-sm); display: inline-flex; align-items: center; gap: var(--space-4);
   border-radius: var(--radius-8); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
-.sw em { font-style: normal; opacity: .55; margin-left: var(--space-4); font-size: var(--text-micro); line-height: var(--lh-micro); }
+.sw:hover { background: var(--surface-hv); color: var(--text); }
+.sw em { font-style: normal; opacity: .55; font-size: var(--text-micro); line-height: var(--lh-micro); }
 .sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--acc-bd); }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
@@ -274,7 +422,15 @@
   transition: box-shadow var(--dur-fast) var(--ease-out);
 }
 .searchbox::placeholder { color: var(--faint); }
-.searchbox:focus { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
+/* `:focus-visible`, not `:focus` -- for one spelling across the system, not
+   for a change in behaviour. Measured: a text field matches `:focus-visible`
+   on a mouse click too, because the browser assumes somebody who clicks into
+   a field is about to type. So this ring appears exactly when it did before,
+   and that is right: a focused text field should say so however it was
+   reached. The spelling still matters, because the next person to copy this
+   rule onto a button would have copied a ring that sticks after a click. */
+.searchbox:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
+.searchbox:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .searchbox[aria-invalid="true"] { box-shadow: inset 0 0 0 var(--border-focus) var(--st-drop-9); }
 /* Notes are the one multi-line field, so it is the one that may grow. */
 textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--space-12) var(--space-16); line-height: var(--lh-body); }
@@ -318,7 +474,10 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
      is 460px wide. --sheet-pad is its one number, and it lives in tokens.css
      with the rest of the role layer. */
   width: 100%; max-width: 460px;
-  background: var(--bg-sub); border-top: var(--border-hair) solid var(--bd);
+  /* `--raised`, not `--bg-sub`: a sheet floats over the page, and --bg-sub is
+     DARKER than the page in the light theme (L .939 against .974) while
+     --shadow-sheet below draws a shadow under it. Lighter in both themes now. */
+  background: var(--raised); border-top: var(--border-hair) solid var(--bd);
   border-radius: var(--radius-16) var(--radius-16) 0 0;
   padding: var(--space-12) var(--sheet-pad) max(var(--sheet-pad), env(safe-area-inset-bottom));
   box-shadow: var(--shadow-sheet);
@@ -396,7 +555,8 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-family: var(--f-s); transition: box-shadow .12s;
 }
 .inp:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
-.inp:focus { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
+.inp:disabled { background: var(--bg-sub); color: var(--faint); cursor: not-allowed; }
+.inp:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .inp.dim { color: var(--muted); }
 .hint { font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-4); }
 /* ---------------- settings blocks ----------------
@@ -424,6 +584,8 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-weight: 600; cursor: pointer; transition: filter .12s;
 }
 .del:hover { filter: brightness(1.1); }
+/* It can be disabled -- Picker renders it so -- and said nothing about it. */
+.del:disabled { opacity: .55; cursor: not-allowed; filter: none; }
 .del-confirm { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); margin-bottom: var(--space-8); }
 .del-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
 
@@ -595,6 +757,9 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-weight: 600; color: var(--muted); cursor: pointer;
 }
 .pw-peek:hover { color: var(--text); background: var(--surface-hv); }
+/* It is a toggle -- the password is showing or it is not -- and it drew the
+   same either way, so the only way to know was to look at the field. */
+.pw-peek[aria-pressed="true"] { color: var(--acc-t); background: var(--acc-bg); }
 
 /* Requirements you watch yourself meet, rather than a rule read out after you
    have already failed it. */

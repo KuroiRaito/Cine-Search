@@ -6,14 +6,23 @@ on:
   pull_request:
     branches: [ main, master ]
 
-# What belongs in the merge gate: checks that are fast and that catch a
-# regression a reviewer would not see. Measured on 25 Nov 2026 — the whole set
-# below is about four seconds of work, against an npm ci that takes thirty.
+# What belongs in the merge gate: checks that catch a regression a reviewer
+# would not see. Two blocks, cheapest first, because a failure should report in
+# seconds rather than after a browser download.
+#
+#   source      verify · lint · find · cohorts · build · test:api
+#               ~4s in total, measured 25 Nov 2026, against an npm ci that
+#               takes thirty. Reads the code; needs no browser, no network and
+#               no credentials.
+#
+#   measured    gallery · gallery:audit · states
+#               Renders the real controls and reads the boxes. Needs Chromium,
+#               so it runs last.
 #
 # Deliberately NOT here:
-#   npm run auth      38 session cases · 80s + a browser download. Real cost on
-#                     every merge, and sessions change rarely. Run it before a
-#                     release, and after anything touching auth or the shell.
+#   npm run auth      38 session cases · 80s + a browser download. A real cost
+#                     on every merge, and sessions change rarely. Run it before
+#                     a release, and after anything touching auth or the shell.
 #   npm run snap      72 screens · 3-4 min. Once before a PR, by hand.
 jobs:
   build:
@@ -28,7 +37,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      # Cheapest first, so an obvious break reports in seconds.
+      # ---- source: reads the code, needs no browser ----
       - name: Verify design system
         run: npm run verify
       # 2.5s, and it has already earned its place: an anchored edit once clipped
@@ -36,15 +45,39 @@ jobs:
       # Browse dead on arrival. Lint caught it before anything ran.
       - name: Lint
         run: npm run lint
-
-      # The behavioural rules. Both are pure logic — no network, no browser, no
-      # credentials — so they cost nothing and were only ever run by hand.
+      # Pure logic, so they cost nothing and were only ever run by hand.
       - name: Search rules
         run: npm run find
       - name: Title cohorts
         run: npm run cohorts
-
       - name: Build Project
         run: npm run build
       - name: Smoke-test serverless API
         run: npm run test:api
+
+      # ---- measured: renders the real controls and reads the boxes ----
+      #
+      # These were the whole point of the gallery and they were not gated, so
+      # for a month the only thing standing between a measured bug and main was
+      # somebody remembering to type `npm run check`. All three of the bugs that
+      # reached production this month are caught here and by nothing above: a
+      # glyph off-centre, a control taller than the one line it declares, and an
+      # item whose size changes with the count.
+      #
+      # Last, because Chromium is the slowest thing in this file and nothing
+      # below depends on it.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Regenerate the as-built gallery
+        run: npm run gallery
+      # docs/as-built.html is generated and committed. If regenerating it moves
+      # it, the committed copy was stale -- which is how a gallery stops
+      # describing the product and starts being decoration.
+      - name: The committed gallery matches the code
+        run: git diff --exit-code docs/as-built.html
+      - name: Measure the rendered controls
+        run: npm run gallery:audit
+      # In CI for its table, but it blocks nothing: which coverage gaps matter
+      # is a product call, not a machine's. See CLAUDE.md.
+      - name: State coverage table
+        run: npm run states

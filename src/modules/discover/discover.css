@@ -55,4 +55,3 @@
 /* A chip row, not a rail. Position 2 for everybody today — the library-aware
    reorder is the rails work, not this. */
 .chips.presets { padding-top: var(--space-16); }
-.chips.presets .chip { text-decoration: none; }

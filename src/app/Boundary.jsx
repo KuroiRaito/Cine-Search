@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '../shared/ui/index.js';
 
 /**
  * A failure is contained by the smallest thing that can contain it.
@@ -63,12 +64,11 @@ export default class Boundary extends Component {
                     before it is asked. */}
                 <p>Nothing you saved is affected.</p>
                 <div className="broke-do">
-                    <button
-                        type="button"
-                        className="btn"
+                    <Button
+
                         onClick={() => this.setState({ error: null, id: null })}
-                    >Try again</button>
-                    <Link className="btn quiet" to="/">Go to Discover</Link>
+                    >Try again</Button>
+                    <Button as={Link} variant="quiet" to="/">Go to Discover</Button>
                 </div>
                 {/* Never the stack. A stack trace on screen tells a person
                     nothing, and tells them loudly. */}
@@ -88,7 +88,7 @@ function AppDead({ id }) {
             <h1>Bingecon stopped working.</h1>
             <p>Nothing you saved is affected.</p>
             <div className="broke-do">
-                <button type="button" className="btn" onClick={() => window.location.assign('/')}>Reload</button>
+                <Button onClick={() => window.location.assign('/')}>Reload</Button>
             </div>
             <p className="broke-id">{id}</p>
         </div>

@@ -3,6 +3,7 @@ import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { backdropUrl, posterUrl } from '../../shared/tmdb/view.js';
 import { COLOURS, colourClass, bannerOf, avatarOf, joinedOn, identityProblem, BIO_MAX, NAME_MAX } from './identity.js';
 import './profile.css';
+import { Button } from '../../shared/ui/index.js';
 
 /**
  * The band above everything: banner, face, name, handle, bio.
@@ -148,9 +149,9 @@ function EditIdentity({ onClose }) {
 
                 {fail && <p className="form-error" role="alert"><span>{fail}</span></p>}
 
-                <button type="submit" className="btn block" disabled={busy || Boolean(problem)}>
+                <Button block type="submit" disabled={busy || Boolean(problem)}>
                     {busy ? 'Saving…' : fail ? 'Try again' : 'Save'}
-                </button>
+                </Button>
             </form>
         </Sheet>
     );

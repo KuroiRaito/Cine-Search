@@ -1,6 +1,7 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Poster, Tile, Skeleton, Empty, Toast, Icon, Chip, Button} from '../../shared/ui/index.js';
+import { Poster, Tile, Skeleton, Empty, Icon, Chip, Button } from '../../shared/ui/index.js';
+import { useToast } from '../../app/ToastProvider.jsx';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from './LibraryProvider.jsx';
 import {
@@ -40,7 +41,12 @@ export default function Library() {
     const { isSignedIn, authReady } = useAuth();
     const lib = useLibrary();
     const [filter, setFilter] = useState(null);
-    const [toast, setToast] = useState(null);
+    /* SH15 -- one toast, owned by the shell. This screen rendered its own,
+       and it also spelled the action differently: `undo:` here against
+       `actionLabel`/`onAction` everywhere else, translated at the call site.
+       Two spellings for one prop is the same defect the component layer just
+       removed from `.chip` and `.seg`, one level up. */
+    const { notify: setToast } = useToast();
     const [term, setTerm] = useState('');
     /* Remembered per shelf, not globally: sorting Watched by rating must not
        reorder Watching the next time it is opened. Six shelves, six memories —
@@ -187,7 +193,8 @@ export default function Library() {
         if (ok) {
             setToast({
                 message: `${row.title} · ${epLabel(row.next)} watched`,
-                undo: () => lib.setEpisodes({ id: row.id, mediaType: 'tv' }, row.next.season, row.watched[key] ?? []),
+                actionLabel: 'Undo',
+                onAction: () => lib.setEpisodes({ id: row.id, mediaType: 'tv' }, row.next.season, row.watched[key] ?? []),
             });
         }
     };
@@ -320,12 +327,6 @@ export default function Library() {
                 />
             )}
 
-            <Toast
-                message={toast?.message}
-                actionLabel={toast?.undo ? 'Undo' : undefined}
-                onAction={() => { toast?.undo?.(); setToast(null); }}
-                onDismiss={() => setToast(null)}
-            />
         </div>
     );
 }

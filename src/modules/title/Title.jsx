@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './title.css';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { titleFull, season as fetchSeason, collection as fetchCollection } from '../../shared/tmdb/endpoints.js';
@@ -6,7 +6,8 @@ import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { wikiSummary } from '../../shared/wiki/wiki.js';
 import { useRegion } from '../../shared/hooks/RegionProvider.jsx';
-import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, Icon, initialsOf, Button} from '../../shared/ui/index.js';
+import { Poster, Tile, PersonRow, ErrorBox, Empty, Icon, initialsOf, Button} from '../../shared/ui/index.js';
+import { useToast } from '../../app/ToastProvider.jsx';
 import { TitleSkeleton } from './TitleSkeleton.jsx';
 import { SignInPrompt } from '../entry';
 import { Editor } from '../library';
@@ -84,8 +85,14 @@ export default function Title() {
     const [playing, setPlaying] = useState(false);
     const [prompt, setPrompt] = useState(null);
     const [editing, setEditing] = useState(false);
-    const [toast, setToast] = useState(null);
-    const dismissToast = useCallback(() => setToast(null), []);
+    /* SH15 -- there is exactly one toast and the shell owns it. This screen
+       used to render its own, which meant two <Toast> elements could carry a
+       message at the same moment. `.toast` is `position: fixed` at one
+       coordinate, so they do not queue: measured, both land in the same
+       358x48 box at (16, 732), and a tap at the centre hits whichever is
+       later in the DOM -- the shell's, because the provider renders after
+       its children. You read one message and undid the other action. */
+    const { notify: setToast } = useToast();
     const { isSignedIn, authReady } = useAuth();
     const lib = useLibrary();
     const stateFor = useTileStates();
@@ -213,7 +220,17 @@ export default function Title() {
         for a single tap. */
     const markSeason = async (season, numbers, on) => {
         const ok = await lib.setEpisodes(t, season, on ? numbers : []);
-        if (ok) setToast({ message: on ? `Season ${season} marked watched` : `Season ${season} cleared` });
+        if (!ok) return;
+        if (on) { setToast({ message: `Season ${season} marked watched` }); return; }
+        /* Clearing a season throws away every tick in it, and the toast used
+           to offer a dismiss cross -- the one shape of message that must
+           carry a way back was the one that did not. `numbers` is the season
+           as it was, so undo is the same call with the list restored. */
+        setToast({
+            message: `Season ${season} cleared`,
+            actionLabel: 'Undo',
+            onAction: () => lib.setEpisodes(t, season, numbers),
+        });
     };
     const toggle = (key) => setOpenCard((c) => (c === key ? null : key));
     const makers = t.crew.filter((c) => c.job === 'Director' || c.job === 'Creator');
@@ -616,12 +633,6 @@ export default function Title() {
             )}
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
             {editing && <Editor title={t} onClose={() => setEditing(false)} />}
-            <Toast
-                message={toast?.message}
-                actionLabel={toast?.actionLabel}
-                onAction={() => { toast?.onAction?.(); setToast(null); }}
-                onDismiss={dismissToast}
-            />
         </div>
     );
 }

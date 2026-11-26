@@ -48,7 +48,7 @@ one file. **Adding a variant is still two changes in two lanes** — the CSS
 where the control lives, and the prop that selects it — and a design agent
 does the first and says so, rather than doing the second.
 
-Check `docs/CONTROLS.md` C6.3 before you add a prop. Three bugs were found by
+Check `docs/CONTROLS.md` C6.3 and C13 before you add a prop. Three bugs were found by
 writing those files, all of the same shape: one state spelled two ways in two
 places. The chip's was decided by **CSS chunk load order**, and an element
 carrying both spellings painted as neither.
@@ -70,7 +70,7 @@ component, so it cannot drift from the code — that is the whole point of it.
 If it looks wrong, the code is wrong.
 
 The specification and the code are checked against each other (`verify` check
-18; there are 19 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
+18; there are 20 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
 radius scales**, so those are not cross-checked — `src/shared/theme/tokens.css`
 is the only statement of them.
 

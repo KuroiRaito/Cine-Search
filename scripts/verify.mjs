@@ -753,6 +753,63 @@ for (const f of jsx) {
 }
 
 
+/* ---------------------------------------------------------------
+   20. The toast is mounted once, and raised one way.
+
+   SH15 says there is exactly one toast and the shell owns it, because the
+   same action reporting differently depending on where it was done is how one
+   piece of furniture owned by two modules comes to mean two things.
+   `ToastProvider` was built to settle that -- and then Library and Title went
+   on rendering their own, so three <Toast> elements were mounted at once.
+
+   They do not queue. `.toast` is `position: fixed` at one coordinate:
+   measured, two of them land in the same 358x48 box at (16, 732) on a 390px
+   screen, with the same `--z-toast`. So the later one in the DOM is drawn
+   over the earlier, and `elementFromPoint` at the centre returns the later
+   one -- the provider's, because it renders after its children. You read one
+   message and your tap undid the other action.
+
+   Library also spelled the action `undo:` where everything else said
+   `actionLabel` + `onAction`, translated at its own call site. Two spellings
+   for one prop, which is the C6.3 defect one level up: a prop contract that
+   nothing enforces.
+
+   So: one mount point, and every other screen goes through `useToast`. */
+{
+    const PROVIDER = 'app/ToastProvider.jsx';
+    const mounts = [];
+    for (const f of jsx) {
+        const rel = relative(ROOT, f);
+        const src = readFileSync(f, 'utf8')
+            .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+        src.split('\n').forEach((line, i) => {
+            /* Not `[\s/>]` -- `<Toast` is the whole line where the props are
+               indented below it, so there is no following character to match.
+               The first draft used that and found nothing; the "counting
+               nothing" guard below is what caught it on the first run. */
+            if (/<Toast(?![A-Za-z])/.test(line)) mounts.push({ rel, line: i + 1 });
+        });
+        /* The old spelling, wherever a toast is raised. */
+        for (const m of src.matchAll(/\bundo\s*:/g)) {
+            const line = src.slice(0, m.index).split('\n').length;
+            fail('one-toast', `${rel}:${line}: a toast raised with \`undo:\``
+                + ' -- Toast reads `actionLabel` and `onAction`, so this renders a dismiss cross');
+        }
+    }
+    for (const m of mounts) {
+        if (!m.rel.endsWith(PROVIDER)) {
+            fail('one-toast', `${m.rel}:${m.line}: a second <Toast> is mounted here`
+                + ` -- there is one, in ${PROVIDER}; raise this through useToast()`);
+        }
+    }
+    /* A check that cannot find the thing it counts passes forever (C7.7). */
+    if (!mounts.some((m) => m.rel.endsWith(PROVIDER))) {
+        fail('one-toast', `no <Toast> found in ${PROVIDER}`
+            + ' -- the shell has stopped mounting one, and this check is counting nothing');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -777,6 +834,7 @@ const CHECKS = [
     ['icon-row', 'An icon beside content sits in a row that was declared'],
     ['spec-drift', 'The specification and the code agree on every token'],
     ['owned-class', 'A shared control\'s class is written by its component, not by hand'],
+    ['one-toast', 'One toast, mounted by the shell, raised one way'],
 ];
 
 let failed = 0;

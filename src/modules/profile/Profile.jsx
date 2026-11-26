@@ -155,7 +155,7 @@ export default function You() {
                 {['Overview', 'Favourites', 'Stats'].map((t) => (
                     <button
                         key={t} type="button" role="tab" aria-selected={tab === t}
-                        className={tab === t ? 'ptab on' : 'ptab'}
+                        className="ptab"
                         onClick={() => setTab(t)}
                     >{t}</button>
                 ))}

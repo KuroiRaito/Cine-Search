@@ -322,7 +322,7 @@
   transition: background .12s, color .12s;
 }
 .epchk:hover { background: var(--ink-5); color: var(--muted); }
-.epchk.on { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
+.epchk[aria-pressed="true"] { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
 .epchk:disabled { opacity: .4; cursor: default; }
 .sect-h .markall:hover { color: var(--acc-t-hv); }
 .sect-h .markall {

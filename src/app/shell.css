@@ -163,7 +163,7 @@ img { max-width: 100%; display: block; }
 /* The tab icon is a component at --icon-20; the old `.ico` span is gone.
    Its size is set by the component, never by this rule. */
 .tab-item .icon { margin-bottom: var(--space-2); }
-.tab-item.on { color: var(--acc-t); }
+.tab-item[aria-current="page"] { color: var(--acc-t); }
 
 .topbar { display: none; }
 
@@ -289,7 +289,7 @@ img { max-width: 100%; display: block; }
     padding: 0 var(--space-12); border-radius: var(--radius-8);
     font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 500; color: var(--muted);
   }
-  .topnav a.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+  .topnav a[aria-current="page"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
   .topbar-spacer { flex: 1; }
   .topbar-in .circ { margin-right: var(--space-4); }
 

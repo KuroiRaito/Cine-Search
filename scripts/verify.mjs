@@ -810,6 +810,98 @@ for (const f of jsx) {
 }
 
 
+/* ---------------------------------------------------------------
+   21. Selection is an ARIA attribute, never a class.
+
+   One state had two spellings and that is how the Kind filter looked
+   unselected for as long as it existed: `.seg.on` was the only rule that
+   drew a selected segment, and FilterPanel set `aria-pressed` and never
+   added the class. It announced itself correctly to a screen reader and
+   showed nothing at all to everybody else.
+
+   Every OTHER selectable control wrote both -- the class and the attribute,
+   agreeing. That is not a safety net. It is two chances to be wrong, and the
+   reason nobody noticed the one place they disagreed: twelve controls where
+   the pair matched made the pair look like the convention.
+
+   So the stylesheet selects on the attribute the control's role requires:
+   `aria-pressed` for a toggle button, `aria-selected` inside a tablist,
+   `aria-current` for the link to the page you are on. A selected look is now
+   unreachable without the announcement that goes with it, which is the whole
+   point -- the two cannot drift, because there is only one of them.
+
+   `.on` is forbidden outright rather than kept as a synonym because it also
+   meant two other things: a lit star in the rating (now `.full`) and the
+   library's find row being open (now `.finding`). One class, three meanings,
+   and no reader could tell which from the name. */
+{
+    /* A machine cannot tell what a class MEANS, so this forbids the names
+       that have ever meant "selected" in this codebase or in the idiom
+       around it. A new one invented tomorrow is not caught, which is why the
+       convention is also written down in CONTROLS.md C4. */
+    const SYNONYMS = ['on', 'sel', 'selected', 'is-selected', 'active', 'is-active',
+        'current', 'is-current', 'checked', 'chosen'];
+    const alt = SYNONYMS.join('|');
+    /* `(?![\w-])` is what keeps `.on-image` out of it -- a different class
+       that happens to start with the same two letters. */
+    const inCss = new RegExp(`\\.(${alt})(?![\\w-])`, 'g');
+
+    let selectionRules = 0;
+    for (const f of cssFiles) {
+        const rel = relative(ROOT, f);
+        const src = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+        src.split('\n').forEach((line, i) => {
+            /* Declarations only, not a selector's braces content. A `.on` can
+               only be in the selector, which is before the first `{`. */
+            const selector = line.split('{')[0];
+            for (const m of selector.matchAll(inCss)) {
+                fail('aria-selection', `${rel}:${i + 1}: \`.${m[1]}\` styles a state as a class`
+                    + ' -- selection is aria-pressed, aria-selected or aria-current (C4)');
+            }
+        });
+        selectionRules += [...src.matchAll(/\[aria-(pressed|selected|current)/g)].length;
+    }
+
+    for (const f of jsx) {
+        const rel = relative(ROOT, f);
+        const src = readFileSync(f, 'utf8')
+            .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+        src.split('\n').forEach((line, i) => {
+            for (const m of line.matchAll(/className=(?:"([^"]*)"|\{([^}]*)\})/g)) {
+                const text = (m[1] || m[2] || '');
+                /* Class STRINGS only. `fav.on` is a property read, not a
+                   class, and `open === k` is a comparison -- both appear
+                   inside a className expression and neither is a class. */
+                for (const q of text.matchAll(/['"`]([^'"`]*)['"`]/g)) {
+                    for (const c of q[1].split(/\s+/).filter(Boolean)) {
+                        if (SYNONYMS.includes(c)) {
+                            fail('aria-selection', `${rel}:${i + 1}: className applies \`${c}\``
+                                + ' -- write the state as aria-pressed / aria-selected, which is what the stylesheet selects on (C4)');
+                        }
+                    }
+                }
+                if (m[1] !== undefined) {
+                    for (const c of m[1].split(/\s+/).filter(Boolean)) {
+                        if (SYNONYMS.includes(c)) {
+                            fail('aria-selection', `${rel}:${i + 1}: className applies \`${c}\``
+                                + ' -- write the state as aria-pressed / aria-selected (C4)');
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* C7.7 -- a check that cannot find what it counts passes forever. If no
+       stylesheet selects on a selection attribute, the convention has been
+       abandoned and the half above is guarding nothing. */
+    if (selectionRules < 10) {
+        fail('aria-selection', `only ${selectionRules} rules select on an ARIA selection attribute`
+            + ' -- the stylesheets have stopped styling selection this way, so this check is guarding nothing');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -835,6 +927,7 @@ const CHECKS = [
     ['spec-drift', 'The specification and the code agree on every token'],
     ['owned-class', 'A shared control\'s class is written by its component, not by hand'],
     ['one-toast', 'One toast, mounted by the shell, raised one way'],
+    ['aria-selection', 'Selection is an ARIA attribute, never a class'],
 ];
 
 let failed = 0;

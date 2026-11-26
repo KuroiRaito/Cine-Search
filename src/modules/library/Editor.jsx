@@ -126,7 +126,7 @@ export default function Editor({ title, onClose }) {
                     </div>
                     <button
                         type="button"
-                        className={`ibtn like${favourite ? ' on' : ''}`}
+                        className="ibtn like"
                         aria-pressed={favourite}
                         aria-label={favourite ? 'Remove from favourites' : 'Mark as favourite'}
                         onClick={() => setFavourite((f) => !f)}
@@ -180,7 +180,7 @@ export default function Editor({ title, onClose }) {
                                 <button
                                     key={n}
                                     type="button"
-                                    className={`${full ? 'on' : ''}${half ? ' half' : ''}`}
+                                    className={`${full ? 'full' : ''}${half ? ' half' : ''}`}
                                     aria-label={`${n * 2} out of 10`}
                                     onClick={() => pickRating(n * 2)}
                                     onContextMenu={(e) => { e.preventDefault(); pickRating(n * 2 - 1); }}

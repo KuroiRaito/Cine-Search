@@ -189,7 +189,7 @@ function PickBanner({ onClose }) {
                     return (
                         <button
                             key={c.key} type="button"
-                            className={on ? `swatch ${colourClass(c.key)} on` : `swatch ${colourClass(c.key)}`}
+                            className={`swatch ${colourClass(c.key)}`}
                             aria-pressed={on}
                             onClick={() => choose('colour', c.key)}
                         >{c.label}</button>

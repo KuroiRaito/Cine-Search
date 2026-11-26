@@ -70,7 +70,7 @@ component, so it cannot drift from the code — that is the whole point of it.
 If it looks wrong, the code is wrong.
 
 The specification and the code are checked against each other (`verify` check
-18; there are 20 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
+18; there are 21 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
 radius scales**, so those are not cross-checked — `src/shared/theme/tokens.css`
 is the only statement of them.
 
@@ -132,11 +132,17 @@ Say so rather than assuming the net is wider than it is.
   structural checks. Still *not* in CI: `snap`, `auth`, `cohorts`, `find` —
   the behavioural harnesses, three of which need credentials. Run those
   yourself. `states` is in CI for its table and blocks nothing by design.
-- **`npm run snap`'s fingerprints are structural, not pixel.** Element count
-  and geometry hash. Dark and light shots of a screen share a value, which is
-  why only 36 of the 72 are distinct. Identical fingerprints prove the markup
-  and layout did not move; they say nothing about colour. Read computed
-  styles for that.
+- **`npm run snap`'s fingerprints are structural, not pixel**, and there are
+  **two** of them. `geometry` is every box's position and size — that is the
+  "did anything move" question. `hash` is the same thing plus each element's
+  class list, so **it moves when a class is renamed even though nothing moved
+  on screen.** Read `geometry` to judge a refactor; `hash` only tells you the
+  markup changed, which you already knew. Neither says anything about colour
+  — read computed styles for that. Dark and light shots share a value, which
+  is why only 36 of the 72 are distinct.
+- **No search screenshot contains a chip.** The photographed search screen
+  has no filter applied, and `.chips:empty` is `display: none`. The chip is
+  covered only through Library's shelf row.
 - **Accessibility beyond focus order is unchecked.** Contrast is designed, not
   verified.
 

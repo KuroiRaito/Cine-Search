@@ -382,7 +382,7 @@ img { max-width: 100%; display: block; }
 /* The tab icon is a component at --icon-20; the old `.ico` span is gone.
    Its size is set by the component, never by this rule. */
 .tab-item .icon { margin-bottom: var(--space-2); }
-.tab-item.on { color: var(--acc-t); }
+.tab-item[aria-current="page"] { color: var(--acc-t); }
 
 .topbar { display: none; }
 
@@ -508,7 +508,7 @@ img { max-width: 100%; display: block; }
     padding: 0 var(--space-12); border-radius: var(--radius-8);
     font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 500; color: var(--muted);
   }
-  .topnav a.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+  .topnav a[aria-current="page"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
   .topbar-spacer { flex: 1; }
   .topbar-in .circ { margin-right: var(--space-4); }
 
@@ -831,6 +831,27 @@ img { max-width: 100%; display: block; }
    that grows. Resizing stays vertical — a sheet has a fixed width. */
 .inp.notes { min-height: var(--space-64); line-height: var(--lh-body-sm); resize: vertical; }
 
+/* ---- C4: selection is an ARIA attribute, never a class ----
+
+   One state had two spellings. `.seg.on` was the only rule that drew a
+   selected segment, and the Kind filter set `aria-pressed` and never added
+   the class, so it announced itself correctly and looked unselected for as
+   long as it existed. Every other selectable control wrote BOTH -- the class
+   and the attribute, agreeing -- which is not safety, it is two chances to
+   be wrong and a reason nobody noticed the one place that disagreed.
+
+   So the stylesheet selects on the attribute, and the attribute is the one
+   the control's role requires: `aria-pressed` for a toggle button,
+   `aria-selected` inside a tablist, `aria-current` for the link to the page
+   you are on (React Router writes that one itself -- measured: NavLink emits
+   `aria-current="page"` exactly when active). A selected look is now
+   unreachable without the announcement that goes with it.
+
+   `.on` also meant two other things, which is why it is gone rather than
+   kept as a synonym: a lit star in the rating (`.full`, beside `.half`) and
+   the library's find row being open (`.finding`). One class name, three
+   meanings, and `verify` check 21 now forbids it outright. ---- */
+
 /* ---- Controls and state tones used on more than one screen. The six
         watch-state hues carry a tone into whatever they are applied to:
         a pill, a segment, a chip, a library row. ---- */
@@ -937,8 +958,8 @@ img { max-width: 100%; display: block; }
 .chip { text-decoration: none; }
 .chip em { font-style: normal; opacity: .5; font-variant-numeric: tabular-nums; }
 .chip:hover { background: var(--ink-4); color: var(--text); }
-.chip[aria-pressed="true"] { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
-.chip[aria-pressed="true"] em { opacity: .65; }
+.chip:is([aria-pressed="true"], [aria-selected="true"]) { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
+.chip:is([aria-pressed="true"], [aria-selected="true"]) em { opacity: .65; }
 /* The chip has TWO selected looks, and they are two different ideas:
    `aria-pressed` is a filter option you turned ON -- it fills solid, because
    it is the thing you just did. `.applied` is a filter already in force in
@@ -991,8 +1012,8 @@ img { max-width: 100%; display: block; }
 .st-re      { --stc: var(--st-re-11);   --stb: var(--st-re-3);   --stl: var(--st-re-9); }
 .st-drop    { --stc: var(--st-drop-11); --stb: var(--st-drop-3); --stl: var(--st-drop-9); }
 
-.ibtn.on { background: var(--stb); color: var(--stc); box-shadow: inset 0 0 0 1px var(--stl); }
-.ibtn.like.on { --stb: var(--like-3); --stc: var(--like-11); --stl: var(--like-9); }
+.ibtn[aria-pressed="true"] { background: var(--stb); color: var(--stc); box-shadow: inset 0 0 0 1px var(--stl); }
+.ibtn.like[aria-pressed="true"] { --stb: var(--like-3); --stc: var(--like-11); --stl: var(--like-9); }
 /* Loading shimmer, after the rules it overrides. */
 .skel, .tile .art {
   background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
@@ -1102,7 +1123,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 }
 .seg:hover { background: var(--ink-4); color: var(--text); }
 .seg i { font-style: normal; font-size: var(--text-micro); line-height: var(--lh-micro); font-family: var(--f-s); }
-.seg.on { background: var(--stb); color: var(--stc); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--stc); }
+.seg:is([aria-pressed="true"], [aria-selected="true"]) { background: var(--stb); color: var(--stc); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--stc); }
 
 .prog {
   display: flex; align-items: center; gap: var(--space-8); background: var(--bg-sub);
@@ -1130,7 +1151,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   background: none; border: 0; padding: 0; cursor: pointer; position: relative;
   font-size: var(--text-title-sm); color: var(--ink-7); line-height: 1; width: var(--icon-20); height: var(--icon-24);
 }
-.stars button.on { color: var(--rate); }
+.stars button.full { color: var(--rate); }
 /* A half star is the full glyph clipped down the middle, over a dim one. */
 .stars button.half::after {
   content: "★"; position: absolute; inset: 0; color: var(--rate);
@@ -1819,7 +1840,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   transition: background .12s, color .12s;
 }
 .epchk:hover { background: var(--ink-5); color: var(--muted); }
-.epchk.on { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
+.epchk[aria-pressed="true"] { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
 .epchk:disabled { opacity: .4; cursor: default; }
 .sect-h .markall:hover { color: var(--acc-t-hv); }
 .sect-h .markall {

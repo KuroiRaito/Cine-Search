@@ -106,17 +106,33 @@ const modules = Object.keys(MODULES).filter((m) => !wanted.length || wanted.incl
  * render outside the shell, and scoping to `.app` fingerprinted them as zero
  * elements — a screen that could change freely without the check noticing.
  */
+/* TWO hashes, because they answer different questions and one of them used
+   to be answering both badly.
+
+   `hash` includes each element's class list, so it moves when a class is
+   renamed even though nothing on screen moved a pixel. That is useful -- a
+   class appearing or vanishing is worth noticing -- but it is not a layout
+   check, and it was being read as one. The selection sweep renamed a class
+   on twelve controls and all 36 screens' hashes changed, which looked
+   exactly like a product-wide layout regression and was not one.
+
+   `geometry` is the same boxes with the class list left out. That is the
+   question "did anything move", and it is the one worth gating. Before this
+   existed, proving a rename inert meant measuring computed styles control by
+   control, because the only tool for it could not tell the two apart. */
 const FINGERPRINT = `(() => {
     const parts = [];
+    const geom = [];
     for (const el of document.querySelectorAll('#root *')) {
         const r = el.getBoundingClientRect();
         const cls = typeof el.className === 'string' ? el.className.trim().split(/\\s+/).sort().join('.') : '';
-        parts.push(el.tagName + '.' + cls + '|' + Math.round(r.x) + ',' + Math.round(r.y + scrollY)
-                 + ',' + Math.round(r.width) + ',' + Math.round(r.height));
+        const box = Math.round(r.x) + ',' + Math.round(r.y + scrollY)
+                 + ',' + Math.round(r.width) + ',' + Math.round(r.height);
+        parts.push(el.tagName + '.' + cls + '|' + box);
+        geom.push(el.tagName + '|' + box);
     }
-    let h = 0;
-    for (const c of parts.join('\\n')) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-    return { elements: parts.length, hash: h.toString(16) };
+    const hash = (a) => { let h = 0; for (const c of a.join('\\n')) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h.toString(16); };
+    return { elements: parts.length, hash: hash(parts), geometry: hash(geom) };
 })()`;
 
 /* ---------------------------------------------------------------

@@ -338,5 +338,17 @@ console.log(`  ${rows.filter((r) => r.focus === 'global').length} lean on the on
 console.log(`  ${miss('disabled')} can be disabled but do not say so`);
 console.log(`  ${miss('selected')} can be selected but do not say so`);
 const byConv = (c) => rows.filter((r) => r.selected === c).length;
-console.log(`  selection is written ${[['aria', byConv('aria')], ['class', byConv('class')], ['both', byConv('aria+class')]]
-    .filter(([, n]) => n).map(([k, n]) => `${n} as ${k}`).join(', ')} — one state, more than one convention\n`);
+{
+    /* This line used to end "one state, more than one convention" and said it
+       whatever the numbers were -- including after there was only one left.
+       A summary that states its conclusion before counting is the same fault
+       as a check that passes before reading its results (C7.7), just
+       quieter. `verify` check 21 is the gate; this says where things stand. */
+    const parts = [['aria', byConv('aria')], ['class', byConv('class')], ['both', byConv('aria+class')]]
+        .filter(([, n]) => n);
+    const written = parts.map(([k, n]) => `${n} as ${k}`).join(', ');
+    const verdict = parts.length === 1 && parts[0][0] === 'aria'
+        ? 'one state, one convention — the attribute the role requires'
+        : 'one state, MORE THAN ONE CONVENTION — this is C4, and it is how the Kind filter looked unselected for months';
+    console.log(`  selection is written ${written} — ${verdict}\n`);
+}

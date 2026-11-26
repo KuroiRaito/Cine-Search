@@ -114,7 +114,7 @@ export default function Person() {
                 {fav.canFavourite && (
                     <button
                         type="button"
-                        className={fav.on ? 'ibtn like on' : 'ibtn like'}
+                        className="ibtn like"
                         aria-pressed={fav.on}
                         aria-label={fav.on ? `Remove ${p.name} from favourites` : `Add ${p.name} to favourites`}
                         onClick={fav.toggle}
@@ -161,7 +161,7 @@ export default function Person() {
                             {isSignedIn && (
                                 <button
                                     type="button"
-                                    className={`sw${unseenOnly ? ' on' : ''}`}
+                                    className="sw"
                                     aria-pressed={unseenOnly}
                                     onClick={() => setUnseenOnly((v) => !v)}
                                 >Not seen</button>

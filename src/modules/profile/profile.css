@@ -242,7 +242,7 @@
   font-family: var(--f-s); font-size: var(--text-micro); line-height: var(--lh-micro);
   font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(4, 6, 12, .7);
 }
-.swatch.on { border-color: var(--acc); }
+.swatch[aria-pressed="true"] { border-color: var(--acc); }
 
 /* E3 — the counter, and what it does when you go past. */
 .cnt {
@@ -271,7 +271,7 @@
   font-weight: 600; color: var(--muted); text-decoration: none;
   display: inline-flex; align-items: center;
 }
-.ptab.on { color: var(--acc-t); border-bottom-color: var(--acc); }
+.ptab[aria-selected="true"] { color: var(--acc-t); border-bottom-color: var(--acc); }
 .ptab:hover { color: var(--text); }
 
 .shelf { margin-top: var(--section-gap); }
@@ -308,7 +308,7 @@
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
   font-weight: 600; display: inline-flex; align-items: center; gap: var(--space-4);
 }
-.fchip.on { background: var(--acc-bg); border-color: var(--acc-bd); color: var(--acc-t); }
+.fchip[aria-selected="true"] { background: var(--acc-bg); border-color: var(--acc-bd); color: var(--acc-t); }
 .fchip em {
   font-family: var(--f-m); font-style: normal;
   font-size: var(--text-micro); line-height: var(--lh-micro); opacity: .8;

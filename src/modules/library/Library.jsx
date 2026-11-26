@@ -207,7 +207,7 @@ export default function Library() {
                 somebody opens a five-hundred-title library is usually one
                 title, and four characters gets them there. */}
             <div className="lbar">
-                <div className={finding ? 'lfind on' : 'lfind'}>
+                <div className={finding ? 'lfind finding' : 'lfind'}>
                     <Icon name="search" size={16} />
                     <input
                         type="search" value={term} className="lfind-in"
@@ -228,7 +228,7 @@ export default function Library() {
                     disabled={finding} onClick={() => setSorting(true)}
                 ><Icon name="reorder" size={20} /></button>
                 <button
-                    type="button" className={compact ? 'lbtn on' : 'lbtn'}
+                    type="button" className="lbtn"
                     aria-pressed={compact}
                     aria-label={compact ? 'Comfortable rows' : 'Compact rows'}
                     onClick={() => setDensity(compact ? 'comfortable' : 'compact')}
@@ -362,7 +362,7 @@ function SortSheet({ shelf, current, options, onPick, onClose }) {
                         <button
                             key={o.key}
                             type="button"
-                            className={o.key === current ? 'sortopt on' : 'sortopt'}
+                            className="sortopt"
                             aria-pressed={o.key === current}
                             onClick={() => onPick(o.key)}
                         >

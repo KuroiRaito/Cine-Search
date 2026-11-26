@@ -292,7 +292,7 @@ export default function Title() {
                 </button>
                 <button
                     type="button"
-                    className={`ibtn like${entry?.is_favourite ? ' on' : ''}`}
+                    className="ibtn like"
                     aria-pressed={isSignedIn ? Boolean(entry?.is_favourite) : undefined}
                     aria-label={entry?.is_favourite ? 'Remove from favourites' : 'Mark as favourite'}
                     onClick={() => gate('like', () => lib.save(t, { favourite: !entry?.is_favourite }))}
@@ -822,7 +822,7 @@ function Episodes({ title, entry, season, onSeason, jumpTo, onJumped, state, onT
                                 be ticked — and says so rather than failing. */}
                             <button
                                 type="button"
-                                className={`epchk${on ? ' on' : ''}`}
+                                className="epchk"
                                 disabled={!e.aired}
                                 aria-pressed={on}
                                 aria-label={`${on ? 'Un-mark' : 'Mark'} episode ${e.number} watched`}

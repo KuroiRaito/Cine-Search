@@ -65,7 +65,7 @@ function Shell({ children }) {
                     <nav className="topnav">
                         {TABS.map((t) => (
                             <NavLink key={t.to} to={t.to} end={t.to === '/'}
-                                className={({ isActive }) => (isActive ? 'on' : undefined)}>
+                            >
                                 {t.label}
                             </NavLink>
                         ))}
@@ -101,7 +101,7 @@ function Shell({ children }) {
                 <nav className="tabs" aria-label="Main">
                     {TABS.map((t) => (
                         <NavLink key={t.to} to={t.to} end={t.to === '/'}
-                            className={({ isActive }) => `tab-item${isActive ? ' on' : ''}`}>
+                            className="tab-item">
                             <Icon name={t.icon} size={20} />
                             {t.label}
                         </NavLink>

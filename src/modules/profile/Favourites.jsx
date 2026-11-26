@@ -162,7 +162,7 @@ export function FavouritesTab({ shelves, onChanged }) {
                     <button
                         key={sh.key} type="button" role="tab"
                         aria-selected={open === sh.key}
-                        className={open === sh.key ? 'fchip on' : 'fchip'}
+                        className="fchip"
                         onClick={() => { setOpen(sh.key); setOrder(null); }}
                     >
                         {sh.label}<em>{(shelves[sh.key] || []).length}</em>

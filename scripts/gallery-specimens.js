@@ -205,4 +205,57 @@ export const SPECIMENS = [
     { group: 'Feedback', name: 'errbox', cls: 'errbox', tag: 'div', surface: true, states: ['rest'],
         html: '<b>Couldn&apos;t load titles</b><p>The Movie Database didn&apos;t answer. '
             + 'The rest of this page is unaffected.</p><button class="btn quiet">Try again</button>' },
+
+    /* ---------------- composition ----------------
+
+       The third kind of case. `states` is what a control is doing, `content`
+       is what it is holding, and this is how many of it there are.
+
+       It is its own kind because the failures are different ones. A control
+       does not break at a count; a COLLECTION does -- a grid whose columns
+       are `auto-fit` stretches its only tile to the full width of the page,
+       a rail whose children can grow turns two posters into two half-screens,
+       a chip row that neither wraps nor scrolls hides the eighth filter off
+       the edge where nobody will find it.
+
+       The invariant the audit holds them to: an item's size must not depend
+       on how many items are beside it. Both of this product's collections
+       already get that right -- `.grid` is `auto-fill` rather than `auto-fit`,
+       and `.rail > *` is `flex: 0 0 auto` -- which is exactly why it is worth
+       pinning. Those are one-word edits away from being wrong, and nothing
+       until now would have noticed.
+
+       0 is included because empty is a count, and the empty state is a
+       different component (`.empty`) that somebody has to remember to
+       render. A collection that draws nothing at 0 is a blank screen. */
+
+    { group: 'Composition', name: 'chips — the filter row', cls: 'chips', tag: 'div',
+        surface: true, states: [], html: '',
+        collection: {
+            counts: [0, 1, 2, 8],
+            /* TMDB's real genre names, longest first, because the row has to
+               survive the ones it will actually be given. */
+            child: (i) => {
+                const g = ['Action &amp; Adventure', 'Science Fiction', 'Documentary',
+                    'War &amp; Politics', 'Sci-Fi &amp; Fantasy', 'Drama', 'Comedy', 'Horror'];
+                return `<button class="chip on">${g[i % g.length]}<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
+            },
+        } },
+
+    { group: 'Composition', name: 'grid — search results', cls: 'grid', tag: 'div',
+        surface: true, states: [], html: '',
+        collection: {
+            counts: [1, 2, 7],
+            child: (i) => `<a class="tile"><div class="art"><div class="noart">Title ${i + 1}</div>`
+                + `<span class="score-badge"><svg class="icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg> 7.${i}</span>`
+                + `</div><div class="name">Title ${i + 1}</div><div class="meta">20${10 + i}</div></a>`,
+        } },
+
+    { group: 'Composition', name: 'rail — a shelf', cls: 'rail', tag: 'div',
+        surface: true, states: [], html: '',
+        collection: {
+            counts: [1, 2, 8],
+            child: (i) => `<a class="tile"><div class="art"><div class="noart">Title ${i + 1}</div></div>`
+                + `<div class="name">Title ${i + 1}</div></a>`,
+        } },
 ];

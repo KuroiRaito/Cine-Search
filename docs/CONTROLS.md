@@ -31,7 +31,7 @@ States are half of it. The other half is content, and it is the half that broke 
 - **C2.3** **One child and several.** A chip with a count, a chip with a count and a cross.
 - **C2.4** **Both themes.** Light is not dark with the numbers flipped: a floating surface gets *lighter* as it rises in dark and *darker* in light, which is why `--raised` exists and cannot alias the ink scale.
 - **C2.5** **All three bands.** 390, 900, 1280. The 900 band is the one nobody draws.
-- **C2.6** **Empty, one, and many**, wherever it renders a list.
+- **C2.6** **Empty, one, and many**, wherever it renders a list. **Drawn and checked** since 2026-11-26 — see C11.
 
 ## C3 — Focus has exactly one owner
 
@@ -79,6 +79,15 @@ A control that lands on a poster or a still cannot borrow the page's surfaces, b
 - **C8.2** It was seven controls inventing it separately: rest opacities `.55 .6 .6 .62 .68 .72`, hovers `.72` and `.78`, and two different base colours — `rgba(8,12,20)` for `.quickadd` and `rgba(4,6,12)` for the other six. The top-right and bottom-left corners of the same poster were built out of different glass, which is a thing nobody can see as a bug and everybody can see as cheapness.
 - **C8.3** **The hairline is not trim.** A dark control on a dark poster has no edge of its own. `--glass-line` is what stops it dissolving into the artwork, and it belongs to every glass control, not just the one that happened to have it.
 - **C8.4** `--scrim-wash` is a different job — the full-screen dim behind a sheet — and keeps its own name even at the same value. `.tplay-b` was using it as a control ground; it now uses `--glass`.
+
+## C11 — An item's size does not depend on how many are beside it
+
+- **C11.1** A collection is a third kind of case, after what a control is *doing* and what it is *holding*. Specimens carry a `collection` with `counts`, and the gallery draws each count.
+- **C11.2** **The invariant is that an item's size must not change with the count.** That is the signature of the two classic collection bugs: `grid-template-columns: repeat(auto-fit, …)` stretches a lone tile across the page, and a flex child that can grow turns two posters into two half-screens. Both are one word away from true in any stylesheet.
+- **C11.3** This product gets both right already — `.grid` is `auto-fill`, `.rail > *` is `flex: 0 0 auto` — **which is exactly why it is worth pinning.** Proved by flipping `auto-fill` to `auto-fit`: one search result became 844px wide and 1302px tall, and the check named it with those numbers.
+- **C11.4** **0 is a count.** `.chips` was rendered unconditionally by `SearchPage`, so with no filters on there was an empty 12px row above the results, and applying the first filter shoved them down by the height of a chip. Fixed at the container rather than the call site — `.chips:empty, .rail:empty, .grid:empty { display: none; }` — so it is true of every instance, including ones nobody has written yet. `:empty` matches no children *and* no text, so a collection holding one chip is untouched. This is not an empty *state*: `.empty` is a component somebody renders on purpose.
+- **C11.5** **A container that scrolls an axis is exempt on that axis.** Content past the edge is what a rail is for. Flagging it taught the content check to report two false breaks before this was added.
+- **C11.6** Running past the edge is **reported, never failed**. Whether `.chips` at 8 filters (151px past) and `.rail` at 8 tiles (732px past) need an affordance is a design decision — both set `scrollbar-width: none` deliberately — and the report exists so somebody decides it rather than nobody seeing it.
 
 ## C10 — A control that says it is one line is one line
 

@@ -142,7 +142,7 @@ function expand(html) {
    state, different contents. It is a separate argument rather than a second
    specimen because the point is that nothing about the control changed --
    only what somebody put in it. */
-function cell(spec, state, labelOverride, htmlOverride) {
+function cell(spec, state, labelOverride, htmlOverride, count) {
     const tag = spec.tag || 'button';
     const attrs = { ...(spec.attrs || {}) };
     let cls = spec.cls;
@@ -162,8 +162,10 @@ function cell(spec, state, labelOverride, htmlOverride) {
     const el = tag === 'input'
         ? `<input class="${cls}"${force}${a}>`
         : `<${tag} class="${cls}"${force}${a}>${inner}</${tag}>`;
-    const mark = htmlOverride ? ` data-content="${labelOverride}"` : '';
-    return `<div class="g-cell${htmlOverride ? ' g-content' : ''}"${mark}><div class="g-state">${labelOverride || state}</div><div class="g-stage${spec.surface ? ' g-surface' : ''}">${el}</div></div>`;
+    const mark = count !== undefined ? ` data-count="${count}"`
+        : htmlOverride ? ` data-content="${labelOverride}"` : '';
+    const kind = count !== undefined ? ' g-count' : htmlOverride ? ' g-content' : '';
+    return `<div class="g-cell${kind}"${mark}><div class="g-state">${labelOverride || state}</div><div class="g-stage${spec.surface ? ' g-surface' : ''}">${el}</div></div>`;
 }
 
 /* ---------------------------------------------------------------
@@ -291,8 +293,14 @@ const body = groups.map((g) => {
         rows.push(`
       <div class="g-row${s.surface ? ' g-wide' : ''}">
         <div class="g-name"><code>${s.name}</code><span>.${s.cls.split(' ').join('.')}</span></div>
-        <div class="g-cells">${s.states.map((st) => cell(s, st)).join('')
-            }${(s.content || []).map(([label, html]) => cell(s, s.states[0], label, html)).join('')}</div>
+        <div class="g-cells${s.collection ? ' g-stack' : ''}">${s.states.map((st) => cell(s, st)).join('')
+            }${(s.content || []).map(([label, html]) => cell(s, s.states[0], label, html)).join('')
+            }${(s.collection ? s.collection.counts : []).map((n) => cell(
+                s, s.states[0],
+                n === 0 ? 'empty' : n === 1 ? '1 item' : `${n} items`,
+                Array.from({ length: n }, (_, i) => s.collection.child(i)).join(''),
+                n,
+            )).join('')}</div>
       </div>`);
     }
     return `<section class="g-group"><h2>${g}</h2>${rows.join('')}</section>`;
@@ -317,6 +325,12 @@ const CHROME = `
      this state do anything" but "does this control survive what goes in it"
      -- so it is marked rather than left to be read as one more state. */
   .g-cell.g-content .g-state { color: var(--mar-9); }
+  /* A collection has to be given the room a collection gets, so these stack
+     full width rather than sitting in the 104px column the controls use. */
+  .g-cells.g-stack { flex-direction: column; }
+  .g-cells.g-stack .g-cell { width: 100%; min-width: 0; }
+  .g-cell.g-count .g-state { color: var(--acc-t); }
+  .g-cell.g-count .g-stage { border-style: solid; border-color: var(--acc-bd); padding: 0; }
   .g-cell.g-content .g-stage { border-style: solid; border-color: var(--mar-8); }
   .g-state { font-family: var(--f-m); font-size: 10px; letter-spacing: .04em; color: var(--faint);
              text-transform: uppercase; margin-bottom: 6px; }

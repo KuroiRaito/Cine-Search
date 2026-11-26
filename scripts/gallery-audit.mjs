@@ -49,6 +49,8 @@ const browser = await chromium.launch();
 const findings = [];
 const offCentre = [];
 const contentBreaks = [];
+const sizing = [];
+const overflows = [];
 let geometryFailed = false;
 
 for (const theme of ['dark', 'light']) {
@@ -134,25 +136,61 @@ for (const theme of ['dark', 'light']) {
                     /* A child whose box leaves its parent's, and content cut
                        off with nothing to say so. Both are losses a person
                        sees; neither depends on a baseline. */
+                    /* A container that scrolls an axis is SUPPOSED to hold
+                       more than fits on it -- that is what a rail is. So
+                       spill is only counted on an axis the container does
+                       not scroll, and clipping is only a loss when the
+                       content cannot be reached by scrolling to it. */
+                    const scrollsX = ['auto', 'scroll'].includes(cs2.overflowX);
+                    const scrollsY = ['auto', 'scroll'].includes(cs2.overflowY);
                     let spill = 0;
                     for (const d of el.querySelectorAll('*')) {
                         const b = d.getBoundingClientRect();
                         if (!b.width && !b.height) continue;
-                        spill = Math.max(spill, r.top - b.top, b.bottom - r.bottom,
-                            r.left - b.left, b.right - r.right);
+                        if (!scrollsY) spill = Math.max(spill, r.top - b.top, b.bottom - r.bottom);
+                        if (!scrollsX) spill = Math.max(spill, r.left - b.left, b.right - r.right);
                     }
                     const ell = cs2.textOverflow === 'ellipsis'
                         || [...el.querySelectorAll('*')].some((d) => getComputedStyle(d).textOverflow === 'ellipsis');
                     const clipped = (el.scrollWidth > el.clientWidth + 1) && !ell
-                        && cs2.overflow !== 'visible';
+                        && !scrollsX && cs2.overflow !== 'visible';
                     if (spill > 1 || clipped) {
                         stress = { ...(stress || {}), spill: Math.round(spill * 10) / 10, clipped };
                     }
                 }
 
+                /* Composition. A collection drawn at several counts, and
+                   the one thing that must not vary: the size of an item.
+
+                   An item's size depending on how many items are beside it
+                   is the signature of `auto-fit` (one tile stretched across
+                   the page) or of a flex child that can grow (two posters as
+                   two half-screens). Both are one word away from true in any
+                   stylesheet, and nothing here would have noticed. */
+                let composed = null;
+                if (c.dataset.count !== undefined) {
+                    const n = Number(c.dataset.count);
+                    const first = el.firstElementChild;
+                    const fb = first ? first.getBoundingClientRect() : null;
+                    composed = {
+                        n,
+                        w: fb ? Math.round(fb.width * 10) / 10 : null,
+                        h: fb ? Math.round(fb.height * 10) / 10 : null,
+                        /* Does the collection run past its own visible box?
+                           Reported, never failed: .chips and .rail set
+                           `overflow-x: auto` with `scrollbar-width: none` on
+                           purpose, so this is a judgement about affordance,
+                           not a defect. */
+                        over: Math.max(0, el.scrollWidth - el.clientWidth),
+                        scrolls: ['auto', 'scroll'].includes(getComputedStyle(el).overflowX),
+                        drewNothing: n === 0 && el.getBoundingClientRect().height > 0 && !el.children.length,
+                    };
+                }
+
                 return {
                     label,
                     content: c.dataset.content ?? null,
+                    composed,
                     stress,
                     centring,
                     sig: paint.map((p) => cs.getPropertyValue(p)).join('|')
@@ -174,6 +212,32 @@ for (const theme of ['dark', 'light']) {
                pushing the glyph off and a person can see it. */
             if (Math.abs(dx) >= 0.5 || Math.abs(dy) >= 0.5) {
                 offCentre.push({ theme, name, state: c.label, ...c.centring });
+            }
+        }
+
+        {
+            const cs = cells.filter((c) => c.composed && c.composed.n > 0 && c.composed.w);
+            if (cs.length > 1) {
+                const ws = cs.map((c) => c.composed.w);
+                const lo = Math.min(...ws), hi = Math.max(...ws);
+                if (hi - lo > 1) {
+                    const at = cs.map((c) => `${c.composed.n}:${c.composed.w}px`).join('  ');
+                    sizing.push({ theme, name, why: `an item's width changes with the count -- ${at}` });
+                }
+                const hs = cs.map((c) => c.composed.h);
+                if (Math.max(...hs) - Math.min(...hs) > 1) {
+                    const at = cs.map((c) => `${c.composed.n}:${c.composed.h}px`).join('  ');
+                    sizing.push({ theme, name, why: `an item's height changes with the count -- ${at}` });
+                }
+            }
+            for (const c of cells) {
+                if (!c.composed) continue;
+                if (c.composed.over > 1) {
+                    overflows.push({ theme, name, n: c.composed.n, px: c.composed.over, scrolls: c.composed.scrolls });
+                }
+                if (c.composed.drewNothing) {
+                    sizing.push({ theme, name, why: 'at 0 items it still takes vertical space and draws nothing -- an empty state has to be rendered in its place' });
+                }
             }
         }
 
@@ -240,6 +304,39 @@ console.log('\nGLYPHS THAT ARE NOT CENTRED IN THEIR OWN CONTROL\n');
 
 /* Reported with the geometry, and failing like it: a control that cannot
    hold what the product puts in it is broken, not under-designed. */
+console.log('\nCOLLECTIONS WHOSE ITEMS CHANGE SIZE WITH THE COUNT\n');
+{
+    const seen = new Map();
+    for (const f of sizing) if (!seen.has(f.name + f.why)) seen.set(f.name + f.why, f);
+    if (!seen.size) {
+        console.log('  none. An item is the same size whether it has one neighbour or twenty.\n');
+    } else {
+        for (const [, f] of seen) console.log(`  ${f.name}\n      ${f.why}`);
+        console.log(`\n  ${seen.size}. An item's size must not depend on how many are beside it.\n`);
+        geometryFailed = true;
+    }
+}
+
+/* Reported, not failed. A row that runs past its edge may be a deliberate
+   scroller or may be hiding the eighth filter where nobody will find it, and
+   which one it is depends on whether anything tells the reader to scroll. */
+console.log('\nCOLLECTIONS THAT RUN PAST THEIR OWN EDGE\n');
+{
+    const seen = new Map();
+    for (const f of overflows) {
+        const k = `${f.name}\u0000${f.n}`;
+        if (!seen.has(k)) seen.set(k, f);
+    }
+    if (!seen.size) console.log('  none.\n');
+    else {
+        for (const [, f] of [...seen].sort()) {
+            console.log(`  ${f.name.padEnd(28)} at ${String(f.n).padStart(2)} items: ${f.px}px past the edge`
+                + (f.scrolls ? ' (scrolls -- is there anything saying so?)' : ' (DOES NOT SCROLL -- that content is unreachable)'));
+        }
+        console.log('');
+    }
+}
+
 console.log('\nCONTROLS THAT BREAK ON REAL CONTENT\n');
 {
     const seen = new Map();

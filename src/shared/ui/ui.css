@@ -259,6 +259,18 @@
    carrying 12.5px, 13px and a 99px radius. */
 .chips { display: flex; gap: var(--space-8); overflow-x: auto; padding: var(--space-12) var(--gutter) 0; scrollbar-width: none; }
 .chips::-webkit-scrollbar { height: 0; }
+/* A collection with nothing in it is still a box with padding. SearchPage
+   renders `<div className="chips">` whether or not any filter is on, so with
+   none the results sat under 12px of nothing -- and applying the first filter
+   shoved them down by the height of a chip. Collapsing the empty case here
+   rather than at each call site means it is true of every instance, including
+   the ones nobody has written yet.
+
+   `:empty` is exact: it matches an element with no children AND no text, so a
+   collection holding a single chip is untouched. It is not an empty STATE --
+   `.empty` is a component somebody renders on purpose, and this is only the
+   container getting out of the way. */
+.chips:empty, .rail:empty, .grid:empty { display: none; }
 /* `display` is load-bearing, not decoration. A chip carries a label and, in
    two places, something after it: a count in <em>, or the close cross that
    takes the filter off. `.icon` is `display:block` (one line down, so every

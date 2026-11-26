@@ -4,6 +4,9 @@ A film and TV tracker, live at **bingecon.com**. React 19, Vite, Supabase.
 The repo, the directory and the `cine_*` storage keys stay "Cine Search" on
 purpose; the product is called Bingecon.
 
+Raman is a **Product Manager, not an engineer**. Explain tradeoffs in product
+terms and always give a recommendation.
+
 Read this before changing anything that renders.
 
 ---
@@ -18,6 +21,10 @@ verify → states → gallery → gallery:audit → lint → build, stopping at 
 first failure. If it is green, you have not broken any of the rules below. If
 it is red, read what it says — every failure names the file, the value and
 what it expected.
+
+`check` is the source block of CI minus `find`, `cohorts` and `test:api`,
+which are gated but not in this script — run those too before a PR that
+touches search, title states or the API.
 
 `RUNBOOK.md` has the rest, including how to run one of them on its own and
 how to photograph a single control.
@@ -74,6 +81,10 @@ The specification and the code are checked against each other (`verify` check
 radius scales**, so those are not cross-checked — `src/shared/theme/tokens.css`
 is the only statement of them.
 
+`docs/USE_CASES.md` is a fourth, and answers a different question again: what
+the product is supposed to *do* — 219 cases across 13 journeys, each carrying
+the state id it came from.
+
 ## 4. The layers, and the one rule about them
 
 ```
@@ -124,33 +135,120 @@ product's own recorded TMDB responses or from TMDB's actual genre names. An
 invented 200-character string proves a control *can* be broken; it does not
 prove anything *will* break it.
 
-## 6. Two rules that matter more than they look
+## 6. Fixing things once
 
-**Measure, do not assert.** Build the case, render it, read the number. Three
-production bugs in this repo survived review because everyone reasoned about
-the CSS instead of measuring the box. The plus that looked off-centre was not
-off-centre — its button had a 12px content box, and only
-`getBoundingClientRect` said so.
+**A fix is not finished when the symptom goes. It is finished when that kind of
+problem can no longer happen.**
+
+Every bug belongs to a class. Fixing the instance guarantees the class returns
+wearing different clothes, which is how a product accumulates a permanent hum
+of small defects that never quite get solved. So two questions, in order:
+
+1. **What class is this an instance of?** One sentence, general enough that a
+   second instance would match it.
+2. **What is the strongest thing that makes the whole class impossible or
+   caught?** Build that, not just the fix.
+
+### 6.1 The strength ladder
+
+Take the strongest tier the problem allows, and **say which tier you landed
+on** when you report the work:
+
+| | Tier | What it means |
+|---|---|---|
+| **1** | **Unrepresentable** | Restructure so the bug cannot be written. A parse that cannot return a valid-looking wrong answer beats remembering to guard every call site |
+| **2** | **Build-time** | A lint rule or a `verify` check. Fails before anything runs |
+| **3** | **Harness** | A named assertion tied to a law or state id, so the test says *which rule* broke |
+| **4** | **Visible** | A fingerprint, a measurement, a report. Does not prevent — guarantees you find out |
+| **5** | **Written down** | A note in a doc. Relies on somebody reading it |
+
+**Tier 5 on its own is not a fix.** If a stronger tier was available and the
+work stopped at a comment, say so plainly rather than reporting a fix.
+
+### 6.2 Measure, do not assert
+
+Build the case, render it, read the number. Three production bugs in this repo
+survived review because everyone reasoned about the CSS instead of measuring
+the box. The plus that looked off-centre was not off-centre — its button had a
+12px content box, and only `getBoundingClientRect` said so.
+
+### 6.3 Prove the gate
 
 **A new check is proved by reinstating the bug and watching it fire.** A check
-that has only ever seen a clean tree has not been tested. This is not
-ceremony: two checks in this repo passed while completely broken, and only
-re-breaking the product found them. One compared a long label against a short
-one and measured a difference of zero because both were broken; the other ran
-after its own results had already been collected.
+that has only ever seen a clean tree has not been tested, and a gate that can
+fail open is worse than no gate because it buys false confidence.
 
-## 7. What is NOT covered
+Not ceremony — four checks in this repo have passed while broken. One compared
+a long label against a short one and measured a difference of zero because both
+were broken. One ran after its own results had already been collected, so its
+complaints went unread. One shipped with a wrong constant name and an
+`if (ROLES.size)` guard, so it silently passed everything. And `npm run auth`
+seeded its session on every navigation, so signing out was unobservable and two
+cases read as a product bug that did not exist.
+
+### 6.4 The rule of three
+
+**Three instances of one class means stop fixing instances.** Three is not bad
+luck; it is a structural invitation. At the third, the correct next action is
+the class fix, even when it costs more than the third instance would.
+
+Watch for this inside a single session too. Playwright route-order shadowing
+was hit three times in one sitting before anyone named it.
+
+## 7. Classes already named
+
+Do not rediscover these. A new defect matching one is a *repeat*, which means
+the class fix was insufficient — strengthen the gate rather than patch again.
+
+**Absent must never become plausible.** A missing value that coerces into a
+valid-looking wrong one is the most expensive bug shape here: four instances.
+`Number(params.get('season'))` → `0`, and `0` is Specials, so every arrival
+selected Specials. `{ q: undefined }` stringified to the literal `"undefined"`
+and switched Browse off. `toQuery` fell back to `watch_region: 'US'`, so a
+browse shared from Mumbai ran against US providers. `VITE_SUPABASE_URL`
+undefined made `REF` fall back to `'project'` and write a key nothing reads —
+twice blamed on timing. **Class fix: absent throws or stays absent. It never
+defaults into something that looks like an answer.**
+
+**One state spelled two ways in two places.** Three bugs, found by writing
+`docs/CONTROLS.md`. The chip's was decided by CSS chunk load order, and an
+element carrying both spellings painted as neither. Selection is still written
+three ways as `aria` and four as a class on the controls the component layer
+did not cover — that is the next thing worth a component.
+
+**A catch-all registered last shadows the specific ones.** Playwright route
+order, three times.
+
+**A pipe swallows the exit code.** `npm run snap 2>&1 | tail -2` inside an `&&`
+chain hid a crash and let stale fingerprints be pushed.
+
+**Live third-party data in a deterministic test is not a test.** `snap --check`
+failed on an untouched `main` because TMDB had drifted. Class fix: every
+third-party response, the region and the session are pinned.
+
+**A shape that crosses a module boundary must be converted at the boundary.**
+Two instances: `toCollectionView` written against a raw TMDB payload the
+endpoint never returns, and Browse tiles linking to `/title/undefined/123`
+because `discover` returns the harness shape while `Tile` wants the view shape.
+
+**One module's design document cannot retract another's.** Deleting
+`.head-actions` on the find document's instruction removed the only sign-in
+route for a guest on a phone — the shell document had claimed it.
+
+## 8. What is NOT covered
 
 Say so rather than assuming the net is wider than it is.
 
 - **`npm run snap` photographs default states only.** 72 screenshots, 7
   screens × 3 widths × 2 themes, all at rest. None of the three bugs that
   reached production would ever appear in it.
-- **CI runs `verify`, `lint`, `gallery`, `gallery:audit`, `states`, `build`
-  and `test:api`.** So the four measurements are gated now, not just the
-  structural checks. Still *not* in CI: `snap`, `auth`, `cohorts`, `find` —
-  the behavioural harnesses, three of which need credentials. Run those
-  yourself. `states` is in CI for its table and blocks nothing by design.
+- **CI runs `verify`, `lint`, `find`, `cohorts`, `build`, `test:api`, then
+  `gallery`, `gallery:audit` and `states`.** The four measurements are gated
+  now, not just the structural checks. Still *not* in CI: `snap` and `auth` —
+  3-4 min and 80s respectively, both needing a browser. Run those yourself:
+  `auth` before a release and after anything touching auth or the shell, `snap`
+  once before a PR. `states` is in CI for its table and blocks nothing by
+  design — which coverage gaps matter is a product call, not a machine's.
 - **`npm run snap`'s fingerprints are structural, not pixel**, and there are
   **two** of them. `geometry` is every box's position and size — that is the
   "did anything move" question. `hash` is the same thing plus each element's
@@ -174,9 +272,33 @@ Say so rather than assuming the net is wider than it is.
   Devanagari title sits in a different typeface from the UI around it. IBM
   Plex has Devanagari, JP and KR siblings if that is ever worth the bytes.
 - **Accessibility beyond focus order is unchecked.** Contrast is designed, not
-  verified.
+  verified. No check measures a touch target, which is why a 32px chip against
+  a 44px floor went unnoticed — a class waiting for a tier-2 gate.
+- **No error reporting exists.** `Boundary.jsx` prints its id to
+  `console.error` and nowhere else, so the code a person screenshots points at
+  nothing.
 
-## 8. Writing it down
+## 9. Feedback and RCA
+
+`docs/FEEDBACK_INTAKE.md` is the method. Every reported problem is tagged to a
+use-case id from `docs/USE_CASES.md`, or recorded as new — and **new is the
+most interesting outcome**, because it means the design never considered it.
+
+Then classified by cause, because symptoms cluster uselessly and causes cluster
+into fixes: **unbuilt · misbuilt · mis-designed · unanticipated · upstream ·
+environmental.**
+
+The split that does the work is **misbuilt** (code disagrees with its own
+design document) against **mis-designed** (code matches it exactly and the
+document is wrong). Identical complaints, opposite responses. One means a gate
+leaked; the other means the thinking was wrong, and only the second teaches
+anything about users.
+
+Then §6.4, with one question asked of every cluster: **what gate would have
+caught all of these?** If the answer is "none exists", that is an architecture
+change, and it is the thing actually being hunted.
+
+## 10. Writing it down
 
 Commit messages here carry the *reasoning*, not a summary of the diff — what
 was measured, what the number was, what was considered and rejected. The
@@ -186,7 +308,11 @@ record a mechanism somebody will otherwise rediscover the hard way.
 Comments in the stylesheets do the same job. If a declaration is load-bearing
 for a non-obvious reason, the reason goes next to it.
 
-## 9. Process
+When reporting work: what was built, **which tier of §6.1 the prevention landed
+on**, and what is still exposed. Report failures with their output. A skipped
+step is said out loud. Never report something as verified that was not run.
+
+## 11. Process
 
 Concept → design → grooming → development. **No development starts until
 grooming closes.** The plan of record is `docs/AUDIT_2026-09-13.md`.

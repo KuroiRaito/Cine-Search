@@ -1,4 +1,5 @@
 import { keyOf } from '../library';
+import { posterUrl } from '../../shared/tmdb/view.js';
 
 /**
  * The shelves. docs/profile-module.html §03.
@@ -52,6 +53,12 @@ export function shelfOf(rows, mediaType, live) {
             title: r.catalog_titles?.title || 'Untitled',
             year: (r.catalog_titles?.release_date || '').slice(0, 4) || null,
             posterPath: r.catalog_titles?.poster_path || null,
+            // Poster draws an <img> only when it is handed a src; `path` alone
+            // supplies the srcSet. Without this the whole films and series
+            // shelf fell through to the "no artwork" placeholder and rendered
+            // its own titles as text, beside people and characters that had a
+            // face — cardOf() has always built this, and this half never did.
+            face: posterUrl(r.catalog_titles?.poster_path, 'w342'),
             order: live?.[keyOf(r.media_type, r.tmdb_id)]?.favourite_order ?? r.favourite_order ?? null,
             addedAt: r.added_at,
         }))

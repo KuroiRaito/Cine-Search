@@ -63,13 +63,13 @@ Selection is written two ways today: `aria-pressed` on some controls, an `.on` c
 
 ## C7 — How this is held
 
-- **C7.1** `npm run verify` — 17 machine checks, CI-gated. Check 17 is C2.1.
+- **C7.1** `npm run verify` — 18 machine checks, CI-gated. Check 17 is C2.1; check 18 is C12.
 - **C7.2** `npm run states` — the coverage table. Not a gate: the gaps are design decisions and which ones matter is not a machine's call. It has been wrong twice, both times by reading too narrowly — once reporting MISSING focus for 40 controls the scoped global ring covers, once reporting MISSING hover for every control that answers on its subtree, and once filing `:hover:not(:disabled)` as a variant's hover because it counted the pseudos inside `:not()`. A tool that under-reports is worse than no tool, because the clean rows are believed.
 - **C7.3** `npm run snap` — 72 screenshots, 7 screens × 3 bands × 2 themes. **It photographs the default state only.** None of this month's three bugs would ever appear in it, because states do not show up in screenshots of pages.
 - **C7.4** `npm run gallery` — `docs/as-built.html`, every control drawn in every state it owes. Two things keep it from drifting away from the product, which is how every gallery dies: the CSS is the product's own, inlined verbatim and never restated; and `:hover`, `:focus-visible`, `:active` and `:disabled`, which markup cannot force, are *derived* — each rule that styles one is duplicated with the pseudo-class swapped for `[data-force~="…"]`. A control with no rule for a state draws the same as rest, so the gap is visible rather than inferred. Icons come from the real `Icon` component through vite-node, so one dropped from the role map disappears from the gallery too.
 - **C7.5** `npm run gallery:audit` — reads back the computed style of all 60 cells in both themes and reports any state whose paint is identical to rest. It found six on the first run, and it found two false positives in `npm run states`: a state styled only on a variant (`.circ.sm:disabled`) or behind another pseudo-class (`.searchbox:-webkit-autofill:hover`) was being credited to the bare control. Two tools that disagree are worth more than one that is confident.
 - **C7.6** `npm run shot -- <control>` — pulls one row out of the gallery at 3×. The gallery is 18,000px tall; a 24px control cannot be judged at the size it ships at, and "looks fine" at 1× is how a 2px offset survives. `--list` names every row, `--light` switches theme.
-- **C7.7** A new check is proved by reverting the bug and watching it fire. A check that has only ever seen a clean tree has not been tested. The geometry check in C9 was proved this way: with the reset removed it reported `quickadd 2.0px right`, which is the figure measured by hand before the fix.
+- **C7.7** A new check is proved by reverting the bug and watching it fire. **Three checks in this repo have now passed while broken**, and only re-breaking the product found them: the content check compared a long label to a short one and measured a difference of zero because both were broken; the spec-drift check ran *after* its own results had been collected, so its failures were never read; and `states` under-reported for two separate reasons. A check that has only ever seen a clean tree is not evidence of anything. A check that has only ever seen a clean tree has not been tested. The geometry check in C9 was proved this way: with the reset removed it reported `quickadd 2.0px right`, which is the figure measured by hand before the fix.
 
 ## C8 — Artwork has no theme
 
@@ -79,6 +79,14 @@ A control that lands on a poster or a still cannot borrow the page's surfaces, b
 - **C8.2** It was seven controls inventing it separately: rest opacities `.55 .6 .6 .62 .68 .72`, hovers `.72` and `.78`, and two different base colours — `rgba(8,12,20)` for `.quickadd` and `rgba(4,6,12)` for the other six. The top-right and bottom-left corners of the same poster were built out of different glass, which is a thing nobody can see as a bug and everybody can see as cheapness.
 - **C8.3** **The hairline is not trim.** A dark control on a dark poster has no edge of its own. `--glass-line` is what stops it dissolving into the artwork, and it belongs to every glass control, not just the one that happened to have it.
 - **C8.4** `--scrim-wash` is a different job — the full-screen dim behind a sheet — and keeps its own name even at the same value. `.tplay-b` was using it as a control ground; it now uses `--glass`.
+
+## C12 — The specification and the code agree, and that is checked
+
+- **C12.1** `docs/design-system.html` is what the design **says**; `src/shared/theme/tokens.css` is what the product **does**. They share 83 custom properties and every one currently matches.
+- **C12.2** It is a check rather than a note because the failure is silent and expensive: an agent reads the spec, builds to a value the code no longer holds, and nobody finds out until it is on screen. Neither file is wrong in that situation — they simply stopped being the same file, and nobody reads 162 tokens across two documents to notice.
+- **C12.3** One level of `var()` is resolved first, because the code legitimately aliases where the spec states a literal — `--sh: var(--shadow-raised)` and the shadow written out are the same shadow said two ways. Proved by changing `--beam-9`: it reported both `--beam-9` and `--acc`, which aliases through it.
+- **C12.4** Only the spec's `<style>` blocks are read. An inline `style="--c: …"` in one of its own demos is local to that demo, not a statement about the system.
+- **C12.5** **The specification does not declare the spacing or radius scales**, so those are not cross-checked and `tokens.css` is their only statement. Worth closing, and worth knowing until it is.
 
 ## C11 — An item's size does not depend on how many are beside it
 

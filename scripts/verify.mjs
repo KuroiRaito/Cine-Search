@@ -9,7 +9,7 @@
  * referenced in five places with no rule behind it, so every card in the app
  * lost its background, padding, radius and margin at once.
  */
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, extname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
@@ -627,8 +627,70 @@ for (const f of jsx) {
     }
 }
 
+/* ---------------------------------------------------------------
+   18. The specification and the code agree on every token.
+
+   docs/design-system.html is the Projector specification -- what the design
+   SAYS. src/shared/theme/tokens.css is what the product DOES. They share 84
+   custom properties, and as of today every one of them matches.
+
+   That is worth a check rather than a note, because the failure is silent and
+   expensive: a developer agent reads the spec, builds to a value the code no
+   longer holds, and nobody finds out until it is on screen. Neither file is
+   wrong in that situation -- they just stopped being the same file, and no
+   human reads 162 tokens across two documents to notice.
+
+   One level of `var()` is resolved before comparing, because the code
+   legitimately aliases where the spec states a literal: `--sh: var(
+   --shadow-raised)` and `--sh: 0 6px 16px -4px rgba(0,0,0,.6)` are the same
+   shadow said two ways. Inline `style="--c: ..."` in the spec's own demo
+   markup is not a token and is not read -- only its <style> blocks are. */
+{
+    const specFile = join(ROOT, 'docs/design-system.html');
+    if (existsSync(specFile)) {
+        const html = readFileSync(specFile, 'utf8');
+        /* <style> blocks only. An inline style attribute in a demo is local
+           to that demo, not a declaration about the system. */
+        const styles = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
+        const tokensCss = readFileSync(join(ROOT, 'src/shared/theme/tokens.css'), 'utf8');
+
+        const declsOf = (css) => {
+            const out = new Map();
+            for (const m of css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/(--[a-z0-9-]+)\s*:\s*([^;}]+)/gi)) {
+                if (!out.has(m[1])) out.set(m[1], m[2].trim());
+            }
+            return out;
+        };
+        const deref = (map, v, depth = 0) => {
+            if (depth > 4) return v;
+            const m = /^var\(\s*(--[a-z0-9-]+)\s*\)$/i.exec(v.trim());
+            return m && map.has(m[1]) ? deref(map, map.get(m[1]), depth + 1) : v.trim();
+        };
+
+        const S = declsOf(styles);
+        const T = declsOf(tokensCss);
+        let compared = 0;
+        for (const [name, rawSpec] of S) {
+            if (!T.has(name)) continue;
+            compared++;
+            const a = deref(S, rawSpec).replace(/\s+/g, ' ');
+            const b = deref(T, T.get(name)).replace(/\s+/g, ' ');
+            if (a !== b) {
+                fail('spec-drift', `${name}: the specification says ${a}, the code says ${b}`
+                    + ' -- docs/design-system.html vs src/shared/theme/tokens.css');
+            }
+        }
+        if (!compared) {
+            fail('spec-drift', 'docs/design-system.html declares no token this check could compare'
+                + ' -- the check has stopped reading the specification, which is worse than a drift');
+        }
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
+
 
 const CHECKS = [
     ['undefined-class', 'Every class in the markup has a CSS rule'],
@@ -648,6 +710,7 @@ const CHECKS = [
     ['component-import', 'A component used is a component imported'],
     ['icon-name', 'An icon names a role the set actually has'],
     ['icon-row', 'An icon beside content sits in a row that was declared'],
+    ['spec-drift', 'The specification and the code agree on every token'],
 ];
 
 let failed = 0;

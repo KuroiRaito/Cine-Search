@@ -29,6 +29,9 @@
     "find": "node --env-file-if-exists=.env scripts/find-cases.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/ibm-plex-sans": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@supabase/supabase-js": "^2.95.3",
     "lucide-react": "^1.46.0",
     "react": "^19.2.0",

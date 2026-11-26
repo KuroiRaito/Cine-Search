@@ -40,8 +40,12 @@
   margin: var(--section-gap) var(--gutter) 0; font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted);
 }
 .rolesw { display: flex; gap: var(--space-8); overflow-x: auto; margin: var(--space-16) var(--gutter) 0; padding: var(--space-2) 0; scrollbar-width: none; }
-.rolesw .sw { border-radius: var(--radius-full); background: var(--surface); }
-.rolesw .sw[aria-pressed="true"] { background: var(--acc-bg); }
+/* `.rolesw .sw` used to set `border-radius: var(--radius-full)` and
+   `background: var(--surface)` here. The other module that draws `.sw` set
+   the identical pair, and the `[aria-pressed]` half repeated a value the
+   base rule already had -- dead. Every `.sw` in the product sits in one of
+   those two rows, so the pill was not a variant: the BASE was wrong, and
+   both modules had been correcting it separately. Folded into `.sw`. */
 .rolesw::-webkit-scrollbar { height: 0; }
 
 .bio { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); max-width: var(--measure); }

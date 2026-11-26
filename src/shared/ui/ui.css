@@ -54,9 +54,22 @@
 
 /* A poster we have no artwork for still has to say which title it is. */
 .noart {
-  width: 100%; height: 100%; display: grid; place-items: center; padding: var(--space-8); text-align: center;
+  width: 100%; height: 100%; display: grid; place-items: center; text-align: center;
   background: linear-gradient(150deg, var(--ink-5), var(--ink-3));
-  font-family: var(--f-d); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 700; color: var(--muted);
+  font-family: var(--f-d); font-weight: 700; color: var(--muted);
+  /* Two knobs, because this fills whatever box it is given and that box is
+     34px wide in the editor's header and 190px wide on a grid tile. Three
+     places used to set `font-size` and `padding` on it from their own
+     stylesheets -- library twice with the identical `7px`/`2px` pair, entry
+     once while also restating the base font-size, which did nothing. A
+     container that needs a smaller label now sets the knob, and the control
+     is still the only thing that decides what it looks like (C5.5).
+     Declared as var() FALLBACKS, not as properties on `.noart`: a custom
+     property set on the element beats the same one inherited from an
+     ancestor, which is the trap `--prow-bg` fell into above. */
+  font-size: var(--noart-size, var(--text-micro));
+  line-height: var(--lh-micro);
+  padding: var(--noart-pad, var(--space-8));
 }
 
 .quickadd {
@@ -120,8 +133,23 @@
 
 
 .prow {
+  /* `--prow-bg` is the one thing a surrounding surface may change about this
+     control, and it is declared here so that is legible from the control's
+     own file. Title's desktop sidebar used to do it with
+     `.tside .prow { background: ... }` -- a module repainting a shared
+     control, invisible from here. A parent setting a knob the control
+     declares is the sanctioned shape of that (C5.5); reaching past the
+     control to its properties is not.
+
+     The default is the var()'s FALLBACK, not a declaration on `.prow`.
+     Declaring `--prow-bg: var(--surface)` here was the first attempt and it
+     silently broke the sidebar: a custom property set on the element itself
+     beats the same property inherited from an ancestor, so `.tside`'s value
+     never arrived and the rows kept the default ground. The measurement
+     caught it as rgb(247,248,251) turning into rgb(239,241,246); reading the
+     CSS would not have. */
   display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8) var(--space-12); border-radius: var(--radius-12);
-  background: var(--surface); transition: background .12s; width: 100%; text-align: left;
+  background: var(--prow-bg, var(--surface)); transition: background .12s; width: 100%; text-align: left;
 }
 .prow + .prow { margin-top: var(--space-8); }
 .prow:hover { background: var(--surface-hv); }
@@ -164,6 +192,11 @@
    real thing, so nothing shifts on arrival. Height and width stay props on the
    component — those are the one inline style the contract allows. */
 .skel-flat { border-radius: 0; }
+/* A page-sized placeholder block, rounded like the cards it stands in for.
+   `src/app/shell.css` used to get this by giving `.routewait .skel-flat` a
+   radius -- the journeys layer repainting a shared control, and a square
+   skeleton told to be round rather than a round one asked for by name. */
+.skel-block { border-radius: var(--radius-12); }
 .skel-art { border-radius: var(--radius-8); }
 .skel-poster { border-radius: var(--radius-8); margin-bottom: var(--space-4); }
 .skel-round { border-radius: var(--radius-full); }
@@ -203,6 +236,18 @@
 
 /* The season header is a second heading inside one section — same type, but it
    carries an action, so it needs its own rhythm above the list. */
+/* The section heading. Three modules draw it; it was declared in
+   `src/app/shell.css` while the `.markrow` variant below sat here, so the
+   control and its variant were in different layers and neither file showed
+   the whole control. */
+.sect-h {
+  font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm);
+  font-weight: 700; letter-spacing: -.02em; color: var(--text);
+  margin-bottom: var(--space-8);
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-8);
+}
+/* `.markrow` -- a season header, which is a heading that carries an action,
+   so it needs its own quieter rhythm above the episode list. */
 .sect-h.markrow { margin-top: var(--space-16); font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 400; }
 .sect-note { font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); font-weight: 400; }
 
@@ -223,6 +268,10 @@
    a link because that is what it does; it is a button because there is nothing
    to link to. */
 .linkish:hover { color: var(--acc-t-hv); }
+/* `.back` -- the one that returns up a level and therefore needs a line of
+   its own and room under it. Declared with the control although profile is
+   the only screen using it (C5.3). */
+.linkish.back { display: inline-block; margin-bottom: var(--space-8); }
 .linkish {
   background: none; border: 0; padding: 0; cursor: pointer;
   font-family: var(--f-s); font-weight: 600; color: var(--acc-t);
@@ -237,9 +286,72 @@
    that grows. Resizing stays vertical — a sheet has a fixed width. */
 .inp.notes { min-height: var(--space-64); line-height: var(--lh-body-sm); resize: vertical; }
 
+/* ---- C4: selection is an ARIA attribute, never a class ----
+
+   One state had two spellings. `.seg.on` was the only rule that drew a
+   selected segment, and the Kind filter set `aria-pressed` and never added
+   the class, so it announced itself correctly and looked unselected for as
+   long as it existed. Every other selectable control wrote BOTH -- the class
+   and the attribute, agreeing -- which is not safety, it is two chances to
+   be wrong and a reason nobody noticed the one place that disagreed.
+
+   So the stylesheet selects on the attribute, and the attribute is the one
+   the control's role requires: `aria-pressed` for a toggle button,
+   `aria-selected` inside a tablist, `aria-current` for the link to the page
+   you are on (React Router writes that one itself -- measured: NavLink emits
+   `aria-current="page"` exactly when active). A selected look is now
+   unreachable without the announcement that goes with it.
+
+   `.on` also meant two other things, which is why it is gone rather than
+   kept as a synonym: a lit star in the rating (`.full`, beside `.half`) and
+   the library's find row being open (`.finding`). One class name, three
+   meanings, and `verify` check 21 now forbids it outright. ---- */
+
 /* ---- Controls and state tones used on more than one screen. The six
         watch-state hues carry a tone into whatever they are applied to:
         a pill, a segment, a chip, a library row. ---- */
+
+/* ---------------- the round icon control ----------------
+
+   44x44, not 38: the 44-pixel law. A finger does not get smaller on a
+   tablet, so this does not change at any breakpoint.
+
+   Declared here rather than in `src/app/shell.css`, where it used to live:
+   entry, profile, title, library and search all draw it, which makes it a
+   shared control, and a shared control declared in the frame around the
+   modules is the same C5.1 mistake `.btn` was. The shell still positions it
+   (`.topbar-in .circ`), which is that layer's business. */
+.circ {
+  width: var(--control-h); height: var(--control-h); flex: 0 0 auto;
+  border-radius: var(--radius-full);
+  background: var(--surface); border: 0; color: var(--muted);
+  display: grid; place-items: center;
+  font-size: var(--text-title-sm); cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.circ:hover { background: var(--surface-hv); color: var(--text); }
+/* Was answered on .circ.sm only, so the bare control looked pressable while
+   disabled. Not opacity -- see C1.6: opacity fades the shadow with it and
+   reads as a rendering fault rather than a decision. */
+.circ:disabled { background: var(--surface); color: var(--faint); cursor: not-allowed; }
+/* Artwork has no theme: a control over a poster keeps its own dark ground
+   and white glyph in both light and dark. The cover had a second copy of
+   these four declarations in `entry.css`, byte for byte, because nothing
+   said the variant existed. Asking for the variant is now the only way to
+   get the glass. */
+.circ.on-image {
+  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+}
+.circ.on-image:hover { background: var(--glass-hv); color: var(--on-glass); }
+/* `.sm` -- the reorder and remove controls on a favourites row, where three
+   of them sit inside one tile and 44px each would be the tile. Declared with
+   the control although profile is the only screen that uses it: where a
+   variant is USED is not where it is declared (C5.3). Opacity here rather
+   than a flat colour because at 24px the control is already quiet and the
+   colour change was not readable. */
+.circ.sm { width: var(--space-24); height: var(--space-24); min-height: var(--space-24); font-size: var(--text-caption); }
+.circ.sm:disabled { opacity: .4; cursor: default; }
 
 /* ---------------- the button ----------------
 
@@ -316,6 +428,12 @@
    `.empty` is a component somebody renders on purpose, and this is only the
    container getting out of the way. */
 .chips:empty, .rail:empty, .grid:empty { display: none; }
+/* `.aside` -- the filter row while find is in use. The filter is set aside,
+   not removed: it stays legible and stays tappable, because tapping a chip
+   is the way back out of find. Declared here although library is the only
+   screen that uses it (C5.3); it was in `library.css`, where the fact that a
+   chip row has a stood-down state was invisible from the control's file. */
+.chips.aside { opacity: .5; }
 /* `display` is load-bearing, not decoration. A chip carries a label and, in
    two places, something after it: a count in <em>, or the close cross that
    takes the filter off. `.icon` is `display:block` (one line down, so every
@@ -329,9 +447,40 @@
    because a chip is also used inline, in the sentence the search results
    print back; as a child of `.chips` it blockifies to `flex` anyway.
    `gap` owns the spacing from here -- one mechanism, not a margin per child. */
+/* The chip was the only control under the touch floor. `.btn`, `.circ` and
+   `.seg` are all `--control-h` (44px) and `.sw` is `--control-sm` (36px); the
+   chip sized itself from its text alone and came out 32px. It is also the
+   densest control on the page -- a filter row is nothing but chips -- so it
+   is the one most often aimed at with a thumb.
+
+   The horizontal padding went 12px -> 16px as part of the SAME change, and
+   not for looks. A pill is only a pill while it is wider than it is tall, and
+   the product makes chips far shorter than a genre name: the region chips are
+   ISO country codes (`IN`, `US`, `GB`) and Library's tablist ends in `All`.
+   Measured at 390px with the real stylesheet:
+
+                      44px tall, 12px pad     44px tall, 16px pad
+     IN                36.4 x 44  NOT a pill   44.4 x 44  ok
+     All               38.7 x 44  NOT a pill   46.7 x 44  ok
+     War (shortest     46.7 x 44  ok           54.7 x 44  ok
+       real genre)
+
+   16px is the minimum that answers it -- `IN` clears 44 by 0.4px, which is
+   the tightest real case there is. 14px would still leave it 40.4px wide.
+   The cost is width: the eight-genre filter row runs 741px past its edge
+   instead of 677px. It already scrolls, on purpose.
+
+   `padding-block: 8px` stays even though `min-height` now decides the height,
+   and it is load-bearing for a CHECK rather than for the look. The audit's
+   one-line invariant is `max(line-height + padding + border, min-height)`,
+   so with 8px a chip that drops its cross onto a second line measures 48px
+   against a 44px expectation and fires; with 0 it would measure 44px and
+   hide inside the new floor. That is the production bug this control is
+   named for, so the padding that keeps it visible is not decoration. */
 .chip {
   flex: 0 0 auto; font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 500;
-  padding: var(--space-8) var(--space-12); border-radius: var(--radius-full); border: 0; cursor: pointer;
+  padding: var(--space-8) var(--space-16); border-radius: var(--radius-full); border: 0; cursor: pointer;
+  min-height: var(--control-h);
   background: var(--ink-3); color: var(--muted); white-space: nowrap;
   display: inline-flex; align-items: center; gap: var(--space-4);
   transition: background .12s, color .12s;
@@ -343,8 +492,8 @@
 .chip { text-decoration: none; }
 .chip em { font-style: normal; opacity: .5; font-variant-numeric: tabular-nums; }
 .chip:hover { background: var(--ink-4); color: var(--text); }
-.chip[aria-pressed="true"] { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
-.chip[aria-pressed="true"] em { opacity: .65; }
+.chip:is([aria-pressed="true"], [aria-selected="true"]) { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
+.chip:is([aria-pressed="true"], [aria-selected="true"]) em { opacity: .65; }
 /* The chip has TWO selected looks, and they are two different ideas:
    `aria-pressed` is a filter option you turned ON -- it fills solid, because
    it is the thing you just did. `.applied` is a filter already in force in
@@ -364,12 +513,19 @@
    against a block-level icon and did not. */
 .chip.applied svg { opacity: .7; }
 
+/* The pill shape and the resting ground were set from `title.css` and
+   `person.css` -- the same two declarations in both, written separately,
+   each with a comment explaining why reaching into a shared control was
+   acceptable here. Every `.sw` in the product sits inside one of those two
+   rows, so the pill was never a variant: the base was wrong and both modules
+   had been quietly correcting it. The gallery meanwhile drew the bare base,
+   a look that appeared nowhere on screen. */
 .sw {
-  flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
+  flex: 0 0 auto; border: 0; background: var(--surface); cursor: pointer; color: var(--muted);
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
   font-weight: 500; padding: 0 var(--space-12);
   min-height: var(--control-sm); display: inline-flex; align-items: center; gap: var(--space-4);
-  border-radius: var(--radius-8); white-space: nowrap; font-variant-numeric: tabular-nums;
+  border-radius: var(--radius-full); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
 .sw:hover { background: var(--surface-hv); color: var(--text); }
 .sw em { font-style: normal; opacity: .55; font-size: var(--text-micro); line-height: var(--lh-micro); }
@@ -397,8 +553,8 @@
 .st-re      { --stc: var(--st-re-11);   --stb: var(--st-re-3);   --stl: var(--st-re-9); }
 .st-drop    { --stc: var(--st-drop-11); --stb: var(--st-drop-3); --stl: var(--st-drop-9); }
 
-.ibtn.on { background: var(--stb); color: var(--stc); box-shadow: inset 0 0 0 1px var(--stl); }
-.ibtn.like.on { --stb: var(--like-3); --stc: var(--like-11); --stl: var(--like-9); }
+.ibtn[aria-pressed="true"] { background: var(--stb); color: var(--stc); box-shadow: inset 0 0 0 1px var(--stl); }
+.ibtn.like[aria-pressed="true"] { --stb: var(--like-3); --stc: var(--like-11); --stl: var(--like-9); }
 /* Loading shimmer, after the rules it overrides. */
 .skel, .tile .art {
   background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hv) 50%, var(--surface) 75%);
@@ -482,6 +638,17 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   padding: var(--space-12) var(--sheet-pad) max(var(--sheet-pad), env(safe-area-inset-bottom));
   box-shadow: var(--shadow-sheet);
 }
+/* The two sheets that are longer than a sheet. Both were declared by the
+   module that uses them -- `.editor` in library.css, `.tall` in profile.css --
+   which meant the full set of shapes a sheet can take was written down
+   nowhere, and each module had to work out for itself that a scrolling sheet
+   needs a cap (C5.3).
+   `.editor` sets `--sheet-pad` rather than `padding`: the knob the control
+   declares, which is the shape a context is allowed to influence (C5.5). Its
+   `padding-inline: 0` is there because the editor's own rows carry the inset,
+   so the sheet must not add it again. */
+.sheet.editor { --sheet-pad: 14px; padding-inline: 0; max-height: 88vh; overflow-y: auto; }
+.sheet.tall { max-height: 80vh; overflow-y: auto; }
 
 /* S5 — with a pointer the sheet stops being a sheet. Centred, all four corners
    rounded, and no longer glued to an edge the thumb was reaching for. The width
@@ -508,7 +675,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 }
 .seg:hover { background: var(--ink-4); color: var(--text); }
 .seg i { font-style: normal; font-size: var(--text-micro); line-height: var(--lh-micro); font-family: var(--f-s); }
-.seg.on { background: var(--stb); color: var(--stc); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--stc); }
+.seg:is([aria-pressed="true"], [aria-selected="true"]) { background: var(--stb); color: var(--stc); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--stc); }
 
 .prog {
   display: flex; align-items: center; gap: var(--space-8); background: var(--bg-sub);
@@ -536,7 +703,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   background: none; border: 0; padding: 0; cursor: pointer; position: relative;
   font-size: var(--text-title-sm); color: var(--ink-7); line-height: 1; width: var(--icon-20); height: var(--icon-24);
 }
-.stars button.on { color: var(--rate); }
+.stars button.full { color: var(--rate); }
 /* A half star is the full glyph clipped down the middle, over a dim one. */
 .stars button.half::after {
   content: "★"; position: absolute; inset: 0; color: var(--rate);

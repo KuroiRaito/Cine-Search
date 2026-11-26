@@ -243,8 +243,12 @@
    the same primitive doing a different job, and §03d's rule is about season
    selectors. Styling a shared class inside one of its own is the one thing
    MODULE.md allows here. */
-.seasonsw .sw { border-radius: var(--radius-full); background: var(--surface); }
-.seasonsw .sw[aria-pressed="true"] { background: var(--acc-bg); }
+/* `.seasonsw .sw` used to set `border-radius: var(--radius-full)` and
+   `background: var(--surface)` here. The other module that draws `.sw` set
+   the identical pair, and the `[aria-pressed]` half repeated a value the
+   base rule already had -- dead. Every `.sw` in the product sits in one of
+   those two rows, so the pill was not a variant: the BASE was wrong, and
+   both modules had been correcting it separately. Folded into `.sw`. */
 .seasonsw::-webkit-scrollbar { height: 0; }
 
 /* TV9 — the band header is the season: its name, its year, its own fraction,
@@ -322,7 +326,7 @@
   transition: background .12s, color .12s;
 }
 .epchk:hover { background: var(--ink-5); color: var(--muted); }
-.epchk.on { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
+.epchk[aria-pressed="true"] { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
 .epchk:disabled { opacity: .4; cursor: default; }
 .sect-h .markall:hover { color: var(--acc-t-hv); }
 .sect-h .markall {
@@ -426,7 +430,12 @@
     display: block; position: sticky; top: var(--space-80);
     background: var(--surface); border-radius: var(--radius-12); padding: var(--space-16);
   }
-  .tside .prow { background: var(--bg-sub); }
+  /* Not `.tside .prow { background: ... }`. That was this module reaching in
+     and repainting a shared control, and nothing in `.prow`'s own file said
+     it could happen. `--prow-bg` is a knob the control declares and this
+     surface sets: the parent says what ground it offers, the control decides
+     what to do about it. */
+  .tside { --prow-bg: var(--bg-sub); }
   .tside .pchip { background: var(--ink-4); }
 
   /* The four cards go one across rather than two by two. */

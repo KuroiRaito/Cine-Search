@@ -42,6 +42,7 @@
  * of the shared control, so no module restyles the chip any more (C5.2).
  */
 import Icon from './Icon.jsx';
+import selectionAttr from './selection.js';
 
 export function Chip({
     as: As = 'button',
@@ -64,11 +65,14 @@ export function Chip({
     if (As === 'button') {
         props.type = rest.type || 'button';
     }
-    /* C4 -- one prop, one spelling. `aria-pressed` is the source of truth
-       because it is the one a browser and a screen reader can both read, and
-       it is what ui.css selects on. The class spelling is gone. An applied
-       chip never claims to be pressed: it is a remove button. */
-    if (selected && !isApplied) props['aria-pressed'] = 'true';
+    /* C4 -- one prop, one spelling, and it is the one the ROLE requires.
+       Library's shelf filters are a tablist: they carry `role="tab"`, where
+       `aria-pressed` is not a supported attribute, so they were announcing
+       their state with something the role does not define. `aria-selected`
+       is the answer there, `aria-pressed` for a plain toggle, and ui.css
+       selects on either. An applied chip claims neither: it is a remove
+       button, not a thing that is on. */
+    if (selected && !isApplied) props[selectionAttr(rest.role)] = 'true';
 
     return (
         <As {...props}>

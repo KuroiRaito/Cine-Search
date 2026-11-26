@@ -255,6 +255,18 @@ const LEGAL_RAW = new Set(['320px', '1px', '-1px']);
 const SCALED_PROPS = /^(padding|padding-[a-z]+|margin|margin-[a-z]+|gap|row-gap|column-gap|font-size|line-height|border-radius|height|min-height|width|min-width|top|right|bottom|left|inset)$/;
 
 const stripComments = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '');
+/* Same thing, but the text keeps its shape: every character of a comment
+   becomes a space and every newline survives, so a line number computed
+   afterwards is still the line number in the file. Three checks reported the
+   wrong line before this existed -- they stripped comments, then counted
+   newlines in the stripped text, and in a codebase whose stylesheets are
+   half commentary the answer was off by dozens of lines. A check that names
+   the wrong line sends its reader to the wrong place, which is worse than
+   saying nothing: the reader concludes the check is broken and stops reading
+   it. */
+const blankComments = (t) => t
+    .replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '))
+    .replace(/^([^\n]*?)\/\/[^\n]*$/gm, (l, keep) => keep + ' '.repeat(l.length - keep.length));
 
 for (const f of cssFiles) {
     const rel = relative(ROOT, f);
@@ -810,6 +822,304 @@ for (const f of jsx) {
 }
 
 
+/* ---------------------------------------------------------------
+   21. Selection is an ARIA attribute, never a class.
+
+   One state had two spellings and that is how the Kind filter looked
+   unselected for as long as it existed: `.seg.on` was the only rule that
+   drew a selected segment, and FilterPanel set `aria-pressed` and never
+   added the class. It announced itself correctly to a screen reader and
+   showed nothing at all to everybody else.
+
+   Every OTHER selectable control wrote both -- the class and the attribute,
+   agreeing. That is not a safety net. It is two chances to be wrong, and the
+   reason nobody noticed the one place they disagreed: twelve controls where
+   the pair matched made the pair look like the convention.
+
+   So the stylesheet selects on the attribute the control's role requires:
+   `aria-pressed` for a toggle button, `aria-selected` inside a tablist,
+   `aria-current` for the link to the page you are on. A selected look is now
+   unreachable without the announcement that goes with it, which is the whole
+   point -- the two cannot drift, because there is only one of them.
+
+   `.on` is forbidden outright rather than kept as a synonym because it also
+   meant two other things: a lit star in the rating (now `.full`) and the
+   library's find row being open (now `.finding`). One class, three meanings,
+   and no reader could tell which from the name. */
+{
+    /* A machine cannot tell what a class MEANS, so this forbids the names
+       that have ever meant "selected" in this codebase or in the idiom
+       around it. A new one invented tomorrow is not caught, which is why the
+       convention is also written down in CONTROLS.md C4. */
+    const SYNONYMS = ['on', 'sel', 'selected', 'is-selected', 'active', 'is-active',
+        'current', 'is-current', 'checked', 'chosen'];
+    const alt = SYNONYMS.join('|');
+    /* `(?![\w-])` is what keeps `.on-image` out of it -- a different class
+       that happens to start with the same two letters. */
+    const inCss = new RegExp(`\\.(${alt})(?![\\w-])`, 'g');
+
+    let selectionRules = 0;
+    for (const f of cssFiles) {
+        const rel = relative(ROOT, f);
+        const src = blankComments(readFileSync(f, 'utf8'));
+        src.split('\n').forEach((line, i) => {
+            /* Declarations only, not a selector's braces content. A `.on` can
+               only be in the selector, which is before the first `{`. */
+            const selector = line.split('{')[0];
+            for (const m of selector.matchAll(inCss)) {
+                fail('aria-selection', `${rel}:${i + 1}: \`.${m[1]}\` styles a state as a class`
+                    + ' -- selection is aria-pressed, aria-selected or aria-current (C4)');
+            }
+        });
+        selectionRules += [...src.matchAll(/\[aria-(pressed|selected|current)/g)].length;
+    }
+
+    for (const f of jsx) {
+        const rel = relative(ROOT, f);
+        const src = blankComments(readFileSync(f, 'utf8'));
+        src.split('\n').forEach((line, i) => {
+            for (const m of line.matchAll(/className=(?:"([^"]*)"|\{([^}]*)\})/g)) {
+                const text = (m[1] || m[2] || '');
+                /* Class STRINGS only. `fav.on` is a property read, not a
+                   class, and `open === k` is a comparison -- both appear
+                   inside a className expression and neither is a class. */
+                for (const q of text.matchAll(/['"`]([^'"`]*)['"`]/g)) {
+                    for (const c of q[1].split(/\s+/).filter(Boolean)) {
+                        if (SYNONYMS.includes(c)) {
+                            fail('aria-selection', `${rel}:${i + 1}: className applies \`${c}\``
+                                + ' -- write the state as aria-pressed / aria-selected, which is what the stylesheet selects on (C4)');
+                        }
+                    }
+                }
+                if (m[1] !== undefined) {
+                    for (const c of m[1].split(/\s+/).filter(Boolean)) {
+                        if (SYNONYMS.includes(c)) {
+                            fail('aria-selection', `${rel}:${i + 1}: className applies \`${c}\``
+                                + ' -- write the state as aria-pressed / aria-selected (C4)');
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* C7.7 -- a check that cannot find what it counts passes forever. If no
+       stylesheet selects on a selection attribute, the convention has been
+       abandoned and the half above is guarding nothing. */
+    if (selectionRules < 10) {
+        fail('aria-selection', `only ${selectionRules} rules select on an ARIA selection attribute`
+            + ' -- the stylesheets have stopped styling selection this way, so this check is guarding nothing');
+    }
+}
+
+
+/* ---------------------------------------------------------------
+   22. A module may position a shared control. It may not repaint one.
+
+   C5.4. The line is between what a control LOOKS like and how much room it
+   gets. A card deciding its action runs full width, or an empty state
+   deciding how far below the message its button sits, is the parent's
+   business and is fine. A module changing a shared control's background,
+   radius or shadow is not: the declaration that decides how the control
+   looks ends up in a file the control's own file knows nothing about.
+
+   That is not a hypothetical. `search.css` carried a `vertical-align:
+   middle` patch for a chip it does not own -- a declaration that cannot move
+   a block box and never did anything -- sitting one layer away from the rule
+   that caused the problem, so neither reader ever saw both. And `.sw` was
+   repainted from `title.css` and `person.css` with the IDENTICAL two
+   declarations, written separately, each with a comment explaining why
+   reaching in was acceptable there. Every `.sw` in the product sat inside
+   one of those two rows, so the base was simply wrong and both modules had
+   been correcting it in private.
+
+   Two shapes are allowed and are not flagged:
+     - a parent setting layout on a shared control (`.nothing .btn
+       { margin-top }`);
+     - a parent setting a CUSTOM PROPERTY the control itself declares
+       (`.tside { --prow-bg: ... }`). The control still decides what to do
+       with the value, and the knob is visible in the control's own file --
+       which is the whole difference (C5.5). */
+{
+    const PAINT = /^\s*(background|background-[a-z-]+|color|border|border-[a-z-]*colou?r|border-[a-z-]*width|border-[a-z-]*style|border-radius|box-shadow|font-weight|font-family|font-size|font-style|opacity|filter|backdrop-filter|text-decoration[a-z-]*|text-transform|letter-spacing|outline[a-z-]*)\s*$/;
+
+    /* Where each class is DECLARED on its own, which is its home. A class
+       only ever written as somebody else's descendant has no home here and
+       is not a shared control. */
+    const layerOfFile = (rel) => (rel.includes('shared/ui') || rel.includes('shared/theme') ? 'shared'
+        : rel.includes('src/app/') || rel === 'src/App.jsx' ? 'app'
+            : (rel.match(/src\/modules\/([^/]+)\//) || [, null])[1]);
+
+    const home = new Map();
+    const rules = [];
+    for (const f of cssFiles) {
+        const rel = relative(ROOT, f);
+        const layer = layerOfFile(rel);
+        const src = blankComments(readFileSync(f, 'utf8'));
+        for (const m of src.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+            const line = src.slice(0, m.index).split('\n').length;
+            for (const sel of m[1].split(',')) {
+                const sl = sel.trim();
+                if (!sl.includes('.')) continue;
+                const compounds = sl.split(/[\s>+~]+/).filter(Boolean);
+                const subject = compounds[compounds.length - 1];
+                const names = [...subject.matchAll(/\.([A-Za-z0-9_-]+)/g)].map((c) => c[1]);
+                if (!names.length) continue;
+                /* A bare single-class rule is where that class lives. */
+                if (compounds.length === 1 && names.length === 1
+                    && !/[:[]/.test(subject.replace(/\.[A-Za-z0-9_-]+/g, ''))) {
+                    if (!home.has(names[0])) home.set(names[0], layer);
+                }
+                rules.push({ rel, line, layer, sl, compounds, names, decls: m[2] });
+            }
+        }
+    }
+
+    let checked = 0;
+    for (const r of rules) {
+        const owner = r.names[0];
+        const h = home.get(owner);
+        if (!h || h === r.layer) continue;            // its own layer may do as it likes
+        if (h !== 'shared' && h !== 'app') continue;  // only SHARED controls are protected
+        checked++;
+        const props = r.decls.split(';').map((d) => d.split(':')[0]).filter((x) => x && x.trim());
+        for (const prop of props) {
+            const name = prop.trim();
+            /* A custom property is a knob, not a repaint -- but only one the
+               control declares, which check 5 already guarantees is declared
+               somewhere. */
+            if (name.startsWith('--')) continue;
+            if (!PAINT.test(name)) continue;          // layout: the parent's business
+            const shape = r.compounds.length > 1 ? 'repaints' : 'declares a variant that repaints';
+            fail('no-repaint', `${r.rel}:${r.line}: \`${r.sl.trim()}\` ${shape} \`.${owner}\``
+                + ` (declared in ${h}) -- \`${name}\` belongs with the control, or pass a custom property it declares (C5.4)`);
+        }
+    }
+    /* C7.7 -- if this found nothing to look at, it is guarding nothing. The
+       product has always had modules positioning shared controls. */
+    if (!checked) {
+        fail('no-repaint', 'no module rule touches a shared control at all'
+            + ' -- that is not plausible, so this check has stopped finding the rules it judges');
+    }
+}
+
+
+/* ---- 23. a watch state carries enough colour to BE a state -------------
+   `want` shipped at 39% of the quietest sibling's chroma, in both themes.
+   It is the most-used status in a tracker -- most of a library is things
+   you have not watched yet -- so the one tone that reads as "no state" is
+   the one almost everything wears.
+
+   Saturation in HSL is the wrong ruler here: 20% at 221deg and 20% at
+   131deg are not the same amount of colour to an eye, which is how a blue
+   at "20%" sat beside greens at "38%" without the gap being obvious from
+   the source. OkLCh chroma is perceptually even, so it can carry a floor.
+
+   The floors are set below the quietest real tone in each tier, not at the
+   current values, so this is a floor and not a snapshot -- a seventh status
+   added in any hue has to carry colour, and nothing has to be re-tuned
+   when a tone is adjusted deliberately. Lightness is deliberately NOT
+   checked: the six already agree on it, and it is what contrast depends
+   on. */
+{
+    const FLOOR = { 9: 0.10, 11: 0.07, 3: 0.015 };
+    const srgb = (v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    const chromaOf = (hex) => {
+        const [r, g, b] = [0, 2, 4]
+            .map((i) => parseInt(hex.slice(i + 1, i + 3), 16) / 255)
+            .map(srgb);
+        const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+        const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+        const t = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+        const A = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * t;
+        const B = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * t;
+        return Math.hypot(A, B);
+    };
+
+    const tokensSrc = readFileSync(join(ROOT, 'src/shared/theme/tokens.css'), 'utf8');
+    let seen = 0;
+    for (const m of tokensSrc.matchAll(/--st-([a-z]+)-(9|11|3)\s*:\s*(#[0-9A-Fa-f]{6})/g)) {
+        const [, state, tier, hex] = m;
+        const line = tokensSrc.slice(0, m.index).split('\n').length;
+        seen++;
+        const c = chromaOf(hex);
+        if (c < FLOOR[tier]) {
+            fail('status-chroma', `src/shared/theme/tokens.css:${line}: \`--st-${state}-${tier}\``
+                + ` is ${hex}, chroma ${c.toFixed(3)} -- under the ${FLOOR[tier]} floor for a`
+                + ` -${tier} tone, so it reads as grey rather than as a state (C14 companion)`);
+        }
+    }
+    /* C7.7 -- six states, three tiers, and a light block declared twice.
+       Anything far under that means the palette moved and this stopped
+       reading it. */
+    if (seen < 30) {
+        fail('status-chroma', `only ${seen} watch-state tones found in tokens.css`
+            + ' -- that is too few, so this check has stopped finding the palette it judges');
+    }
+}
+
+
+/* ---- 24. a typeface the design NAMES is a typeface the product LOADS ----
+   The design system named Archivo, IBM Plex Sans and IBM Plex Mono from the
+   first extraction. The product loaded none of them: no @font-face, no font
+   package, nothing in index.html. So every visitor saw whatever their device
+   supplied, `--f-d`'s `sans-serif` fallback resolved to a different face from
+   `--f-s`'s `system-ui`, and the display and body type differed by accident
+   rather than by design.
+
+   It survived for months because a missing face fails SILENTLY -- the browser
+   drops to the next name in the stack and says nothing -- and because every
+   check in this repo was reading the same fallback and agreeing with itself.
+   Loading the faces moved all 72 structural fingerprints.
+
+   So: the first family in every stack must be one that an imported stylesheet
+   actually declares an @font-face for. First position, because that is the one
+   the product intends; the names behind it are the fallbacks, and a fallback is
+   allowed to be absent -- that is its job. */
+{
+    const tokensRel = 'src/shared/theme/tokens.css';
+    const tokensSrc = readFileSync(join(ROOT, tokensRel), 'utf8');
+
+    /* Every family any imported sheet declares a face for. */
+    const declared = new Set();
+    const imports = [...tokensSrc.matchAll(/@import\s+'([^']+)'/g)].map((m) => m[1]);
+    for (const spec of imports) {
+        let sheet;
+        try {
+            sheet = readFileSync(join(ROOT, 'node_modules', spec), 'utf8');
+        } catch {
+            fail('font-loaded', `${tokensRel}: \`@import '${spec}'\` does not resolve`
+                + ' -- the face it was meant to load is missing and will fail silently');
+            continue;
+        }
+        for (const m of sheet.matchAll(/font-family:\s*'([^']+)'/g)) declared.add(m[1]);
+    }
+
+    let stacks = 0;
+    for (const m of tokensSrc.matchAll(/--(f-[a-z]+)\s*:\s*([^;]+);/g)) {
+        const [, token, value] = m;
+        const first = value.trim().match(/^'([^']+)'/);
+        /* A stack that opens with a generic keyword (system-ui, monospace) is
+           asking for the device's own face on purpose, and needs no file. */
+        if (!first) continue;
+        stacks++;
+        const line = tokensSrc.slice(0, m.index).split('\n').length;
+        if (!declared.has(first[1])) {
+            fail('font-loaded', `${tokensRel}:${line}: \`--${token}\` names`
+                + ` '${first[1]}' first, but no imported stylesheet declares a face for it`
+                + ' -- it will fall back silently and the design\'s typeface will never render');
+        }
+    }
+    /* C7.7 -- three font tokens have been in this file since the first
+       extraction. Zero means the tokens were renamed and this stopped
+       reading them, which is how the original bug hid. */
+    if (stacks < 3) {
+        fail('font-loaded', `only ${stacks} named font stack(s) found in ${tokensRel}`
+            + ' -- too few, so this check has stopped finding the stacks it judges');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -835,6 +1145,10 @@ const CHECKS = [
     ['spec-drift', 'The specification and the code agree on every token'],
     ['owned-class', 'A shared control\'s class is written by its component, not by hand'],
     ['one-toast', 'One toast, mounted by the shell, raised one way'],
+    ['aria-selection', 'Selection is an ARIA attribute, never a class'],
+    ['no-repaint', 'A module positions a shared control, never repaints it'],
+    ['status-chroma', 'Every watch state carries enough colour to be a state'],
+    ['font-loaded', 'A typeface the design names is a typeface the product loads'],
 ];
 
 let failed = 0;

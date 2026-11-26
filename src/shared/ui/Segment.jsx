@@ -22,6 +22,8 @@
  * the bug is not fixable-here-and-broken-there any more -- it is fixed.
  */
 
+import selectionAttr from './selection.js';
+
 export function Segment({
     selected = false,
     tone,
@@ -29,17 +31,17 @@ export function Segment({
     children,
     ...rest
 }) {
-    const cls = ['seg', tone, selected && 'on', className].filter(Boolean).join(' ');
+    const cls = ['seg', tone, className].filter(Boolean).join(' ');
+    /* C4 -- one spelling, and it is the one the role requires. The `.on`
+       class is gone: the stylesheet selects on the attribute now, so there
+       is no second place for the state to be written and no way for the two
+       to disagree. */
     return (
         <button
             type={rest.type || 'button'}
             {...rest}
             className={cls}
-            /* C4.1 -- the attribute is the source of truth because it is the
-               one a browser and a screen reader can both read. The class is
-               what the stylesheet selects on today. Both come from one prop,
-               which is what makes "where the two disagree" unreachable. */
-            aria-pressed={selected}
+            {...{ [selectionAttr(rest.role)]: selected }}
         >
             {children}
         </button>

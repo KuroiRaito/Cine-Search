@@ -25,7 +25,7 @@
  *   npm run gallery        write docs/as-built.html
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -361,7 +361,65 @@ const CHROME = `
   @media (max-width: 720px) { .g-row { grid-template-columns: 1fr; } .g-name { padding-top: 0; } }
 `;
 
-const css = SHEETS.map(read).join('\n');
+/* ---------------------------------------------------------------
+   Resolve the font @imports into this page, as data URIs.
+
+   tokens.css loads its faces with `@import '@fontsource/...'`, which Vite
+   resolves for the product. Inlining tokens.css verbatim carries those bare
+   specifiers into a plain HTML file, where NOTHING resolves them: no browser
+   knows what `@fontsource-variable/archivo` means, and a font that fails to
+   load fails SILENTLY to the next name in the stack.
+
+   That is not a cosmetic problem here. This page is what `gallery:audit`
+   measures, and the whole reason the fonts were loaded at all is that every
+   measurement in this repo had been taken in the fallback face. Leaving the
+   imports dead would reproduce the exact blindness being fixed, one layer
+   further in.
+
+   Data URIs rather than paths, because the alternatives both fail: the audit's
+   own server answers every request with this HTML, and a human opening
+   docs/as-built.html from disk gets a CORS refusal on a relative file:// font.
+   A self-contained page works in both, and in a fresh clone with no
+   node_modules -- which is also what `as-built.html` claims to be.
+
+   Latin and latin-ext only, upright only. The gallery draws no italic (its
+   Devanagari specimen has no Plex face in any of these subsets and falls back
+   whatever happens), so carrying cyrillic, greek and vietnamese would add
+   ~400kB of base64 to a generated file for glyphs no specimen contains. When a
+   specimen needs one, widen KEEP and regenerate -- do not let it fall back. */
+const KEEP = /-(latin|latin-ext)-/;
+const fontCss = (spec) => {
+    /* An italic-only import contributes nothing here, and that is a decision
+       rather than a failure -- so it is stated, not swallowed by the guard
+       below, which exists to catch a package whose layout moved. */
+    if (/italic/.test(spec)) return `/* ${spec} -- omitted, no specimen is italic */`;
+    const file = join(ROOT, 'node_modules', spec);
+    const dir = dirname(file);
+    const faces = readFileSync(file, 'utf8').split('@font-face').slice(1);
+    const out = [];
+    for (const face of faces) {
+        const m = face.match(/url\((\.\/files\/([^)]+\.woff2))\)/);
+        if (!m || !KEEP.test(m[2]) || /italic/.test(m[2])) continue;
+        const b64 = readFileSync(join(dir, 'files', m[2])).toString('base64');
+        out.push('@font-face' + face.replace(m[1], `data:font/woff2;base64,${b64}`));
+    }
+    if (!out.length) throw new Error(`no face kept from ${spec} -- the package layout changed`);
+    return out.join('\n');
+};
+
+let css = SHEETS.map(read).join('\n');
+{
+    const imports = [...css.matchAll(/@import\s+'([^']+)';?/g)];
+    /* C7.7 -- tokens.css declares three typefaces. If this stops finding the
+       imports that load them, the page silently reverts to measuring the
+       fallback, which is the bug this whole mechanism exists to prevent. */
+    if (!imports.length) {
+        throw new Error('gallery: no @import found in the product stylesheets'
+            + ' -- the faces are no longer being loaded, so this page would'
+            + ' measure the fallback face. Check tokens.css.');
+    }
+    for (const [whole, spec] of imports) css = css.replace(whole, fontCss(spec));
+}
 const html = `<!doctype html>
 <html lang="en" data-theme="dark">
 <head>

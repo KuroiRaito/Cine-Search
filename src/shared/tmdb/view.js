@@ -530,6 +530,11 @@ export function toPersonView(raw) {
         name: raw.name,
         department: raw.known_for_department || null,
         photo: profileUrl(raw.profile_path, 'h632'),
+        /* The raw path as well as the built URL. user_favourites.image_path
+           stores a path, not a URL, because the People shelf rebuilds it at
+           w185 — carrying only the h632 `photo` meant the heart on this page
+           saved every favourite person with no face at all. */
+        profilePath: raw.profile_path || null,
         /* The whole career, before the relevance filter thins it for display.
            "Credits 10" for Denis Villeneuve is visibly wrong to anybody who
            knows the work, and the filter exists to keep a grid readable rather

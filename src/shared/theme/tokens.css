@@ -13,7 +13,48 @@
    It is declared here rather than re-extracted because the two systems
    have not been reconciled yet. Reconciling them is the open task; until
    then this is the only token in this file with no upstream twin.
+
+   EXCEPTION, 2026-11-26 — the three font stacks. The design system names
+   the TYPEFACES: Archivo, IBM Plex Sans, IBM Plex Mono. It had named them
+   since the first extraction, and the product loaded none of them: there
+   was no @font-face, no font package and nothing in index.html, so every
+   visitor saw whatever their device supplied, and `--f-d`'s `sans-serif`
+   fallback resolved to a DIFFERENT face from `--f-s`'s `system-ui`. The
+   display and body type differed by accident of fallback rather than by
+   design, and every measurement this repo takes was measuring the
+   fallback.
+
+   The faces are loaded now, self-hosted (see the imports below), and a
+   stack has to name the family that the loaded @font-face DECLARES.
+   Archivo and IBM Plex Sans are variable fonts, and the package names
+   those families with a `Variable` suffix, so the stacks lead with
+   `'Archivo Variable'` and `'IBM Plex Sans Variable'` and keep the plain
+   names behind them for anyone who has the static face installed. The
+   typefaces are the ones the design asked for; only the family STRING
+   differs from upstream, and it has to.
    ============================================================ */
+
+/* The faces, self-hosted rather than fetched from Google Fonts. Three
+   reasons, and the third is the one that matters here:
+     - no third-party request, so no visitor's IP goes to a font host;
+     - the files are fingerprinted and served from our own origin;
+     - **every check in this repo runs in headless Chromium, often with no
+       network.** A <link> to a font host would fail there, so `gallery`,
+       `gallery:audit` and `snap` would go on silently measuring the
+       fallback — which is exactly how a design system can name three
+       typefaces for months while the product renders none of them.
+   Variable where the family has one (one file covers the whole weight
+   axis, so a weight can never be missing); IBM Plex Mono has no variable
+   cut, so its four used weights are named. Mono needs no italic: the only
+   two italic rules in the product, `.tagline` and `.pbio.ph`, inherit
+   `--f-s` from `body`. */
+@import '@fontsource-variable/archivo/wght.css';
+@import '@fontsource-variable/ibm-plex-sans/wght.css';
+@import '@fontsource-variable/ibm-plex-sans/wght-italic.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+@import '@fontsource/ibm-plex-mono/700.css';
 
 :root{
   color-scheme:dark;
@@ -51,7 +92,7 @@
   --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
   --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-t-hv:var(--beam-12);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
   --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);--on-rate:var(--on-mar-9);
-  --f-d:'Archivo',sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',monospace;
+  --f-d:'Archivo Variable','Archivo',sans-serif;--f-s:'IBM Plex Sans Variable','IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',ui-monospace,monospace;
 
   /* ============================================================
      ATOMS — the measurement layer. Published in docs/foundations.html.

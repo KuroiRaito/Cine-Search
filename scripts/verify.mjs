@@ -1059,6 +1059,67 @@ for (const f of jsx) {
 }
 
 
+/* ---- 24. a typeface the design NAMES is a typeface the product LOADS ----
+   The design system named Archivo, IBM Plex Sans and IBM Plex Mono from the
+   first extraction. The product loaded none of them: no @font-face, no font
+   package, nothing in index.html. So every visitor saw whatever their device
+   supplied, `--f-d`'s `sans-serif` fallback resolved to a different face from
+   `--f-s`'s `system-ui`, and the display and body type differed by accident
+   rather than by design.
+
+   It survived for months because a missing face fails SILENTLY -- the browser
+   drops to the next name in the stack and says nothing -- and because every
+   check in this repo was reading the same fallback and agreeing with itself.
+   Loading the faces moved all 72 structural fingerprints.
+
+   So: the first family in every stack must be one that an imported stylesheet
+   actually declares an @font-face for. First position, because that is the one
+   the product intends; the names behind it are the fallbacks, and a fallback is
+   allowed to be absent -- that is its job. */
+{
+    const tokensRel = 'src/shared/theme/tokens.css';
+    const tokensSrc = readFileSync(join(ROOT, tokensRel), 'utf8');
+
+    /* Every family any imported sheet declares a face for. */
+    const declared = new Set();
+    const imports = [...tokensSrc.matchAll(/@import\s+'([^']+)'/g)].map((m) => m[1]);
+    for (const spec of imports) {
+        let sheet;
+        try {
+            sheet = readFileSync(join(ROOT, 'node_modules', spec), 'utf8');
+        } catch {
+            fail('font-loaded', `${tokensRel}: \`@import '${spec}'\` does not resolve`
+                + ' -- the face it was meant to load is missing and will fail silently');
+            continue;
+        }
+        for (const m of sheet.matchAll(/font-family:\s*'([^']+)'/g)) declared.add(m[1]);
+    }
+
+    let stacks = 0;
+    for (const m of tokensSrc.matchAll(/--(f-[a-z]+)\s*:\s*([^;]+);/g)) {
+        const [, token, value] = m;
+        const first = value.trim().match(/^'([^']+)'/);
+        /* A stack that opens with a generic keyword (system-ui, monospace) is
+           asking for the device's own face on purpose, and needs no file. */
+        if (!first) continue;
+        stacks++;
+        const line = tokensSrc.slice(0, m.index).split('\n').length;
+        if (!declared.has(first[1])) {
+            fail('font-loaded', `${tokensRel}:${line}: \`--${token}\` names`
+                + ` '${first[1]}' first, but no imported stylesheet declares a face for it`
+                + ' -- it will fall back silently and the design\'s typeface will never render');
+        }
+    }
+    /* C7.7 -- three font tokens have been in this file since the first
+       extraction. Zero means the tokens were renamed and this stopped
+       reading them, which is how the original bug hid. */
+    if (stacks < 3) {
+        fail('font-loaded', `only ${stacks} named font stack(s) found in ${tokensRel}`
+            + ' -- too few, so this check has stopped finding the stacks it judges');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -1087,6 +1148,7 @@ const CHECKS = [
     ['aria-selection', 'Selection is an ARIA attribute, never a class'],
     ['no-repaint', 'A module positions a shared control, never repaints it'],
     ['status-chroma', 'Every watch state carries enough colour to be a state'],
+    ['font-loaded', 'A typeface the design names is a typeface the product loads'],
 ];
 
 let failed = 0;

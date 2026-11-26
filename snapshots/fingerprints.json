@@ -1,27 +1,27 @@
 {
   "discover/home@1280-dark": {
     "elements": 1276,
-    "hash": "43373cbb"
+    "hash": "de3ce8bb"
   },
   "discover/home@1280-light": {
     "elements": 1276,
-    "hash": "43373cbb"
+    "hash": "de3ce8bb"
   },
   "discover/home@390-dark": {
     "elements": 1276,
-    "hash": "3c201fd8"
+    "hash": "c6308998"
   },
   "discover/home@390-light": {
     "elements": 1276,
-    "hash": "3c201fd8"
+    "hash": "c6308998"
   },
   "discover/home@900-dark": {
     "elements": 1276,
-    "hash": "a438d82"
+    "hash": "44de3982"
   },
   "discover/home@900-light": {
     "elements": 1276,
-    "hash": "a438d82"
+    "hash": "44de3982"
   },
   "entry/cover@1280-dark": {
     "elements": 35,
@@ -156,8 +156,8 @@
     "hash": "136c3f26"
   },
   "person/director@390-light": {
-    "elements": 235,
-    "hash": "c270b0fd"
+    "elements": 236,
+    "hash": "136c3f26"
   },
   "person/director@900-dark": {
     "elements": 236,

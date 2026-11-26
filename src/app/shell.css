@@ -105,6 +105,22 @@ img { max-width: 100%; display: block; }
    focus to be read out -- overrides it without a fight. */
 :where([tabindex="-1"]):focus { outline: none; }
 
+/* C1.4 -- the press. Nothing in the product answered it: every control in
+   the product went from rest straight to its result, with no moment of
+   contact in between. On a pointer that reads as a slow app; on a phone,
+   where there is no hover at all to confirm the finger landed, it reads as
+   a tap that did not register, and people tap again.
+
+   Scoped the same way the focus ring is, and for the same reason: it
+   belongs to things that are controls, not to anything that happens to be
+   inside one. transform rather than a colour step because it is the one
+   answer that works on a filled button, a ghost button, a chip and a poster
+   without knowing what any of them look like -- and a control that must not
+   move says so by overriding this one rule. */
+:is(button, [role="button"], a[href]):not(:disabled):active {
+  transform: scale(.97);
+}
+
 .about-h { font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 700; margin-bottom: var(--space-8); }
 .about-p { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }
 .about-p + .about-p { margin-top: var(--space-8); }
@@ -174,6 +190,10 @@ img { max-width: 100%; display: block; }
   transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .circ:hover { background: var(--surface-hv); color: var(--text); }
+/* Was answered on .circ.sm only, so the bare control looked pressable while
+   disabled. Not opacity -- see C1.6: opacity fades the shadow with it and
+   reads as a rendering fault rather than a decision. */
+.circ:disabled { background: var(--surface); color: var(--faint); cursor: not-allowed; }
 /* Artwork has no theme: a control over a poster keeps its own dark ground
    and white glyph in both light and dark. */
 .circ.on-image {
@@ -274,6 +294,7 @@ img { max-width: 100%; display: block; }
     display: flex; align-items: center; gap: var(--space-8);
     font-family: var(--f-d); font-weight: 800; font-size: var(--text-title-sm); letter-spacing: -.03em;
   }
+  .wordmark:hover { color: var(--acc-t); }
   .wordmark i { width: var(--space-8); height: var(--space-8); border-radius: var(--radius-full); background: var(--acc); font-style: normal; }
   .topnav { display: flex; gap: var(--space-4); }
   .topnav a {

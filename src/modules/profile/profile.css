@@ -321,6 +321,8 @@
 .fgrid li { min-width: 0; }
 
 .fcard { display: block; text-decoration: none; min-width: 0; }
+.fcard .fart { transition: filter var(--dur-fast) var(--ease-out); }
+.fcard:hover .fart { filter: brightness(1.08); }
 .fart {
   position: relative; aspect-ratio: 2 / 3; border-radius: var(--radius-8);
   overflow: hidden; background: var(--surface); margin-bottom: var(--space-4);
@@ -425,6 +427,7 @@
   font-family: var(--f-s); font-size: var(--text-body-sm); font-weight: 600; color: var(--acc-t);
 }
 .undo .dismiss-x { margin-left: auto; color: var(--muted); font-size: var(--text-title-sm); line-height: 1; }
+.undo .dismiss-x:hover { color: var(--text); }
 
 /* SH16 — two account actions, not one. Stacked at 320 because two buttons side
    by side at that width are two half-buttons. */

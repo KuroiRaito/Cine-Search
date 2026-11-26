@@ -49,7 +49,7 @@
   --raised:var(--ink-5);
   --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
   --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
-  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-t-hv:var(--beam-12);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
   --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);--on-rate:var(--on-mar-9);
   --f-d:'Archivo',sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',monospace;
 

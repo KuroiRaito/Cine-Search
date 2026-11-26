@@ -23,6 +23,7 @@
 .said b { color: var(--text); font-weight: 600; }
 /* The original, one tap away. A button rather than a link: it changes what this
    screen is showing, it does not go anywhere. */
+.said-undo:hover { color: var(--acc-t-hv); }
 .said-undo {
   display: inline; background: none; border: 0; padding: 0 0 0 var(--space-4);
   font-family: var(--f-s); font-size: inherit; line-height: inherit;
@@ -61,6 +62,7 @@
    second one. Same reason .grid has a flush variant. */
 .chips.flush { padding: 0; }
 
+.morefilters:hover { color: var(--acc-t-hv); }
 .morefilters {
   display: inline-flex; align-items: center; gap: var(--space-4);
   margin-top: var(--space-16); background: none; border: 0; padding: var(--space-8) 0;
@@ -98,6 +100,7 @@
   margin: var(--space-16) var(--gutter) 0;
   font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted);
 }
+.bsort:hover { border-color: var(--bd-str); }
 .bsort {
   background: var(--surface); color: var(--text); border: var(--border-hair) solid var(--bd);
   border-radius: var(--radius-8); padding: var(--space-4) var(--space-8);

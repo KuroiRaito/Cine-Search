@@ -70,7 +70,32 @@ for (const f of cssFiles) {
             if (!s.includes('.')) continue;
             /* The subject of a selector is its last compound: in
                `.eprow .ed .sc:hover`, the thing being styled is `.sc`. */
-            const last = s.split(/[\s>+~]+/).filter(Boolean).pop() || '';
+            /* A control often answers a state by styling something inside
+               itself: `.tile:hover .art` brightens the poster, `.tplay:hover
+               img` brightens the still. The subject of that selector is the
+               child, so reading only the subject reported the control as
+               having no hover at all -- and the honest reading is that it
+               has one, on its own hover, drawn on its subtree.
+
+               So credit the compound that CARRIES the pseudo, wherever it
+               sits in the selector, as well as the subject. */
+            const compounds = s.split(/[\s>+~]+/).filter(Boolean);
+            for (const c of compounds.slice(0, -1)) {
+                const owner = /\.([A-Za-z0-9_-]+)/.exec(c);
+                if (!owner) continue;
+                for (const [, ps] of c.matchAll(/:{1,2}([a-z-]+)/g)) {
+                    if (['hover', 'focus-visible', 'disabled', 'active'].includes(ps)) {
+                        note(owner[1], ps === 'focus-visible' ? 'focus-visible' : ps, rel);
+                    }
+                }
+            }
+
+            /* `:not(:disabled)` is a guard on a state, not a second state.
+               `.lbtn:hover:not(:disabled)` is the bare control's hover and
+               was being reported as a variant's, because counting pseudo-
+               classes counted the ones inside :not() too. */
+            const last = (s.split(/[\s>+~]+/).filter(Boolean).pop() || '')
+                .replace(/:not\([^()]*\)/g, '');
             const cls = /\.([A-Za-z0-9_-]+)/.exec(last);
             if (!cls) continue;
             const pseudos = [...last.matchAll(/:{1,2}([a-z-]+)/g)].map((p) => p[1]);

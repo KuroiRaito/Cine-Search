@@ -145,6 +145,7 @@
 .wbg .prov-l { margin-bottom: var(--space-8); }
 .wbg .more { display: inline-block; text-decoration: none; }
 
+.more:hover { color: var(--acc-t-hv); }
 .more {
   background: none; border: 0; color: var(--acc-t); cursor: pointer;
   font-family: var(--f-s); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 600;
@@ -155,6 +156,7 @@
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); margin-top: var(--section-gap); align-items: start; }
 .pc { border: var(--border-hair) solid var(--bd); border-radius: var(--radius-12); background: var(--surface); padding: var(--space-12); }
 .pc.open { grid-column: 1 / -1; }
+.pc-top:hover .pc-h b { color: var(--acc-t); }
 .pc-top {
   display: block; width: 100%; background: none; border: 0; padding: 0; cursor: pointer;
   text-align: left; font-family: var(--f-s);
@@ -186,6 +188,8 @@
    itself. 16:9 because that is the shape every trailer is. */
 .trailer { margin-top: var(--space-16); border-radius: var(--radius-12); overflow: hidden; background: var(--ink-4); }
 .trailer iframe { display: block; width: 100%; aspect-ratio: 16/9; border: 0; }
+.tplay img { transition: filter var(--dur-fast) var(--ease-out); }
+.tplay:hover img { filter: brightness(1.08); }
 .tplay {
   display: block; position: relative; width: 100%; aspect-ratio: 16/9;
   padding: 0; border: 0; background: none; cursor: pointer; overflow: hidden;
@@ -320,6 +324,7 @@
 .epchk:hover { background: var(--ink-5); color: var(--muted); }
 .epchk.on { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
 .epchk:disabled { opacity: .4; cursor: default; }
+.sect-h .markall:hover { color: var(--acc-t-hv); }
 .sect-h .markall {
   background: none; border: 0; cursor: pointer; padding: 0;
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 600; color: var(--acc-t);

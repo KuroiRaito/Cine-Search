@@ -10,6 +10,26 @@
 .rail::-webkit-scrollbar { height: 0; }
 .rail > * { flex: 0 0 auto; }
 
+/* ---------------- hover ----------------
+
+   19 controls styled no hover at all. The product has three conventions for
+   it already and they cover everything; none of this is a new idea, it is
+   the existing three applied to the controls that were skipped:
+
+     muted furniture   ->  color: var(--text)
+     a surface         ->  background: var(--surface-hv)
+     filled or artwork ->  filter: brightness(1.0x)
+
+   Accent text had no convention because nothing had ever needed one, so
+   --acc-t-hv was added for it: one step up the beam ramp, which inverts
+   with the theme the way every other pair on that ramp does. */
+/* Every poster in the product was inert under the pointer. The lift is on
+   the art rather than the whole card: brightness on a card brightens its
+   label too, which in light mode means dark text on its way to grey. */
+.tile .art { transition: filter var(--dur-fast) var(--ease-out); }
+.tile:hover .art { filter: brightness(1.08); }
+.tile:hover .name { color: var(--acc-t); }
+
 .tile { width: var(--tile-w); }
 
 /* Rails show about two and a half posters. The artwork is the thing being
@@ -192,11 +212,17 @@
   background: var(--stl); color: var(--bg);
   box-shadow: none; cursor: default; backdrop-filter: none;
 }
-.quickadd.saved:hover { background: var(--stl); color: var(--bg); }
+/* This rule existed and did nothing. It sets `background`, and the .st-*
+   tone class that carries the watch-state colour sets `background` too at
+   the same specificity and later in the file, so the hover always lost.
+   `filter` is not a property any tone class sets, so it survives all six
+   of them without the rule having to know which one is on. */
+.quickadd.saved:hover { filter: brightness(1.12); }
 
 /* A control that navigates within the screen rather than to a URL. It reads as
    a link because that is what it does; it is a button because there is nothing
    to link to. */
+.linkish:hover { color: var(--acc-t-hv); }
 .linkish {
   background: none; border: 0; padding: 0; cursor: pointer;
   font-family: var(--f-s); font-weight: 600; color: var(--acc-t);
@@ -265,6 +291,7 @@
   min-height: var(--control-sm); display: inline-flex; align-items: center; gap: var(--space-4);
   border-radius: var(--radius-8); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
+.sw:hover { background: var(--surface-hv); color: var(--text); }
 .sw em { font-style: normal; opacity: .55; font-size: var(--text-micro); line-height: var(--lh-micro); }
 .sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--acc-bd); }
 @keyframes shimmer { to { background-position: -200% 0; } }
@@ -322,6 +349,7 @@
    and that is right: a focused text field should say so however it was
    reached. The spelling still matters, because the next person to copy this
    rule onto a button would have copied a ring that sticks after a click. */
+.searchbox:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
 .searchbox:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .searchbox[aria-invalid="true"] { box-shadow: inset 0 0 0 var(--border-focus) var(--st-drop-9); }
 /* Notes are the one multi-line field, so it is the one that may grow. */
@@ -447,6 +475,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-family: var(--f-s); transition: box-shadow .12s;
 }
 .inp:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
+.inp:disabled { background: var(--bg-sub); color: var(--faint); cursor: not-allowed; }
 .inp:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .inp.dim { color: var(--muted); }
 .hint { font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-4); }
@@ -475,6 +504,8 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-weight: 600; cursor: pointer; transition: filter .12s;
 }
 .del:hover { filter: brightness(1.1); }
+/* It can be disabled -- Picker renders it so -- and said nothing about it. */
+.del:disabled { opacity: .55; cursor: not-allowed; filter: none; }
 .del-confirm { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); margin-bottom: var(--space-8); }
 .del-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
 
@@ -646,6 +677,9 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-weight: 600; color: var(--muted); cursor: pointer;
 }
 .pw-peek:hover { color: var(--text); background: var(--surface-hv); }
+/* It is a toggle -- the password is showing or it is not -- and it drew the
+   same either way, so the only way to know was to look at the field. */
+.pw-peek[aria-pressed="true"] { color: var(--acc-t); background: var(--acc-bg); }
 
 /* Requirements you watch yourself meet, rather than a rule read out after you
    have already failed it. */

@@ -84,11 +84,22 @@ for (const theme of ['dark', 'light']) {
                     }
                 }
 
+                /* A control often answers a state on something inside
+                   itself -- `.tile:hover .art` brightens the poster, not the
+                   link. Reading only the subject's own paint reported that
+                   as a hover which changes nothing, which is the opposite of
+                   what it does. The signature covers the subtree. */
+                const sub = [...el.querySelectorAll('*')].slice(0, 40).map((d) => {
+                    const ds = getComputedStyle(d);
+                    return paint.map((p) => ds.getPropertyValue(p)).join('~');
+                }).join('/');
+
                 return {
                     label,
                     centring,
                     sig: paint.map((p) => cs.getPropertyValue(p)).join('|')
-                        + `|${r.width.toFixed(1)}x${r.height.toFixed(1)}`,
+                        + `|${r.width.toFixed(1)}x${r.height.toFixed(1)}`
+                        + `|${sub}`,
                 };
             });
             out.push({ name, cells });

@@ -58,7 +58,7 @@
   --raised:var(--ink-5);
   --bd-sub:var(--ink-6);--bd:var(--ink-7);--bd-str:var(--ink-8);
   --text:var(--ink-12);--muted:var(--ink-11);--faint:var(--ink-10);
-  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
+  --acc:var(--beam-9);--acc-t:var(--beam-11);--acc-t-hv:var(--beam-12);--acc-bg:var(--beam-3);--acc-bd:var(--beam-7);--on-acc:var(--on-beam-9);
   --rate:var(--mar-9);--rate-t:var(--mar-11);--rate-bg:var(--mar-3);--rate-bd:var(--mar-7);--on-rate:var(--on-mar-9);
   --f-d:'Archivo',sans-serif;--f-s:'IBM Plex Sans',system-ui,sans-serif;--f-m:'IBM Plex Mono',monospace;
 
@@ -324,6 +324,22 @@ img { max-width: 100%; display: block; }
    focus to be read out -- overrides it without a fight. */
 :where([tabindex="-1"]):focus { outline: none; }
 
+/* C1.4 -- the press. Nothing in the product answered it: every control in
+   the product went from rest straight to its result, with no moment of
+   contact in between. On a pointer that reads as a slow app; on a phone,
+   where there is no hover at all to confirm the finger landed, it reads as
+   a tap that did not register, and people tap again.
+
+   Scoped the same way the focus ring is, and for the same reason: it
+   belongs to things that are controls, not to anything that happens to be
+   inside one. transform rather than a colour step because it is the one
+   answer that works on a filled button, a ghost button, a chip and a poster
+   without knowing what any of them look like -- and a control that must not
+   move says so by overriding this one rule. */
+:is(button, [role="button"], a[href]):not(:disabled):active {
+  transform: scale(.97);
+}
+
 .about-h { font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm); font-weight: 700; margin-bottom: var(--space-8); }
 .about-p { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); }
 .about-p + .about-p { margin-top: var(--space-8); }
@@ -393,6 +409,10 @@ img { max-width: 100%; display: block; }
   transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .circ:hover { background: var(--surface-hv); color: var(--text); }
+/* Was answered on .circ.sm only, so the bare control looked pressable while
+   disabled. Not opacity -- see C1.6: opacity fades the shadow with it and
+   reads as a rendering fault rather than a decision. */
+.circ:disabled { background: var(--surface); color: var(--faint); cursor: not-allowed; }
 /* Artwork has no theme: a control over a poster keeps its own dark ground
    and white glyph in both light and dark. */
 .circ.on-image {
@@ -493,6 +513,7 @@ img { max-width: 100%; display: block; }
     display: flex; align-items: center; gap: var(--space-8);
     font-family: var(--f-d); font-weight: 800; font-size: var(--text-title-sm); letter-spacing: -.03em;
   }
+  .wordmark:hover { color: var(--acc-t); }
   .wordmark i { width: var(--space-8); height: var(--space-8); border-radius: var(--radius-full); background: var(--acc); font-style: normal; }
   .topnav { display: flex; gap: var(--space-4); }
   .topnav a {
@@ -603,6 +624,26 @@ img { max-width: 100%; display: block; }
 .rail { display: flex; gap: var(--space-8); overflow-x: auto; padding: 0 var(--gutter) var(--space-8); scrollbar-width: none; }
 .rail::-webkit-scrollbar { height: 0; }
 .rail > * { flex: 0 0 auto; }
+
+/* ---------------- hover ----------------
+
+   19 controls styled no hover at all. The product has three conventions for
+   it already and they cover everything; none of this is a new idea, it is
+   the existing three applied to the controls that were skipped:
+
+     muted furniture   ->  color: var(--text)
+     a surface         ->  background: var(--surface-hv)
+     filled or artwork ->  filter: brightness(1.0x)
+
+   Accent text had no convention because nothing had ever needed one, so
+   --acc-t-hv was added for it: one step up the beam ramp, which inverts
+   with the theme the way every other pair on that ramp does. */
+/* Every poster in the product was inert under the pointer. The lift is on
+   the art rather than the whole card: brightness on a card brightens its
+   label too, which in light mode means dark text on its way to grey. */
+.tile .art { transition: filter var(--dur-fast) var(--ease-out); }
+.tile:hover .art { filter: brightness(1.08); }
+.tile:hover .name { color: var(--acc-t); }
 
 .tile { width: var(--tile-w); }
 
@@ -786,11 +827,17 @@ img { max-width: 100%; display: block; }
   background: var(--stl); color: var(--bg);
   box-shadow: none; cursor: default; backdrop-filter: none;
 }
-.quickadd.saved:hover { background: var(--stl); color: var(--bg); }
+/* This rule existed and did nothing. It sets `background`, and the .st-*
+   tone class that carries the watch-state colour sets `background` too at
+   the same specificity and later in the file, so the hover always lost.
+   `filter` is not a property any tone class sets, so it survives all six
+   of them without the rule having to know which one is on. */
+.quickadd.saved:hover { filter: brightness(1.12); }
 
 /* A control that navigates within the screen rather than to a URL. It reads as
    a link because that is what it does; it is a button because there is nothing
    to link to. */
+.linkish:hover { color: var(--acc-t-hv); }
 .linkish {
   background: none; border: 0; padding: 0; cursor: pointer;
   font-family: var(--f-s); font-weight: 600; color: var(--acc-t);
@@ -859,6 +906,7 @@ img { max-width: 100%; display: block; }
   min-height: var(--control-sm); display: inline-flex; align-items: center; gap: var(--space-4);
   border-radius: var(--radius-8); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
+.sw:hover { background: var(--surface-hv); color: var(--text); }
 .sw em { font-style: normal; opacity: .55; font-size: var(--text-micro); line-height: var(--lh-micro); }
 .sw[aria-pressed="true"] { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; box-shadow: inset 0 0 0 var(--border-hair) var(--acc-bd); }
 @keyframes shimmer { to { background-position: -200% 0; } }
@@ -916,6 +964,7 @@ img { max-width: 100%; display: block; }
    and that is right: a focused text field should say so however it was
    reached. The spelling still matters, because the next person to copy this
    rule onto a button would have copied a ring that sticks after a click. */
+.searchbox:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
 .searchbox:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .searchbox[aria-invalid="true"] { box-shadow: inset 0 0 0 var(--border-focus) var(--st-drop-9); }
 /* Notes are the one multi-line field, so it is the one that may grow. */
@@ -1041,6 +1090,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-family: var(--f-s); transition: box-shadow .12s;
 }
 .inp:hover { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
+.inp:disabled { background: var(--bg-sub); color: var(--faint); cursor: not-allowed; }
 .inp:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .inp.dim { color: var(--muted); }
 .hint { font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); margin-top: var(--space-4); }
@@ -1069,6 +1119,8 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-weight: 600; cursor: pointer; transition: filter .12s;
 }
 .del:hover { filter: brightness(1.1); }
+/* It can be disabled -- Picker renders it so -- and said nothing about it. */
+.del:disabled { opacity: .55; cursor: not-allowed; filter: none; }
 .del-confirm { font-size: var(--text-caption); line-height: var(--lh-caption); color: var(--muted); margin-bottom: var(--space-8); }
 .del-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
 
@@ -1240,6 +1292,9 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-weight: 600; color: var(--muted); cursor: pointer;
 }
 .pw-peek:hover { color: var(--text); background: var(--surface-hv); }
+/* It is a toggle -- the password is showing or it is not -- and it drew the
+   same either way, so the only way to know was to look at the field. */
+.pw-peek[aria-pressed="true"] { color: var(--acc-t); background: var(--acc-bg); }
 
 /* Requirements you watch yourself meet, rather than a rule read out after you
    have already failed it. */
@@ -1293,6 +1348,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 .said b { color: var(--text); font-weight: 600; }
 /* The original, one tap away. A button rather than a link: it changes what this
    screen is showing, it does not go anywhere. */
+.said-undo:hover { color: var(--acc-t-hv); }
 .said-undo {
   display: inline; background: none; border: 0; padding: 0 0 0 var(--space-4);
   font-family: var(--f-s); font-size: inherit; line-height: inherit;
@@ -1331,6 +1387,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
    second one. Same reason .grid has a flush variant. */
 .chips.flush { padding: 0; }
 
+.morefilters:hover { color: var(--acc-t-hv); }
 .morefilters {
   display: inline-flex; align-items: center; gap: var(--space-4);
   margin-top: var(--space-16); background: none; border: 0; padding: var(--space-8) 0;
@@ -1368,6 +1425,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   margin: var(--space-16) var(--gutter) 0;
   font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted);
 }
+.bsort:hover { border-color: var(--bd-str); }
 .bsort {
   background: var(--surface); color: var(--text); border: var(--border-hair) solid var(--bd);
   border-radius: var(--radius-8); padding: var(--space-4) var(--space-8);
@@ -1527,6 +1585,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 .wbg .prov-l { margin-bottom: var(--space-8); }
 .wbg .more { display: inline-block; text-decoration: none; }
 
+.more:hover { color: var(--acc-t-hv); }
 .more {
   background: none; border: 0; color: var(--acc-t); cursor: pointer;
   font-family: var(--f-s); font-size: var(--text-body-sm); line-height: var(--lh-body-sm); font-weight: 600;
@@ -1537,6 +1596,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); margin-top: var(--section-gap); align-items: start; }
 .pc { border: var(--border-hair) solid var(--bd); border-radius: var(--radius-12); background: var(--surface); padding: var(--space-12); }
 .pc.open { grid-column: 1 / -1; }
+.pc-top:hover .pc-h b { color: var(--acc-t); }
 .pc-top {
   display: block; width: 100%; background: none; border: 0; padding: 0; cursor: pointer;
   text-align: left; font-family: var(--f-s);
@@ -1568,6 +1628,8 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
    itself. 16:9 because that is the shape every trailer is. */
 .trailer { margin-top: var(--space-16); border-radius: var(--radius-12); overflow: hidden; background: var(--ink-4); }
 .trailer iframe { display: block; width: 100%; aspect-ratio: 16/9; border: 0; }
+.tplay img { transition: filter var(--dur-fast) var(--ease-out); }
+.tplay:hover img { filter: brightness(1.08); }
 .tplay {
   display: block; position: relative; width: 100%; aspect-ratio: 16/9;
   padding: 0; border: 0; background: none; cursor: pointer; overflow: hidden;
@@ -1702,6 +1764,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 .epchk:hover { background: var(--ink-5); color: var(--muted); }
 .epchk.on { background: var(--st-done-9); color: var(--st-done-3); font-weight: 700; }
 .epchk:disabled { opacity: .4; cursor: default; }
+.sect-h .markall:hover { color: var(--acc-t-hv); }
 .sect-h .markall {
   background: none; border: 0; cursor: pointer; padding: 0;
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 600; color: var(--acc-t);
@@ -1822,26 +1885,38 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   outline-offset: 3px;
 }
 :where([tabindex="-1"])[data-force~="focus"] { outline: none; }
+:is(button, [role="button"], a[href]):not([data-force~="disabled"])[data-force~="active"] {
+  transform: scale(.97);
+}
 .circ[data-force~="hover"] { background: var(--surface-hv); color: var(--text); }
+.circ[data-force~="disabled"] { background: var(--surface); color: var(--faint); cursor: not-allowed; }
 .circ.on-image[data-force~="hover"] { background: var(--glass-hv); color: var(--on-glass); }
 .btn[data-force~="hover"] { filter: brightness(1.06); }
 .btn[data-force~="disabled"] { opacity: .55; cursor: not-allowed; filter: none; }
 .btn.quiet[data-force~="hover"] { background: var(--ink-5); filter: none; }
+@media (min-width: 1120px) { .wordmark[data-force~="hover"] { color: var(--acc-t); } }
 .session-note button[data-force~="hover"] { opacity: 1; }
+.tile[data-force~="hover"] .art { filter: brightness(1.08); }
+.tile[data-force~="hover"] .name { color: var(--acc-t); }
 .quickadd[data-force~="hover"] { background: var(--acc); color: var(--on-acc); box-shadow: none; }
 .prow[data-force~="hover"] { background: var(--surface-hv); }
-.quickadd.saved[data-force~="hover"] { background: var(--stl); color: var(--bg); }
+.quickadd.saved[data-force~="hover"] { filter: brightness(1.12); }
+.linkish[data-force~="hover"] { color: var(--acc-t-hv); }
 .ibtn[data-force~="hover"] { background: var(--ink-5); color: var(--text); }
 .ibtn.like[data-force~="hover"] { color: var(--like-9); }
 .chip[data-force~="hover"] { background: var(--ink-4); color: var(--text); }
+.sw[data-force~="hover"] { background: var(--surface-hv); color: var(--text); }
+.searchbox[data-force~="hover"] { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
 .searchbox[data-force~="focus-visible"] { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .seg[data-force~="hover"] { background: var(--ink-4); color: var(--text); }
 .stp[data-force~="hover"] { background: var(--ink-5); }
 .stp[data-force~="disabled"] { opacity: .35; cursor: default; }
 .stars .clear[data-force~="hover"] { color: var(--text); }
 .inp[data-force~="hover"] { box-shadow: inset 0 0 0 var(--border-hair) var(--bd); }
+.inp[data-force~="disabled"] { background: var(--bg-sub); color: var(--faint); cursor: not-allowed; }
 .inp[data-force~="focus-visible"] { outline: none; box-shadow: inset 0 0 0 var(--border-focus) var(--acc); }
 .del[data-force~="hover"] { filter: brightness(1.1); }
+.del[data-force~="disabled"] { opacity: .55; cursor: not-allowed; filter: none; }
 .form-error[data-force~="focus-visible"] { outline: var(--border-focus) solid var(--acc); outline-offset: var(--space-2); }
 .searchbox:-webkit-autofill[data-force~="hover"], .searchbox:-webkit-autofill[data-force~="focus"] {
   -webkit-text-fill-color: var(--text);
@@ -1851,12 +1926,19 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   box-shadow: inset 0 0 0 var(--space-40) var(--bg-sub), inset 0 0 0 var(--border-focus) var(--acc);
 }
 .pw-peek[data-force~="hover"] { color: var(--text); background: var(--surface-hv); }
+.said-undo[data-force~="hover"] { color: var(--acc-t-hv); }
+.morefilters[data-force~="hover"] { color: var(--acc-t-hv); }
+.bsort[data-force~="hover"] { border-color: var(--bd-str); }
 .spill[data-force~="hover"] { filter: brightness(1.06); }
 .pchip.paid[data-force~="hover"] { background: var(--ink-4); }
+.more[data-force~="hover"] { color: var(--acc-t-hv); }
+.pc-top[data-force~="hover"] .pc-h b { color: var(--acc-t); }
+.tplay[data-force~="hover"] img { filter: brightness(1.08); }
 .eprow .en[data-force~="hover"] { color: var(--acc-t); }
 .spill.set[data-force~="hover"] { filter: brightness(1.06); }
 .epchk[data-force~="hover"] { background: var(--ink-5); color: var(--muted); }
 .epchk[data-force~="disabled"] { opacity: .4; cursor: default; }
+.sect-h .markall[data-force~="hover"] { color: var(--acc-t-hv); }
 </style>
 <style>
   .g-wrap { padding: 24px; max-width: 1180px; margin: 0 auto; }
@@ -2165,6 +2247,12 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
         <div class="g-cells g-tokens"><div class="g-tok">
         <div class="g-chip" style="background:var(--acc-t)"></div>
         <code>acc-t</code></div></div>
+      </div>
+      <div class="g-row g-wide">
+        <div class="g-name"><code>--acc-t-hv-*</code><span>1 token</span></div>
+        <div class="g-cells g-tokens"><div class="g-tok">
+        <div class="g-chip" style="background:var(--acc-t-hv)"></div>
+        <code>acc-t-hv</code></div></div>
       </div>
       <div class="g-row g-wide">
         <div class="g-name"><code>--acc-bg-*</code><span>1 token</span></div>

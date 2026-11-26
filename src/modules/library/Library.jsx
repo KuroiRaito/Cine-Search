@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Poster, Tile, Skeleton, Empty, Toast, Icon } from '../../shared/ui/index.js';
+import { Poster, Tile, Skeleton, Empty, Toast, Icon, Chip, Button} from '../../shared/ui/index.js';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from './LibraryProvider.jsx';
 import {
@@ -106,7 +106,7 @@ export default function Library() {
                 <Empty
                     title="Nothing saved yet"
                     body="An account keeps your watchlist, ratings and episode progress — private by default."
-                    action={<Link className="btn" to="/welcome/signup" state={{ from: '/library' }}>Create an account</Link>}
+                    action={<Button as={Link} to="/welcome/signup" state={{ from: '/library' }}>Create an account</Button>}
                 />
             </div>
         );
@@ -135,7 +135,7 @@ export default function Library() {
                 <Empty
                     title="Couldn’t load your library"
                     body="Your records are safe — this screen just couldn’t reach them."
-                    action={<button type="button" className="btn" onClick={retry}>Try again</button>}
+                    action={<Button onClick={retry}>Try again</Button>}
                 />
             </div>
         );
@@ -148,7 +148,7 @@ export default function Library() {
                 <Empty
                     title="Nothing saved yet"
                     body="Save a film or series and it will appear here."
-                    action={<Link className="btn" to="/">Find something to watch</Link>}
+                    action={<Button as={Link} to="/">Find something to watch</Button>}
                 />
             </div>
         );
@@ -240,20 +240,19 @@ export default function Library() {
                 set twenty minutes ago — and tapping any chip is the way back. */}
             <div className={finding ? 'chips aside' : 'chips'} role="tablist" aria-label="Filter by status">
                 {FILTERS.filter((k) => counts[k]).map((k) => (
-                    <button
+                    <Chip
                         key={k}
-                        type="button"
                         role="tab"
-                        className="chip"
-                        aria-pressed={!finding && active === k}
+                        selected={!finding && active === k}
+                        count={counts[k]}
                         onClick={() => pick(k)}
                     >
-                        {statusMeta(k).label}<em>{counts[k]}</em>
-                    </button>
+                        {statusMeta(k).label}
+                    </Chip>
                 ))}
-                <button type="button" role="tab" className="chip" aria-pressed={!finding && active === 'all'} onClick={() => pick('all')}>
-                    All<em>{rows.length}</em>
-                </button>
+                <Chip role="tab" selected={!finding && active === 'all'} count={rows.length} onClick={() => pick('all')}>
+                    All
+                </Chip>
             </div>
 
             {/* L6 — find failed, so the honest next step is Search, carrying
@@ -264,9 +263,9 @@ export default function Library() {
                     title={`Nothing in your library matches “${term.trim()}”.`}
                     body="It may still be out there."
                     action={
-                        <Link className="btn" to={`/search?q=${encodeURIComponent(term.trim())}`}>
+                        <Button as={Link} to={`/search?q=${encodeURIComponent(term.trim())}`}>
                             Search the catalogue
-                        </Link>
+                        </Button>
                     }
                 />
             )}

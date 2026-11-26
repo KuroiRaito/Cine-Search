@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Poster, Empty, Icon } from '../../shared/ui/index.js';
+import { Poster, Empty, Icon, Button} from '../../shared/ui/index.js';
 import { useLibrary } from '../library';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { castOf, credit, searchMulti, searchPerson, personCredits } from '../../shared/tmdb/endpoints.js';
@@ -61,12 +61,12 @@ function Doors({ onPick, onTitle }) {
                 Characters live inside cast lists, so start with something you know.
             </p>
             <div className="doors">
-                <button type="button" className="btn quiet" onClick={() => onPick('title')}>
+                <Button variant="quiet" onClick={() => onPick('title')}>
                     <Icon name="film" size={16} /> From a film or series
-                </button>
-                <button type="button" className="btn quiet" onClick={() => onPick('person')}>
+                </Button>
+                <Button variant="quiet" onClick={() => onPick('person')}>
                     <Icon name="you" size={16} /> From an actor
-                </button>
+                </Button>
             </div>
             {recent.length > 0 && (
                 <>

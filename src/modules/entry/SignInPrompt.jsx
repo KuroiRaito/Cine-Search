@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Poster } from '../../shared/ui/index.js';
+import { Poster, Button} from '../../shared/ui/index.js';
 import './entry.css';
 
 // The verb must match the control that was tapped. A pill reading "Want to
@@ -83,8 +83,8 @@ export default function SignInPrompt({ title, poster, action = 'save', onClose }
                     <li>Private by default — nobody sees your library but you</li>
                 </ul>
                 <div className="sheet-actions">
-                    <button type="button" className="btn" onClick={() => go('signup')}>Create account</button>
-                    <button type="button" className="btn quiet" onClick={() => go('signin')}>Sign in</button>
+                    <Button onClick={() => go('signup')}>Create account</Button>
+                    <Button variant="quiet" onClick={() => go('signin')}>Sign in</Button>
                 </div>
                 <button type="button" className="dismiss" onClick={onClose}>Not now</button>
             </div>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Poster } from '../../shared/ui/index.js';
+import { Poster, Button} from '../../shared/ui/index.js';
 import { useLibrary } from './LibraryProvider.jsx';
 import {
     statusesFor, canRate, statusTone, runningOrder, nextUnwatched, lastWatched, epLabel, episodesWatched,
 } from './library.js';
 import './library.css';
-import { Icon } from '../../shared/ui/index.js';
+import { Icon, Segment } from '../../shared/ui/index.js';
 
 const dateText = (iso) => (iso
     ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
@@ -131,24 +131,23 @@ export default function Editor({ title, onClose }) {
                         aria-label={favourite ? 'Remove from favourites' : 'Mark as favourite'}
                         onClick={() => setFavourite((f) => !f)}
                     ><Icon name="heart" size={20} /></button>
-                    <button type="button" className="btn" disabled={busy} onClick={onSave}>
+                    <Button disabled={busy} onClick={onSave}>
                         {busy ? 'Saving…' : 'Save'}
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="fld">
                     <label htmlFor="ed-status">Status</label>
                     <div className="segs" id="ed-status" role="group">
                         {statusesFor(title.mediaType).map((s) => (
-                            <button
+                            <Segment
                                 key={s.key}
-                                type="button"
-                                className={`seg ${s.tone}${status === s.key ? ' on' : ''}`}
-                                aria-pressed={status === s.key}
+                                tone={s.tone}
+                                selected={status === s.key}
                                 onClick={() => setStatus(s.key)}
                             >
                                 {s.icon}<i>{s.short}</i>
-                            </button>
+                            </Segment>
                         ))}
                     </div>
                 </div>
@@ -273,7 +272,7 @@ export default function Editor({ title, onClose }) {
                                 ].filter(Boolean).join(', ').replace(/,([^,]*)$/, ' and$1')} — not just from this screen.
                             </p>
                             <div className="del-row">
-                                <button type="button" className="btn quiet" onClick={() => setConfirming(false)}>Keep it</button>
+                                <Button variant="quiet" onClick={() => setConfirming(false)}>Keep it</Button>
                                 <button type="button" className="del" disabled={busy} onClick={onRemove}>Remove</button>
                             </div>
                         </>

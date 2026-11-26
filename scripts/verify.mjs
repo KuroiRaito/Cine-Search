@@ -445,6 +445,12 @@ for (const f of jsx) {
     }
     for (const m of body.matchAll(/(?:function|class)\s+([A-Z][\w$]*)/g)) known.add(m[1]);
     for (const m of body.matchAll(/(?:const|let|var)\s+([A-Z][\w$]*)\s*=/g)) known.add(m[1]);
+    /* A polymorphic component takes its tag as a prop: `{ as: As = 'button' }`
+       renders <As>, which is a destructured local, not a missing import. The
+       alias is what makes it capitalised, because JSX reads a lowercase tag
+       as an HTML element. Only the renaming form counts -- a bare `{ As }`
+       would already be caught by the import scan above. */
+    for (const m of body.matchAll(/\b[a-z][\w$]*\s*:\s*([A-Z][\w$]*)\s*(?:=|[,}])/g)) known.add(m[1]);
 
     const seen = new Set();
     for (const m of body.matchAll(/<([A-Z][\w$]*)[\s/>]/g)) {
@@ -688,6 +694,65 @@ for (const f of jsx) {
 }
 
 
+/* ---------------------------------------------------------------
+   19. Nothing hand-applies a shared control's class name.
+
+   `.btn` was written by hand at 45 call sites across 19 files, `.chip` at 8
+   and `.seg` at 3. That is the single mechanism behind most of C1 and C2: a
+   class name is not an owner. Nothing knew which cases existed, so the one
+   chip that added a close cross was the first to do so and had no way of
+   finding that out; the one segment that set `aria-pressed` without the `on`
+   class looked unselected for as long as it existed; and `.chip` had two
+   selected appearances in two layers that painted a third thing when both
+   were present.
+
+   Button.jsx, Chip.jsx and Segment.jsx now own that markup, so the class
+   names are theirs. A `className="btn"` written anywhere else is a 46th
+   definition of the button that no measurement in this repo can see, and it
+   is how the next case gets solved in one file and stays broken in the other
+   eighteen.
+
+   The components themselves are exempt -- they are where the class is
+   supposed to be written. A control's own name as a MODIFIER (`chips`,
+   `pchip`, `fchip`, `filterbtn`) is a different class and is not matched. */
+{
+    const OWNED = {
+        btn: 'shared/ui/Button.jsx  -- <Button variant="quiet|ghost" size="lg" block busy as={Link}>',
+        chip: 'shared/ui/Chip.jsx   -- <Chip selected count onRemove> / <RemovableChip>',
+        seg: 'shared/ui/Segment.jsx -- <Segment selected tone>',
+    };
+    const OWNERS = ['shared/ui/Button.jsx', 'shared/ui/Chip.jsx', 'shared/ui/Segment.jsx'];
+
+    for (const f of jsx) {
+        const rel = relative(ROOT, f);
+        if (OWNERS.some((o) => rel.endsWith(o))) continue;
+        const src = readFileSync(f, 'utf8');
+        const lines = src.split('\n');
+        lines.forEach((line, i) => {
+            /* Only a className. A `.btn` inside a comment or a selector string
+               is prose, not markup. */
+            for (const m of line.matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\}|\{[^}]*?['"]([^'"]*)['"])/g)) {
+                const classes = (m[1] || m[2] || m[3] || '')
+                    .replace(/\$\{[^}]*\}/g, ' ').split(/\s+/).filter(Boolean);
+                for (const c of classes) {
+                    if (OWNED[c]) {
+                        fail('owned-class', `${rel}:${i + 1}: className has "${c}" by hand -- use ${OWNED[c]}`);
+                    }
+                }
+            }
+        });
+    }
+    /* A check that cannot see the thing it forbids passes forever. Three
+       checks in this repo have already done exactly that (C7.7), so this one
+       states what it managed to read. */
+    const owners = jsx.filter((f) => OWNERS.some((o) => relative(ROOT, f).endsWith(o)));
+    if (owners.length !== OWNERS.length) {
+        fail('owned-class', `expected ${OWNERS.length} component files to own these classes, found ${owners.length}`
+            + ' -- the component layer has moved and this check is looking at nothing');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -711,6 +776,7 @@ const CHECKS = [
     ['icon-name', 'An icon names a role the set actually has'],
     ['icon-row', 'An icon beside content sits in a row that was declared'],
     ['spec-drift', 'The specification and the code agree on every token'],
+    ['owned-class', 'A shared control\'s class is written by its component, not by hand'],
 ];
 
 let failed = 0;

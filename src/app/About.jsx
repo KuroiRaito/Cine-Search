@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Button } from '../shared/ui/index.js';
 
 /**
  * The canonical home for attribution.
@@ -45,7 +46,7 @@ export default function About() {
             </div>
 
             <div className="pad stack">
-                <Link className="btn quiet" to="/">Back to Discover</Link>
+                <Button as={Link} variant="quiet" to="/">Back to Discover</Button>
             </div>
         </div>
     );

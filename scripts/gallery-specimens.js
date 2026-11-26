@@ -66,12 +66,12 @@ export const SPECIMENS = [
         content: [['longest + count', 'Action &amp; Adventure<em>1,204</em>']],
         states: ['rest', 'hover', 'selected'] },
     /* The one that shipped broken: a chip that carries its own removal. */
-    { group: 'Chips', name: 'chip.on + cross', cls: 'chip on', html: 'Action{icon:close}',
+    { group: 'Chips', name: 'chip.applied + cross', cls: 'chip applied', html: 'Action{icon:close}',
         /* This exact cell is the production bug: a genre long enough to wrap,
            with a cross after it. It was 32px tall and became 48. */
         content: [['longest + cross', 'Action &amp; Adventure{icon:close}'], ['devanagari + cross', 'विज्ञान कथा{icon:close}']],
         states: ['rest', 'hover', 'focus-visible'] },
-    { group: 'Chips', name: 'chip, longest label', cls: 'chip on', html: `${LONG}{icon:close}`,
+    { group: 'Chips', name: 'chip, longest label', cls: 'chip applied', html: `${LONG}{icon:close}`,
         states: ['rest'] },
     { group: 'Chips', name: 'sw', cls: 'sw', html: 'Episodes<em>62</em>',
         content: [['longest + count', 'Unwatched episodes<em>1,204</em>']],
@@ -238,7 +238,7 @@ export const SPECIMENS = [
             child: (i) => {
                 const g = ['Action &amp; Adventure', 'Science Fiction', 'Documentary',
                     'War &amp; Politics', 'Sci-Fi &amp; Fantasy', 'Drama', 'Comedy', 'Horror'];
-                return `<button class="chip on">${g[i % g.length]}<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
+                return `<button class="chip applied">${g[i % g.length]}<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
             },
         } },
 

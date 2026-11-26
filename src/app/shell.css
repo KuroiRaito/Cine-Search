@@ -202,24 +202,11 @@ img { max-width: 100%; display: block; }
 }
 .circ.on-image:hover { background: var(--glass-hv); color: var(--on-glass); }
 
-/* A button and an input are the same object to the eye when stacked, so they
-   share a height and a radius. This is what removes the 1px drift that was
-   visible on the sign-up form. */
-.btn {
-  font-family: var(--f-s);
-  font-size: var(--text-label); line-height: var(--lh-label); font-weight: 600;
-  height: var(--control-h); padding: 0 var(--space-16);
-  border-radius: var(--radius-control); border: 0; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
-  background: var(--acc); color: var(--on-acc);
-  box-shadow: inset 0 1px 0 var(--hl);
-  transition: filter var(--dur-fast) var(--ease-out);
-}
-.btn:hover { filter: brightness(1.06); }
-.btn:disabled { opacity: .55; cursor: not-allowed; filter: none; }
-.btn.quiet { background: var(--surface-hv); color: var(--text); box-shadow: none; }
-.btn.quiet:hover { background: var(--ink-5); filter: none; }
-.btn.block { width: 100%; }
+/* `.btn` used to be declared here, in the journeys layer, which made the
+   most reused control in the product a property of the frame around the
+   modules rather than of the shared control set. It now lives in
+   `shared/ui/ui.css` beside every other control more than one module uses
+   (C5.1). Nothing about it changed except where it is written down. */
 
 .section { margin: var(--section-gap) var(--gutter) 0; }
 .section-h {
@@ -325,14 +312,6 @@ img { max-width: 100%; display: block; }
   min-height: var(--control-h); padding: var(--space-4) var(--space-8); cursor: pointer; opacity: .7;
 }
 .session-note button:hover { opacity: 1; }
-
-/* The gap where the sign-in button or the username will go, once the session
-   question has an answer. Holding the space is the difference between a bar
-   that is thinking and a bar that jumps. */
-.btn.quiet.is-waiting {
-  display: inline-block; min-width: var(--space-64); height: var(--control-sm);
-  background: var(--surface); box-shadow: none; pointer-events: none;
-}
 
 /* ---------------- wide: 1440+ ----------------
 

@@ -6,7 +6,7 @@ import { humanError, signUpOutcome, failureKind, RATE_LIMIT_WAIT } from './messa
 import { emailProblem, passwordProblem, usernameProblem, PASSWORD_RULES } from './rules.js';
 import { supabase } from '../../shared/auth/supabaseClient.js';
 import './entry.css';
-import { Icon } from '../../shared/ui/index.js';
+import { Icon, Button} from '../../shared/ui/index.js';
 
 /**
  * One screen, five steps, one flow.
@@ -439,9 +439,9 @@ export default function Auth() {
                         <p className="form-error" role="alert">
                             This link has expired or has already been used.
                         </p>
-                        <Link className="btn block" to="/welcome/forgot" state={{ from: back }}>
+                        <Button as={Link} block to="/welcome/forgot" state={{ from: back }}>
                             Send a new link
-                        </Link>
+                        </Button>
                     </>
                 ) : (
                 <>
@@ -533,9 +533,9 @@ export default function Auth() {
                         </p>
                     )}
 
-                    <button type="submit" className="btn block" disabled={busy || waitLeft > 0}>
+                    <Button block type="submit" disabled={busy || waitLeft > 0}>
                         {waitLeft > 0 ? `Try again in ${waitLeft}s` : submitLabel}
-                    </button>
+                    </Button>
                 </form>
 
                 {(step === 'signin' || step === 'signup') && (
@@ -596,9 +596,9 @@ function Done({ panel, back, onBack }) {
                 <p className="auth-lede">{panel.body}</p>
 
                 {panel.resend && (
-                    <button type="button" className="btn quiet block" onClick={again} disabled={state === 'sending' || state === 'sent'}>
+                    <Button variant="quiet" block onClick={again} disabled={state === 'sending' || state === 'sent'}>
                         {state === 'sending' ? 'Sending…' : state === 'sent' ? 'Sent again' : 'Resend the link'}
-                    </button>
+                    </Button>
                 )}
                 {state === 'failed' && (
                     <p className="form-error" role="alert"><span>Couldn’t send it again. Try in a minute.</span></p>

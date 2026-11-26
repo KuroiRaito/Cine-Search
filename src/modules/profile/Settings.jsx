@@ -4,7 +4,7 @@ import { AccountCard } from '../entry';
 import { useRegion } from '../../shared/hooks/RegionProvider.jsx';
 import { themeSetting, applyTheme } from '../../shared/theme/theme.js';
 import './profile.css';
-import { Icon } from '../../shared/ui/index.js';
+import { Icon, Segment } from '../../shared/ui/index.js';
 
 /**
  * Plain and conventional by decision, not by omission — settings has no bespoke
@@ -43,15 +43,14 @@ export default function Settings() {
                     first tap; it was the one state nobody could return to. */}
                 <div className="segs">
                     {['system', 'light', 'dark'].map((t) => (
-                        <button
+                        <Segment
                             key={t}
-                            type="button"
-                            className={`seg${theme === t ? ' on st-done' : ''}`}
-                            aria-pressed={theme === t}
+                            selected={theme === t}
+                            tone={theme === t ? 'st-done' : undefined}
                             onClick={() => flip(t)}
                         >
                             <Icon name={THEME_ICON[t]} size={20} /><i>{THEME_LABEL[t]}</i>
-                        </button>
+                        </Segment>
                     ))}
                 </div>
             </div>

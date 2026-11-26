@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Poster, Empty, Icon } from '../../shared/ui/index.js';
+import { Poster, Empty, Icon, Button} from '../../shared/ui/index.js';
 import { profileUrl, posterUrl } from '../../shared/tmdb/view.js';
 import { useLibrary, setFavouriteOrder, loadFavourites } from '../library';
 import { loadShelf, addFavourite, removeFavourite, setShelfOrder, sortShelf } from './shelves.js';
@@ -172,9 +172,9 @@ export function FavouritesTab({ shelves, onChanged }) {
 
             {open === 'character' && (
                 <div className="pad">
-                    <button type="button" className="btn quiet" onClick={() => setPicking(true)}>
+                    <Button variant="quiet" onClick={() => setPicking(true)}>
                         Add a character
-                    </button>
+                    </Button>
                 </div>
             )}
 
@@ -185,8 +185,8 @@ export function FavouritesTab({ shelves, onChanged }) {
                     title={`No favourite ${shelf.label.toLowerCase()} yet`}
                     body={emptyBody(open)}
                     action={open === 'character'
-                        ? <button type="button" className="btn" onClick={() => setPicking(true)}>Add a character</button>
-                        : <Link className="btn" to={open === 'person' ? '/search' : '/'}>Find something</Link>}
+                        ? <Button onClick={() => setPicking(true)}>Add a character</Button>
+                        : <Button as={Link} to={open === 'person' ? '/search' : '/'}>Find something</Button>}
                 />
             ) : (
                 <ol className="fgrid">

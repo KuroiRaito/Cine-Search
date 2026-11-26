@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Icon } from '../../shared/ui/index.js';
+import { Icon, Segment, Chip } from '../../shared/ui/index.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { providerList } from '../../shared/tmdb/endpoints.js';
 import {
@@ -46,13 +46,11 @@ function Row({ label, options, value, onPick }) {
             <div className="frow-l">{label}</div>
             <div className="chips flush">
                 {options.map((o) => (
-                    <button
+                    <Chip
                         key={String(o.value)}
-                        type="button"
-                        className="chip"
-                        aria-pressed={Array.isArray(value) ? value.includes(o.value) : value === o.value}
+                        selected={Array.isArray(value) ? value.includes(o.value) : value === o.value}
                         onClick={() => onPick(o.value)}
-                    >{o.label}</button>
+                    >{o.label}</Chip>
                 ))}
             </div>
         </div>
@@ -88,12 +86,10 @@ function WhereToWatch({ facets, onPick }) {
                 <p className="frow-ask">Streaming services differ by country. Which is yours?</p>
                 <div className="chips flush">
                     {regionChoices(navigator.language).map((code) => (
-                        <button
+                        <Chip
                             key={code}
-                            type="button"
-                            className="chip"
                             onClick={() => { writeRegion(code); setRegion(code); }}
-                        >{code}</button>
+                        >{code}</Chip>
                     ))}
                 </div>
             </div>
@@ -108,13 +104,11 @@ function WhereToWatch({ facets, onPick }) {
             <div className="frow-l">Where to watch · {region}</div>
             <div className="chips flush">
                 {data.slice(0, 12).map((p) => (
-                    <button
+                    <Chip
                         key={p.id}
-                        type="button"
-                        className="chip"
-                        aria-pressed={facets.provider === p.id}
+                        selected={facets.provider === p.id}
                         onClick={() => onPick(facets.provider === p.id ? null : p.id, region)}
-                    >{p.name}</button>
+                    >{p.name}</Chip>
                 ))}
             </div>
         </div>
@@ -141,13 +135,11 @@ export default function FilterPanel({ facets, vocab, onChange, canHide }) {
                 <div className="frow-l">Kind</div>
                 <div className="segs">
                     {KINDS.map((k) => (
-                        <button
+                        <Segment
                             key={k.key}
-                            type="button"
-                            className="seg"
-                            aria-pressed={facets.kind === k.key}
+                            selected={facets.kind === k.key}
                             onClick={() => set({ kind: k.key })}
-                        >{k.label}</button>
+                        >{k.label}</Segment>
                     ))}
                 </div>
             </div>

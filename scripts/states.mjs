@@ -172,14 +172,47 @@ for (const f of jsxFiles) {
             else if (ch === '>' && depth === 0) break;
         }
         const tag = open[1];
+        let k_toggleHint = false;
         const attrs = src.slice(lt + open[0].length, j);
         i = j + 1;
 
         const cm = /className=(?:"([^"]*)"|\{([\s\S]*)$)/.exec(attrs);
-        if (!cm) continue;
+        /* A component supplies its own base class, so the markup no longer
+           says it. `<Button className="filterbtn">` renders
+           `class="btn filterbtn"`, and a reader that sees only `filterbtn`
+           concludes the control has no hover -- which is exactly what this
+           tool reported the day the component layer landed, for two controls
+           that inherit `.btn:hover` and always did.
+
+           A tool that under-reports is worse than no tool, because the clean
+           rows get believed. So the base class is restored here, and the
+           PROPS that stand for a class are read as that class: `variant`,
+           `size`, `block` and `busy` are `.quiet`, `.btn-lg`, `.block` and
+           `.is-waiting`, and `selected` is the `.on`/`aria-pressed` the
+           component writes. If a component's API changes, this map is the
+           thing to change with it. */
+        const OWNS = { Button: 'btn', Chip: 'chip', Segment: 'seg' };
+        const PROP_CLASS = {
+            'variant="quiet"': 'quiet', 'variant="ghost"': 'ghost',
+            'size="lg"': 'btn-lg', block: 'block', busy: 'is-waiting',
+            applied: 'applied',
+        };
         let names = [];
-        if (cm[1] !== undefined) names = cm[1].split(/\s+/).filter(Boolean);
-        else names = [...attrs.matchAll(/['"`]([^'"`{}$]*)['"`]/g)].flatMap((m) => m[1].split(/\s+/)).filter(Boolean);
+        if (cm) {
+            if (cm[1] !== undefined) names = cm[1].split(/\s+/).filter(Boolean);
+            else names = [...attrs.matchAll(/['"`]([^'"`{}$]*)['"`]/g)].flatMap((m) => m[1].split(/\s+/)).filter(Boolean);
+        }
+        if (OWNS[tag]) {
+            names.unshift(OWNS[tag]);
+            for (const [prop, cls] of Object.entries(PROP_CLASS)) {
+                const re = prop.includes('=') ? prop : `\\b${prop}(?=[\\s/>{=]|$)`;
+                if (new RegExp(re.replace(/[.*+?^${}()|[\]\\]/g, (c) => (prop.includes('=') ? `\\${c}` : c))).test(attrs)) {
+                    names.push(cls);
+                }
+            }
+            /* `selected` is the component's one spelling for a toggle. */
+            if (/\bselected[=}\s/>]/.test(attrs)) k_toggleHint = true;
+        } else if (!cm) continue;
 
         for (const n of names) {
             if (!/^[a-z][\w-]*$/.test(n)) continue;
@@ -188,10 +221,10 @@ for (const f of jsxFiles) {
                its own to answer for. */
             if (names.length === 1) soloed.add(n);
             const k = seeClass(n);
-            if (INTERACTIVE_TAGS.has(tag)) k.tags.add(tag);
+            if (INTERACTIVE_TAGS.has(tag) || OWNS[tag]) k.tags.add(tag);
             if (tag === 'input' || tag === 'textarea' || tag === 'select') k.input = true;
             if (/\bdisabled[=}\s]/.test(attrs) || /aria-disabled/.test(attrs)) k.disabled = true;
-            if (/aria-pressed|aria-selected|aria-current|role="tab"/.test(attrs)) k.toggle = true;
+            if (k_toggleHint || /aria-pressed|aria-selected|aria-current|role="tab"/.test(attrs)) k.toggle = true;
             if (/\bonClick=/.test(attrs)) { k.onClick = true; k.tags.add(tag); }
         }
     }
@@ -219,7 +252,10 @@ const ringSel = (() => {
 
 /* What the markup calls a thing is not what the browser sees: react-router's
    Link and NavLink both render <a href>. */
-const AS = { Link: 'a', NavLink: 'a', Group: 'div' };
+/* What a tag actually renders, for the focus question. The three
+   components default to <button> and take `as` for the rest, so the
+   global ring covers them -- without this they read as unfocusable. */
+const AS = { Link: 'a', NavLink: 'a', Group: 'div', Button: 'button', Chip: 'button', Segment: 'button' };
 const ringTags = new Set();
 let ringAttrs = [];
 if (ringSel) {

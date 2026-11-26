@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import './entry.css';
+import { Button } from '../../shared/ui/index.js';
 
 /**
  * Who you are signed in as, and how to stop being.
@@ -39,7 +40,7 @@ export default function AccountCard({ from = '/' }) {
                     You&apos;re browsing without one. An account keeps your watchlist,
                     ratings and episode progress.
                 </p>
-                <Link className="btn" to="/welcome/signup" state={{ from }}>Create an account</Link>
+                <Button as={Link} to="/welcome/signup" state={{ from }}>Create an account</Button>
             </div>
         );
     }
@@ -67,9 +68,9 @@ export default function AccountCard({ from = '/' }) {
                         again to see it.
                     </p>
                     <div className="del-row">
-                        <button type="button" className="btn quiet" onClick={() => setConfirming(false)}>
+                        <Button variant="quiet" onClick={() => setConfirming(false)}>
                             Stay signed in
-                        </button>
+                        </Button>
                         <button type="button" className="del" onClick={out} disabled={leaving}>
                             {leaving ? 'Signing out…' : 'Sign out'}
                         </button>

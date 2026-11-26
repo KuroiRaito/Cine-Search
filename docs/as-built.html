@@ -421,24 +421,11 @@ img { max-width: 100%; display: block; }
 }
 .circ.on-image:hover { background: var(--glass-hv); color: var(--on-glass); }
 
-/* A button and an input are the same object to the eye when stacked, so they
-   share a height and a radius. This is what removes the 1px drift that was
-   visible on the sign-up form. */
-.btn {
-  font-family: var(--f-s);
-  font-size: var(--text-label); line-height: var(--lh-label); font-weight: 600;
-  height: var(--control-h); padding: 0 var(--space-16);
-  border-radius: var(--radius-control); border: 0; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
-  background: var(--acc); color: var(--on-acc);
-  box-shadow: inset 0 1px 0 var(--hl);
-  transition: filter var(--dur-fast) var(--ease-out);
-}
-.btn:hover { filter: brightness(1.06); }
-.btn:disabled { opacity: .55; cursor: not-allowed; filter: none; }
-.btn.quiet { background: var(--surface-hv); color: var(--text); box-shadow: none; }
-.btn.quiet:hover { background: var(--ink-5); filter: none; }
-.btn.block { width: 100%; }
+/* `.btn` used to be declared here, in the journeys layer, which made the
+   most reused control in the product a property of the frame around the
+   modules rather than of the shared control set. It now lives in
+   `shared/ui/ui.css` beside every other control more than one module uses
+   (C5.1). Nothing about it changed except where it is written down. */
 
 .section { margin: var(--section-gap) var(--gutter) 0; }
 .section-h {
@@ -544,14 +531,6 @@ img { max-width: 100%; display: block; }
   min-height: var(--control-h); padding: var(--space-4) var(--space-8); cursor: pointer; opacity: .7;
 }
 .session-note button:hover { opacity: 1; }
-
-/* The gap where the sign-in button or the username will go, once the session
-   question has an answer. Holding the space is the difference between a bar
-   that is thinking and a bar that jumps. */
-.btn.quiet.is-waiting {
-  display: inline-block; min-width: var(--space-64); height: var(--control-sm);
-  background: var(--surface); box-shadow: none; pointer-events: none;
-}
 
 /* ---------------- wide: 1440+ ----------------
 
@@ -856,6 +835,51 @@ img { max-width: 100%; display: block; }
         watch-state hues carry a tone into whatever they are applied to:
         a pill, a segment, a chip, a library row. ---- */
 
+/* ---------------- the button ----------------
+
+   The most reused control in the product: 45 call sites across 19 files
+   before `Button.jsx` took ownership of the markup. It was declared in three
+   different layers -- the base in `src/app/shell.css` (journeys), and
+   `.btn-lg` and `.btn.ghost` in `src/modules/entry/entry.css` (one module) --
+   so the full set of appearances it could produce was not written down
+   anywhere. Collected here, where a control used by more than one module
+   belongs, because `Button` can emit every one of them from any screen.
+
+   A button and an input are the same object to the eye when stacked, so they
+   share a height and a radius. This is what removes the 1px drift that was
+   visible on the sign-up form. */
+.btn {
+  font-family: var(--f-s);
+  font-size: var(--text-label); line-height: var(--lh-label); font-weight: 600;
+  height: var(--control-h); padding: 0 var(--space-16);
+  border-radius: var(--radius-control); border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
+  background: var(--acc); color: var(--on-acc);
+  box-shadow: inset 0 1px 0 var(--hl);
+  transition: filter var(--dur-fast) var(--ease-out);
+}
+.btn:hover { filter: brightness(1.06); }
+.btn:disabled { opacity: .55; cursor: not-allowed; filter: none; }
+.btn.quiet { background: var(--surface-hv); color: var(--text); box-shadow: none; }
+.btn.quiet:hover { background: var(--ink-5); filter: none; }
+.btn.block { width: 100%; }
+/* `size="lg"`. Unprefixed, as it was in entry.css, because the specificity
+   is what lets it raise the height past the base rule. */
+.btn-lg { width: 100%; height: var(--control-lg); padding: 0 var(--space-20); font-size: var(--text-body); }
+/* `variant="ghost"`. The second action on a screen whose first action is the
+   whole point -- it has to be reachable without competing. */
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 var(--border-hair) var(--bd-str); }
+.btn.ghost:hover { background: var(--surface-hv); filter: none; }
+/* `busy`. The gap where the sign-in button or the username will go, once the
+   session question has an answer. Holding the space is the difference between
+   a bar that is thinking and a bar that jumps. Must stay after `.btn.quiet`:
+   it is 0,3,0 against 0,2,0 and wins on specificity, but the background and
+   box-shadow it overrides are declared there. */
+.btn.quiet.is-waiting {
+  display: inline-block; min-width: var(--space-64); height: var(--control-sm);
+  background: var(--surface); box-shadow: none; pointer-events: none;
+}
+
 .ibtn {
   width: var(--control-h); min-height: var(--control-h); border: 0; background: var(--ink-4); color: var(--muted);
   border-radius: var(--radius-12); cursor: pointer; display: grid; place-items: center;
@@ -906,10 +930,33 @@ img { max-width: 100%; display: block; }
   display: inline-flex; align-items: center; gap: var(--space-4);
   transition: background .12s, color .12s;
 }
+/* `as={Link}` makes a chip a link, and a link is underlined. Discover
+   stripped that from its own row (`.chips.presets .chip`), which meant
+   the next module to render a chip as a link would have had to discover
+   the same thing. A chip is a pill in every layer, so it says so here. */
+.chip { text-decoration: none; }
 .chip em { font-style: normal; opacity: .5; font-variant-numeric: tabular-nums; }
 .chip:hover { background: var(--ink-4); color: var(--text); }
 .chip[aria-pressed="true"] { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
 .chip[aria-pressed="true"] em { opacity: .65; }
+/* The chip has TWO selected looks, and they are two different ideas:
+   `aria-pressed` is a filter option you turned ON -- it fills solid, because
+   it is the thing you just did. `.applied` is a filter already in force in
+   the row above the results, which you can take OFF -- it is a record, so it
+   tints rather than shouts.
+
+   They lived in two layers and were measured to collide: both are 0,2,0, so
+   which one won was decided by CSS chunk order, and an element carrying both
+   painted as neither (the tint, plus the solid look's inset highlight). One
+   prop per role in Chip.jsx now makes writing both unreachable; this is the
+   half that used to be `.chip.on` in search.css. */
+.chip.applied { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+/* The cross is quieter than the label: you read what the filter IS first,
+   then that you can drop it. Position is not this rule's business -- `.chip`
+   is a flex line and owns both the alignment and the 4px gap. This rule used
+   to carry `vertical-align: middle` and a margin, which could not work
+   against a block-level icon and did not. */
+.chip.applied svg { opacity: .7; }
 
 .sw {
   flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
@@ -1415,13 +1462,11 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--text); cursor: pointer;
 }
 
-/* A chip in the record carries its own removal. The cross is quieter than the
-   label: you read what the filter is first, then that you can drop it.
-   Position is not this rule's business -- `.chip` is a flex line and owns both
-   the alignment and the 4px. This rule used to carry `vertical-align: middle`
-   and a margin, which could not work against a block-level icon and did not. */
-.chip.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
-.chip.on svg { opacity: .7; }
+/* The applied-filter chip used to be restyled from here as `.chip.on` -- a
+   module reaching into a shared control, and the second of two spellings for
+   "selected" on the same element. It moved to `.chip.applied` in ui.css,
+   where the control lives, because the two looks turned out to be two
+   different ideas rather than one idea written twice. See Chip.jsx. */
 
 /* A facet that was dropped says so. Silence would be the screen answering a
    question nobody asked. */
@@ -1903,9 +1948,6 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 .circ[data-force~="hover"] { background: var(--surface-hv); color: var(--text); }
 .circ[data-force~="disabled"] { background: var(--surface); color: var(--faint); cursor: not-allowed; }
 .circ.on-image[data-force~="hover"] { background: var(--glass-hv); color: var(--on-glass); }
-.btn[data-force~="hover"] { filter: brightness(1.06); }
-.btn[data-force~="disabled"] { opacity: .55; cursor: not-allowed; filter: none; }
-.btn.quiet[data-force~="hover"] { background: var(--ink-5); filter: none; }
 @media (min-width: 1120px) { .wordmark[data-force~="hover"] { color: var(--acc-t); } }
 .session-note button[data-force~="hover"] { opacity: 1; }
 .tile[data-force~="hover"] .art { filter: brightness(1.08); }
@@ -1914,6 +1956,10 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 .prow[data-force~="hover"] { background: var(--surface-hv); }
 .quickadd.saved[data-force~="hover"] { filter: brightness(1.12); }
 .linkish[data-force~="hover"] { color: var(--acc-t-hv); }
+.btn[data-force~="hover"] { filter: brightness(1.06); }
+.btn[data-force~="disabled"] { opacity: .55; cursor: not-allowed; filter: none; }
+.btn.quiet[data-force~="hover"] { background: var(--ink-5); filter: none; }
+.btn.ghost[data-force~="hover"] { background: var(--surface-hv); filter: none; }
 .ibtn[data-force~="hover"] { background: var(--ink-5); color: var(--text); }
 .ibtn.like[data-force~="hover"] { color: var(--like-9); }
 .chip[data-force~="hover"] { background: var(--ink-4); color: var(--text); }
@@ -2793,12 +2839,12 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
         <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip">Documentary<em>142</em></button></div></div><div class="g-cell"><div class="g-state">hover</div><div class="g-stage"><button class="chip" data-force="hover">Documentary<em>142</em></button></div></div><div class="g-cell"><div class="g-state">selected</div><div class="g-stage"><button class="chip on" aria-pressed="true">Documentary<em>142</em></button></div></div><div class="g-cell g-content" data-content="longest + count"><div class="g-state">longest + count</div><div class="g-stage"><button class="chip">Action &amp; Adventure<em>1,204</em></button></div></div></div>
       </div>
       <div class="g-row">
-        <div class="g-name"><code>chip.on + cross</code><span>.chip.on</span></div>
-        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip on">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell"><div class="g-state">hover</div><div class="g-stage"><button class="chip on" data-force="hover">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell"><div class="g-state">focus-visible</div><div class="g-stage"><button class="chip on" data-force="focus-visible">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="longest + cross"><div class="g-state">longest + cross</div><div class="g-stage"><button class="chip on">Action &amp; Adventure<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="devanagari + cross"><div class="g-state">devanagari + cross</div><div class="g-stage"><button class="chip on">विज्ञान कथा<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div></div>
+        <div class="g-name"><code>chip.applied + cross</code><span>.chip.applied</span></div>
+        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip applied">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell"><div class="g-state">hover</div><div class="g-stage"><button class="chip applied" data-force="hover">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell"><div class="g-state">focus-visible</div><div class="g-stage"><button class="chip applied" data-force="focus-visible">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="longest + cross"><div class="g-state">longest + cross</div><div class="g-stage"><button class="chip applied">Action &amp; Adventure<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="devanagari + cross"><div class="g-state">devanagari + cross</div><div class="g-stage"><button class="chip applied">विज्ञान कथा<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div></div>
       </div>
       <div class="g-row">
-        <div class="g-name"><code>chip, longest label</code><span>.chip.on</span></div>
-        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip on">Science Fiction &amp; Fantasy<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div></div>
+        <div class="g-name"><code>chip, longest label</code><span>.chip.applied</span></div>
+        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip applied">Science Fiction &amp; Fantasy<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div></div>
       </div>
       <div class="g-row">
         <div class="g-name"><code>sw</code><span>.sw</span></div>
@@ -2943,7 +2989,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 <section class="g-group"><h2>Composition</h2>
       <div class="g-row g-wide">
         <div class="g-name"><code>chips — the filter row</code><span>.chips</span></div>
-        <div class="g-cells g-stack"><div class="g-cell g-count" data-count="0"><div class="g-state">empty</div><div class="g-stage g-surface"><div class="chips"></div></div></div><div class="g-cell g-count" data-count="1"><div class="g-state">1 item</div><div class="g-stage g-surface"><div class="chips"><button class="chip on">Action &amp; Adventure<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div></div><div class="g-cell g-count" data-count="2"><div class="g-state">2 items</div><div class="g-stage g-surface"><div class="chips"><button class="chip on">Action &amp; Adventure<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip on">Science Fiction<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div></div><div class="g-cell g-count" data-count="8"><div class="g-state">8 items</div><div class="g-stage g-surface"><div class="chips"><button class="chip on">Action &amp; Adventure<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip on">Science Fiction<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip on">Documentary<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip on">War &amp; Politics<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip on">Sci-Fi &amp; Fantasy<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip on">Drama<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip on">Comedy<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip on">Horror<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div></div></div>
+        <div class="g-cells g-stack"><div class="g-cell g-count" data-count="0"><div class="g-state">empty</div><div class="g-stage g-surface"><div class="chips"></div></div></div><div class="g-cell g-count" data-count="1"><div class="g-state">1 item</div><div class="g-stage g-surface"><div class="chips"><button class="chip applied">Action &amp; Adventure<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div></div><div class="g-cell g-count" data-count="2"><div class="g-state">2 items</div><div class="g-stage g-surface"><div class="chips"><button class="chip applied">Action &amp; Adventure<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip applied">Science Fiction<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div></div><div class="g-cell g-count" data-count="8"><div class="g-state">8 items</div><div class="g-stage g-surface"><div class="chips"><button class="chip applied">Action &amp; Adventure<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip applied">Science Fiction<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip applied">Documentary<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip applied">War &amp; Politics<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip applied">Sci-Fi &amp; Fantasy<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip applied">Drama<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip applied">Comedy<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><button class="chip applied">Horror<svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></div></div></div>
       </div>
       <div class="g-row g-wide">
         <div class="g-name"><code>grid — search results</code><span>.grid</span></div>

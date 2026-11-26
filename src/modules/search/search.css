@@ -78,13 +78,11 @@
   font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--text); cursor: pointer;
 }
 
-/* A chip in the record carries its own removal. The cross is quieter than the
-   label: you read what the filter is first, then that you can drop it.
-   Position is not this rule's business -- `.chip` is a flex line and owns both
-   the alignment and the 4px. This rule used to carry `vertical-align: middle`
-   and a margin, which could not work against a block-level icon and did not. */
-.chip.on { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
-.chip.on svg { opacity: .7; }
+/* The applied-filter chip used to be restyled from here as `.chip.on` -- a
+   module reaching into a shared control, and the second of two spellings for
+   "selected" on the same element. It moved to `.chip.applied` in ui.css,
+   where the control lives, because the two looks turned out to be two
+   different ideas rather than one idea written twice. See Chip.jsx. */
 
 /* A facet that was dropped says so. Silence would be the screen answering a
    question nobody asked. */

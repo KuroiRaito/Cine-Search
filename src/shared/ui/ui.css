@@ -241,6 +241,51 @@
         watch-state hues carry a tone into whatever they are applied to:
         a pill, a segment, a chip, a library row. ---- */
 
+/* ---------------- the button ----------------
+
+   The most reused control in the product: 45 call sites across 19 files
+   before `Button.jsx` took ownership of the markup. It was declared in three
+   different layers -- the base in `src/app/shell.css` (journeys), and
+   `.btn-lg` and `.btn.ghost` in `src/modules/entry/entry.css` (one module) --
+   so the full set of appearances it could produce was not written down
+   anywhere. Collected here, where a control used by more than one module
+   belongs, because `Button` can emit every one of them from any screen.
+
+   A button and an input are the same object to the eye when stacked, so they
+   share a height and a radius. This is what removes the 1px drift that was
+   visible on the sign-up form. */
+.btn {
+  font-family: var(--f-s);
+  font-size: var(--text-label); line-height: var(--lh-label); font-weight: 600;
+  height: var(--control-h); padding: 0 var(--space-16);
+  border-radius: var(--radius-control); border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
+  background: var(--acc); color: var(--on-acc);
+  box-shadow: inset 0 1px 0 var(--hl);
+  transition: filter var(--dur-fast) var(--ease-out);
+}
+.btn:hover { filter: brightness(1.06); }
+.btn:disabled { opacity: .55; cursor: not-allowed; filter: none; }
+.btn.quiet { background: var(--surface-hv); color: var(--text); box-shadow: none; }
+.btn.quiet:hover { background: var(--ink-5); filter: none; }
+.btn.block { width: 100%; }
+/* `size="lg"`. Unprefixed, as it was in entry.css, because the specificity
+   is what lets it raise the height past the base rule. */
+.btn-lg { width: 100%; height: var(--control-lg); padding: 0 var(--space-20); font-size: var(--text-body); }
+/* `variant="ghost"`. The second action on a screen whose first action is the
+   whole point -- it has to be reachable without competing. */
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 var(--border-hair) var(--bd-str); }
+.btn.ghost:hover { background: var(--surface-hv); filter: none; }
+/* `busy`. The gap where the sign-in button or the username will go, once the
+   session question has an answer. Holding the space is the difference between
+   a bar that is thinking and a bar that jumps. Must stay after `.btn.quiet`:
+   it is 0,3,0 against 0,2,0 and wins on specificity, but the background and
+   box-shadow it overrides are declared there. */
+.btn.quiet.is-waiting {
+  display: inline-block; min-width: var(--space-64); height: var(--control-sm);
+  background: var(--surface); box-shadow: none; pointer-events: none;
+}
+
 .ibtn {
   width: var(--control-h); min-height: var(--control-h); border: 0; background: var(--ink-4); color: var(--muted);
   border-radius: var(--radius-12); cursor: pointer; display: grid; place-items: center;
@@ -291,10 +336,33 @@
   display: inline-flex; align-items: center; gap: var(--space-4);
   transition: background .12s, color .12s;
 }
+/* `as={Link}` makes a chip a link, and a link is underlined. Discover
+   stripped that from its own row (`.chips.presets .chip`), which meant
+   the next module to render a chip as a link would have had to discover
+   the same thing. A chip is a pill in every layer, so it says so here. */
+.chip { text-decoration: none; }
 .chip em { font-style: normal; opacity: .5; font-variant-numeric: tabular-nums; }
 .chip:hover { background: var(--ink-4); color: var(--text); }
 .chip[aria-pressed="true"] { background: var(--acc); color: var(--on-beam-9); font-weight: 600; box-shadow: inset 0 1px 0 var(--hl); }
 .chip[aria-pressed="true"] em { opacity: .65; }
+/* The chip has TWO selected looks, and they are two different ideas:
+   `aria-pressed` is a filter option you turned ON -- it fills solid, because
+   it is the thing you just did. `.applied` is a filter already in force in
+   the row above the results, which you can take OFF -- it is a record, so it
+   tints rather than shouts.
+
+   They lived in two layers and were measured to collide: both are 0,2,0, so
+   which one won was decided by CSS chunk order, and an element carrying both
+   painted as neither (the tint, plus the solid look's inset highlight). One
+   prop per role in Chip.jsx now makes writing both unreachable; this is the
+   half that used to be `.chip.on` in search.css. */
+.chip.applied { background: var(--acc-bg); color: var(--acc-t); font-weight: 600; }
+/* The cross is quieter than the label: you read what the filter IS first,
+   then that you can drop it. Position is not this rule's business -- `.chip`
+   is a flex line and owns both the alignment and the 4px gap. This rule used
+   to carry `vertical-align: middle` and a margin, which could not work
+   against a block-level icon and did not. */
+.chip.applied svg { opacity: .7; }
 
 .sw {
   flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);

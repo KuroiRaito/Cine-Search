@@ -6,7 +6,7 @@ import { toTitleView, toSeasonView, compactCount } from '../../shared/tmdb/view.
 import { useAsync } from '../../shared/hooks/useAsync.js';
 import { wikiSummary } from '../../shared/wiki/wiki.js';
 import { useRegion } from '../../shared/hooks/RegionProvider.jsx';
-import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, Icon, initialsOf } from '../../shared/ui/index.js';
+import { Poster, Tile, PersonRow, ErrorBox, Empty, Toast, Icon, initialsOf, Button} from '../../shared/ui/index.js';
 import { TitleSkeleton } from './TitleSkeleton.jsx';
 import { SignInPrompt } from '../entry';
 import { Editor } from '../library';
@@ -129,7 +129,7 @@ export default function Title() {
 
     if (!valid) {
         return <Empty title="Not found" body="That isn’t a kind of thing we have."
-            action={<Link className="btn" to="/">Go to Discover</Link>} />;
+            action={<Button as={Link} to="/">Go to Discover</Button>} />;
     }
     if (loading) return <TitleSkeleton />;
 
@@ -140,8 +140,8 @@ export default function Title() {
                 title={gone ? 'We couldn’t find that title' : 'Something went wrong'}
                 body={gone ? 'It may have been removed from TMDB, or the link may be wrong.' : 'The Movie Database didn’t answer.'}
                 action={gone
-                    ? <Link className="btn" to="/">Go to Discover</Link>
-                    : <button type="button" className="btn" onClick={retry}>Try again</button>}
+                    ? <Button as={Link} to="/">Go to Discover</Button>
+                    : <Button onClick={retry}>Try again</Button>}
             />
         );
     }
@@ -660,9 +660,9 @@ function StoreSheet({ region, stores, link, onClose }) {
                     ))}
                 </div>
                 {link && (
-                    <a className="btn quiet storelink" href={link} target="_blank" rel="noreferrer noopener">
+                    <Button as="a" variant="quiet" className="storelink" href={link} target="_blank" rel="noreferrer noopener">
                         See them on TMDB
-                    </a>
+                    </Button>
                 )}
             </div>
         </div>
@@ -924,9 +924,9 @@ function EpisodeSheet({ episode: e, season, watched, onTick, onClose }) {
                     </div>
                 )}
                 {e.aired && (
-                    <button type="button" className="btn epmark" onClick={() => onTick(!watched)}>
+                    <Button className="epmark" onClick={() => onTick(!watched)}>
                         {watched ? 'Un-mark watched' : 'Mark watched'}
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>

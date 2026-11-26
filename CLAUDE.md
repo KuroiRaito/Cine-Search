@@ -28,13 +28,30 @@ how to photograph a single control.
 |---|---|
 | **Every `.css` file** — shared *and* module | design's lane |
 | **Every `.jsx` file** | development's lane |
+| `src/shared/ui/Button.jsx` `Chip.jsx` `Segment.jsx` | the seam — read §2.1 |
 
 This is a real boundary, not a preference. A design agent that edits `.jsx`
 has changed behaviour nobody reviewed; a development agent that edits `.css`
 has changed a system that eleven machine checks are holding in place.
 
-If a design fix genuinely requires markup, **say so and stop**. Several
-already do, and they are listed in `docs/CONTROLS.md` C6.
+If a design fix genuinely requires markup, **say so and stop**.
+
+### 2.1 The three components own three class names
+
+`.btn`, `.chip` and `.seg` are written by `src/shared/ui/Button.jsx`,
+`Chip.jsx` and `Segment.jsx` — nowhere else, and `verify` check 19 enforces
+that. Before the component layer they were applied by hand at 45, 9 and 3
+sites, and a case solved in one file was unknown to the rest.
+
+So a case that used to need markup at twenty call sites now needs one prop in
+one file. **Adding a variant is still two changes in two lanes** — the CSS
+where the control lives, and the prop that selects it — and a design agent
+does the first and says so, rather than doing the second.
+
+Check `docs/CONTROLS.md` C6.3 before you add a prop. Three bugs were found by
+writing those files, all of the same shape: one state spelled two ways in two
+places. The chip's was decided by **CSS chunk load order**, and an element
+carrying both spellings painted as neither.
 
 ## 3. What is authoritative
 
@@ -53,7 +70,7 @@ component, so it cannot drift from the code — that is the whole point of it.
 If it looks wrong, the code is wrong.
 
 The specification and the code are checked against each other (`verify` check
-18) on the 83 tokens the spec declares. **It does not declare the spacing or
+18; there are 19 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
 radius scales**, so those are not cross-checked — `src/shared/theme/tokens.css`
 is the only statement of them.
 
@@ -112,9 +129,11 @@ Say so rather than assuming the net is wider than it is.
   reached production would ever appear in it.
 - **CI runs `verify`, `build` and `test:api` only.** The gallery audit and the
   behavioural harnesses are not wired in — run `npm run check` yourself.
-- **There is no component layer.** `.btn`, `.chip` and `.seg` are class names
-  applied by hand in roughly twenty files. A case solved in one file is
-  unknown to the other nineteen.
+- **`npm run snap`'s fingerprints are structural, not pixel.** Element count
+  and geometry hash. Dark and light shots of a screen share a value, which is
+  why only 36 of the 72 are distinct. Identical fingerprints prove the markup
+  and layout did not move; they say nothing about colour. Read computed
+  styles for that.
 - **Accessibility beyond focus order is unchecked.** Contrast is designed, not
   verified.
 

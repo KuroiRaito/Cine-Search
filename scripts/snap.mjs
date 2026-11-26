@@ -68,6 +68,9 @@ const THEMES = ['dark', 'light'];
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
 const RECORD = args.includes('--record');
+/* A full refresh of the corpus, which is a deliberate maintenance action with
+   its own diff. --record on its own fills the gaps; see below. */
+const FRESH = args.includes('--fresh');
 
 /**
  * Every third-party response, frozen.
@@ -246,10 +249,22 @@ let shots = 0;
    /api/tmdb?path=<path>&<params>, and the dev server's port changes per run so
    the rest of the URL is not stable. Wikidata and Wikipedia are keyed by the
    whole URL, because that is what identifies them. */
-const fixtures = !RECORD && existsSync(FIXTURES)
+/* Loaded even when recording, which is the difference between filling the
+   corpus and replacing it.
+   
+   This used to be `!RECORD`, so `--record` started from nothing and re-fetched
+   every response — which meant there was no way to pin eight missing requests
+   without also refreshing the other hundred and moving every fingerprint with
+   them. A flag called "record" that discards what is already recorded is a
+   destructive default wearing an additive name.
+   
+   Now a key that is already pinned is served from the fixture and never
+   reaches the network, so a record run fetches precisely what is missing.
+   `--fresh` is how you ask for the old behaviour, having meant to. */
+const fixtures = !FRESH && existsSync(FIXTURES)
     ? JSON.parse(gunzipSync(readFileSync(FIXTURES)).toString('utf8'))
     : {};
-const recorded = {};
+const recorded = { ...fixtures };
 const missed = new Set();
 
 const keyOf = (url) => {
@@ -367,16 +382,28 @@ try {
 if (RECORD) {
     writeFileSync(FIXTURES, gzipSync(JSON.stringify(recorded), { level: 9 }));
     const kb = Math.round(readFileSync(FIXTURES).length / 1024);
+    const total = Object.keys(recorded).length;
+    const added = total - Object.keys(fixtures).length;
     const wiki = Object.keys(recorded).filter((k) => k.startsWith('http')).length;
-    console.log(`\n  Recorded ${Object.keys(recorded).length} responses`
-        + ` (${Object.keys(recorded).length - wiki} TMDB, ${wiki} Wikidata/Wikipedia), ${kb} KB.\n`);
+    console.log(`\n  ${added === total ? 'Recorded' : `Added ${added}, keeping ${total - added}.`}`
+        + ` ${total} responses in the corpus`
+        + ` (${total - wiki} TMDB, ${wiki} Wikidata/Wikipedia), ${kb} KB.\n`);
     process.exit(0);
 }
 
 if (missed.size) {
     console.log(`\n  ${missed.size} request(s) had no fixture and went to the network:`);
     for (const k of [...missed].slice(0, 8)) console.log(`    ${k}`);
-    console.log('  Those screens are measuring live data. Re-record: npm run snap -- --record\n');
+    console.log('  Those screens are measuring live data. Record them: npm run snap -- --record\n');
+    /* And a comparison against live data is not a comparison. The fingerprint
+       is meant to be a fact about the code; for an unpinned screen it is a fact
+       about what TMDB returned this minute, so --check would go red for reasons
+       nobody caused — which is the thing that teaches everyone to ignore it,
+       and the reason this corpus exists at all. */
+    if (CHECK) {
+        console.log('  A check against live data is not a check. Nothing was compared.\n');
+        process.exit(1);
+    }
 }
 
 if (CHECK) {

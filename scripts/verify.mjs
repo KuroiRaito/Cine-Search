@@ -1004,6 +1004,61 @@ for (const f of jsx) {
 }
 
 
+/* ---- 23. a watch state carries enough colour to BE a state -------------
+   `want` shipped at 39% of the quietest sibling's chroma, in both themes.
+   It is the most-used status in a tracker -- most of a library is things
+   you have not watched yet -- so the one tone that reads as "no state" is
+   the one almost everything wears.
+
+   Saturation in HSL is the wrong ruler here: 20% at 221deg and 20% at
+   131deg are not the same amount of colour to an eye, which is how a blue
+   at "20%" sat beside greens at "38%" without the gap being obvious from
+   the source. OkLCh chroma is perceptually even, so it can carry a floor.
+
+   The floors are set below the quietest real tone in each tier, not at the
+   current values, so this is a floor and not a snapshot -- a seventh status
+   added in any hue has to carry colour, and nothing has to be re-tuned
+   when a tone is adjusted deliberately. Lightness is deliberately NOT
+   checked: the six already agree on it, and it is what contrast depends
+   on. */
+{
+    const FLOOR = { 9: 0.10, 11: 0.07, 3: 0.015 };
+    const srgb = (v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    const chromaOf = (hex) => {
+        const [r, g, b] = [0, 2, 4]
+            .map((i) => parseInt(hex.slice(i + 1, i + 3), 16) / 255)
+            .map(srgb);
+        const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+        const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+        const t = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+        const A = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * t;
+        const B = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * t;
+        return Math.hypot(A, B);
+    };
+
+    const tokensSrc = readFileSync(join(ROOT, 'src/shared/theme/tokens.css'), 'utf8');
+    let seen = 0;
+    for (const m of tokensSrc.matchAll(/--st-([a-z]+)-(9|11|3)\s*:\s*(#[0-9A-Fa-f]{6})/g)) {
+        const [, state, tier, hex] = m;
+        const line = tokensSrc.slice(0, m.index).split('\n').length;
+        seen++;
+        const c = chromaOf(hex);
+        if (c < FLOOR[tier]) {
+            fail('status-chroma', `src/shared/theme/tokens.css:${line}: \`--st-${state}-${tier}\``
+                + ` is ${hex}, chroma ${c.toFixed(3)} -- under the ${FLOOR[tier]} floor for a`
+                + ` -${tier} tone, so it reads as grey rather than as a state (C14 companion)`);
+        }
+    }
+    /* C7.7 -- six states, three tiers, and a light block declared twice.
+       Anything far under that means the palette moved and this stopped
+       reading it. */
+    if (seen < 30) {
+        fail('status-chroma', `only ${seen} watch-state tones found in tokens.css`
+            + ' -- that is too few, so this check has stopped finding the palette it judges');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -1031,6 +1086,7 @@ const CHECKS = [
     ['one-toast', 'One toast, mounted by the shell, raised one way'],
     ['aria-selection', 'Selection is an ARIA attribute, never a class'],
     ['no-repaint', 'A module positions a shared control, never repaints it'],
+    ['status-chroma', 'Every watch state carries enough colour to be a state'],
 ];
 
 let failed = 0;

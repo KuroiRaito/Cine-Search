@@ -39,7 +39,7 @@
   --like-9:#E5484D;--like-11:#FF9592;--like-3:#2A1012;
   --hl:rgba(255,255,255,.08);
   /* watch-state palette */
-  --st-want-9:#7C8AA8;--st-want-11:#A8B4CC;--st-want-3:#151C2A;
+  --st-want-9:#6687D4;--st-want-11:#94B3F3;--st-want-3:#131C2D;
   --st-ing-9:#2ABFA0;--st-ing-11:#6FE0C8;--st-ing-3:#07241F;
   --st-done-9:#4BA85C;--st-done-11:#86D493;--st-done-3:#0C2412;
   --st-re-9:#9B7BD4;--st-re-11:#C0A8EC;--st-re-3:#1A1230;
@@ -180,7 +180,7 @@
   --mar-1:#FEFDFB;--mar-2:#FDFAF3;--mar-3:#FBF3E0;--mar-4:#F8EACA;--mar-5:#F4E0B4;
   --mar-6:#EED29A;--mar-7:#E4BF78;--mar-8:#D5A648;--mar-9:#F5C45C;--mar-10:#EDB845;
   --mar-11:#7A5A0B;--mar-12:#3D2D06;
-  --st-want-9:#6B7994;--st-want-11:#4C566B;--st-want-3:#EEF0F5;
+  --st-want-9:#5477BD;--st-want-11:#405582;--st-want-3:#EBF0FE;
   --st-ing-9:#159E82;--st-ing-11:#0A6152;--st-ing-3:#E2F6F1;
   --st-done-9:#3F8F4E;--st-done-11:#2C6B38;--st-done-3:#E6F4E9;
   --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
@@ -205,7 +205,7 @@
   --mar-1:#FEFDFB;--mar-2:#FDFAF3;--mar-3:#FBF3E0;--mar-4:#F8EACA;--mar-5:#F4E0B4;
   --mar-6:#EED29A;--mar-7:#E4BF78;--mar-8:#D5A648;--mar-9:#F5C45C;--mar-10:#EDB845;
   --mar-11:#7A5A0B;--mar-12:#3D2D06;
-  --st-want-9:#6B7994;--st-want-11:#4C566B;--st-want-3:#EEF0F5;
+  --st-want-9:#5477BD;--st-want-11:#405582;--st-want-3:#EBF0FE;
   --st-ing-9:#159E82;--st-ing-11:#0A6152;--st-ing-3:#E2F6F1;
   --st-done-9:#3F8F4E;--st-done-11:#2C6B38;--st-done-3:#E6F4E9;
   --st-re-9:#7B5CB8;--st-re-11:#533C82;--st-re-3:#F0EAFA;
@@ -1033,9 +1033,40 @@ img { max-width: 100%; display: block; }
    because a chip is also used inline, in the sentence the search results
    print back; as a child of `.chips` it blockifies to `flex` anyway.
    `gap` owns the spacing from here -- one mechanism, not a margin per child. */
+/* The chip was the only control under the touch floor. `.btn`, `.circ` and
+   `.seg` are all `--control-h` (44px) and `.sw` is `--control-sm` (36px); the
+   chip sized itself from its text alone and came out 32px. It is also the
+   densest control on the page -- a filter row is nothing but chips -- so it
+   is the one most often aimed at with a thumb.
+
+   The horizontal padding went 12px -> 16px as part of the SAME change, and
+   not for looks. A pill is only a pill while it is wider than it is tall, and
+   the product makes chips far shorter than a genre name: the region chips are
+   ISO country codes (`IN`, `US`, `GB`) and Library's tablist ends in `All`.
+   Measured at 390px with the real stylesheet:
+
+                      44px tall, 12px pad     44px tall, 16px pad
+     IN                36.4 x 44  NOT a pill   44.4 x 44  ok
+     All               38.7 x 44  NOT a pill   46.7 x 44  ok
+     War (shortest     46.7 x 44  ok           54.7 x 44  ok
+       real genre)
+
+   16px is the minimum that answers it -- `IN` clears 44 by 0.4px, which is
+   the tightest real case there is. 14px would still leave it 40.4px wide.
+   The cost is width: the eight-genre filter row runs 741px past its edge
+   instead of 677px. It already scrolls, on purpose.
+
+   `padding-block: 8px` stays even though `min-height` now decides the height,
+   and it is load-bearing for a CHECK rather than for the look. The audit's
+   one-line invariant is `max(line-height + padding + border, min-height)`,
+   so with 8px a chip that drops its cross onto a second line measures 48px
+   against a 44px expectation and fires; with 0 it would measure 44px and
+   hide inside the new floor. That is the production bug this control is
+   named for, so the padding that keeps it visible is not decoration. */
 .chip {
   flex: 0 0 auto; font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 500;
-  padding: var(--space-8) var(--space-12); border-radius: var(--radius-full); border: 0; cursor: pointer;
+  padding: var(--space-8) var(--space-16); border-radius: var(--radius-full); border: 0; cursor: pointer;
+  min-height: var(--control-h);
   background: var(--ink-3); color: var(--muted); white-space: nowrap;
   display: inline-flex; align-items: center; gap: var(--space-4);
   transition: background .12s, color .12s;
@@ -2971,7 +3002,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 <section class="g-group"><h2>Chips</h2>
       <div class="g-row">
         <div class="g-name"><code>chip</code><span>.chip</span></div>
-        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip">Documentary</button></div></div><div class="g-cell"><div class="g-state">hover</div><div class="g-stage"><button class="chip" data-force="hover">Documentary</button></div></div><div class="g-cell"><div class="g-state">focus-visible</div><div class="g-stage"><button class="chip" data-force="focus-visible">Documentary</button></div></div><div class="g-cell"><div class="g-state">selected</div><div class="g-stage"><button class="chip on" aria-pressed="true">Documentary</button></div></div><div class="g-cell g-content" data-content="longest genre"><div class="g-state">longest genre</div><div class="g-stage"><button class="chip">Action &amp; Adventure</button></div></div><div class="g-cell g-content" data-content="devanagari"><div class="g-state">devanagari</div><div class="g-stage"><button class="chip">विज्ञान कथा और फ़ैंटेसी</button></div></div></div>
+        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip">Documentary</button></div></div><div class="g-cell"><div class="g-state">hover</div><div class="g-stage"><button class="chip" data-force="hover">Documentary</button></div></div><div class="g-cell"><div class="g-state">focus-visible</div><div class="g-stage"><button class="chip" data-force="focus-visible">Documentary</button></div></div><div class="g-cell"><div class="g-state">selected</div><div class="g-stage"><button class="chip on" aria-pressed="true">Documentary</button></div></div><div class="g-cell g-content" data-content="longest genre"><div class="g-state">longest genre</div><div class="g-stage"><button class="chip">Action &amp; Adventure</button></div></div><div class="g-cell g-content" data-content="devanagari"><div class="g-state">devanagari</div><div class="g-stage"><button class="chip">विज्ञान कथा और फ़ैंटेसी</button></div></div><div class="g-cell g-content" data-content="region code — shortest"><div class="g-state">region code — shortest</div><div class="g-stage"><button class="chip">IN</button></div></div><div class="g-cell g-content" data-content="shortest tab label"><div class="g-state">shortest tab label</div><div class="g-stage"><button class="chip">All</button></div></div></div>
       </div>
       <div class="g-row">
         <div class="g-name"><code>chip + count</code><span>.chip</span></div>
@@ -2979,7 +3010,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
       </div>
       <div class="g-row">
         <div class="g-name"><code>chip.applied + cross</code><span>.chip.applied</span></div>
-        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip applied">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell"><div class="g-state">hover</div><div class="g-stage"><button class="chip applied" data-force="hover">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell"><div class="g-state">focus-visible</div><div class="g-stage"><button class="chip applied" data-force="focus-visible">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="longest + cross"><div class="g-state">longest + cross</div><div class="g-stage"><button class="chip applied">Action &amp; Adventure<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="devanagari + cross"><div class="g-state">devanagari + cross</div><div class="g-stage"><button class="chip applied">विज्ञान कथा<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div></div>
+        <div class="g-cells"><div class="g-cell"><div class="g-state">rest</div><div class="g-stage"><button class="chip applied">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell"><div class="g-state">hover</div><div class="g-stage"><button class="chip applied" data-force="hover">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell"><div class="g-state">focus-visible</div><div class="g-stage"><button class="chip applied" data-force="focus-visible">Action<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="longest + cross"><div class="g-state">longest + cross</div><div class="g-stage"><button class="chip applied">Action &amp; Adventure<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="devanagari + cross"><div class="g-state">devanagari + cross</div><div class="g-stage"><button class="chip applied">विज्ञान कथा<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div><div class="g-cell g-content" data-content="shortest genre + cross"><div class="g-state">shortest genre + cross</div><div class="g-stage"><button class="chip applied">War<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x icon" aria-hidden="true" focusable="false"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div></div>
       </div>
       <div class="g-row">
         <div class="g-name"><code>chip, longest label</code><span>.chip.applied</span></div>

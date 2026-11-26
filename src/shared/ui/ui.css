@@ -447,9 +447,40 @@
    because a chip is also used inline, in the sentence the search results
    print back; as a child of `.chips` it blockifies to `flex` anyway.
    `gap` owns the spacing from here -- one mechanism, not a margin per child. */
+/* The chip was the only control under the touch floor. `.btn`, `.circ` and
+   `.seg` are all `--control-h` (44px) and `.sw` is `--control-sm` (36px); the
+   chip sized itself from its text alone and came out 32px. It is also the
+   densest control on the page -- a filter row is nothing but chips -- so it
+   is the one most often aimed at with a thumb.
+
+   The horizontal padding went 12px -> 16px as part of the SAME change, and
+   not for looks. A pill is only a pill while it is wider than it is tall, and
+   the product makes chips far shorter than a genre name: the region chips are
+   ISO country codes (`IN`, `US`, `GB`) and Library's tablist ends in `All`.
+   Measured at 390px with the real stylesheet:
+
+                      44px tall, 12px pad     44px tall, 16px pad
+     IN                36.4 x 44  NOT a pill   44.4 x 44  ok
+     All               38.7 x 44  NOT a pill   46.7 x 44  ok
+     War (shortest     46.7 x 44  ok           54.7 x 44  ok
+       real genre)
+
+   16px is the minimum that answers it -- `IN` clears 44 by 0.4px, which is
+   the tightest real case there is. 14px would still leave it 40.4px wide.
+   The cost is width: the eight-genre filter row runs 741px past its edge
+   instead of 677px. It already scrolls, on purpose.
+
+   `padding-block: 8px` stays even though `min-height` now decides the height,
+   and it is load-bearing for a CHECK rather than for the look. The audit's
+   one-line invariant is `max(line-height + padding + border, min-height)`,
+   so with 8px a chip that drops its cross onto a second line measures 48px
+   against a 44px expectation and fires; with 0 it would measure 44px and
+   hide inside the new floor. That is the production bug this control is
+   named for, so the padding that keeps it visible is not decoration. */
 .chip {
   flex: 0 0 auto; font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption); font-weight: 500;
-  padding: var(--space-8) var(--space-12); border-radius: var(--radius-full); border: 0; cursor: pointer;
+  padding: var(--space-8) var(--space-16); border-radius: var(--radius-full); border: 0; cursor: pointer;
+  min-height: var(--control-h);
   background: var(--ink-3); color: var(--muted); white-space: nowrap;
   display: inline-flex; align-items: center; gap: var(--space-4);
   transition: background .12s, color .12s;

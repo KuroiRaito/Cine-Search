@@ -60,7 +60,14 @@ export const SPECIMENS = [
 
     /* ---------------- chips ---------------- */
     { group: 'Chips', name: 'chip', cls: 'chip', html: 'Documentary',
-        content: [['longest genre', 'Action &amp; Adventure'], ['devanagari', 'विज्ञान कथा और फ़ैंटेसी']],
+        /* Both ends of the content axis, because they fail differently. The
+           longest string wraps; the SHORTEST one stops the pill being a pill
+           once `min-height` is raised to the touch floor. These are the two
+           shortest the product can actually produce -- the region chips are
+           ISO country codes (browse.js REGIONS) and Library's tablist ends
+           in `All` -- not invented stubs. */
+        content: [['longest genre', 'Action &amp; Adventure'], ['devanagari', 'विज्ञान कथा और फ़ैंटेसी'],
+            ['region code — shortest', 'IN'], ['shortest tab label', 'All']],
         states: ['rest', 'hover', 'focus-visible', 'selected'] },
     { group: 'Chips', name: 'chip + count', cls: 'chip', html: 'Documentary<em>142</em>',
         content: [['longest + count', 'Action &amp; Adventure<em>1,204</em>']],
@@ -69,7 +76,8 @@ export const SPECIMENS = [
     { group: 'Chips', name: 'chip.applied + cross', cls: 'chip applied', html: 'Action{icon:close}',
         /* This exact cell is the production bug: a genre long enough to wrap,
            with a cross after it. It was 32px tall and became 48. */
-        content: [['longest + cross', 'Action &amp; Adventure{icon:close}'], ['devanagari + cross', 'विज्ञान कथा{icon:close}']],
+        content: [['longest + cross', 'Action &amp; Adventure{icon:close}'], ['devanagari + cross', 'विज्ञान कथा{icon:close}'],
+            ['shortest genre + cross', 'War{icon:close}']],
         states: ['rest', 'hover', 'focus-visible'] },
     { group: 'Chips', name: 'chip, longest label', cls: 'chip applied', html: `${LONG}{icon:close}`,
         states: ['rest'] },

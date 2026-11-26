@@ -119,8 +119,8 @@ for (const theme of ['dark', 'light']) {
                 let stress = null;
                 {
                     const cs2 = getComputedStyle(el);
+                    const px = (v) => parseFloat(v) || 0;
                     if (cs2.whiteSpace === 'nowrap' && r.height) {
-                        const px = (v) => parseFloat(v) || 0;
                         const lh = cs2.lineHeight === 'normal'
                             ? px(cs2.fontSize) * 1.2 : px(cs2.lineHeight);
                         const chrome = px(cs2.paddingTop) + px(cs2.paddingBottom)
@@ -133,6 +133,42 @@ for (const theme of ['dark', 'light']) {
                             };
                         }
                     }
+
+                    /* A pill is only a pill while it is wider than it is
+                       tall. Below that it draws as a circle or, worse, a
+                       vertical ellipse -- a shape nothing in the design
+                       asks for, and one no amount of looking at the long
+                       label will ever reveal.
+
+                       This is the OTHER end of the content axis. The gallery
+                       has always drawn the longest string a control will get,
+                       because that is the end that wraps. The short end has
+                       its own failure and its own trigger: a `min-height`
+                       raised to meet the touch floor. Raising the chip to
+                       44px did exactly that to the two shortest labels the
+                       product can produce -- a region chip (`IN`) and
+                       Library's `All` -- and the horizontal padding had to
+                       go 12px -> 16px to answer it. Nothing here would have
+                       said so, which is why this now measures it.
+
+                       A control that is genuinely round -- `.circ`, an
+                       avatar, a skeleton dot -- is square, so it passes on
+                       equality rather than needing an exception. */
+                    {
+                        const radii = ['borderTopLeftRadius', 'borderTopRightRadius',
+                            'borderBottomLeftRadius', 'borderBottomRightRadius'].map((k) => cs2[k]);
+                        const roundPx = radii.every((v) => String(v).endsWith('px'))
+                            && radii.every((v) => px(v) >= r.height / 2 - 0.5);
+                        if (roundPx && r.height && r.width && r.width < r.height - 0.5) {
+                            stress = {
+                                ...(stress || {}),
+                                squat: Math.round((r.height - r.width) * 10) / 10,
+                                wide: Math.round(r.width * 10) / 10,
+                                high: Math.round(r.height * 10) / 10,
+                            };
+                        }
+                    }
+
                     /* A child whose box leaves its parent's, and content cut
                        off with nothing to say so. Both are losses a person
                        sees; neither depends on a baseline. */
@@ -247,6 +283,11 @@ for (const theme of ['dark', 'light']) {
             if (c.stress.tall) {
                 why.push(`declares one line but is ${c.stress.is}px tall, not ${c.stress.should}px`
                     + ` -- ${c.stress.tall}px of something taking its own line`);
+            }
+            if (c.stress.squat) {
+                why.push(`a pill ${c.stress.wide}px wide and ${c.stress.high}px tall`
+                    + ` -- ${c.stress.squat}px taller than it is wide, so it draws`
+                    + ' as a circle rather than a pill');
             }
             if (c.stress.spill > 1) why.push(`content spills ${c.stress.spill}px outside the control`);
             if (c.stress.clipped) why.push('clipped with no ellipsis -- the end is lost silently');

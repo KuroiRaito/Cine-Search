@@ -163,6 +163,12 @@ img { max-width: 100%; display: block; }
 /* The tab icon is a component at --icon-20; the old `.ico` span is gone.
    Its size is set by the component, never by this rule. */
 .tab-item .icon { margin-bottom: var(--space-2); }
+/* The bottom bar is a phone idiom, but it is on screen from 0 to 1119 -- a
+   900px window on a laptop and an iPad with a trackpad both get it, both
+   have a pointer, and it answered nothing. `--text` is the same step every
+   other quiet control takes on hover (.circ, .chip, .sw). Before
+   `[aria-current]`, so a tab you are already on keeps its accent. */
+.tab-item:hover { color: var(--text); }
 .tab-item[aria-current="page"] { color: var(--acc-t); }
 
 .topbar { display: none; }
@@ -179,28 +185,12 @@ img { max-width: 100%; display: block; }
 .page-head h1 { font-size: var(--text-title); line-height: var(--lh-title); font-weight: 800; letter-spacing: -.03em; }
 .head-actions { display: flex; align-items: center; gap: var(--space-8); }
 
-/* 44x44, not 38: the 44-pixel law. A finger does not get smaller on a tablet,
-   so this does not change at any breakpoint. */
-.circ {
-  width: var(--control-h); height: var(--control-h); flex: 0 0 auto;
-  border-radius: var(--radius-full);
-  background: var(--surface); border: 0; color: var(--muted);
-  display: grid; place-items: center;
-  font-size: var(--text-title-sm); cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
-}
-.circ:hover { background: var(--surface-hv); color: var(--text); }
-/* Was answered on .circ.sm only, so the bare control looked pressable while
-   disabled. Not opacity -- see C1.6: opacity fades the shadow with it and
-   reads as a rendering fault rather than a decision. */
-.circ:disabled { background: var(--surface); color: var(--faint); cursor: not-allowed; }
-/* Artwork has no theme: a control over a poster keeps its own dark ground
-   and white glyph in both light and dark. */
-.circ.on-image {
-  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
-  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
-}
-.circ.on-image:hover { background: var(--glass-hv); color: var(--on-glass); }
+/* `.circ` used to be declared here, in the journeys layer. Entry, profile,
+   title, library and search all draw it, which makes it a shared control,
+   and a shared control declared in the frame around the modules is the same
+   C5.1 mistake `.btn` was. It now lives in `shared/ui/ui.css` with its `.sm`
+   and `.on-image` variants. The shell still positions it -- see
+   `.topbar-in .circ` below, which is this layer's business. */
 
 /* `.btn` used to be declared here, in the journeys layer, which made the
    most reused control in the product a property of the frame around the
@@ -220,12 +210,10 @@ img { max-width: 100%; display: block; }
 
 /* A titled block, on any page. */
 .sect { margin-top: var(--section-gap); }
-.sect-h {
-  font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm);
-  font-weight: 700; letter-spacing: -.02em; color: var(--text);
-  margin-bottom: var(--space-8);
-  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-8);
-}
+/* `.sect-h` used to be declared here. Title, search and profile all draw it
+   and `ui.css` already held its `.markrow` variant, so the control lived in
+   the journeys layer while a variant of it lived in the shared one -- the
+   same C5.1 split `.btn` and `.circ` had. Both halves are in ui.css now. */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -357,8 +345,12 @@ img { max-width: 100%; display: block; }
 /* Three blocks at the grid's own geometry: close enough to every screen in the
    product that nothing jumps more than a few pixels when the real one lands. */
 .routewait { padding: var(--space-24) var(--gutter) 0; }
-.routewait .skel-flat { height: var(--space-80); border-radius: var(--radius-12); }
-.routewait .skel-flat + .skel-flat { margin-top: var(--space-12); }
+/* Height and the gap between them are this layer's business -- how much room
+   the placeholder gets. The radius was not: it used to be set here, which
+   made a square shared skeleton round from the outside. `.skel-block` is
+   that shape, declared with the control and asked for by name. */
+.routewait .skel-block { height: var(--space-80); }
+.routewait .skel-block + .skel-block { margin-top: var(--space-12); }
 
 .broke { padding: var(--space-48) var(--gutter) 0; max-width: var(--measure); }
 .broke h1 {

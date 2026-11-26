@@ -31,32 +31,32 @@
   },
   "entry/cover@1280-dark": {
     "elements": 35,
-    "hash": "7a8403ba",
+    "hash": "772fc877",
     "geometry": "e5b19fc7"
   },
   "entry/cover@1280-light": {
     "elements": 35,
-    "hash": "7a8403ba",
+    "hash": "772fc877",
     "geometry": "e5b19fc7"
   },
   "entry/cover@390-dark": {
     "elements": 35,
-    "hash": "e477bd5b",
+    "hash": "bc7cb310",
     "geometry": "772ef416"
   },
   "entry/cover@390-light": {
     "elements": 35,
-    "hash": "e477bd5b",
+    "hash": "bc7cb310",
     "geometry": "772ef416"
   },
   "entry/cover@900-dark": {
     "elements": 35,
-    "hash": "6c803914",
+    "hash": "62fdf751",
     "geometry": "e51c76ad"
   },
   "entry/cover@900-light": {
     "elements": 35,
-    "hash": "6c803914",
+    "hash": "62fdf751",
     "geometry": "e51c76ad"
   },
   "entry/forgot@1280-dark": {

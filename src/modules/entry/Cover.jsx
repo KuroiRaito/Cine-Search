@@ -59,7 +59,7 @@ export default function Cover() {
             </div>
             <div className="cover-scrim" aria-hidden="true" />
 
-            <div className="cover-theme"><ThemeToggle /></div>
+            <div className="cover-theme"><ThemeToggle onImage /></div>
 
             <div className="cover-in">
                 <div className="cover-mark"><i />Cine Search</div>

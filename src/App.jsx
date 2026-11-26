@@ -152,9 +152,9 @@ function RequireProfile({ children }) {
 function RouteSkeleton() {
     return (
         <div className="page routewait" aria-busy="true">
-            <div className="skel skel-flat" />
-            <div className="skel skel-flat" />
-            <div className="skel skel-flat" />
+            <div className="skel skel-block" />
+            <div className="skel skel-block" />
+            <div className="skel skel-block" />
         </div>
     );
 }

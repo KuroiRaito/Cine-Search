@@ -255,6 +255,18 @@ const LEGAL_RAW = new Set(['320px', '1px', '-1px']);
 const SCALED_PROPS = /^(padding|padding-[a-z]+|margin|margin-[a-z]+|gap|row-gap|column-gap|font-size|line-height|border-radius|height|min-height|width|min-width|top|right|bottom|left|inset)$/;
 
 const stripComments = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '');
+/* Same thing, but the text keeps its shape: every character of a comment
+   becomes a space and every newline survives, so a line number computed
+   afterwards is still the line number in the file. Three checks reported the
+   wrong line before this existed -- they stripped comments, then counted
+   newlines in the stripped text, and in a codebase whose stylesheets are
+   half commentary the answer was off by dozens of lines. A check that names
+   the wrong line sends its reader to the wrong place, which is worse than
+   saying nothing: the reader concludes the check is broken and stops reading
+   it. */
+const blankComments = (t) => t
+    .replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '))
+    .replace(/^([^\n]*?)\/\/[^\n]*$/gm, (l, keep) => keep + ' '.repeat(l.length - keep.length));
 
 for (const f of cssFiles) {
     const rel = relative(ROOT, f);
@@ -849,7 +861,7 @@ for (const f of jsx) {
     let selectionRules = 0;
     for (const f of cssFiles) {
         const rel = relative(ROOT, f);
-        const src = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+        const src = blankComments(readFileSync(f, 'utf8'));
         src.split('\n').forEach((line, i) => {
             /* Declarations only, not a selector's braces content. A `.on` can
                only be in the selector, which is before the first `{`. */
@@ -864,8 +876,7 @@ for (const f of jsx) {
 
     for (const f of jsx) {
         const rel = relative(ROOT, f);
-        const src = readFileSync(f, 'utf8')
-            .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+        const src = blankComments(readFileSync(f, 'utf8'));
         src.split('\n').forEach((line, i) => {
             for (const m of line.matchAll(/className=(?:"([^"]*)"|\{([^}]*)\})/g)) {
                 const text = (m[1] || m[2] || '');
@@ -902,6 +913,97 @@ for (const f of jsx) {
 }
 
 
+/* ---------------------------------------------------------------
+   22. A module may position a shared control. It may not repaint one.
+
+   C5.4. The line is between what a control LOOKS like and how much room it
+   gets. A card deciding its action runs full width, or an empty state
+   deciding how far below the message its button sits, is the parent's
+   business and is fine. A module changing a shared control's background,
+   radius or shadow is not: the declaration that decides how the control
+   looks ends up in a file the control's own file knows nothing about.
+
+   That is not a hypothetical. `search.css` carried a `vertical-align:
+   middle` patch for a chip it does not own -- a declaration that cannot move
+   a block box and never did anything -- sitting one layer away from the rule
+   that caused the problem, so neither reader ever saw both. And `.sw` was
+   repainted from `title.css` and `person.css` with the IDENTICAL two
+   declarations, written separately, each with a comment explaining why
+   reaching in was acceptable there. Every `.sw` in the product sat inside
+   one of those two rows, so the base was simply wrong and both modules had
+   been correcting it in private.
+
+   Two shapes are allowed and are not flagged:
+     - a parent setting layout on a shared control (`.nothing .btn
+       { margin-top }`);
+     - a parent setting a CUSTOM PROPERTY the control itself declares
+       (`.tside { --prow-bg: ... }`). The control still decides what to do
+       with the value, and the knob is visible in the control's own file --
+       which is the whole difference (C5.5). */
+{
+    const PAINT = /^\s*(background|background-[a-z-]+|color|border|border-[a-z-]*colou?r|border-[a-z-]*width|border-[a-z-]*style|border-radius|box-shadow|font-weight|font-family|font-size|font-style|opacity|filter|backdrop-filter|text-decoration[a-z-]*|text-transform|letter-spacing|outline[a-z-]*)\s*$/;
+
+    /* Where each class is DECLARED on its own, which is its home. A class
+       only ever written as somebody else's descendant has no home here and
+       is not a shared control. */
+    const layerOfFile = (rel) => (rel.includes('shared/ui') || rel.includes('shared/theme') ? 'shared'
+        : rel.includes('src/app/') || rel === 'src/App.jsx' ? 'app'
+            : (rel.match(/src\/modules\/([^/]+)\//) || [, null])[1]);
+
+    const home = new Map();
+    const rules = [];
+    for (const f of cssFiles) {
+        const rel = relative(ROOT, f);
+        const layer = layerOfFile(rel);
+        const src = blankComments(readFileSync(f, 'utf8'));
+        for (const m of src.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+            const line = src.slice(0, m.index).split('\n').length;
+            for (const sel of m[1].split(',')) {
+                const sl = sel.trim();
+                if (!sl.includes('.')) continue;
+                const compounds = sl.split(/[\s>+~]+/).filter(Boolean);
+                const subject = compounds[compounds.length - 1];
+                const names = [...subject.matchAll(/\.([A-Za-z0-9_-]+)/g)].map((c) => c[1]);
+                if (!names.length) continue;
+                /* A bare single-class rule is where that class lives. */
+                if (compounds.length === 1 && names.length === 1
+                    && !/[:[]/.test(subject.replace(/\.[A-Za-z0-9_-]+/g, ''))) {
+                    if (!home.has(names[0])) home.set(names[0], layer);
+                }
+                rules.push({ rel, line, layer, sl, compounds, names, decls: m[2] });
+            }
+        }
+    }
+
+    let checked = 0;
+    for (const r of rules) {
+        const owner = r.names[0];
+        const h = home.get(owner);
+        if (!h || h === r.layer) continue;            // its own layer may do as it likes
+        if (h !== 'shared' && h !== 'app') continue;  // only SHARED controls are protected
+        checked++;
+        const props = r.decls.split(';').map((d) => d.split(':')[0]).filter((x) => x && x.trim());
+        for (const prop of props) {
+            const name = prop.trim();
+            /* A custom property is a knob, not a repaint -- but only one the
+               control declares, which check 5 already guarantees is declared
+               somewhere. */
+            if (name.startsWith('--')) continue;
+            if (!PAINT.test(name)) continue;          // layout: the parent's business
+            const shape = r.compounds.length > 1 ? 'repaints' : 'declares a variant that repaints';
+            fail('no-repaint', `${r.rel}:${r.line}: \`${r.sl.trim()}\` ${shape} \`.${owner}\``
+                + ` (declared in ${h}) -- \`${name}\` belongs with the control, or pass a custom property it declares (C5.4)`);
+        }
+    }
+    /* C7.7 -- if this found nothing to look at, it is guarding nothing. The
+       product has always had modules positioning shared controls. */
+    if (!checked) {
+        fail('no-repaint', 'no module rule touches a shared control at all'
+            + ' -- that is not plausible, so this check has stopped finding the rules it judges');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -928,6 +1030,7 @@ const CHECKS = [
     ['owned-class', 'A shared control\'s class is written by its component, not by hand'],
     ['one-toast', 'One toast, mounted by the shell, raised one way'],
     ['aria-selection', 'Selection is an ARIA attribute, never a class'],
+    ['no-repaint', 'A module positions a shared control, never repaints it'],
 ];
 
 let failed = 0;

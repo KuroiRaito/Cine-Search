@@ -70,7 +70,7 @@ component, so it cannot drift from the code — that is the whole point of it.
 If it looks wrong, the code is wrong.
 
 The specification and the code are checked against each other (`verify` check
-18; there are 21 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
+18; there are 22 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
 radius scales**, so those are not cross-checked — `src/shared/theme/tokens.css`
 is the only statement of them.
 
@@ -83,10 +83,25 @@ src/modules/<name>/<name>.css one module's own
 src/app/shell.css             journeys — the frame around the modules
 ```
 
-**A module never restyles a shared control.** If a module needs a shared
-control to look different, that difference is a *variant on the shared
-control*, declared where the control lives. Seven controls break this today
-and are listed in `docs/CONTROLS.md` C5.2.
+**A module never repaints a shared control.** Two shapes are allowed, and
+the difference is the whole rule:
+
+- **positioning it** — `width`, `height`, `margin`, `padding`, `overflow`.
+  How much room the control gets is the parent's business.
+- **setting a custom property the control declares** — `--prow-bg`,
+  `--noart-size`, `--sheet-pad`. The control still decides what it looks
+  like, and the knob is visible in the control's own file.
+
+Changing its `background`, `border`, `radius`, `shadow`, `weight` or
+`opacity` from another layer is not allowed, and `verify` check 22 fails it.
+A difference that is really a new *variant* is declared where the control
+lives, even if only one module uses it. `npm run states` reports the two
+counts separately — *repainted* is the violation and is 0.
+
+**Declare a knob as a `var()` fallback, never as a property on the control.**
+A custom property set on an element beats the same one inherited from an
+ancestor, so `.prow { --prow-bg: var(--surface) }` silently stops `.tside`
+from ever setting it. Use `background: var(--prow-bg, var(--surface))`.
 
 ## 5. A control is not finished until every case is answered
 

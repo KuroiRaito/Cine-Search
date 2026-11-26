@@ -382,6 +382,12 @@ img { max-width: 100%; display: block; }
 /* The tab icon is a component at --icon-20; the old `.ico` span is gone.
    Its size is set by the component, never by this rule. */
 .tab-item .icon { margin-bottom: var(--space-2); }
+/* The bottom bar is a phone idiom, but it is on screen from 0 to 1119 -- a
+   900px window on a laptop and an iPad with a trackpad both get it, both
+   have a pointer, and it answered nothing. `--text` is the same step every
+   other quiet control takes on hover (.circ, .chip, .sw). Before
+   `[aria-current]`, so a tab you are already on keeps its accent. */
+.tab-item:hover { color: var(--text); }
 .tab-item[aria-current="page"] { color: var(--acc-t); }
 
 .topbar { display: none; }
@@ -398,28 +404,12 @@ img { max-width: 100%; display: block; }
 .page-head h1 { font-size: var(--text-title); line-height: var(--lh-title); font-weight: 800; letter-spacing: -.03em; }
 .head-actions { display: flex; align-items: center; gap: var(--space-8); }
 
-/* 44x44, not 38: the 44-pixel law. A finger does not get smaller on a tablet,
-   so this does not change at any breakpoint. */
-.circ {
-  width: var(--control-h); height: var(--control-h); flex: 0 0 auto;
-  border-radius: var(--radius-full);
-  background: var(--surface); border: 0; color: var(--muted);
-  display: grid; place-items: center;
-  font-size: var(--text-title-sm); cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
-}
-.circ:hover { background: var(--surface-hv); color: var(--text); }
-/* Was answered on .circ.sm only, so the bare control looked pressable while
-   disabled. Not opacity -- see C1.6: opacity fades the shadow with it and
-   reads as a rendering fault rather than a decision. */
-.circ:disabled { background: var(--surface); color: var(--faint); cursor: not-allowed; }
-/* Artwork has no theme: a control over a poster keeps its own dark ground
-   and white glyph in both light and dark. */
-.circ.on-image {
-  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
-  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
-}
-.circ.on-image:hover { background: var(--glass-hv); color: var(--on-glass); }
+/* `.circ` used to be declared here, in the journeys layer. Entry, profile,
+   title, library and search all draw it, which makes it a shared control,
+   and a shared control declared in the frame around the modules is the same
+   C5.1 mistake `.btn` was. It now lives in `shared/ui/ui.css` with its `.sm`
+   and `.on-image` variants. The shell still positions it -- see
+   `.topbar-in .circ` below, which is this layer's business. */
 
 /* `.btn` used to be declared here, in the journeys layer, which made the
    most reused control in the product a property of the frame around the
@@ -439,12 +429,10 @@ img { max-width: 100%; display: block; }
 
 /* A titled block, on any page. */
 .sect { margin-top: var(--section-gap); }
-.sect-h {
-  font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm);
-  font-weight: 700; letter-spacing: -.02em; color: var(--text);
-  margin-bottom: var(--space-8);
-  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-8);
-}
+/* `.sect-h` used to be declared here. Title, search and profile all draw it
+   and `ui.css` already held its `.markrow` variant, so the control lived in
+   the journeys layer while a variant of it lived in the shared one -- the
+   same C5.1 split `.btn` and `.circ` had. Both halves are in ui.css now. */
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -576,8 +564,12 @@ img { max-width: 100%; display: block; }
 /* Three blocks at the grid's own geometry: close enough to every screen in the
    product that nothing jumps more than a few pixels when the real one lands. */
 .routewait { padding: var(--space-24) var(--gutter) 0; }
-.routewait .skel-flat { height: var(--space-80); border-radius: var(--radius-12); }
-.routewait .skel-flat + .skel-flat { margin-top: var(--space-12); }
+/* Height and the gap between them are this layer's business -- how much room
+   the placeholder gets. The radius was not: it used to be set here, which
+   made a square shared skeleton round from the outside. `.skel-block` is
+   that shape, declared with the control and asked for by name. */
+.routewait .skel-block { height: var(--space-80); }
+.routewait .skel-block + .skel-block { margin-top: var(--space-12); }
 
 .broke { padding: var(--space-48) var(--gutter) 0; max-width: var(--measure); }
 .broke h1 {
@@ -648,9 +640,22 @@ img { max-width: 100%; display: block; }
 
 /* A poster we have no artwork for still has to say which title it is. */
 .noart {
-  width: 100%; height: 100%; display: grid; place-items: center; padding: var(--space-8); text-align: center;
+  width: 100%; height: 100%; display: grid; place-items: center; text-align: center;
   background: linear-gradient(150deg, var(--ink-5), var(--ink-3));
-  font-family: var(--f-d); font-size: var(--text-micro); line-height: var(--lh-micro); font-weight: 700; color: var(--muted);
+  font-family: var(--f-d); font-weight: 700; color: var(--muted);
+  /* Two knobs, because this fills whatever box it is given and that box is
+     34px wide in the editor's header and 190px wide on a grid tile. Three
+     places used to set `font-size` and `padding` on it from their own
+     stylesheets -- library twice with the identical `7px`/`2px` pair, entry
+     once while also restating the base font-size, which did nothing. A
+     container that needs a smaller label now sets the knob, and the control
+     is still the only thing that decides what it looks like (C5.5).
+     Declared as var() FALLBACKS, not as properties on `.noart`: a custom
+     property set on the element beats the same one inherited from an
+     ancestor, which is the trap `--prow-bg` fell into above. */
+  font-size: var(--noart-size, var(--text-micro));
+  line-height: var(--lh-micro);
+  padding: var(--noart-pad, var(--space-8));
 }
 
 .quickadd {
@@ -714,8 +719,23 @@ img { max-width: 100%; display: block; }
 
 
 .prow {
+  /* `--prow-bg` is the one thing a surrounding surface may change about this
+     control, and it is declared here so that is legible from the control's
+     own file. Title's desktop sidebar used to do it with
+     `.tside .prow { background: ... }` -- a module repainting a shared
+     control, invisible from here. A parent setting a knob the control
+     declares is the sanctioned shape of that (C5.5); reaching past the
+     control to its properties is not.
+
+     The default is the var()'s FALLBACK, not a declaration on `.prow`.
+     Declaring `--prow-bg: var(--surface)` here was the first attempt and it
+     silently broke the sidebar: a custom property set on the element itself
+     beats the same property inherited from an ancestor, so `.tside`'s value
+     never arrived and the rows kept the default ground. The measurement
+     caught it as rgb(247,248,251) turning into rgb(239,241,246); reading the
+     CSS would not have. */
   display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8) var(--space-12); border-radius: var(--radius-12);
-  background: var(--surface); transition: background .12s; width: 100%; text-align: left;
+  background: var(--prow-bg, var(--surface)); transition: background .12s; width: 100%; text-align: left;
 }
 .prow + .prow { margin-top: var(--space-8); }
 .prow:hover { background: var(--surface-hv); }
@@ -758,6 +778,11 @@ img { max-width: 100%; display: block; }
    real thing, so nothing shifts on arrival. Height and width stay props on the
    component — those are the one inline style the contract allows. */
 .skel-flat { border-radius: 0; }
+/* A page-sized placeholder block, rounded like the cards it stands in for.
+   `src/app/shell.css` used to get this by giving `.routewait .skel-flat` a
+   radius -- the journeys layer repainting a shared control, and a square
+   skeleton told to be round rather than a round one asked for by name. */
+.skel-block { border-radius: var(--radius-12); }
 .skel-art { border-radius: var(--radius-8); }
 .skel-poster { border-radius: var(--radius-8); margin-bottom: var(--space-4); }
 .skel-round { border-radius: var(--radius-full); }
@@ -797,6 +822,18 @@ img { max-width: 100%; display: block; }
 
 /* The season header is a second heading inside one section — same type, but it
    carries an action, so it needs its own rhythm above the list. */
+/* The section heading. Three modules draw it; it was declared in
+   `src/app/shell.css` while the `.markrow` variant below sat here, so the
+   control and its variant were in different layers and neither file showed
+   the whole control. */
+.sect-h {
+  font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm);
+  font-weight: 700; letter-spacing: -.02em; color: var(--text);
+  margin-bottom: var(--space-8);
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-8);
+}
+/* `.markrow` -- a season header, which is a heading that carries an action,
+   so it needs its own quieter rhythm above the episode list. */
 .sect-h.markrow { margin-top: var(--space-16); font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 400; }
 .sect-note { font-family: var(--f-m); font-size: var(--text-micro); line-height: var(--lh-micro); color: var(--muted); font-weight: 400; }
 
@@ -817,6 +854,10 @@ img { max-width: 100%; display: block; }
    a link because that is what it does; it is a button because there is nothing
    to link to. */
 .linkish:hover { color: var(--acc-t-hv); }
+/* `.back` -- the one that returns up a level and therefore needs a line of
+   its own and room under it. Declared with the control although profile is
+   the only screen using it (C5.3). */
+.linkish.back { display: inline-block; margin-bottom: var(--space-8); }
 .linkish {
   background: none; border: 0; padding: 0; cursor: pointer;
   font-family: var(--f-s); font-weight: 600; color: var(--acc-t);
@@ -855,6 +896,48 @@ img { max-width: 100%; display: block; }
 /* ---- Controls and state tones used on more than one screen. The six
         watch-state hues carry a tone into whatever they are applied to:
         a pill, a segment, a chip, a library row. ---- */
+
+/* ---------------- the round icon control ----------------
+
+   44x44, not 38: the 44-pixel law. A finger does not get smaller on a
+   tablet, so this does not change at any breakpoint.
+
+   Declared here rather than in `src/app/shell.css`, where it used to live:
+   entry, profile, title, library and search all draw it, which makes it a
+   shared control, and a shared control declared in the frame around the
+   modules is the same C5.1 mistake `.btn` was. The shell still positions it
+   (`.topbar-in .circ`), which is that layer's business. */
+.circ {
+  width: var(--control-h); height: var(--control-h); flex: 0 0 auto;
+  border-radius: var(--radius-full);
+  background: var(--surface); border: 0; color: var(--muted);
+  display: grid; place-items: center;
+  font-size: var(--text-title-sm); cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.circ:hover { background: var(--surface-hv); color: var(--text); }
+/* Was answered on .circ.sm only, so the bare control looked pressable while
+   disabled. Not opacity -- see C1.6: opacity fades the shadow with it and
+   reads as a rendering fault rather than a decision. */
+.circ:disabled { background: var(--surface); color: var(--faint); cursor: not-allowed; }
+/* Artwork has no theme: a control over a poster keeps its own dark ground
+   and white glyph in both light and dark. The cover had a second copy of
+   these four declarations in `entry.css`, byte for byte, because nothing
+   said the variant existed. Asking for the variant is now the only way to
+   get the glass. */
+.circ.on-image {
+  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
+  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
+}
+.circ.on-image:hover { background: var(--glass-hv); color: var(--on-glass); }
+/* `.sm` -- the reorder and remove controls on a favourites row, where three
+   of them sit inside one tile and 44px each would be the tile. Declared with
+   the control although profile is the only screen that uses it: where a
+   variant is USED is not where it is declared (C5.3). Opacity here rather
+   than a flat colour because at 24px the control is already quiet and the
+   colour change was not readable. */
+.circ.sm { width: var(--space-24); height: var(--space-24); min-height: var(--space-24); font-size: var(--text-caption); }
+.circ.sm:disabled { opacity: .4; cursor: default; }
 
 /* ---------------- the button ----------------
 
@@ -931,6 +1014,12 @@ img { max-width: 100%; display: block; }
    `.empty` is a component somebody renders on purpose, and this is only the
    container getting out of the way. */
 .chips:empty, .rail:empty, .grid:empty { display: none; }
+/* `.aside` -- the filter row while find is in use. The filter is set aside,
+   not removed: it stays legible and stays tappable, because tapping a chip
+   is the way back out of find. Declared here although library is the only
+   screen that uses it (C5.3); it was in `library.css`, where the fact that a
+   chip row has a stood-down state was invisible from the control's file. */
+.chips.aside { opacity: .5; }
 /* `display` is load-bearing, not decoration. A chip carries a label and, in
    two places, something after it: a count in <em>, or the close cross that
    takes the filter off. `.icon` is `display:block` (one line down, so every
@@ -979,12 +1068,19 @@ img { max-width: 100%; display: block; }
    against a block-level icon and did not. */
 .chip.applied svg { opacity: .7; }
 
+/* The pill shape and the resting ground were set from `title.css` and
+   `person.css` -- the same two declarations in both, written separately,
+   each with a comment explaining why reaching into a shared control was
+   acceptable here. Every `.sw` in the product sits inside one of those two
+   rows, so the pill was never a variant: the base was wrong and both modules
+   had been quietly correcting it. The gallery meanwhile drew the bare base,
+   a look that appeared nowhere on screen. */
 .sw {
-  flex: 0 0 auto; border: 0; background: none; cursor: pointer; color: var(--muted);
+  flex: 0 0 auto; border: 0; background: var(--surface); cursor: pointer; color: var(--muted);
   font-family: var(--f-s); font-size: var(--text-caption); line-height: var(--lh-caption);
   font-weight: 500; padding: 0 var(--space-12);
   min-height: var(--control-sm); display: inline-flex; align-items: center; gap: var(--space-4);
-  border-radius: var(--radius-8); white-space: nowrap; font-variant-numeric: tabular-nums;
+  border-radius: var(--radius-full); white-space: nowrap; font-variant-numeric: tabular-nums;
 }
 .sw:hover { background: var(--surface-hv); color: var(--text); }
 .sw em { font-style: normal; opacity: .55; font-size: var(--text-micro); line-height: var(--lh-micro); }
@@ -1097,6 +1193,17 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
   padding: var(--space-12) var(--sheet-pad) max(var(--sheet-pad), env(safe-area-inset-bottom));
   box-shadow: var(--shadow-sheet);
 }
+/* The two sheets that are longer than a sheet. Both were declared by the
+   module that uses them -- `.editor` in library.css, `.tall` in profile.css --
+   which meant the full set of shapes a sheet can take was written down
+   nowhere, and each module had to work out for itself that a scrolling sheet
+   needs a cap (C5.3).
+   `.editor` sets `--sheet-pad` rather than `padding`: the knob the control
+   declares, which is the shape a context is allowed to influence (C5.5). Its
+   `padding-inline: 0` is there because the editor's own rows carry the inset,
+   so the sheet must not add it again. */
+.sheet.editor { --sheet-pad: 14px; padding-inline: 0; max-height: 88vh; overflow-y: auto; }
+.sheet.tall { max-height: 80vh; overflow-y: auto; }
 
 /* S5 — with a pointer the sheet stops being a sheet. Centred, all four corners
    rounded, and no longer glued to an edge the thumb was reaching for. The width
@@ -1761,8 +1868,12 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
    the same primitive doing a different job, and §03d's rule is about season
    selectors. Styling a shared class inside one of its own is the one thing
    MODULE.md allows here. */
-.seasonsw .sw { border-radius: var(--radius-full); background: var(--surface); }
-.seasonsw .sw[aria-pressed="true"] { background: var(--acc-bg); }
+/* `.seasonsw .sw` used to set `border-radius: var(--radius-full)` and
+   `background: var(--surface)` here. The other module that draws `.sw` set
+   the identical pair, and the `[aria-pressed]` half repeated a value the
+   base rule already had -- dead. Every `.sw` in the product sits in one of
+   those two rows, so the pill was not a variant: the BASE was wrong, and
+   both modules had been correcting it separately. Folded into `.sw`. */
 .seasonsw::-webkit-scrollbar { height: 0; }
 
 /* TV9 — the band header is the season: its name, its year, its own fraction,
@@ -1944,7 +2055,12 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
     display: block; position: sticky; top: var(--space-80);
     background: var(--surface); border-radius: var(--radius-12); padding: var(--space-16);
   }
-  .tside .prow { background: var(--bg-sub); }
+  /* Not `.tside .prow { background: ... }`. That was this module reaching in
+     and repainting a shared control, and nothing in `.prow`'s own file said
+     it could happen. `--prow-bg` is a knob the control declares and this
+     surface sets: the parent says what ground it offers, the control decides
+     what to do about it. */
+  .tside { --prow-bg: var(--bg-sub); }
   .tside .pchip { background: var(--ink-4); }
 
   /* The four cards go one across rather than two by two. */
@@ -1966,9 +2082,7 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 :is(button, [role="button"], a[href]):not([data-force~="disabled"])[data-force~="active"] {
   transform: scale(.97);
 }
-.circ[data-force~="hover"] { background: var(--surface-hv); color: var(--text); }
-.circ[data-force~="disabled"] { background: var(--surface); color: var(--faint); cursor: not-allowed; }
-.circ.on-image[data-force~="hover"] { background: var(--glass-hv); color: var(--on-glass); }
+.tab-item[data-force~="hover"] { color: var(--text); }
 @media (min-width: 1120px) { .wordmark[data-force~="hover"] { color: var(--acc-t); } }
 .session-note button[data-force~="hover"] { opacity: 1; }
 .tile[data-force~="hover"] .art { filter: brightness(1.08); }
@@ -1977,6 +2091,10 @@ textarea.searchbox { height: auto; min-height: var(--space-64); padding: var(--s
 .prow[data-force~="hover"] { background: var(--surface-hv); }
 .quickadd.saved[data-force~="hover"] { filter: brightness(1.12); }
 .linkish[data-force~="hover"] { color: var(--acc-t-hv); }
+.circ[data-force~="hover"] { background: var(--surface-hv); color: var(--text); }
+.circ[data-force~="disabled"] { background: var(--surface); color: var(--faint); cursor: not-allowed; }
+.circ.on-image[data-force~="hover"] { background: var(--glass-hv); color: var(--on-glass); }
+.circ.sm[data-force~="disabled"] { opacity: .4; cursor: default; }
 .btn[data-force~="hover"] { filter: brightness(1.06); }
 .btn[data-force~="disabled"] { opacity: .55; cursor: not-allowed; filter: none; }
 .btn.quiet[data-force~="hover"] { background: var(--ink-5); filter: none; }

@@ -54,11 +54,22 @@ const layerOf = (rel) =>
 const styled = new Map();   // class -> { states:Set, variantOnly:Set, layers:Set, file }
 const conventions = new Map();
 const conventionOf = (c) => { if (!conventions.has(c)) conventions.set(c, new Set()); return conventions.get(c); };
-const note = (cls, state, rel, variantOnly) => {
-    if (!styled.has(cls)) styled.set(cls, { states: new Set(), variantOnly: new Set(), layers: new Set(), file: rel });
+/* Paint is what a control LOOKS like; the rest is how much room it gets.
+   The distinction is the whole of C5.4: a module may position a shared
+   control and may not repaint it, and a count that lumps the two together
+   can never reach zero, so it cannot be a gate and stops being read.
+   `padding` and `width` are deliberately NOT here -- a card deciding its
+   action is full width is a layout decision, and `--sheet-pad` is a knob the
+   control itself declares for exactly that purpose (C5.5). */
+const PAINT_PROPS = /(^|[;\s])(background|background-[a-z-]+|color|border|border-[a-z-]*colou?r|border-[a-z-]*width|border-[a-z-]*style|border-radius|box-shadow|font-weight|font-family|font-size|font-style|opacity|filter|backdrop-filter|text-decoration[a-z-]*|text-transform|letter-spacing|outline[a-z-]*)\s*:/;
+const paints = (decls) => PAINT_PROPS.test(decls || '');
+
+const note = (cls, state, rel, variantOnly, decls) => {
+    if (!styled.has(cls)) styled.set(cls, { states: new Set(), variantOnly: new Set(), layers: new Set(), paintLayers: new Set(), posLayers: new Set(), file: rel });
     const e = styled.get(cls);
     if (state) (variantOnly ? e.variantOnly : e.states).add(state);
     e.layers.add(layerOf(rel));
+    if (decls !== undefined) (paints(decls) ? e.paintLayers : e.posLayers).add(layerOf(rel));
 };
 
 for (const f of cssFiles) {
@@ -110,7 +121,7 @@ for (const f of cssFiles) {
             if (attrs.includes('aria-pressed') || attrs.includes('aria-selected')
                 || attrs.includes('aria-current') || attrs.includes('aria-disabled')
                 || attrs.includes('aria-invalid')) {
-                note(cls[1], attrs.includes('aria-invalid') ? 'invalid' : 'selected', rel);
+                note(cls[1], attrs.includes('aria-invalid') ? 'invalid' : 'selected', rel, false, m[2]);
                 if (!attrs.includes('aria-invalid')) conventionOf(cls[1]).add('aria');
             }
             /* Selection is also written as a second class -- `.chip.on`,
@@ -120,7 +131,7 @@ for (const f of cssFiles) {
             const compound = [...last.matchAll(/\.([A-Za-z0-9_-]+)/g)].map((c) => c[1]).slice(1);
             const SELECTED = ['on', 'active', 'selected', 'current'];
             if (compound.some((c) => SELECTED.includes(c))) {
-                note(cls[1], 'selected', rel);
+                note(cls[1], 'selected', rel, false, m[2]);
                 conventionOf(cls[1]).add('class');
             }
             /* A state only belongs to the bare control if nothing else has to
@@ -138,7 +149,7 @@ for (const f of cssFiles) {
                Both were counted as the real thing until the gallery audit
                rendered them and found the cell identical to rest. */
             const conditional = compound.some((c) => !SELECTED.includes(c)) || pseudos.length > 1;
-            note(cls[1], state, rel, conditional);
+            note(cls[1], state, rel, conditional, m[2]);
         }
     }
 }
@@ -297,6 +308,19 @@ for (const [cls, k] of kind) {
             return reach.length ? `${home} +${reach.length} module` : home;
         })(),
         crossesLayers: [...st.layers].length > 1,
+        /* Which KIND of reach. `repaint` is the C5.4 violation and should be
+           zero; `positioned` is a parent deciding how much room its child
+           gets, which is allowed and is most of what is left. */
+        repaintedAway: (() => {
+            const ls = [...st.layers];
+            const home = ls.includes('shared') ? 'shared' : ls.includes('app') ? 'app' : ls[0];
+            return [...st.paintLayers].some((l) => l !== home);
+        })(),
+        positionedAway: (() => {
+            const ls = [...st.layers];
+            const home = ls.includes('shared') ? 'shared' : ls.includes('app') ? 'app' : ls[0];
+            return [...st.posLayers].some((l) => l !== home) && ![...st.paintLayers].some((l) => l !== home);
+        })(),
         on: ([...k.tags].join('/') || 'onClick').slice(0, 15),
         hover: has('hover') ? 'yes' : st.variantOnly.has('hover') ? 'variant only' : 'MISSING',
         focus: focusOwn ? 'own'
@@ -323,7 +347,16 @@ for (const r of rows) console.log(line([r.cls, r.layer, r.on, r.hover, r.focus, 
 const miss = (key) => rows.filter((r) => r[key].startsWith('MISSING')).length;
 const variantOnly = rows.filter((r) => r.hover === 'variant only' || r.disabled === 'variant only').length;
 console.log(`\n  ${rows.length} controls`);
-console.log(`  ${rows.filter((r) => r.crossesLayers).length} are defined in one layer and restyled from another`);
+{
+    const repaint = rows.filter((r) => r.repaintedAway);
+    const placed = rows.filter((r) => r.positionedAway);
+    /* Two numbers, because they are two different things and the old single
+       count could never reach zero -- it included every parent that sets a
+       margin on a child, which is allowed. A number that cannot reach zero
+       is not a gate, and an ungated number stops being read. */
+    console.log(`  ${repaint.length} are REPAINTED from another layer${repaint.length ? ` -- ${repaint.map((r) => '.' + r.cls).join(' ')} (C5.4, and verify check 22)` : ' (C5.4)'}`);
+    console.log(`  ${placed.length} are positioned from another layer, which is allowed${placed.length ? `: ${placed.map((r) => '.' + r.cls).join(' ')}` : ''}`);
+}
 console.log(`  ${miss('hover')} style no hover`);
 console.log(`  ${variantOnly} answer a state on a variant only, so the bare control does not have it`);
 console.log(`  ${rows.filter((r) => r.focus === 'BARE :focus').length} use bare :focus (fires on a mouse click, and stays)`);

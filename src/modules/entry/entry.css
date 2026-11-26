@@ -22,7 +22,10 @@
   border-radius: var(--radius-8); overflow: hidden; background: var(--surface-hv);
 }
 .sheet-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.sheet-art .noart { font-size: var(--text-micro); line-height: var(--lh-micro); padding: var(--space-4); }
+/* This used to restate `.noart`'s own font-size and line-height -- both
+   already the base, so both did nothing -- and set a padding. Only the
+   padding was real, and it is a knob the control declares now (C5.5). */
+.sheet-art { --noart-pad: var(--space-4); }
 .sheet-head .sheet-title { margin-bottom: 0; }
 
 .benefits { list-style: none; margin: 0 0 var(--space-20); padding: 0; display: grid; gap: var(--space-8); }
@@ -237,10 +240,8 @@
 }
 :root[data-theme="light"] .mosaic { opacity: .82; }
 
-/* Artwork has no theme: the control over the poster keeps its own dark
-   ground and white glyph in both. */
-.cover-theme .circ {
-  background: var(--glass); backdrop-filter: var(--glass-blur); color: var(--on-glass);
-  box-shadow: inset 0 0 0 var(--border-hair) var(--glass-line);
-}
-.cover-theme .circ:hover { background: var(--glass-hv); color: var(--on-glass); }
+/* The cover's theme control used to repaint `.circ` from here, with four
+   declarations that were byte-for-byte `.circ.on-image` in the shell -- the
+   same glass, invented twice, neither file knowing about the other. Measured
+   identical before it was removed. The cover now asks for the variant
+   (`<ThemeToggle onImage />`) instead of restyling the control. */

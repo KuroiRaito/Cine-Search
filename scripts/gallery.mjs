@@ -138,7 +138,11 @@ function expand(html) {
     });
 }
 
-function cell(spec, state, labelOverride) {
+/* `htmlOverride` is how a content case is drawn: the same control, the same
+   state, different contents. It is a separate argument rather than a second
+   specimen because the point is that nothing about the control changed --
+   only what somebody put in it. */
+function cell(spec, state, labelOverride, htmlOverride) {
     const tag = spec.tag || 'button';
     const attrs = { ...(spec.attrs || {}) };
     let cls = spec.cls;
@@ -154,11 +158,12 @@ function cell(spec, state, labelOverride) {
         ? ` data-force="${state}"` : '';
     const a = Object.entries(attrs)
         .map(([k, v]) => (v === '' ? ` ${k}` : ` ${k}="${String(v).replace(/"/g, '&quot;')}"`)).join('');
-    const inner = tag === 'input' ? '' : expand(spec.html);
+    const inner = tag === 'input' ? '' : expand(htmlOverride ?? spec.html);
     const el = tag === 'input'
         ? `<input class="${cls}"${force}${a}>`
         : `<${tag} class="${cls}"${force}${a}>${inner}</${tag}>`;
-    return `<div class="g-cell"><div class="g-state">${labelOverride || state}</div><div class="g-stage${spec.surface ? ' g-surface' : ''}">${el}</div></div>`;
+    const mark = htmlOverride ? ` data-content="${labelOverride}"` : '';
+    return `<div class="g-cell${htmlOverride ? ' g-content' : ''}"${mark}><div class="g-state">${labelOverride || state}</div><div class="g-stage${spec.surface ? ' g-surface' : ''}">${el}</div></div>`;
 }
 
 /* ---------------------------------------------------------------
@@ -286,7 +291,8 @@ const body = groups.map((g) => {
         rows.push(`
       <div class="g-row${s.surface ? ' g-wide' : ''}">
         <div class="g-name"><code>${s.name}</code><span>.${s.cls.split(' ').join('.')}</span></div>
-        <div class="g-cells">${s.states.map((st) => cell(s, st)).join('')}</div>
+        <div class="g-cells">${s.states.map((st) => cell(s, st)).join('')
+            }${(s.content || []).map(([label, html]) => cell(s, s.states[0], label, html)).join('')}</div>
       </div>`);
     }
     return `<section class="g-group"><h2>${g}</h2>${rows.join('')}</section>`;
@@ -307,6 +313,11 @@ const CHROME = `
   .g-name span { color: var(--faint); font-family: var(--f-m); font-size: 11px; }
   .g-cells { display: flex; flex-wrap: wrap; gap: 10px; }
   .g-cell { min-width: 104px; }
+  /* A content cell asks a different question from a state cell -- not "does
+     this state do anything" but "does this control survive what goes in it"
+     -- so it is marked rather than left to be read as one more state. */
+  .g-cell.g-content .g-state { color: var(--mar-9); }
+  .g-cell.g-content .g-stage { border-style: solid; border-color: var(--mar-8); }
   .g-state { font-family: var(--f-m); font-size: 10px; letter-spacing: .04em; color: var(--faint);
              text-transform: uppercase; margin-bottom: 6px; }
   /* A dashed box, so a control with no rule for a state is obviously the same

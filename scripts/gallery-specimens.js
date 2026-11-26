@@ -22,9 +22,30 @@ export const ALL_STATES = ['rest', 'hover', 'focus-visible', 'active', 'disabled
 
 const LONG = 'Science Fiction &amp; Fantasy';
 
+/* ---------------- content cases ----------------
+
+   A control has two kinds of case, and until now this file only carried one.
+   `states` is what the control is DOING -- resting, hovered, disabled. These
+   are what it is HOLDING, and they are the half that broke in production: the
+   close cross dropped below the label on a filter chip, which is a content
+   case, not a state.
+
+   Everything below is real. The longest title and the Korean one are lifted
+   out of snapshots/tmdb-fixtures.json.gz, the product's own recorded TMDB
+   responses. `Action & Adventure` is TMDB's longest genre name and reaches
+   the chip row the moment somebody filters a TV search. The Devanagari is
+   there because facets.js leads with Hindi, Tamil and Telugu -- the Indian
+   languages are why that facet exists at all, so a title in one of them is
+   not an edge case in this product, it is Tuesday.
+
+   The rule for adding one: it must be content the product will really hold.
+   An invented 200-character string proves a control can be broken; it does
+   not prove anything will break it. */
+
 export const SPECIMENS = [
     /* ---------------- buttons ---------------- */
     { group: 'Buttons', name: 'btn', cls: 'btn', html: 'Add to library',
+        content: [['longest', 'Mark this season as watched'], ['devanagari', 'लाइब्रेरी में जोड़ें']],
         states: ['rest', 'hover', 'focus-visible', 'active', 'disabled'] },
     { group: 'Buttons', name: 'btn.quiet', cls: 'btn quiet', html: 'Not now',
         states: ['rest', 'hover', 'focus-visible', 'active', 'disabled'] },
@@ -39,17 +60,24 @@ export const SPECIMENS = [
 
     /* ---------------- chips ---------------- */
     { group: 'Chips', name: 'chip', cls: 'chip', html: 'Documentary',
+        content: [['longest genre', 'Action &amp; Adventure'], ['devanagari', 'विज्ञान कथा और फ़ैंटेसी']],
         states: ['rest', 'hover', 'focus-visible', 'selected'] },
     { group: 'Chips', name: 'chip + count', cls: 'chip', html: 'Documentary<em>142</em>',
+        content: [['longest + count', 'Action &amp; Adventure<em>1,204</em>']],
         states: ['rest', 'hover', 'selected'] },
     /* The one that shipped broken: a chip that carries its own removal. */
     { group: 'Chips', name: 'chip.on + cross', cls: 'chip on', html: 'Action{icon:close}',
+        /* This exact cell is the production bug: a genre long enough to wrap,
+           with a cross after it. It was 32px tall and became 48. */
+        content: [['longest + cross', 'Action &amp; Adventure{icon:close}'], ['devanagari + cross', 'विज्ञान कथा{icon:close}']],
         states: ['rest', 'hover', 'focus-visible'] },
     { group: 'Chips', name: 'chip, longest label', cls: 'chip on', html: `${LONG}{icon:close}`,
         states: ['rest'] },
     { group: 'Chips', name: 'sw', cls: 'sw', html: 'Episodes<em>62</em>',
+        content: [['longest + count', 'Unwatched episodes<em>1,204</em>']],
         states: ['rest', 'hover', 'focus-visible', 'selected'] },
     { group: 'Chips', name: 'seg', cls: 'seg', html: 'Films',
+        content: [['longest', 'Films &amp; documentaries']],
         states: ['rest', 'hover', 'focus-visible', 'selected'] },
 
     /* ---------------- fields ---------------- */
@@ -80,7 +108,13 @@ export const SPECIMENS = [
     { group: 'Catalogue', name: 'tile', cls: 'tile', tag: 'a', states: ['rest', 'hover'],
         html: '<div class="art"><div class="noart">Sector 36</div>'
             + '<span class="score-badge">{icon:star} 7.4</span></div>'
-            + '<div class="name">Sector 36</div><div class="meta">2024 · 1,204 votes</div>' },
+            + '<div class="name">Sector 36</div><div class="meta">2024 · 1,204 votes</div>',
+        content: [
+            ['70-char title', '<div class="art"><div class="noart">Empirical Study on the Influence of Sound on the Persistence of Vision</div></div>'
+                + '<div class="name">Empirical Study on the Influence of Sound on the Persistence of Vision</div><div class="meta">1980</div>'],
+            ['hangul', '<div class="art"><div class="noart">복수는 나의 것</div></div>'
+                + '<div class="name">복수는 나의 것</div><div class="meta">2002</div>'],
+        ] },
     { group: 'Catalogue', name: 'tile + quickadd', cls: 'tile', tag: 'a', states: ['rest'],
         html: '<div class="art"><div class="noart">Dune: Part Two</div>'
             + '<button class="quickadd" aria-label="Add">{icon:add}</button>'
@@ -94,7 +128,9 @@ export const SPECIMENS = [
         html: '{icon:watched}' },
     { group: 'Catalogue', name: 'prow', cls: 'prow', tag: 'a', surface: true, states: ['rest', 'hover'],
         html: '<span class="pf noimg">CN</span><span class="pb"><b>Christopher Nolan</b>'
-            + '<span>Director · 24 titles</span></span><span class="go">{icon:forward}</span>' },
+            + '<span>Director · 24 titles</span></span><span class="go">{icon:forward}</span>',
+        content: [['longest real name', '<span class="pf noimg">MB</span><span class="pb"><b>Martiniano Berrelleza Alvarado</b>'
+            + '<span>Writer, Director, Producer · 1 title</span></span><span class="go">{icon:forward}</span>']] },
     { group: 'Catalogue', name: 'prow, no subtitle', cls: 'prow', tag: 'a', surface: true, states: ['rest'],
         html: '<span class="pf noimg">AB</span><span class="pb"><b>A B</b></span>'
             + '<span class="go">{icon:forward}</span>' },
@@ -161,7 +197,8 @@ export const SPECIMENS = [
     { group: 'Feedback', name: 'toast, after an add', cls: 'toast', tag: 'div', surface: true, states: ['rest'],
         html: '<span>Added to your library</span><button aria-label="Dismiss">{icon:close}</button>' },
     { group: 'Feedback', name: 'toast, after a remove', cls: 'toast', tag: 'div', surface: true, states: ['rest'],
-        html: '<span>Removed from your library</span><button>Undo</button>' },
+        html: '<span>Removed from your library</span><button>Undo</button>',
+        content: [['longest', '<span>Empirical Study on the Influence of Sound on the Persistence of Vision · S2 E4 watched</span><button>Undo</button>']] },
     { group: 'Feedback', name: 'empty', cls: 'empty', tag: 'div', surface: true, states: ['rest'],
         html: '<h2>Nothing here yet</h2><p>Titles you add will show up on this shelf.</p>'
             + '<a class="btn" href="#">Find something</a>' },

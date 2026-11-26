@@ -27,7 +27,7 @@ States are half of it. The other half is content, and it is the half that broke 
 
 - **C2.1** **With an icon and without one.** `.icon` is `display: block`. A control that holds an icon beside anything else declares a flex or grid context, and thereby says which direction it runs. Enforced: `verify` check 17.
 - **C2.1a** **An icon *alone* in a box is not covered by that check**, which only fires when the icon has a sibling. A lone glyph needs a correctly *sized* box as well as a correctly declared one, and it passed all 17 checks while sitting 2px right of centre. Geometry is not checkable by reading CSS — it is checkable by measuring a rendered control, which is C9.
-- **C2.2** **The longest label it will really get.** Not "Action" — "Science Fiction & Fantasy", and the Hindi for it.
+- **C2.2** **The longest label it will really get.** Not "Action" — "Action & Adventure", TMDB's longest genre name, and the Hindi for it. **Drawn and checked** since 2026-11-26: specimens carry a `content` axis beside their `states`, and `gallery:audit` fails on it. Every string in it is real — the 70-character title and the Hangul one are lifted out of `snapshots/tmdb-fixtures.json.gz`, the product's own recorded TMDB responses, and the Devanagari is there because `facets.js` leads with Hindi, Tamil and Telugu. The rule for adding one: it must be content the product will really hold. An invented 200-character string proves a control *can* be broken; it does not prove anything *will* break it.
 - **C2.3** **One child and several.** A chip with a count, a chip with a count and a cross.
 - **C2.4** **Both themes.** Light is not dark with the numbers flipped: a floating surface gets *lighter* as it rises in dark and *darker* in light, which is why `--raised` exists and cannot alias the ink scale.
 - **C2.5** **All three bands.** 390, 900, 1280. The 900 band is the one nobody draws.
@@ -79,6 +79,14 @@ A control that lands on a poster or a still cannot borrow the page's surfaces, b
 - **C8.2** It was seven controls inventing it separately: rest opacities `.55 .6 .6 .62 .68 .72`, hovers `.72` and `.78`, and two different base colours — `rgba(8,12,20)` for `.quickadd` and `rgba(4,6,12)` for the other six. The top-right and bottom-left corners of the same poster were built out of different glass, which is a thing nobody can see as a bug and everybody can see as cheapness.
 - **C8.3** **The hairline is not trim.** A dark control on a dark poster has no edge of its own. `--glass-line` is what stops it dissolving into the artwork, and it belongs to every glass control, not just the one that happened to have it.
 - **C8.4** `--scrim-wash` is a different job — the full-screen dim behind a sheet — and keeps its own name even at the same value. `.tplay-b` was using it as a control ground; it now uses `--glass`.
+
+## C10 — A control that says it is one line is one line
+
+- **C10.1** `white-space: nowrap` is the stylesheet saying this control is a single line. One line has a height computable from the control's own box — line-height, padding, border, `min-height` — and anything taller means something inside took a line of its own. That is the filter-chip bug exactly: 32px became 48px when the close cross, being `display: block`, claimed a row.
+- **C10.2** **The first version of this check was relative and proved nothing.** It compared a long-content cell to the control's rest cell and asked whether it grew. With the production bug reinstated it reported *nothing wrong*, because rest holds the cross too — both cells grew by the same 16px and the delta was zero. The invariant has to be absolute.
+- **C10.3** It runs on every cell, not only the content ones. A control that is the wrong height with a short label is already broken; it has only not met a long label yet. With the bug reinstated this reports 6 breaks across rest, hover, focus-visible and both content cases.
+- **C10.4** Also measured, and needing no baseline: a child whose box leaves its parent's, and content clipped with no `text-overflow: ellipsis` to say the end was lost.
+- **C10.5** Growth is a defect **only** where the control declared itself one line. A toast is supposed to wrap — a message that cannot wrap is a message that gets cut off. Flagging it would have trained everyone to ignore the check.
 
 ## C9 — A glyph alone in a control is centred, and that is measured
 

@@ -48,6 +48,7 @@ const url = `http://127.0.0.1:${server.address().port}/`;
 const browser = await chromium.launch();
 const findings = [];
 const offCentre = [];
+const contentBreaks = [];
 let geometryFailed = false;
 
 for (const theme of ['dark', 'light']) {
@@ -94,8 +95,65 @@ for (const theme of ['dark', 'light']) {
                     return paint.map((p) => ds.getPropertyValue(p)).join('~');
                 }).join('/');
 
+                /* Content stress.
+
+                   The first version of this compared a content cell to the
+                   control's rest cell and asked whether it grew. It passed
+                   with the production bug reinstated, because rest holds the
+                   cross too: both cells grew by the same 16px and the delta
+                   was zero. A check can look right and prove nothing.
+
+                   So the invariant is absolute, not relative. `white-space:
+                   nowrap` is the stylesheet saying this control is one line.
+                   One line has a height that can be computed from the
+                   control's own box -- line-height, padding, border -- and
+                   anything taller means something inside took a line of its
+                   own. That is the filter-chip bug, and it is true of the
+                   chip whatever words are in it.
+
+                   Applied to every cell, not only content cells: a control
+                   that is the wrong height with a short label is already
+                   broken, it just has not met a long one yet. */
+                let stress = null;
+                {
+                    const cs2 = getComputedStyle(el);
+                    if (cs2.whiteSpace === 'nowrap' && r.height) {
+                        const px = (v) => parseFloat(v) || 0;
+                        const lh = cs2.lineHeight === 'normal'
+                            ? px(cs2.fontSize) * 1.2 : px(cs2.lineHeight);
+                        const chrome = px(cs2.paddingTop) + px(cs2.paddingBottom)
+                            + px(cs2.borderTopWidth) + px(cs2.borderBottomWidth);
+                        const oneLine = Math.max(lh + chrome, px(cs2.minHeight));
+                        if (r.height > oneLine + 1.5) {
+                            stress = {
+                                tall: Math.round((r.height - oneLine) * 10) / 10,
+                                is: Math.round(r.height), should: Math.round(oneLine),
+                            };
+                        }
+                    }
+                    /* A child whose box leaves its parent's, and content cut
+                       off with nothing to say so. Both are losses a person
+                       sees; neither depends on a baseline. */
+                    let spill = 0;
+                    for (const d of el.querySelectorAll('*')) {
+                        const b = d.getBoundingClientRect();
+                        if (!b.width && !b.height) continue;
+                        spill = Math.max(spill, r.top - b.top, b.bottom - r.bottom,
+                            r.left - b.left, b.right - r.right);
+                    }
+                    const ell = cs2.textOverflow === 'ellipsis'
+                        || [...el.querySelectorAll('*')].some((d) => getComputedStyle(d).textOverflow === 'ellipsis');
+                    const clipped = (el.scrollWidth > el.clientWidth + 1) && !ell
+                        && cs2.overflow !== 'visible';
+                    if (spill > 1 || clipped) {
+                        stress = { ...(stress || {}), spill: Math.round(spill * 10) / 10, clipped };
+                    }
+                }
+
                 return {
                     label,
+                    content: c.dataset.content ?? null,
+                    stress,
                     centring,
                     sig: paint.map((p) => cs.getPropertyValue(p)).join('|')
                         + `|${r.width.toFixed(1)}x${r.height.toFixed(1)}`
@@ -119,10 +177,26 @@ for (const theme of ['dark', 'light']) {
             }
         }
 
+        for (const c of cells) {
+            if (!c.stress) continue;
+            const why = [];
+            if (c.stress.tall) {
+                why.push(`declares one line but is ${c.stress.is}px tall, not ${c.stress.should}px`
+                    + ` -- ${c.stress.tall}px of something taking its own line`);
+            }
+            if (c.stress.spill > 1) why.push(`content spills ${c.stress.spill}px outside the control`);
+            if (c.stress.clipped) why.push('clipped with no ellipsis -- the end is lost silently');
+            if (why.length) contentBreaks.push({ theme, name, content: c.content ?? c.label, why });
+        }
+
         const rest = cells.find((c) => c.label === 'rest');
         if (!rest?.sig) continue;
         for (const c of cells) {
             if (c.label === 'rest' || !c.sig) continue;
+            /* A content cell is a different question -- it is the same state
+               with different contents, so of course its paint matches rest.
+               That is the point of it, not a finding. */
+            if (c.content !== null) continue;
             if (c.sig === rest.sig) findings.push({ theme, name, state: c.label });
         }
     }
@@ -160,6 +234,27 @@ console.log('\nGLYPHS THAT ARE NOT CENTRED IN THEIR OWN CONTROL\n');
             console.log(`  ${f.name.padEnd(22)}${f.state.padEnd(12)}${f.box.padEnd(10)}${f.glyph.padEnd(10)}${off}`);
         }
         console.log(`\n  ${seen.size} control(s). This is never intentional.\n`);
+        geometryFailed = true;
+    }
+}
+
+/* Reported with the geometry, and failing like it: a control that cannot
+   hold what the product puts in it is broken, not under-designed. */
+console.log('\nCONTROLS THAT BREAK ON REAL CONTENT\n');
+{
+    const seen = new Map();
+    for (const f of contentBreaks) {
+        const k = `${f.name}\u0000${f.content}`;
+        if (!seen.has(k)) seen.set(k, f);
+    }
+    if (!seen.size) {
+        console.log('  none. Every content case keeps its control the shape it was.\n');
+    } else {
+        for (const [, f] of [...seen].sort()) {
+            console.log(`  ${f.name}  --  ${f.content}`);
+            for (const w of f.why) console.log(`      ${w}`);
+        }
+        console.log(`\n  ${seen.size} break(s). Content is not an edge case.\n`);
         geometryFailed = true;
     }
 }

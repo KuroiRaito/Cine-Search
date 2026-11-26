@@ -18,8 +18,35 @@ jobs:
           cache: 'npm'
       - name: Install Dependencies
         run: npm ci
+
+      # ---- structural: reads the source, needs no browser ----
       - name: Verify design system
         run: npm run verify
+      - name: Lint
+        run: npm run lint
+
+      # ---- measured: renders the real controls and reads the boxes ----
+      #
+      # These four were the whole point of the gallery and they were not
+      # gated, so for a month the only thing standing between a measured bug
+      # and main was somebody remembering to type `npm run check`. All three
+      # of the bugs that reached production this month are caught here and by
+      # nothing above: a glyph off-centre, a control taller than the one line
+      # it declares, and an item whose size changes with the count.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Regenerate the as-built gallery
+        run: npm run gallery
+      # docs/as-built.html is generated and committed. If regenerating it
+      # moves it, the committed copy was stale -- which is how a gallery
+      # stops describing the product and starts being decoration.
+      - name: The committed gallery matches the code
+        run: git diff --exit-code docs/as-built.html
+      - name: Measure the rendered controls
+        run: npm run gallery:audit
+      - name: State coverage table
+        run: npm run states
+
       - name: Build Project
         run: npm run build
       - name: Smoke-test serverless API

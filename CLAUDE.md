@@ -127,8 +127,11 @@ Say so rather than assuming the net is wider than it is.
 - **`npm run snap` photographs default states only.** 72 screenshots, 7
   screens × 3 widths × 2 themes, all at rest. None of the three bugs that
   reached production would ever appear in it.
-- **CI runs `verify`, `build` and `test:api` only.** The gallery audit and the
-  behavioural harnesses are not wired in — run `npm run check` yourself.
+- **CI runs `verify`, `lint`, `gallery`, `gallery:audit`, `states`, `build`
+  and `test:api`.** So the four measurements are gated now, not just the
+  structural checks. Still *not* in CI: `snap`, `auth`, `cohorts`, `find` —
+  the behavioural harnesses, three of which need credentials. Run those
+  yourself. `states` is in CI for its table and blocks nothing by design.
 - **`npm run snap`'s fingerprints are structural, not pixel.** Element count
   and geometry hash. Dark and light shots of a screen share a value, which is
   why only 36 of the 72 are distinct. Identical fingerprints prove the markup

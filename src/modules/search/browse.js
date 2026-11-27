@@ -111,11 +111,29 @@ export function fromParams(params) {
 export function toParams(f, base = {}) {
     const out = new URLSearchParams(base);
     const set = (k, v, skip) => {
-        if (v === null || v === undefined || v === '' || v === skip) out.delete(k);
-        else out.set(k, String(v));
+        if (v === null || v === undefined || v === '' || v === skip) { out.delete(k); return; }
+        /* A list means OR, and TMDB spells OR with a pipe — it reads a comma as
+           AND, which is the note already written against `genre` below.
+
+           This is here rather than at each call site because that is exactly
+           how it went wrong. `genre` joined with a pipe; `language` was handed
+           to String(), which joins with a comma; and the "Closer to home"
+           preset shipped asking TMDB for films whose single original language
+           was simultaneously Hindi, Tamil, Telugu, Malayalam and Kannada.
+           Measured: 0 results, where the pipe returns 7,545. The knowledge was
+           not missing — it was written one line away and applied once.
+
+           So no call site gets to decide any more. A list is joined here or it
+           is not serialised at all. */
+        if (Array.isArray(v)) {
+            if (!v.length) { out.delete(k); return; }
+            out.set(k, v.join('|'));
+            return;
+        }
+        out.set(k, String(v));
     };
     set('kind', f.kind, 'all');
-    set('genre', f.genre?.length ? f.genre.join('|') : null);
+    set('genre', f.genre);
     set('lang', f.language);
     set('decade', f.decade);
     set('len', f.length);

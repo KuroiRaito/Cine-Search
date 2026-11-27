@@ -55,6 +55,34 @@ const cssFiles = files.filter((f) => extname(f) === '.css');
  */
 const decomment = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ');
 
+/**
+ * Nor is `@media (min-width: 1120px)`.
+ *
+ * The same prelude regex has a second blind spot, and it only shows when a
+ * class is declared *nowhere but* inside an at-rule. `([^{}]+)\{([^}]*)\}`
+ * does not nest: given
+ *
+ *     @media (min-width: 1120px) {  .pintro:has(> .section) { display: grid; }
+ *
+ * it reads the prelude as `@media (min-width: 1120px)` and swallows
+ * `.pintro:has(> .section) {  display: grid;` into the BODY. So the first
+ * rule inside every at-rule block loses its selector, and the declarations
+ * that would have given it its shape are credited to the at-rule instead.
+ *
+ * Every other class in the product survived that because it is also declared
+ * at the top level, where it is read correctly; `.pintro` is the first that
+ * exists only at a breakpoint, and check 1 called it shapeless while it was
+ * setting `display: grid`.
+ *
+ * Dropping the at-rule's opening brace lets the rules inside it be read at
+ * the top level, where this regex is right. `[^{;}]*` and not `[^{]*`: the
+ * greedy form runs from an `@import` with no block of its own all the way to
+ * the next `{`, eating the rule that follows it. Measured over the
+ * stylesheets, the tight form moves exactly one thing — `.pintro` becomes
+ * shaped — and loses no class that was visible before.
+ */
+const unnest = (s) => s.replace(/@[a-z-]+[^{;}]*\{/g, ' ');
+
 const css = cssFiles.map((f) => decomment(readFileSync(f, 'utf8'))).join('\n');
 
 const failures = [];
@@ -81,7 +109,7 @@ const SHAPE_PROPS = new Set([
 
 const defined = new Set();
 const shaped = new Set();
-for (const m of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+for (const m of unnest(css).matchAll(/([^{}]+)\{([^}]*)\}/g)) {
     const props = new Set([...m[2].matchAll(/([a-z-]+)\s*:/g)].map((p) => p[1]));
     // A class that only sets custom properties is still doing something: the
     // watch-state tones (.st-want, .st-ing, …) carry a hue into whatever they
@@ -194,7 +222,7 @@ for (const f of jsx) {
 const moduleOf = (f) => relative(ROOT, f).match(/^src\/modules\/([^/]+)\//)?.[1] ?? null;
 const classesIn = (file) => {
     const found = new Set();
-    for (const m of decomment(readFileSync(file, 'utf8')).matchAll(/([^{}]+)\{[^}]*\}/g)) {
+    for (const m of unnest(decomment(readFileSync(file, 'utf8'))).matchAll(/([^{}]+)\{[^}]*\}/g)) {
         // Strip at-rule preludes: @media's condition is not a selector.
         if (m[1].trim().startsWith('@')) continue;
         for (const c of m[1].matchAll(/\.([A-Za-z][\w-]*)/g)) found.add(c[1]);

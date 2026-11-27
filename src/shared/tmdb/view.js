@@ -463,13 +463,18 @@ function notableCredits(list) {
    which is where they had survived: the chips read "Director" and "Writer".
    The old nouns are gone; anything that needs to name the job for a different
    reason (a cast row on a title page) uses `job` from the credit itself. */
+/* `by` is the same fact in the form a credit line takes -- "Directed by
+   Christopher Nolan" over a grid that is his work (FQ3). It is here rather
+   than built from `label` because no rule turns "Acted in" into "With", and a
+   grid headed "Acted in by Brad Pitt" is the kind of sentence a template
+   writes and a person never would. Six entries, written once. */
 const ROLES = [
-    { key: 'director', label: 'Directed', verb: 'directed', jobs: ['Director'] },
-    { key: 'creator', label: 'Created', verb: 'created', jobs: ['Creator'] },
-    { key: 'writer', label: 'Wrote', verb: 'written', jobs: ['Writer', 'Screenplay'] },
-    { key: 'composer', label: 'Scored', verb: 'scored', jobs: ['Original Music Composer'] },
-    { key: 'camera', label: 'Shot', verb: 'shot', jobs: ['Director of Photography'] },
-    { key: 'cast', label: 'Acted in', verb: 'acted in', jobs: null },
+    { key: 'director', label: 'Directed', verb: 'directed', by: 'Directed by', jobs: ['Director'] },
+    { key: 'creator', label: 'Created', verb: 'created', by: 'Created by', jobs: ['Creator'] },
+    { key: 'writer', label: 'Wrote', verb: 'written', by: 'Written by', jobs: ['Writer', 'Screenplay'] },
+    { key: 'composer', label: 'Scored', verb: 'scored', by: 'Scored by', jobs: ['Original Music Composer'] },
+    { key: 'camera', label: 'Shot', verb: 'shot', by: 'Shot by', jobs: ['Director of Photography'] },
+    { key: 'cast', label: 'Acted in', verb: 'acted in', by: 'With', jobs: null },
 ];
 
 /** Which role a stored credit belongs to, so a card can find its denominator. */
@@ -485,9 +490,18 @@ export function roleForJob(role, job) {
  * directed, six of which you have seen; switching to Writer changes both halves
  * because it is a different body of work.
  *
- * Roles are ordered by size, so the largest body of work leads — which is
- * Director for a director, Cast for an actor, and Composer for a composer,
- * without needing a rule for each.
+ * ROLES COME BACK IN DECLARATION ORDER, NOT BY SIZE. This comment used to
+ * claim the opposite — "ordered by size, so the largest body of work leads" —
+ * and the code has never done it: ROLES lists cast last, so one directed
+ * episode sits ahead of a whole acting career. The person page was right
+ * anyway because Person.jsx sorts with `leadRoles` before drawing; the search
+ * page read `roles[0]` and promoted Bryan Cranston as "Directed by Bryan
+ * Cranston · 6 series".
+ *
+ * So: `roles[0]` is not the answer to "what is this person known for". Ask
+ * `leadRoles` from the person module, which decides it properly — heaviest
+ * first, except inside the band where the top two are too close for rank to be
+ * deciding anything, where authored work leads.
  */
 /** Every released credit once, however many jobs it was under. */
 function countCredits(credits) {
@@ -513,6 +527,7 @@ export function toPersonView(raw) {
             key: role.key,
             label: role.label,
             verb: role.verb,
+            by: role.by,
             items,
             // Everything the filter removed, counted so the screen can admit to
             // it rather than quietly present an opinion as a total.

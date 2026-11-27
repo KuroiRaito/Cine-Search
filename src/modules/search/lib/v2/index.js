@@ -29,6 +29,11 @@ export async function search(query, opts = {}, { signal } = {}) {
     return {
         results: r.titles.slice(0, 20),
         people: r.people,
+        /* What TMDB ranked first across titles and people together. FQ3 turns
+           on it and the two lists above cannot reconstruct it. Only this path
+           has it: the v1 fallback above returns neither people nor a rank, so
+           `lead` is ABSENT there rather than false. */
+        lead: r.lead,
         totalPages: r.totalPages,
         meta: { variant: 'v2', path: 'multi', calls: 1 },
     };

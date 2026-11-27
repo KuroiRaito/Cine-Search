@@ -131,6 +131,13 @@
 
 @media (min-width: 1120px) {
 
+  /* The face keeps the size the tablet band gives it. It did not, because
+     that band was carved out of base.css with an upper bound rather than
+     left open, so 1120+ fell back to the phone's 64px: the widest screens in
+     the product wore the smallest face. More room, smaller face — nobody
+     decided that, the bound did. */
+  .phead .avatar { --face: 96px; }
+
   /* `:has(> .section)` and not `.pintro`, because the second column is the
      biography and plenty of people have none. Without the guard their header
      keeps the half-width track and sits beside an empty one — a narrower

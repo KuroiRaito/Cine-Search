@@ -30,6 +30,7 @@
     "library": "vite-node scripts/library-cases.mjs",
     "paste": "vite-node scripts/paste-cases.mjs",
     "restore": "vite-node scripts/restore-cases.mjs",
+    "person": "vite-node scripts/person-cases.mjs",
     "answer": "vite-node scripts/answer-cases.mjs"
   },
   "dependencies": {

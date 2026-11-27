@@ -31,15 +31,60 @@ const wordsOf = (value) => fold(value).split(/[^\p{Letter}\p{Number}]+/u).filter
  * "Dune" sits between them. Deliberately not a substring match — `art` should
  * not return every title containing the letters a-r-t, which is the kind of
  * result that makes somebody stop trusting the box.
- *
- * Title only. Not notes, not people, not genre: those are searches, and they
- * belong to Search.
  */
-export function matches(title, term) {
+function hits(value, term) {
     const needles = wordsOf(term);
     if (!needles.length) return true;
-    const hay = wordsOf(title);
+    const hay = wordsOf(value);
     return needles.every((n) => hay.some((word) => word.startsWith(n)));
+}
+
+/** Whether a term names the person who recommended a row. L27. */
+export const nameMatches = (name, term) => Boolean(name) && hits(name, term);
+
+/**
+ * Title, or the person who recommended it. L27.
+ *
+ * This used to be title only, and the reason given was that notes, people and
+ * genre are searches and belong to Search. That still holds for notes and
+ * genre — they ask the catalogue a question. A recommender does not: the name
+ * was typed by this person, into this library, about this row. It is a label
+ * they put on their own shelf, so finding by it is still "where did I put it".
+ *
+ * Takes the row rather than the title. The previous signature was
+ * `matches(title, term)`, and a caller that passed a row to it would have read
+ * `undefined`, folded to `''`, and matched every row in the library — absent
+ * becoming plausible, which is the most expensive bug shape in this repo. The
+ * rename is what prevents it: the old name no longer exists, so an un-updated
+ * caller fails to build rather than silently returning everything.
+ */
+export function rowMatches(row, term) {
+    if (typeof row === 'string') throw new TypeError('rowMatches takes a row, not a title');
+    return hits(row?.title, term) || nameMatches(row?.recommendedBy, term);
+}
+
+/**
+ * "9 recommended by Priya · 3 watched" — L27's payoff.
+ *
+ * The count is the point of the feature: the question somebody has is not what
+ * did she recommend but am I behind on what she recommended.
+ *
+ * Returns null when the term names nobody, and also when it names more than
+ * one person — a "Priya" who is two different people would otherwise be given
+ * one confident count that is wrong for both. Absent stays absent rather than
+ * defaulting into an answer-shaped number.
+ */
+export function recommenderSummary(rows, term) {
+    if (!isFinding(term)) return null;
+    const hit = (rows || []).filter((r) => nameMatches(r.recommendedBy, term));
+    if (!hit.length) return null;
+    const names = [...new Set(hit.map((r) => r.recommendedBy))];
+    if (names.length !== 1) return null;
+    return {
+        name: names[0],
+        total: hit.length,
+        watched: hit.filter((r) => r.status === 'watched').length,
+    };
 }
 
 /** Whether the person is actually finding, rather than having touched the box. */

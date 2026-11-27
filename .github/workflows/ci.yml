@@ -10,7 +10,7 @@ on:
 # would not see. Two blocks, cheapest first, because a failure should report in
 # seconds rather than after a browser download.
 #
-#   source      verify · lint · find · cohorts · build · test:api
+#   source      verify · lint · find · cohorts · library · build · test:api
 #               ~4s in total, measured 25 Nov 2026, against an npm ci that
 #               takes thirty. Reads the code; needs no browser, no network and
 #               no credentials.
@@ -50,6 +50,8 @@ jobs:
         run: npm run find
       - name: Title cohorts
         run: npm run cohorts
+      - name: Library recommender cases
+        run: npm run library
       - name: Build Project
         run: npm run build
       - name: Smoke-test serverless API

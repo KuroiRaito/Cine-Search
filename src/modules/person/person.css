@@ -50,6 +50,14 @@
 
 .bio { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); color: var(--muted); max-width: var(--measure); }
 
+/* Five lines up front, the rest behind "View more". Mirrors .ov.clamped
+   (title.css:141): same job, different module. The first screen is the
+   person, not their life story. */
+.bio.bio-clamp {
+  display: -webkit-box; -webkit-line-clamp: 5; line-clamp: 5;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
 /* ---------------- collection progress ----------------
 
    "6 of 10 directed" sits above the filmography rather than in a stats block:

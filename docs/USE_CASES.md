@@ -93,9 +93,9 @@ anything here can be traced back and argued with.
 | E3 | Types two, pauses | `in` + 250ms | One request after the quiet. `FQ29` | ✅ |
 | E4 | Clean hit | `inception` | Count, then the grid. Every tile carries its library state and a +. `FQ1` | ✅ |
 | E5 | Titles and people | `nolan` | People **after** the grid, at most three, gated on a photo. `FQ2` | ✅ |
-| E6 | Query *is* a person | `christopher nolan` | Person row first, grid below is **their work** | ○ `FQ3` |
-| E7 | Two people, same name | Ambiguous name | Neither promoted; both rows with evidence lines | ○ `FQ4` |
-| E8 | Query is a franchise | `lord of the rings` | One collection band above the grid, release order, "3 of 8 seen" | ○ `FQ5` |
+| E6 | Query *is* a person | `christopher nolan` | Person row first, grid below is **their work** | ✅ `FQ3` `#112` |
+| E7 | Two people, same name | Ambiguous name | Neither promoted; both rows with evidence lines | ✅ `FQ4` `#112` — `roger deakins` no longer collides at TMDB; `mike mitchell`, `chris williams`, `james murray` and `john williams` do |
+| E8 | Query is a franchise | `lord of the rings` | One collection band above the grid, release order, "3 of 8 seen" | ◐ `FQ5` `#112` — band, fraction and release order ship as a rail; the frame's numbered **strip** needs one CSS rule and the band appears for any franchise member, not only a franchise-shaped query |
 | E9 | Person with no photo | TMDB finds anyone for any string | Excluded. `FQ6` | ✅ |
 | E10 | Rescued by truncation | `interstellar movie` | "Showing results for interstellar", original one tap away. `FQ7` | ✅ |
 | E11 | Rescued by word retry | `koi acchi thriller movie` | Phrased as a **question**, not a claim. `FQ8` | ✅ |
@@ -320,9 +320,15 @@ Ordered by how often a real person would hit them, not by effort.
 2. **E13 — the rescue ladder only fires on *empty*.** `stanger things` returns
    one irrelevant row, so the ladder stays silent even though rung 4 has the
    answer at edit distance 1. The trigger should be "nothing acceptable".
-3. **E6 / E7 / E8 — person-first and franchise-first results.** Designed in
-   detail (`FQ3`–`FQ5`), unbuilt. `christopher nolan` and `lord of the rings`
-   are both common and both currently answered by a plain grid.
+3. ~~**E6 / E7 / E8 — person-first and franchise-first results.**~~ Built in
+   `#112`. What is left of it: the FQ5 band draws as a rail rather than the
+   frame's numbered strip, which needs one rule in `src/modules/search/search.css`;
+   and whether the band belongs on *every* franchise member (`dune` gets one
+   today) or only on a franchise-shaped query is a product call, not a bug.
+   Separately, the shipped people floor of `popularity >= 1` now excludes
+   Rajkumar Hirani, Nawazuddin Siddiqui, Satyajit Ray, Sanjay Leela Bhansali
+   and Ram Gopal Varma from the **people section** — promotion no longer reads
+   that number, but the section still does. `FQ2` / `FQ6`.
 4. **H10 — ticking the last episode doesn't offer to close the series.** The
    record stays "Watching" forever unless they go and change it.
 5. **B11 — the action that sent someone to sign up is never replayed.** They

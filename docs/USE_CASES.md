@@ -24,7 +24,7 @@ anything here can be traced back and argued with.
 | A4 | Arrives on a shared person link | Opens `/person/525` | Person page, no gate | ✅ |
 | A5 | Returning guest | Second visit, never signed up | Discover directly. No cover, no modal, no nag | ✅ |
 | A6 | Unknown URL | `/libary` typo, or a dead link | Not-found **with the tab bar** and one button out. `SH13` | ✅ |
-| A7 | Lands mid-list, hits back | Taps a tile from halfway down, returns | Scroll position restored, grid pages **not** restored | ◐ `S3` |
+| A7 | Lands mid-list, hits back | Taps a tile from halfway down, returns | Scroll position restored, grid pages **not** restored | ✅ `S3` both restored |
 | A8 | Opens in a second tab | Two tabs, same browser | Both work; library state is per-tab until a write | ✅ |
 | A9 | Installs / opens as app on phone | Capacitor shell (iOS/Android dirs exist, unbuilt) | — | ◆ |
 
@@ -88,7 +88,7 @@ anything here can be traced back and argued with.
 
 | # | Use case | Trigger | Expected behaviour | ✓ |
 |---|---|---|---|---|
-| E1 | Opens Search, box empty | Tab 2 | Recents, then presets. Never a question they answered by arriving. `FQ0` | ○ recents unbuilt |
+| E1 | Opens Search, box empty | Tab 2 | Recents, then presets. Never a question they answered by arriving. `FQ0` | ✅ |
 | E2 | Types one character | `i` | No request at all. `FQ29` | ✅ |
 | E3 | Types two, pauses | `in` + 250ms | One request after the quiet. `FQ29` | ✅ |
 | E4 | Clean hit | `inception` | Count, then the grid. Every tile carries its library state and a +. `FQ1` | ✅ |
@@ -103,14 +103,14 @@ anything here can be traced back and argued with.
 | E13 | Typo, but results came back | `stanger things` returns 1 irrelevant row | Ladder **does not fire** — it only triggers on empty | ◆ trigger on "nothing acceptable" |
 | E14 | Typo needing a dictionary | `sholey`, `dangl` | — | ◆ rung 5, ruled "not yet" |
 | E15 | Parses as facets instead | `tamil thriller` finds no title | Offers the browse, with three real results shown beneath. `FQ10` | ✅ |
-| E16 | Nothing, nothing to suggest | `film about a sad robot` | Honest exit: what was searched, that we search **names not plots**, recents, presets. `FQ11` | ◐ recents missing |
+| E16 | Nothing, nothing to suggest | `film about a sad robot` | Honest exit: what was searched, that we search **names not plots**, recents, presets. `FQ11` | ✅ |
 | E17 | Request failed | TMDB unreachable | "Could not reach TMDB" + retry. Never "nothing found". `FQ12` | ✅ |
 | E18 | Titles arrived, people failed | Partial failure | Grid renders; people retries once then stays away. `FQ13` | ✅ |
 | E19 | In flight | Request pending | Six poster skeletons at the grid's own geometry. `FQ14` | ✅ |
 | E20 | Stale response lands last | `inc` resolves after `inception` | Discarded. Keyed to the query that asked. `FQ15` | ✅ |
 | E21 | Box cleared mid-request | Taps × | Aborted; resting state returns instantly. `FQ16` | ✅ |
-| E22 | Title pasted with its year | `Inception (2010)` | Year becomes a **chip**, name goes to the box. `FQ17` | ◐ year is stripped and retried, never shown as a chip |
-| E23 | TMDB or IMDb URL pasted | Pastes a link | Resolved straight to that title — a URL is a destination, not a search | ○ `FQ18` |
+| E22 | Title pasted with its year | `Inception (2010)` | Year becomes a **chip**, name goes to the box. `FQ17` | ✅ removable chip, name in the box |
+| E23 | TMDB or IMDb URL pasted | Pastes a link | Resolved straight to that title — a URL is a destination, not a search | ✅ `FQ18` titles only; a person URL still falls through |
 | E24 | Switches media type | Taps the Films tab | Client-side split of the response in hand. Instant, no request. `FQ19` | ✅ |
 | E25 | People tab with no people | Filter on, zero people | "No people match — 34 titles do", with the way back. `FQ20` | ✅ |
 | E26 | Four results, same name | Remakes | Year and poster carry the difference; year never omitted (—). `FQ21` | ✅ |
@@ -118,7 +118,7 @@ anything here can be traced back and argued with.
 | E28 | Very long title | 90-character name | Two lines then ellipsis. Tile never grows, grid never goes ragged. `FQ23` | ✅ |
 | E29 | Adult results | Any query | Excluded **at the request**, not filtered after. `FQ24` | ✅ |
 | E30 | More than twenty results | Scrolls to the end | Load more — a button, not infinite scroll. `FQ25` | ✅ |
-| E31 | Back from a title | Opened a result, returns | Query, loaded pages **and** scroll all restored. `FQ26` | ◐ position only |
+| E31 | Back from a title | Opened a result, returns | Query, loaded pages **and** scroll all restored. `FQ26` | ✅ |
 | E32 | Already in the library | Result they saved | Badge reports the state; + does not re-offer. `FQ28` | ✅ |
 | E33 | Emoji, RTL, 300 characters | Pastes anything | Sent as typed, allowed to fail into E16. The box never validates. `FQ30` | ✅ |
 
@@ -188,7 +188,7 @@ anything here can be traced back and argued with.
 | H7 | Uses the stepper | Taps + | Advances one, stores the set | ✅ |
 | H8 | Episode has no name | TMDB blank | "Episode 7" rather than empty. `TV7` | ✅ |
 | H9 | No episode data at all | TMDB has the series, no seasons | No track, no +, and a line saying progress is unavailable. **Not a 0 of 0 bar.** `L17` | ✅ |
-| H10 | Finishes every episode, status still Watching | Last tick | Offer "Mark watched?" **once**, inline. Never change their record for them | ○ `L21` |
+| H10 | Finishes every episode, status still Watching | Last tick | Offer "Mark watched?" **once**, inline. Never change their record for them | ✅ `L21` buttons only, no question line |
 | H11 | Film carrying a series status | Letterboxd import | Renders with that status, not silently rewritten. `L18` | ✅ |
 | H12 | Six statuses | TV only | Planning / Watching / On hold / Watched / Rewatching / Dropped | ✅ |
 
@@ -204,13 +204,13 @@ anything here can be traced back and argued with.
 | I6 | Finds a title | Types in find | Ignores the status filter — they want a title, not a shelf. "3 of 203". `L2` | ✅ |
 | I7 | Find matches nothing | No local match | Hands over to Search **carrying the typed text**. `L6` | ✅ |
 | I8 | Find while a filter is on | Filter + query | Find wins; the filter is visibly set aside with a way back. `L20` | ✅ |
-| I9 | Find matches a recommender | Types "Priya" | Their titles, with a count and how many are watched | ○ `L27` |
+| I9 | Find matches a recommender | Types "Priya" | Their titles, with a count and how many are watched | ✅ `L27` |
 | I10 | Switches density | Taps compact | Eleven rows where comfortable fits three. Remembered. `L3` | ✅ |
 | I11 | Sorts a shelf | Opens the sort sheet | Options change with the shelf; remembered **per shelf**. `L4` `L15` | ✅ |
-| I12 | Sorts by recommender | Wants the From section | Appears in the sheet only once a name exists | ○ `L28` `L29` |
+| I12 | Sorts by recommender | Wants the From section | Appears in the sheet only once a name exists | ✅ `L28` `L29` |
 | I13 | Shelf with no films | On hold | "A film is never on hold." A reason, not an apology. `L5` | ✅ |
 | I14 | Only one shelf has anything | Brand new | Five chips absent, one selected. Not a row of zeroes. `L19` | ✅ |
-| I15 | A row shows its recommender | Saved with a name | Third line in the accent: "From Priya". Absence is unmarked. `L26` | ◐ title page only |
+| I15 | A row shows its recommender | Saved with a name | Third line in the accent: "From Priya". Absence is unmarked. `L26` | ◐ series rows; films are tiles at this density, and a tile has no third line |
 | I16 | Edits an entry | Taps a row | Sheet: status, progress, rating, notes. Remove is footer-isolated and confirms. `L12` | ✅ |
 | I17 | Removes while looking at it | Confirms remove | Row goes immediately; undo is the **toast**, not the row. `L22` | ✅ |
 | I18 | A write rolls back | Save fails | "Couldn't save E7. Put back to E6." Names the episode. `L11` | ✅ |
@@ -289,7 +289,7 @@ anything here can be traced back and argued with.
 | M5 | Offline | Connection drops | Each section's own error and retry. No global offline bar. `SH14` | ✅ |
 | M6 | Any screen reports an action | Save, remove, reorder | **One** toast, owned by the shell, above the tab bar, clear of the safe area. `SH15` | ✅ |
 | M7 | Navigates forward | Push | Scroll to top, focus to the heading, route name announced. `SH11` | ✅ |
-| M8 | Goes back | Pop | The scroll position they left | ◐ loaded pages not restored `SH12` `S3` |
+| M8 | Goes back | Pop | The scroll position they left | ✅ `SH12` `S3` pages and position |
 | M9 | Screen reader, route change | Tab press | The page is announced. The design calls this the single largest a11y gap it closed | ✅ |
 | M10 | Tabs on a title page | Opens a title | **Absent** — a title page is somewhere you came back from. `SH19` | ✅ |
 | M11 | Desktop | 1120 / 1440 | One bar, nothing repeated. Six columns at 1440 | ✅ |

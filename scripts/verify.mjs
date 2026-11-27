@@ -31,7 +31,31 @@ function walk(dir, out = []) {
 const files = walk(SRC);
 const jsx = files.filter((f) => ['.jsx', '.js'].includes(extname(f)));
 const cssFiles = files.filter((f) => extname(f) === '.css');
-const css = cssFiles.map((f) => readFileSync(f, 'utf8')).join('\n');
+/**
+ * A comment is not a selector.
+ *
+ * Every rule-matching regex in this file reads the text between the previous
+ * `}` and the next `{` as the prelude, so a comment sitting above a rule is
+ * read as part of its selector list. `/* Mirrors .ov.clamped *\/` above
+ * `.bio.bio-clamp` registered `ov` and `clamped` as classes that person.css
+ * introduces, and check 6 duly reported person and title fighting over them.
+ *
+ * It is not one comment's fault: measured across the stylesheets, 457 class
+ * tokens come from comment text. Two checks were reading them.
+ *
+ *   check 1  a class mentioned in any comment counted as DEFINED, so a class
+ *            in the markup with no rule behind it passed as long as some
+ *            comment somewhere happened to name it. A gate failing open.
+ *   check 6  a class mentioned in a comment counted as INTRODUCED by that
+ *            module, inventing ownership conflicts out of prose.
+ *
+ * The file already strips at-rule preludes for exactly this reason — an
+ * @media condition is not a selector either. This is the same rule applied to
+ * the other thing in a prelude that is not a selector.
+ */
+const decomment = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ');
+
+const css = cssFiles.map((f) => decomment(readFileSync(f, 'utf8'))).join('\n');
 
 const failures = [];
 const fail = (check, detail) => failures.push({ check, detail });
@@ -170,7 +194,7 @@ for (const f of jsx) {
 const moduleOf = (f) => relative(ROOT, f).match(/^src\/modules\/([^/]+)\//)?.[1] ?? null;
 const classesIn = (file) => {
     const found = new Set();
-    for (const m of readFileSync(file, 'utf8').matchAll(/([^{}]+)\{[^}]*\}/g)) {
+    for (const m of decomment(readFileSync(file, 'utf8')).matchAll(/([^{}]+)\{[^}]*\}/g)) {
         // Strip at-rule preludes: @media's condition is not a selector.
         if (m[1].trim().startsWith('@')) continue;
         for (const c of m[1].matchAll(/\.([A-Za-z][\w-]*)/g)) found.add(c[1]);

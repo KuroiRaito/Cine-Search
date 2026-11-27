@@ -20,6 +20,7 @@ import PeopleResults, { usePeopleSearch } from './PeopleResults.jsx';
 import Presets from './Presets.jsx';
 import { recentSearches, rememberSearch } from './recents.js';
 import { destinationOf } from './destination.js';
+import { useRestoredPage } from '../../app/restore.js';
 import { findByImdb } from '../../shared/tmdb/endpoints.js';
 import { useTileStates, useQuickAdd } from '../library';
 import './search.css';
@@ -39,7 +40,10 @@ export default function SearchPage() {
     const yr = params.get('y') || '';
     const [draft, setDraft] = useState(q);
     const [open, setOpen] = useState(false);
-    const [page, setPage] = useState(1);
+    /* A7, E31, M8 — how deep they were, kept with the history entry, so
+       coming back rebuilds a list long enough for the remembered scroll
+       position to exist in. */
+    const [page, setPage] = useRestoredPage();
     const { isSignedIn } = useAuth();
     const lib = useLibrary();
 

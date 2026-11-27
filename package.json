@@ -28,7 +28,8 @@
     "cohorts": "node scripts/title-cohorts.mjs",
     "find": "node --env-file-if-exists=.env scripts/find-cases.mjs",
     "library": "vite-node scripts/library-cases.mjs",
-    "paste": "vite-node scripts/paste-cases.mjs"
+    "paste": "vite-node scripts/paste-cases.mjs",
+    "restore": "vite-node scripts/restore-cases.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

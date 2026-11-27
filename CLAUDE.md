@@ -23,7 +23,7 @@ it is red, read what it says — every failure names the file, the value and
 what it expected.
 
 `check` is the source block of CI minus `find`, `cohorts`, `library`,
-`paste` and `test:api`, which are gated but not in this script — run those too before a PR
+`paste`, `restore` and `test:api`, which are gated but not in this script — run those too before a PR
 that touches search, title states, the library's recommender, or the API.
 
 `RUNBOOK.md` has the rest, including how to run one of them on its own and
@@ -242,8 +242,8 @@ Say so rather than assuming the net is wider than it is.
 - **`npm run snap` photographs default states only.** 72 screenshots, 7
   screens × 3 widths × 2 themes, all at rest. None of the three bugs that
   reached production would ever appear in it.
-- **CI runs `verify`, `lint`, `find`, `cohorts`, `library`, `paste`, `build`,
-  `test:api`, then
+- **CI runs `verify`, `lint`, `find`, `cohorts`, `library`, `paste`, `restore`,
+  `build`, `test:api`, then
   `gallery`, `gallery:audit` and `states`.** The four measurements are gated
   now, not just the structural checks. Still *not* in CI: `snap` and `auth` —
   3-4 min and 80s respectively, both needing a browser. Run those yourself:

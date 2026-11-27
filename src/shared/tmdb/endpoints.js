@@ -25,6 +25,16 @@ export const searchMulti = (query, params = {}, opts) =>
         totalResults: d.total_results || 0,
     }));
 
+/**
+ * One external id to whatever TMDB has under it. FQ18.
+ *
+ * The only way across from IMDb's namespace to TMDB's. Returns buckets by kind
+ * — movie_results, tv_results, person_results — and any of them can be empty,
+ * including all of them, for a real IMDb id TMDB has never catalogued.
+ */
+export const findByImdb = (imdbId, opts) =>
+    get(`/find/${imdbId}`, { external_source: 'imdb_id' }, opts);
+
 export const searchPerson = (query, opts) =>
     get('/search/person', { query }, opts).then((d) => d.results || []);
 

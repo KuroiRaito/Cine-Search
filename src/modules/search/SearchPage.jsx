@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { search } from './lib/index.js';
 import { fromItem } from '../../shared/tmdb/view.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
@@ -19,6 +19,8 @@ import { SignInPrompt } from '../entry';
 import PeopleResults, { usePeopleSearch } from './PeopleResults.jsx';
 import Presets from './Presets.jsx';
 import { recentSearches, rememberSearch } from './recents.js';
+import { destinationOf } from './destination.js';
+import { findByImdb } from '../../shared/tmdb/endpoints.js';
 import { useTileStates, useQuickAdd } from '../library';
 import './search.css';
 
@@ -28,7 +30,13 @@ export default function SearchPage() {
     // The query lives in the URL, so a search can be shared, bookmarked and
     // returned to with the back button.
     const [params, setParams] = useSearchParams();
+    const navigate = useNavigate();
     const q = params.get('q') || '';
+    /* FQ17. The year a paste carried, once the ladder has told us it was one.
+       It lives on the URL rather than in state so the chip survives a reload
+       and a shared link carries the same search — and so taking the chip off
+       is one setParams rather than a second source of truth to keep level. */
+    const yr = params.get('y') || '';
     const [draft, setDraft] = useState(q);
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(1);
@@ -109,6 +117,10 @@ export default function SearchPage() {
     useEffect(() => {
         const t = setTimeout(() => {
             if (draft === q) return;
+            /* FQ18 — a link never becomes a query. It is about to be resolved
+               into a route, and a URL in the `q` parameter would put a search
+               nobody asked for into the history on the way past. */
+            if (destinationOf(draft)) return;
             setParams(draft ? { q: draft } : {}, { replace: true });
         }, DEBOUNCE_MS);
         return () => clearTimeout(t);
@@ -117,13 +129,15 @@ export default function SearchPage() {
     // One request now carries both the titles and the people for a plain
     // query. `people` is null when the search fell back to v1 and carried none.
     const { data, error, loading, retry } = useAsync(
-        ({ signal }) => search(q, {}, { signal }).then((r) => ({
+        ({ signal }) => search(q, yr ? { year: yr } : {}, { signal }).then((r) => ({
             titles: (r.results || []).map(fromItem),
             people: r.people ?? null,
             // At most one, ever. What the app decided the question was.
             interpretation: r.interpretation ?? null,
+            /* Which rung answered, and with what. FQ17 reads it. */
+            meta: r.meta ?? null,
         })),
-        [q],
+        [q, yr],
         { skip: !q.trim() },
     );
     const titles = data?.titles;
@@ -140,6 +154,56 @@ export default function SearchPage() {
         rememberSearch(q);
         setRecents(recentSearches());
     }, [data, q]);
+    /* FQ18 — a pasted URL is a destination, not a search.
+
+       TMDB's own link needs no request: the path carries the media type and the
+       id, which are the two things the title route takes. IMDb's needs one
+       lookup, because its ids are not TMDB's.
+
+       `dead` is a third state and not the absence of a destination: a real
+       IMDb id that TMDB has never catalogued has to say so, rather than sit on
+       "Opening that link" for ever. */
+    const dest = destinationOf(draft);
+    const [dead, setDead] = useState(false);
+    useEffect(() => {
+        if (!dest) { setDead(false); return undefined; }
+        let live = true;
+        setDead(false);
+        if (dest.kind === 'tmdb') {
+            navigate(`/title/${dest.mediaType}/${dest.id}`, { replace: true });
+            return undefined;
+        }
+        findByImdb(dest.imdbId)
+            .then((r) => {
+                if (!live) return;
+                const movie = r?.movie_results?.[0];
+                const tv = r?.tv_results?.[0];
+                if (movie) navigate(`/title/movie/${movie.id}`, { replace: true });
+                else if (tv) navigate(`/title/tv/${tv.id}`, { replace: true });
+                else setDead(true);
+            })
+            .catch(() => { if (live) setDead(true); });
+        return () => { live = false; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dest?.kind, dest?.mediaType, dest?.id, dest?.imdbId, navigate]);
+
+    /* FQ17 — the paste becomes the search it was always asking for.
+       `Inception (2010)` returned nothing; rung 1b finds the name and the year,
+       and this moves both where a person can see and undo them: the name into
+       the box, the year onto the URL as a chip. The box has to move too, or the
+       debounce below sees draft ≠ q and types the parenthesis straight back.
+
+       It costs one extra request — the rewritten URL re-runs a search whose
+       answer we already have. Worth it: the path it is on currently returns
+       zero results, and the alternative is a box and a URL that still say
+       something the app has quietly stopped searching for. */
+    const rescuedYear = data?.meta?.rung === '1b' ? data.meta.year : null;
+    useEffect(() => {
+        if (!rescuedYear || yr) return;
+        setDraft(data.meta.query);
+        setParams({ q: data.meta.query, y: String(rescuedYear) }, { replace: true });
+    }, [rescuedYear, yr, data, setParams]);
+
     /* L2 — every rung that changed the name prints what it did and offers the
        original back in one tap. One line above the results: never a toast,
        which disappears, and never a dialog, which interrupts. */
@@ -197,7 +261,33 @@ export default function SearchPage() {
                 <ChipRow facets={live} vocab={vocab} notice={notice} onChange={setFacets} />
             )}
 
-            {!q.trim() && !browsing && (
+            {/* FQ17. Not a facet — L1 says a query and a facet never travel
+                together, and this is a parameter on the query's own endpoint.
+                Removable, because a filter nobody can undo is worse than one
+                nobody asked for. */}
+            {q.trim() && yr && (
+                <div className="chips">
+                    <RemovableChip
+                        label={yr}
+                        onRemove={() => setParams({ q }, { replace: true })}
+                    />
+                </div>
+            )}
+
+            {/* FQ18. Two states, because a link that resolves to nothing is
+                not the same as one still resolving. */}
+            {dest && !dead && (
+                <Empty title="Opening that link…" body="Taking you to the title." />
+            )}
+            {dest && dead && (
+                <Empty
+                    title="That link points to nothing we can find"
+                    body="The page exists, but it is not in the catalogue this app reads."
+                    action={<Button onClick={() => setDraft('')}>Search instead</Button>}
+                />
+            )}
+
+            {!q.trim() && !browsing && !dest && (
                 <div className="nothing">
                     <WaysIn recents={recents} onPick={(r) => setParams({ q: r })} />
                 </div>

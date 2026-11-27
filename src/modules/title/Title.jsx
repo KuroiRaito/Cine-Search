@@ -8,6 +8,7 @@ import { wikiSummary } from '../../shared/wiki/wiki.js';
 import { useRegion } from '../../shared/hooks/RegionProvider.jsx';
 import { Poster, Tile, PersonRow, ErrorBox, Empty, Icon, initialsOf, Button} from '../../shared/ui/index.js';
 import { useToast } from '../../app/ToastProvider.jsx';
+import { finishKey, alreadyAsked, rememberAsked } from './finished.js';
 import { TitleSkeleton } from './TitleSkeleton.jsx';
 import { SignInPrompt } from '../entry';
 import { Editor } from '../library';
@@ -85,6 +86,10 @@ export default function Title() {
     const [playing, setPlaying] = useState(false);
     const [prompt, setPrompt] = useState(null);
     const [editing, setEditing] = useState(false);
+    /* L21's answer, for this visit. Declared up here with the other
+       screen state because the condition that uses it sits below an early
+       return, and a hook cannot. */
+    const [answeredHere, setAnsweredHere] = useState(false);
     /* SH15 -- there is exactly one toast and the shell owns it. This screen
        used to render its own, which meant two <Toast> elements could carry a
        message at the same moment. `.toast` is `position: fixed` at one
@@ -216,6 +221,28 @@ export default function Title() {
         }
     };
 
+    /* L21 — every aired episode ticked, and the status still says Watching.
+       The toast above already offers this at the moment the last tick lands,
+       but a toast disappears, and the state it announces does not: somebody who
+       ticks the finale on a bus, or who marked a whole season at once, or who
+       simply comes back a week later, arrives at a page with nothing to say
+       about it. So the offer is also inline, where it waits.
+
+       Asked once per title, then never again — the record is theirs, and an app
+       that keeps asking is not proposing, it is pestering. */
+    const finished = isTV
+        && order.length > 0
+        && Boolean(entry)
+        && entry.status !== 'watched'
+        && !nextUnwatched(order, entry.watched_episodes ?? {});
+    const askKey = finished ? finishKey('tv', t?.id) : null;
+    const offerFinish = finished && !answeredHere && !alreadyAsked(askKey);
+    const answerFinish = (accept) => {
+        rememberAsked(askKey);
+        setAnsweredHere(true);
+        if (accept) lib.save(t, { status: 'watched' });
+    };
+
     /** Per season, never per series — a whole-series action is too destructive
         for a single tap. */
     const markSeason = async (season, numbers, on) => {
@@ -273,6 +300,16 @@ export default function Title() {
 
     const actions = (
         <>
+            {/* L21. Below the status row, not inside it: this is a question
+                about the record, not another way to change it. Two answers,
+                both explicit — there is no silent option, because the one
+                thing the design forbids is deciding on somebody's behalf. */}
+            {offerFinish && (
+                <div className="arow">
+                    <Button onClick={() => answerFinish(true)}>Mark series watched</Button>
+                    <Button variant="quiet" onClick={() => answerFinish(false)}>Not yet</Button>
+                </div>
+            )}
             <div className={`arow ${statusTone(entry?.status)}`}>
                 {/* One button, two jobs: it invites while there is nothing to
                     report, and reports once there is. Tapping a saved title

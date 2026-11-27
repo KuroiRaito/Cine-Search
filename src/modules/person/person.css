@@ -114,3 +114,42 @@
   .phead h1 { font-size: var(--text-display-sm); line-height: var(--lh-display-sm); }
   .phead .sub { font-size: var(--text-body-sm); line-height: var(--lh-body-sm); }
 }
+
+
+/* ---------------- desktop ----------------
+
+   1120 and up. Stacked, this band spends its first screen on a face, a name
+   and half a window of nothing, then a biography, and only then the work —
+   so the filmography, which is what the page is for, starts below the fold
+   on the widest screens in the product. Side by side, who they are and what
+   they made both land on the first screen.
+
+   Phone and tablet keep the stack: a column of text beside a column of text
+   needs width to be two columns rather than two gutters, and 1120 is where
+   there is enough.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 1120px) {
+
+  /* `:has(> .section)` and not `.pintro`, because the second column is the
+     biography and plenty of people have none. Without the guard their header
+     keeps the half-width track and sits beside an empty one — a narrower
+     header than the stack it replaced, bought with nothing. */
+  .pintro:has(> .section) {
+    display: grid;
+    /* `minmax(0, 1fr)` rather than `1fr`: a grid track's automatic minimum is
+       its content, so a long unbroken name or an un-wrapped biography would
+       push its own column wider than half and shove the other one narrow. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--gutter);
+  }
+
+  /* Both children already carry the page gutter on both sides, so the space
+     between the columns would be gutter + gutter + column-gap. The inner
+     edges give theirs up and the grid's own gap is the single separation;
+     the outer edges keep theirs, which is what holds the block in line with
+     the stats and the filmography below it. */
+  .pintro:has(> .section) > .phead { padding-right: 0; }
+  .pintro:has(> .section) > .section { margin-left: 0; }
+}

@@ -23,8 +23,8 @@ it is red, read what it says — every failure names the file, the value and
 what it expected.
 
 `check` is the source block of CI minus `find`, `cohorts`, `library`,
-`paste`, `restore`, `answer` and `test:api`, which are gated but not in this script — run those too before a PR
-that touches search, title states, the library's recommender, or the API.
+`paste`, `restore`, `answer`, `person` and `test:api`, which are gated but not in this script — run those too before a PR
+that touches search, title states, the library's recommender, the person page, or the API.
 
 `RUNBOOK.md` has the rest, including how to run one of them on its own and
 how to photograph a single control.
@@ -243,7 +243,7 @@ Say so rather than assuming the net is wider than it is.
   screens × 3 widths × 2 themes, all at rest. None of the three bugs that
   reached production would ever appear in it.
 - **CI runs `verify`, `lint`, `find`, `cohorts`, `library`, `paste`, `restore`,
-  `answer`, `build`, `test:api`, then
+  `answer`, `person`, `build`, `test:api`, then
   `gallery`, `gallery:audit` and `states`.** The four measurements are gated
   now, not just the structural checks. Still *not* in CI: `snap` and `auth` —
   3-4 min and 80s respectively, both needing a browser. Run those yourself:

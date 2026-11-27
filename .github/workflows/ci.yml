@@ -11,7 +11,7 @@ on:
 # seconds rather than after a browser download.
 #
 #   source      verify · lint · find · cohorts · library · paste · restore · answer ·
-#               build · test:api
+#               person · build · test:api
 #               ~4s in total, measured 25 Nov 2026, against an npm ci that
 #               takes thirty. Reads the code; needs no browser, no network and
 #               no credentials.
@@ -57,6 +57,12 @@ jobs:
         run: npm run paste
       - name: Scroll and page restoration
         run: npm run restore
+      # Two caps read off the rendered box rather than declared, and both fail
+      # by hiding content in silence: a column count misread as three where
+      # there are six shows half a filmography behind a button that says it is
+      # showing all of it, and nothing on screen looks wrong.
+      - name: Person page caps
+        run: npm run person
       # §08's three result shapes: when a query is treated as a person, when a
       # shared name suppresses that, and when a collection band appears. The
       # offline half only -- `--live` talks to TMDB, whose index moves, and a

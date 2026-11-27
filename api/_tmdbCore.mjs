@@ -33,6 +33,10 @@ const ALLOWED = [
     // One credit_id rehydrates a whole favourite-character card: the character
     // name, the person with their profile_path, and the title with its poster.
     /^credit\/[A-Za-z0-9]+$/,
+    // FQ18 — a pasted IMDb link. Narrower than TMDB's own route, which also
+    // accepts tvdb and wikidata ids: this app only ever asks about an IMDb
+    // title id, so that is all the proxy forwards.
+    /^find\/tt\d{6,}$/,
     /^collection\/\d+$/,
     /^configuration$/,
 ];

@@ -251,20 +251,39 @@ export function prefixes(query, floor) {
     return out;
 }
 
+/**
+ * The substring of `original` that matches `folded`, with its casing intact.
+ *
+ * Falls back to the folded form when it cannot be found — which can happen
+ * once a rung has removed words from the middle. A name in the wrong case is a
+ * small wrong; a name that is not the one searched for would be a real one.
+ */
+function asTypedCase(original, folded) {
+    if (!folded) return folded;
+    const at = original.toLowerCase().indexOf(folded.toLowerCase());
+    return at === -1 ? folded : original.slice(at, at + folded.length);
+}
+
 export function rungs(raw) {
     const asTyped = String(raw || '').trim();
     const out = [{ rung: 0, query: asTyped, year: null }];
-    const add = (rung, query, year = null) => {
+    const add = (rung, query, year = null, shown = null) => {
         if (!query) return;
         if (out.some((a) => a.query === query && a.year === year)) return;
-        out.push({ rung, query, year });
+        out.push({ rung, query, year, shown: shown ?? query });
     };
 
     const intent = stripIntent(asTyped);
     add(1, intent);
 
     const { query: named, year } = splitYear(intent);
-    if (year) add('1b', named, year);
+    /* 1b is the only rung whose name is ever shown back to the person — FQ17
+       puts it in the box — and by this point the name has been folded for
+       matching. TMDB does not care, but a box that answers `Inception (2010)`
+       with `inception` has corrected somebody's spelling of their own paste.
+       So the casing is recovered from what they typed: the folded name is
+       found inside the original and that slice is carried alongside it. */
+    if (year) add('1b', named, year, asTypedCase(asTyped, named));
 
     add(2, stripParticles(named));
     return out;

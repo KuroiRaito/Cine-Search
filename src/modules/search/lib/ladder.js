@@ -51,11 +51,23 @@ export async function search(query, opts = {}, { signal } = {}) {
     // Rungs 1, 1b and 2 — silent, because they only remove words the index
     // cannot hold. Nothing is being reinterpreted, so nothing is announced.
     for (const attempt of attempts.slice(1)) {
-        const r = await searchV2(attempt.query, o, { signal });
+        /* 1b is the one rung that carries a value rather than only removing
+           words. The year was computed here all along and then thrown away, so
+           `Inception (2010)` searched for every Inception ever made and the
+           year the person typed did nothing. It is a real TMDB parameter on
+           both endpoints, so it costs no extra request to honour it. */
+        const r = await searchV2(attempt.query, attempt.year ? { ...o, year: attempt.year } : o, { signal });
         if (empty(r)) continue;
         return {
             ...r,
-            meta: { ...r.meta, variant: 'ladder', rung: attempt.rung },
+            /* What answered, in the words it answered with. FQ17 turns these
+               two into the box and the chip, which is only possible because
+               the rung says which name it used and which year it applied —
+               the page cannot re-derive them without repeating the ladder. */
+            meta: {
+                ...r.meta, variant: 'ladder', rung: attempt.rung,
+                query: attempt.shown ?? attempt.query, year: attempt.year ?? null,
+            },
             interpretation: null,
         };
     }

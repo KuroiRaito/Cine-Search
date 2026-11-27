@@ -197,6 +197,41 @@ const TV_GENRES = [
 ];
 const VOCAB = { movie: GENRES, tv: TV_GENRES };
 
+/* ---- a list is an OR, and OR is a pipe -------------------------------- */
+
+/* The "Closer to home" preset shipped returning nothing. Its five languages
+   were handed to String(), which joins with a comma, and TMDB reads a comma as
+   AND — so it asked for films whose one original language was simultaneously
+   Hindi, Tamil, Telugu, Malayalam and Kannada. Measured against live TMDB on
+   27 Nov 2026: hi 3,349 · ta 1,284 · hi|ta 4,633 · hi,ta 0 · all five piped
+   7,545 · all five with commas 0.
+
+   The rule is now in toParams itself rather than at each call site, because a
+   call site is precisely what forgot: `genre` joined with a pipe and carried
+   the comment explaining why, and `language` one line below did not. */
+is('FB      a list of languages is joined with a pipe, never a comma',
+    toParams({ ...EMPTY, kind: 'movie', language: ['hi', 'ta', 'te', 'ml', 'kn'] }).get('lang'),
+    'hi|ta|te|ml|kn');
+is('FB      and so is a list of genres, by the same rule rather than its own',
+    toParams({ ...EMPTY, kind: 'movie', genre: [35, 10751] }).get('genre'), '35|10751');
+is('FB      a single language is left alone',
+    toParams({ ...EMPTY, kind: 'movie', language: 'hi' }).get('lang'), 'hi');
+is('FB      an empty list sets nothing at all',
+    toParams({ ...EMPTY, kind: 'movie', genre: [] }).has('genre'), false);
+is('FB      an empty list of languages likewise',
+    toParams({ ...EMPTY, kind: 'movie', language: [] }).has('lang'), false);
+
+/* And it has to survive the round trip, because the URL is what the request is
+   built from — the preset’s array never reaches toQuery. */
+const homeUrl = toParams({ ...EMPTY, kind: 'movie', language: ['hi', 'ta', 'te', 'ml', 'kn'], rating: 7 });
+const homeBack = fromParams(new URLSearchParams(homeUrl.toString()));
+is('FB      the pipe survives being read back off the URL',
+    homeBack.language, 'hi|ta|te|ml|kn');
+is('FB      and reaches TMDB as the OR it was meant to be',
+    toQuery(homeBack, 'movie').with_original_language, 'hi|ta|te|ml|kn');
+is('FB      which is a filter that can actually match a film',
+    toQuery(homeBack, 'movie').with_original_language.includes(','), false);
+
 is('L5      All offers only what means the same on both sides',
     genresFor('all', VOCAB).length, 8);
 is('L5      and every one of them is shared',

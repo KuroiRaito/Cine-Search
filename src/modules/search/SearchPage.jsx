@@ -17,6 +17,8 @@ import { useAuth } from '../../shared/auth/AuthProvider.jsx';
 import { useLibrary } from '../library';
 import { SignInPrompt } from '../entry';
 import PeopleResults, { usePeopleSearch } from './PeopleResults.jsx';
+import Presets from './Presets.jsx';
+import { recentSearches, rememberSearch } from './recents.js';
 import { useTileStates, useQuickAdd } from '../library';
 import './search.css';
 
@@ -126,6 +128,18 @@ export default function SearchPage() {
     );
     const titles = data?.titles;
     const said = data?.interpretation;
+
+    /* Kept only when the search found something, and keyed to what the person
+       typed rather than to whatever rung answered — tapping it re-runs their
+       words, rescue and all. A recent that leads nowhere is not a way out, and
+       the screen it would show on most is the one for a search that just
+       failed. */
+    const [recents, setRecents] = useState(recentSearches);
+    useEffect(() => {
+        if (!q.trim() || !data?.titles?.length) return;
+        rememberSearch(q);
+        setRecents(recentSearches());
+    }, [data, q]);
     /* L2 — every rung that changed the name prints what it did and offers the
        original back in one tap. One line above the results: never a toast,
        which disappears, and never a dialog, which interrupts. */
@@ -184,10 +198,9 @@ export default function SearchPage() {
             )}
 
             {!q.trim() && !browsing && (
-                <Empty
-                    title="What are you looking for?"
-                    body="Search by title, or by the person who made it."
-                />
+                <div className="nothing">
+                    <WaysIn recents={recents} onPick={(r) => setParams({ q: r })} />
+                </div>
             )}
 
             {loading && (
@@ -267,6 +280,8 @@ export default function SearchPage() {
                         <p className="nothing-why">We search names, not plots.</p>
                     )}
 
+                    <WaysIn recents={recents} onPick={(r) => setParams({ q: r })} />
+
                     <Button as={Link} variant="quiet" to="/">Browse instead</Button>
                 </div>
             )}
@@ -285,6 +300,38 @@ export default function SearchPage() {
 
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
         </div>
+    );
+}
+
+/**
+ * The same offer in two places: what you searched before, and somewhere to
+ * start if you have not.
+ *
+ * FQ0 — the resting state is recents then presets, and explicitly *not* "What
+ * are you looking for?", which asks a question the person answered by
+ * arriving. FQ11 — the nothing-found screen ends with the same two, because
+ * what somebody needs after a dead end is a route back to something that
+ * worked.
+ *
+ * One component rather than two copies: these are the same offer, and two
+ * renderings of one offer is how they drift apart.
+ */
+function WaysIn({ recents, onPick }) {
+    return (
+        <>
+            {recents.length > 0 && (
+                <>
+                    <p className="said-ask">Recent</p>
+                    <div className="saidchips">
+                        {recents.map((r) => (
+                            <Chip key={r} onClick={() => onPick(r)}>{r}</Chip>
+                        ))}
+                    </div>
+                </>
+            )}
+            <p className="said-ask">{recents.length ? 'Or start here' : 'Start here'}</p>
+            <Presets />
+        </>
     );
 }
 

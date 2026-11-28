@@ -359,6 +359,28 @@
    is used is not where it is declared. */
 
 @media (min-width: 600px) {
+  /* The second half of the sentence four lines above .pbanner, which the
+     stylesheet has been stating and not doing: "4:1 from medium up: wider
+     becomes a letterbox."
+
+     A ratio with no ceiling grows without one. The banner is full-bleed, so
+     at 3:1 it was 400px at 1280 — 44% of the window, spent on furniture
+     before a single number — and profile was the only screen in the product
+     that got TALLER as the window got wider. Person goes 3350 -> 2105 over
+     the same range.
+
+     600 rather than 1120 because that is what "medium up" means here
+     (shell.css names the bands: medium 600-1119, expanded 1120+), and
+     because the problem is continuous in width, not something that waits for
+     the multi-column layout: at 900 a 3:1 banner is already 284px. The
+     design's own desktop drawing is 4:1 at 1120, which this satisfies.
+
+     Phone stays 3:1 and is NOT settled — the design draws 2:1 on all eleven
+     of its phone screens, and .pbanner's own comment argues 3:1 because
+     "taller eats the fold". That half is open; see
+     docs/GROOMING_DIVERGENCE.md B1. */
+  .pbanner { aspect-ratio: 4 / 1; }
+
   .fgrid { grid-template-columns: repeat(5, 1fr); }
   .frail .fcard { width: var(--space-80); }
 }

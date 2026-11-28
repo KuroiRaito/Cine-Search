@@ -470,15 +470,52 @@ function ratios(modules) {
     return out;
 }
 
-/* Every aspect-ratio the product actually declares, with the selector that
-   declares it -- the third number. */
+/* Every aspect-ratio the product actually declares, with the selector and the
+ * width it applies at -- the third number.
+ *
+ * MEDIA-AWARE, and it has to be. The first version read rules with one flat
+ * regex, which could not see inside an `@media` block and reported only the
+ * base declaration. So a band given its designed shape at a breakpoint still
+ * read as a divergence, for ever, and the next person to open the report
+ * would have redone work that was already done. A diff that cannot see the
+ * fix is worse than one that cannot see the bug.
+ *
+ * A real brace scanner rather than a cleverer regex: CSS nests, and the
+ * flat-regex version also silently dropped the FIRST rule inside every block,
+ * because its "a rule starts after } or @" test is false for a rule that
+ * starts after {.
+ */
 function builtRatios() {
     const out = [];
     for (const rel of SHEETS) {
         const css = readFileSync(join(ROOT, rel), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-        for (const m of css.matchAll(/(^|[}@])([^{}@]*?)\{([^}]*)\}/g)) {
-            const r = /aspect-ratio\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/.exec(m[3]);
-            if (r) out.push({ sel: m[2].replace(/\s+/g, ' ').trim(), ratio: `${r[1]}:${r[2]}`, file: rel });
+        /* at[] is the stack of @-conditions we are inside; buf collects the
+           selector (or at-rule prelude) being read up to its own `{`. */
+        const at = [];
+        let buf = '';
+        for (let i = 0; i < css.length; i++) {
+            const c = css[i];
+            if (c === '{') {
+                const head = buf.replace(/\s+/g, ' ').trim();
+                buf = '';
+                if (head.startsWith('@')) { at.push(head); continue; }
+                /* A plain rule: read to its closing brace. */
+                const end = css.indexOf('}', i);
+                const body = css.slice(i + 1, end === -1 ? css.length : end);
+                const r = /aspect-ratio\s*:\s*([\d.]+)\s*\/\s*([\d.]+)/.exec(body);
+                if (r) {
+                    out.push({
+                        sel: head,
+                        ratio: `${r[1]}:${r[2]}`,
+                        at: at.filter((a) => a.startsWith('@media')).join(' '),
+                        file: rel,
+                    });
+                }
+                i = end === -1 ? css.length : end;
+            } else if (c === '}') {
+                at.pop();
+                buf = '';
+            } else buf += c;
         }
     }
     return out;
@@ -581,10 +618,16 @@ if (JSON_OUT) {
             console.log(`  ${r.mod}`);
             for (const g of r.drawn) {
                 const decl = rs.built.filter((b) => new RegExp('\\.' + g.name + '(?![\\w-])').test(b.sel));
-                const agrees = decl.some((b) => b.ratio === g.ratio);
+                /* "Agrees" means the product declares this shape SOMEWHERE --
+                   at the base or behind a breakpoint. Which width is the
+                   design's business and not something the drawing's own
+                   markup can say, so the report prints where rather than
+                   judging it. */
+                const hit = decl.find((b) => b.ratio === g.ratio);
+                const where = (b) => (b.at ? b.at.replace('@media ', '').replace(/[()]/g, '') : 'base');
                 const mark = !decl.length ? 'no aspect-ratio in CSS'
-                    : agrees ? 'CSS agrees'
-                    : `CSS says ${[...new Set(decl.map((b) => b.ratio))].join('/')}`;
+                    : hit ? `CSS agrees (${where(hit)})`
+                    : `CSS says ${[...new Set(decl.map((b) => `${b.ratio} ${where(b)}`))].join(', ')}`;
                 console.log(`     drawn  ${pad(g.name, 12)}${pad(g.ratio, 7)}${pad(g.device, 7)}`
                     + `${pad(g.screens + ' screen' + (g.screens > 1 ? 's' : ''), 12)}${mark}`);
             }
@@ -593,7 +636,10 @@ if (JSON_OUT) {
             }
         }
         console.log('\n  declared in CSS:');
-        for (const b of rs.built) console.log(`     ${pad(b.ratio, 7)}${pad(b.sel.slice(0, 34), 36)}${b.file}`);
+        for (const b of rs.built) {
+            console.log(`     ${pad(b.ratio, 7)}${pad(b.sel.slice(0, 26), 28)}`
+                + `${pad(b.at ? b.at.replace('@media ', '').replace(/[()]/g, '') : 'base', 22)}${b.file}`);
+        }
 
         if (skip.length) {
             console.log('\n\n  NOT COMPARABLE BY NAME\n');

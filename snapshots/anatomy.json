@@ -6309,7 +6309,7 @@
     {
       "name": "phead",
       "w": 390,
-      "h": 90,
+      "h": 72,
       "children": [
         {
           "name": "avatar",
@@ -6319,7 +6319,7 @@
         {
           "name": "phead-text",
           "w": 243,
-          "h": 90
+          "h": 72
         },
         {
           "name": "ibtn",
@@ -7004,12 +7004,12 @@
     {
       "name": "pid",
       "w": 1200,
-      "h": 460,
+      "h": 360,
       "children": [
         {
           "name": "pbanner",
           "w": 1200,
-          "h": 400
+          "h": 300
         },
         {
           "name": "pav-row",
@@ -7138,12 +7138,12 @@
     {
       "name": "pid",
       "w": 1200,
-      "h": 460,
+      "h": 360,
       "children": [
         {
           "name": "pbanner",
           "w": 1200,
-          "h": 400
+          "h": 300
         },
         {
           "name": "pav-row",
@@ -7540,12 +7540,12 @@
     {
       "name": "pid",
       "w": 900,
-      "h": 360,
+      "h": 285,
       "children": [
         {
           "name": "pbanner",
           "w": 900,
-          "h": 300
+          "h": 225
         },
         {
           "name": "pav-row",
@@ -7674,12 +7674,12 @@
     {
       "name": "pid",
       "w": 900,
-      "h": 360,
+      "h": 285,
       "children": [
         {
           "name": "pbanner",
           "w": 900,
-          "h": 300
+          "h": 225
         },
         {
           "name": "pav-row",

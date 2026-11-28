@@ -18,7 +18,7 @@
     "eval:bench": "vite-node eval/bench.mjs --",
     "test:api": "node scripts/smoke-api.mjs",
     "verify": "node scripts/verify.mjs",
-    "check": "npm run verify && npm run states && npm run gallery && npm run gallery:audit && npm run lint && npm run build",
+    "check": "npm run verify && npm run states && npm run gallery && npm run gallery:audit && npm run fixtures && npm run lint && npm run build",
     "states": "node scripts/states.mjs",
     "gallery": "vite-node scripts/gallery.mjs",
     "shot": "node scripts/shot.mjs",
@@ -32,7 +32,8 @@
     "restore": "vite-node scripts/restore-cases.mjs",
     "person": "vite-node scripts/person-cases.mjs",
     "answer": "vite-node scripts/answer-cases.mjs",
-    "divergence": "node scripts/divergence.mjs"
+    "divergence": "node scripts/divergence.mjs",
+    "fixtures": "node scripts/fixtures.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

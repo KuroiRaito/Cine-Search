@@ -707,6 +707,98 @@ this repo at all.
 
 ---
 
+### B12. The second-fixture pass
+
+Not a divergence. B7 and B11 were both *correct measurements of the wrong
+fixture*, and both were caught by hand. This is the gate neither had.
+
+#### The shape of the failure
+
+A value that slides with content is indistinguishable from a constant if you
+only ever measure it once:
+
+| at 1280, same markup, only the bio changed | empty | one line | four lines | at `BIO_MAX` |
+|---|---|---|---|---|
+| `align-items: center` — what B8 shipped | 44px | 44px | 24px | **14px** |
+| `align-items: flex-start` — B11 | 48px | 48px | 48px | **48px** |
+
+Thirty pixels of swing, driven by what somebody wrote about themselves. It read
+as "4px out" because every measurement of it used the same one-line seed. B7 was
+the same shape on the count axis rather than the content one: "80px shows 8
+tiles and 80% of a 9th" was measured on a shelf holding one film, where
+`PREVIEW = 8` means the ninth tile it described cannot exist.
+
+#### Built in two halves, because one half catches nothing
+
+| | what it stops | where it runs |
+|---|---|---|
+| **`verify` check 26** | you cannot **write** a new overlap without declaring it | source block, no browser |
+| **`npm run fixtures`** | a declared overlap cannot **slide** without failing | measured block, 1.6s |
+
+Check 26 reads every stylesheet for a negative margin and requires each one to
+appear in `scripts/fixtures-registry.js` — as a relationship that gets measured,
+or as a **waiver** saying why there is nothing to measure. The product has eight;
+five are relationships and four are waived, and a waiver naming a margin that no
+longer exists fails too, because a stale waiver is cover for the next selector
+that takes the same name.
+
+`npm run fixtures` then renders each relationship under every fixture and fails
+four ways:
+
+- **SLIDES** — the value moved. The bug.
+- **WRONG** — stable, but not the number the design states.
+- **NO SUCH BOX** — a selector matched nothing. Absent is not passing.
+- **VACUOUS** — the fixtures did not stress anything.
+
+**VACUOUS is what makes it a gate rather than a ritual.** Each relationship
+names the box its fixtures are meant to resize, and the pass refuses to report a
+pass until it has watched that box change — in width, height *or child count*,
+the last because a count fixture changes the DOM without changing a block-level
+container. This repo has already shipped a check that compared a long label
+against a short one and measured a difference of zero because both were broken.
+A fixture axis that moves nothing is that check wearing different clothes.
+
+It fired twice on its own first run, both times correctly about the *registry*
+rather than the code: a 40-character name does not wrap at 1280, and `.faces` is
+1280px wide holding two faces or three.
+
+#### What it covers now
+
+Nine relationships, 32 renders, ten stylesheets — profile's avatar over its
+banner at both bands, the name's 8px clearance at both bands and at `NAME_MAX`,
+title's head lifted over its hero at all three `--head-lift` steps, and the
+stacked cast faces on the count axis. Content strings are the product's own
+enforced ceilings, imported rather than retyped: `BIO_MAX` and `NAME_MAX` come
+from `identity.js`, so if a limit moves the fixture moves with it.
+
+#### Proved by reinstating the bug, five ways
+
+| reinstated | reported |
+|---|---|
+| `align-items: center` on the expanded band | **SLIDES**, 48 → 44 → 14, exit 1 — and it named the expanded band while reporting the compact one as holding |
+| a selector renamed in the registry | **NO SUCH BOX** |
+| a stress box the fixtures cannot move | **VACUOUS** |
+| a registry that said 64 where `--head-lift` steps to 80 | **WRONG** — unplanned, on the first run |
+| the stylesheet walker blinded | the C7.7 fail-open guard |
+
+Check 26 was proved four ways in turn: a new undeclared margin, a waiver gone
+stale, a class that left the JSX, and its own walker blinded. The third of those
+also caught a false positive in its first version — `.hero` is written
+`` `hero${…}` ``, and a boundary test that wanted quotes on both sides reported
+it missing from three relationships.
+
+Tier of §6.1: **2 for writing one, 3 for one that slides.** Check 26 fails
+before anything runs; the pass is a named assertion that says which relationship
+broke and under which fixture.
+
+**Not covered: nesting.** The pass renders the real stylesheets but writes its
+own markup, because nothing can render real JSX with a layout engine in CI. If
+`Identity.jsx` stopped nesting `.pav` inside `.pav-row`, every relationship
+would keep passing while the product broke. Check 26 closes the rename half —
+a class that leaves the JSX fails it — and the nesting half is open.
+
+---
+
 ## C. Found by the tool, and the code is right
 
 Worth recording so nobody "fixes" it later.
@@ -730,7 +822,7 @@ Stated plainly so the net is not assumed to be wider than it is.
 - **The 64 laws are not checked.** They are counted and quoted. Most are product rules no stylesheet can express.
 - **Fixture artifacts, not product faults:** broken poster images (`/snap.jpg` is not a real TMDB path) and a single favourite film. A real account has more favourites, so **the real screen is more crowded than the one measured here**, not less.
 - **Nothing measured here goes above 1280, and the shell does.** `npm run snap`'s widths are 390, 900 and 1280; `--shell-max` rises to **1600 at 1440+**. So the 400px banner B3 fixed was invisible to every harness in the repo and was found by hand. Any claim about the wide band in this document was measured one-off, not gated **This blind spot has now produced two defects, and the second one shipped to `main`** — B9, a banner leaving 400px of blank page beside it at 1600, written and reviewed and photographed without anyone seeing it. A harness that measured 1440 and 1600 would have caught both. It still does not exist; B9 is gated statically instead.
-- **Nothing re-measures under a second fixture.** Every measurement in this repo is taken once, against one seeded account. Two findings today were correct numbers about the wrong fixture: B7's "7-13% occupied" (a one-film shelf) and B11's 44px overlap (a one-line bio, where a four-line one gave 24px). Both were found by hand, by varying the fixture and measuring again. **No harness does that**, so a value that reads right against the seeded account and slides against a real one is invisible here.
+- **~~Nothing re-measures under a second fixture.~~ Built the same day — `npm run fixtures`, B12.** Nine declared relationships, 32 renders, 1.6s, gating in CI. What it still does not cover is **nesting**: it renders the real stylesheets but writes its own markup, so a class that stops being nested where the registry nests it keeps passing. `verify` check 26 closes the rename half of that; the nesting half is open.
 - **`entry` and `profile/settings` have no designed counterpart** — the welcome module has no `-module.html`, and settings is drawn as part of shell.
 
 ---
@@ -854,4 +946,11 @@ drawing.
 **And twice today a measurement was right about the wrong fixture** — B7's
 "7–13% occupied" came from a one-film shelf, B11's 44px from a one-line bio.
 Both were caught by changing the fixture and measuring again, and nothing in
-the repo does that on its own. A second-fixture pass is the gate neither has.
+the repo did that on its own. **That gate was then built: B12.**
+
+**Still open:** **B4**'s three re-scoped pieces — a 1:N band mechanism, a
+band-naming fix in `snap`, and a match-table correction for search. **B5**
+stays parked; section F is untouched. One gate is named and not built: a
+**paint-order check**, for a lifted element landing behind a positioned
+sibling. That was B8's bug, and it was caught by looking at a screenshot
+rather than by any number.

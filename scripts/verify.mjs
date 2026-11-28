@@ -13,6 +13,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, extname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import process from 'node:process';
+import { RELATIONSHIPS, WAIVERS } from './fixtures-registry.js';
 
 // fileURLToPath, not .pathname: this repo lives under a directory with a space
 // in its name, and .pathname hands back the percent-encoded form.
@@ -1255,6 +1256,129 @@ for (const f of jsx) {
 }
 
 
+
+/* ---- 26. a negative margin is a declared relationship, or a written waiver --
+   The other half of `npm run fixtures`, and the half that runs in CI without a
+   browser.
+
+   A negative margin is almost always one box pulled across another box's edge,
+   and the distance is a constant somebody wrote down: "the avatar overlaps the
+   banner by 48". The trouble is that nothing holds it to that. B11 shipped an
+   overlap of 32 where the anatomy table said 48, and when it was corrected the
+   value turned out not to be a constant at all -- `align-items: center` made it
+   a function of the user's bio, 44px against an empty one and 14px at BIO_MAX.
+   It read as fixed because every measurement of it used the same one-line seed.
+
+   `npm run fixtures` renders each declared relationship under several fixtures
+   and fails when the value moves. That catches a relationship that slides. It
+   cannot catch a relationship nobody declared -- so this does. Every negative
+   margin in the product must appear in `scripts/fixtures-registry.js`, either
+   as a relationship that is measured or as a waiver that says why there is
+   nothing to measure. Writing a new overlap without declaring it fails here,
+   before anything renders.
+
+   The two halves, so neither is mistaken for the whole:
+
+       this         you cannot WRITE a new overlap without declaring it
+       fixtures     a declared overlap cannot SLIDE without failing
+
+   It also checks the registry back. A waiver naming a selector that no longer
+   has a negative margin is a stale claim, and a relationship whose classes have
+   left the JSX is measuring markup the product no longer has -- the registry
+   writes its own markup, so that is the one drift it cannot see for itself. */
+{
+    const NEG = /^margin(-top|-bottom|-left|-right|-inline[a-z-]*|-block[a-z-]*)?$/;
+    /* `-8px`, `calc(var(--x) * -1)` and `calc(-1 * var(--x))` are the three
+       spellings this repo uses. A shorthand with any negative component counts:
+       `margin: 0 -8px` pulls just as hard as `margin-right: -8px`. */
+    const isNeg = (v) => /(^|[\s(])-[0-9.]/.test(v) || /\*\s*-1\b/.test(v) || /calc\(\s*-/.test(v);
+
+    /* A relationship measures `.face:nth-child(2)`; the stylesheet declares
+       `.face`. Compare the bare class. */
+    const bare = (sel) => sel.replace(/:[^\s>+~]*/g, '').trim();
+
+    const declared = new Map();   // bare selector -> relationship id
+    for (const r of RELATIONSHIPS) declared.set(bare(r.of), r.id);
+    const waived = new Map();     // selector -> [file, reason]
+    for (const [sel, file, why] of WAIVERS) waived.set(sel, [file, why]);
+
+    const found = new Map();      // selector -> "file:line"
+    for (const f of cssFiles) {
+        const rel = relative(ROOT, f);
+        const src = blankComments(readFileSync(f, 'utf8'));
+        for (const m of src.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+            if (m[1].includes('@')) continue;
+            const line = src.slice(0, m.index).split('\n').length;
+            for (const d of m[2].split(';')) {
+                const i = d.indexOf(':');
+                if (i < 0) continue;
+                const name = d.slice(0, i).trim();
+                if (!NEG.test(name) || !isNeg(d.slice(i + 1).trim())) continue;
+                for (const sel of m[1].split(',')) {
+                    const sl = sel.trim().replace(/\s+/g, ' ');
+                    if (sl && !found.has(sl)) found.set(sl, `${rel}:${line}`);
+                }
+            }
+        }
+    }
+
+    for (const [sel, where] of found) {
+        if (declared.has(sel) || waived.has(sel)) continue;
+        fail('declared-overlap', `${where}: \`${sel}\` has a negative margin that is neither`
+            + ' measured nor waived. Add it to scripts/fixtures-registry.js -- as a'
+            + ' relationship if it pulls one box across another\'s edge, or as a waiver'
+            + ' saying why there is nothing to measure. An overlap nobody declared is an'
+            + ' overlap nothing can tell you has started sliding');
+    }
+
+    /* A waiver for a margin that no longer exists is a claim about the code
+       that the code stopped making. Left alone it rots into cover for the next
+       selector that happens to take the same name. */
+    for (const [sel, [file]] of waived) {
+        if (!found.has(sel)) {
+            fail('declared-overlap', `scripts/fixtures-registry.js waives \`${sel}\` (${file})`
+                + ' but it has no negative margin any more -- delete the waiver');
+        }
+    }
+
+    /* The registry writes its own markup, because nothing can render real JSX
+       with a layout engine in CI. So if a class leaves the product, every
+       relationship using it keeps passing against markup that no longer exists.
+       This closes the rename half of that hole; nesting is still unguarded, and
+       scripts/fixtures.mjs says so in its header. */
+    for (const r of RELATIONSHIPS) {
+        const src = existsSync(join(ROOT, r.from)) ? readFileSync(join(ROOT, r.from), 'utf8') : null;
+        if (src === null) {
+            fail('declared-overlap', `scripts/fixtures-registry.js: "${r.id}" names ${r.from},`
+                + ' which does not exist');
+            continue;
+        }
+        for (const sel of [r.of, r.against, r.stress]) {
+            for (const c of bare(sel).matchAll(/\.([A-Za-z][\w-]*)/g)) {
+                /* A boundary that is "not part of a longer name", not "quoted".
+                   `.hero` is written `` `hero${t.backdrop ? ...}` ``, so a test
+                   for a quote on both sides reports it missing -- which it did,
+                   on three relationships, the first time this ran. The lookarounds
+                   also keep `.face` from matching inside `faces`. */
+                if (!new RegExp(`(?<![\\w-])${c[1]}(?![\\w-])`).test(src)) {
+                    fail('declared-overlap', `scripts/fixtures-registry.js: "${r.id}" measures`
+                        + ` \`.${c[1]}\`, which no longer appears in ${r.from} -- the relationship`
+                        + ' is being measured against markup the product does not have');
+                }
+            }
+        }
+    }
+
+    /* C7.7. A walker that finds nothing waives everything. This repo has had
+       negative margins since the first title page; zero means the parser broke
+       and every undeclared overlap in the tree just passed. */
+    if (found.size < 5) {
+        fail('declared-overlap', `only ${found.size} negative margin(s) found across`
+            + ` ${cssFiles.length} stylesheets -- too few, so this check has stopped finding`
+            + ' the declarations it judges');
+    }
+}
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -1285,6 +1409,7 @@ const CHECKS = [
     ['status-chroma', 'Every watch state carries enough colour to be a state'],
     ['font-loaded', 'A typeface the design names is a typeface the product loads'],
     ['ratio-constraint', 'A ratio with one axis constrained has the other definite'],
+    ['declared-overlap', 'Every negative margin is a measured relationship or a written waiver'],
 ];
 
 let failed = 0;

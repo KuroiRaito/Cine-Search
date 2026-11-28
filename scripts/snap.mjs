@@ -219,6 +219,86 @@ const LIBRARY = [
     shelfRow(27205, 'movie', 'want_to_watch', { title: 'Inception', date: '2010-07-15' }),
 ];
 
+
+/* ---------------------------------------------------------------------
+   The populated profile.
+
+   This fixture used to be `{ films: 1, series: 2, episodes: 3, hours: 4,
+   ratings: 1, favourites: 1 }` -- the shape `taste_summary()` returned
+   before 008 retired it. `profile_stats()` answers something else
+   entirely, so the screen read a shape it did not understand, found no
+   `totals.titles`, and fell to "Nothing watched yet".
+
+   **So every profile screenshot ever taken was of the empty state**, and
+   nothing said so, because degrading to an empty state is exactly what
+   that screen is supposed to do when somebody has watched nothing. A
+   fixture that has drifted from its RPC does not fail -- it quietly
+   photographs the wrong screen.
+
+   The shape below is `supabase/007_profile_stats.sql`, field for field.
+   The values are a plausible library rather than a maximal one: 112 films
+   and 56 series is a real person's few years of watching, and the numbers
+   agree with each other (112 films at ~145 min is 11.3 days; the status
+   distributions sum to the watched counts).
+
+   Content is real, per CLAUDE.md s5 -- TMDB's own genre names, real
+   decades, and people already present in this repo's recorded responses.
+--------------------------------------------------------------------- */
+const dim = (key, count, rated, mean, minutes) => ({ key, count, rated, mean, minutes, partial: false });
+const PROFILE_STATS = {
+    films:  { watched: 112, minutes: 16272, rated: 86, mean: 7.8, partial: false },
+    series: { watched: 56, episodes: 1243, minutes: 55000, rated: 41, mean: 8.1, partial: true },
+    distribution: {
+        movie: { watched: 72, want_to_watch: 21, rewatching: 10, dropped: 3 },
+        tv: { watched: 23, watching: 15, want_to_watch: 10, on_hold: 5, dropped: 3 },
+    },
+    spread: { n: 127, mean: 7.9, sd: 1.3 },
+    dimensions: {
+        genre: [
+            dim('Drama', 64, 52, 8.1, 9280), dim('Science Fiction', 41, 35, 8.4, 6150),
+            dim('Thriller', 38, 29, 7.6, 5320), dim('Action & Adventure', 33, 24, 7.2, 4980),
+            dim('Comedy', 27, 19, 7.0, 3510), dim('Animation', 22, 18, 8.2, 2860),
+            dim('Documentary', 14, 11, 7.9, 1820), dim('Crime', 12, 9, 8.0, 1740),
+        ],
+        decade: [
+            dim('2010s', 58, 47, 7.9, 8410), dim('2020s', 44, 36, 7.7, 6380),
+            dim('2000s', 31, 25, 8.0, 4495), dim('1990s', 19, 16, 8.3, 2755),
+            dim('1980s', 11, 9, 7.8, 1595), dim('1970s', 5, 4, 8.1, 725),
+        ],
+    },
+    people: [
+        { person_id: 137427, name: 'Denis Villeneuve', profile_path: '/snap.jpg', role: 'director',
+          job: 'Director', count: 7, rated: 7, mean: 8.6, minutes: 1015, credit_totals: null },
+        { person_id: 947, name: 'Hans Zimmer', profile_path: '/snap.jpg', role: 'crew',
+          job: 'Original Music Composer', count: 12, rated: 10, mean: 8.1, minutes: 1740, credit_totals: null },
+        { person_id: 1245, name: 'Scarlett Johansson', profile_path: '/snap.jpg', role: 'cast',
+          job: null, count: 9, rated: 7, mean: 7.4, minutes: 1305, credit_totals: null },
+        { person_id: 17419, name: 'Bryan Cranston', profile_path: '/snap.jpg', role: 'cast',
+          job: null, count: 6, rated: 5, mean: 8.8, minutes: 2790, credit_totals: null },
+    ],
+    totals: { titles: 168, episodes: 1243, minutes: 71272, partial: true },
+};
+
+/* The four shelves the Overview previews. `from: 'library'` shelves read the
+   library rows; `from: 'shelf'` shelves read user_favourites, so people and
+   characters need rows of their own or two of the four draw empty. */
+const FAVOURITES = [
+    { kind: 'person', ref: '137427', position: 1000, name: 'Denis Villeneuve', subtitle: 'Director',
+      actor: null, image_path: '/snap.jpg', poster_path: null, media_type: null, tmdb_id: 137427,
+      animated: false, added_at: '2026-01-04T00:00:00Z' },
+    { kind: 'person', ref: '947', position: 2000, name: 'Hans Zimmer', subtitle: 'Composer',
+      actor: null, image_path: '/snap.jpg', poster_path: null, media_type: null, tmdb_id: 947,
+      animated: false, added_at: '2026-01-04T00:00:00Z' },
+    { kind: 'character', ref: 'c:walter-white', position: 1000, name: 'Walter White',
+      subtitle: 'Breaking Bad', actor: 'Bryan Cranston', image_path: '/snap.jpg',
+      poster_path: '/snap.jpg', media_type: 'tv', tmdb_id: 1396, animated: false,
+      added_at: '2026-01-04T00:00:00Z' },
+    { kind: 'character', ref: 'c:tyler-durden', position: 2000, name: 'Tyler Durden',
+      subtitle: 'Fight Club', actor: 'Brad Pitt', image_path: '/snap.jpg',
+      poster_path: '/snap.jpg', media_type: 'movie', tmdb_id: 550, animated: false,
+      added_at: '2026-01-04T00:00:00Z' },
+];
+
 const reply = (route, body) => route.fulfill({
     status: 200, contentType: 'application/json', body: JSON.stringify(body),
 });
@@ -228,10 +308,12 @@ async function pinSession(ctx) {
        general pattern registered last silently shadows every specific one. */
     await ctx.route('**/rest/v1/**', (r) => reply(r, []));
     await ctx.route('**/rest/v1/rpc/**', (r) => reply(r, {}));
-    await ctx.route('**/rest/v1/rpc/profile_stats**', (r) => reply(r, {
-        films: 1, series: 2, episodes: 3, hours: 4, ratings: 1, favourites: 1,
-    }));
+    await ctx.route('**/rest/v1/rpc/profile_stats**', (r) => reply(r, PROFILE_STATS));
     await ctx.route('**/rest/v1/profiles**', (r) => reply(r, [PROFILE]));
+    await ctx.route('**/rest/v1/user_favourites**', (r) => {
+        const asked = /kind=eq\.([a-z_]+)/.exec(r.request().url());
+        return reply(r, asked ? FAVOURITES.filter((x) => x.kind === asked[1]) : FAVOURITES);
+    });
     await ctx.route('**/rest/v1/user_library**', (r) => {
         const asked = /status=eq\.([a-z_]+)/.exec(r.request().url());
         return reply(r, asked ? LIBRARY.filter((x) => x.status === asked[1]) : LIBRARY);

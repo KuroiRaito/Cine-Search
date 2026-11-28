@@ -210,34 +210,34 @@
     "geometry": "779c80c"
   },
   "profile/profile@1280-dark": {
-    "elements": 57,
-    "hash": "33f83c0b",
-    "geometry": "a66aa66d"
+    "elements": 160,
+    "hash": "a8e47788",
+    "geometry": "647d38b1"
   },
   "profile/profile@1280-light": {
-    "elements": 57,
-    "hash": "33f83c0b",
-    "geometry": "a66aa66d"
+    "elements": 160,
+    "hash": "a8e47788",
+    "geometry": "647d38b1"
   },
   "profile/profile@390-dark": {
-    "elements": 57,
-    "hash": "4ce3f40d",
-    "geometry": "f44b6453"
+    "elements": 160,
+    "hash": "8a8383c",
+    "geometry": "bf7bf0e7"
   },
   "profile/profile@390-light": {
-    "elements": 57,
-    "hash": "4ce3f40d",
-    "geometry": "f44b6453"
+    "elements": 160,
+    "hash": "8a8383c",
+    "geometry": "bf7bf0e7"
   },
   "profile/profile@900-dark": {
-    "elements": 57,
-    "hash": "130be79c",
-    "geometry": "ce54dc62"
+    "elements": 160,
+    "hash": "24963f3f",
+    "geometry": "78adea96"
   },
   "profile/profile@900-light": {
-    "elements": 57,
-    "hash": "130be79c",
-    "geometry": "ce54dc62"
+    "elements": 160,
+    "hash": "24963f3f",
+    "geometry": "78adea96"
   },
   "profile/settings@1280-dark": {
     "elements": 71,

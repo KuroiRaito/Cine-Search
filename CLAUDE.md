@@ -17,8 +17,8 @@ Read this before changing anything that renders.
 npm run check
 ```
 
-verify → states → gallery → gallery:audit → lint → build, stopping at the
-first failure. If it is green, you have not broken any of the rules below. If
+verify → states → gallery → gallery:audit → fixtures → lint → build, stopping
+at the first failure. If it is green, you have not broken any of the rules below. If
 it is red, read what it says — every failure names the file, the value and
 what it expected.
 
@@ -77,7 +77,7 @@ component, so it cannot drift from the code — that is the whole point of it.
 If it looks wrong, the code is wrong.
 
 The specification and the code are checked against each other (`verify` check
-18; there are 24 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
+18; there are 26 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
 radius scales**, so those are not cross-checked — `src/shared/theme/tokens.css`
 is the only statement of them.
 
@@ -235,6 +235,47 @@ because `discover` returns the harness shape while `Tile` wants the view shape.
 `.head-actions` on the find document's instruction removed the only sign-in
 route for a guest on a phone — the shell document had claimed it.
 
+**Constraining one axis of an `aspect-ratio` box resizes the other.** `max-height`
+on a box whose width is `auto` does not clamp the height and leave the shape:
+CSS re-resolves the *width* through the ratio to keep it. `.pbanner` with a
+300px ceiling stayed exactly 4:1 and went **narrower than its container** —
+1200px inside a 1600px one, 400px of blank page beside a full-bleed band, on
+`main`, and the comment beside it asserted the opposite. **Class fix: `verify`
+check 25 fails any selector that constrains one axis of a ratio while leaving
+the other indefinite.** It reads declarations per selector across files *and*
+media blocks, because the ratio and its ceiling are routinely written apart.
+
+**A geometric relationship routed through a value something else can resize.**
+*Gated: `verify` check 26 and `npm run fixtures`.*
+The expanded avatar's overlap with the banner was set by `margin-top` under
+`align-items: center`, so the avatar's margin box was centred in a flex line
+whose height came from the *text beside it*: the overlap moved with the length
+of the user's bio — 48px specified, 44px against an empty one, **24px against
+a four-line one**. It measured 4px out and looked like a rounding error; it was
+a sliding value that happened to read 44 against the seeded fixture. **An
+overlap is a relationship between two boxes and must be expressed as one** —
+here `flex-start`, which makes it `padding + margin` and nothing else.
+
+The wider shape was that every measurement in this repo was taken against one
+fixture, so a number that slides reads as a constant. Two findings in one day
+were correct numbers about the wrong fixture: this, and a rail density read off
+a shelf holding one film. **Class fix, in two halves.** `verify` check 26 means
+a negative margin must be declared in `scripts/fixtures-registry.js` — as a
+relationship that is measured or a waiver saying why there is nothing to
+measure — so a new overlap cannot be *written* without the gate knowing. `npm
+run fixtures` then renders each declared relationship under several fixtures
+and fails when the value *moves*, when it is stable but wrong, when a selector
+matches nothing, and — the one that matters — when the fixtures did not stress
+the box they name, because a pass measured against one seed proves nothing.
+
+**A drawing can specify something it cannot render.** `D1` draws a 96px avatar
+lifted 48px over the banner; its avatar is `position: static` under a
+`position: relative` banner, so `elementFromPoint` inside its own overlap
+returns the scrim. The lift has never been visible in the drawing that
+specifies it, and copying the declarations reproduced that exactly. Build the
+intent and record the extra declaration; do not assume a drawing renders what
+it declares.
+
 ## 8. What is NOT covered
 
 Say so rather than assuming the net is wider than it is.
@@ -244,7 +285,7 @@ Say so rather than assuming the net is wider than it is.
   reached production would ever appear in it.
 - **CI runs `verify`, `lint`, `find`, `cohorts`, `library`, `paste`, `restore`,
   `answer`, `person`, `build`, `test:api`, then
-  `gallery`, `gallery:audit` and `states`.** The four measurements are gated
+  `gallery`, `gallery:audit`, `fixtures` and `states`.** The measurements are gated
   now, not just the structural checks. Still *not* in CI: `snap` and `auth` —
   3-4 min and 80s respectively, both needing a browser. Run those yourself:
   `auth` before a release and after anything touching auth or the shell, `snap`
@@ -272,6 +313,12 @@ Say so rather than assuming the net is wider than it is.
 - **Non-Latin product text renders in a fallback face**, so a Hangul or
   Devanagari title sits in a different typeface from the UI around it. IBM
   Plex has Devanagari, JP and KR siblings if that is ever worth the bytes.
+- **`npm run fixtures` measures relationships, not the product's DOM.** It
+  renders the real stylesheets but writes its own markup, because nothing can
+  render real JSX with a layout engine in CI. So if `Identity.jsx` stopped
+  nesting `.pav` inside `.pav-row`, every relationship would keep passing while
+  the product broke. `verify` check 26 closes the *rename* half — a class that
+  leaves the JSX fails it — and **nesting is unguarded.**
 - **Accessibility beyond focus order is unchecked.** Contrast is designed, not
   verified. No check measures a touch target, which is why a 32px chip against
   a 44px floor went unnoticed — a class waiting for a tier-2 gate.

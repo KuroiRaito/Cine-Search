@@ -86,6 +86,32 @@ So the two halves are not the same question:
 
 > My recommendation: **implement as drawn.** The phone is where the banner does its job — it is the only place the name sits on it — and desktop is where it is pure cost. But the phone half is a visible change to a screen you look at daily, so it is your call, not a correctness fix.
 
+#### Closed, 2026-11-28 — *keep 3:1, and the drawings were the outlier*
+
+Decided **3:1 on the phone**, and the reason turned out to be stronger than
+the one I argued it on. I framed this as "two considered positions". It is
+not. **This document's own design doc already said 3:1 twice:**
+
+| where | says |
+|---|---|
+| `docs/profile-module.html:228` — the base rule | `.pbanner{aspect-ratio:3/1}` |
+| `docs/profile-module.html:564` — the anatomy table | Banner, compact: **"3:1, full bleed"** |
+| the eleven phone drawings | `class="pbanner tall"`, and `.tall{aspect-ratio:2/1}` |
+
+So the design document declared 3:1 in its base rule, specified 3:1 in its
+anatomy table, and then drew every phone screen with a modifier that
+overrode both. Two statements against one modifier. **The product has always
+matched the specification; the drawings were the thing that disagreed.**
+
+`.tall` is removed from all eleven drawings and the rule deleted, so the
+document now shows the ratio it specifies. No product code changed — `.pbanner`
+is still 3:1 base, 4:1 from 600, capped at 300. The desktop warn note was
+re-stated against 3:1 rather than 2:1, since 2:1 is no longer drawn anywhere.
+
+**`npm run divergence` now reports `drawn pbanner 3:1 phone 11 screens — CSS
+agrees (base)`,** where it had reported a 2:1 disagreement. That row was the
+first bullet of this document's own verdict.
+
 ### B2. Overview carries four bands the design puts elsewhere
 
 Measured, `profile/profile@390` against `P1`:
@@ -176,6 +202,78 @@ Two desktop drawings (`profile D1`, `library D1`) are refused for the other reas
 
 > My recommendation: **yes, but last, and as renaming in the docs rather than in the code.** The code's names are load-bearing and under test; the docs' are not. Cheaper and far less risky to make the drawings speak the code's language than the reverse.
 
+#### Partly closed, 2026-11-28 — *and the premise was wrong*
+
+**Live comparisons: 2 → 3.** `person/director` now compares. The other four
+cannot be closed by renaming, and that is the finding.
+
+I recommended this as "renaming bands in the docs to the code's names", a
+cheap and safe docs-only change. **Measured against both markups, most of the
+gap is not spelling.** The two sides decompose these screens differently, and
+no rename expresses that.
+
+**What closed.** Three genuine synonyms on the person page, each checked
+against both markups rather than inferred from the name:
+
+| design | code | the same band because |
+|---|---|---|
+| `phdr` | `pintro` | photo, name, one-line description as a flex row; `.phdr .pimg/.pbd` against `.pintro > .phead` |
+| `pstrip` | `pstats` | both hold exactly Credits · You have seen · Active, in that order |
+| `pfilt` | `rolesw` | the role filter; All / Directed / Wrote against All / `<role>` |
+
+Overlap 0% → 50%, which crosses the trust threshold, and the row now says
+something real:
+
+```
+person/director@390  TP1  person · director   3 missing, 6 extra
+    -hero +page-head pintro -tsec pstats rolesw -tsec +collectbar +grid +pad +collectbar +grid
+```
+
+**`-hero` is a finding, not noise:** the design opens the person page on a
+backdrop and the product opens it on `page-head`. `phero` was deliberately
+left aliased to `hero` rather than re-pointed at `page-head` — making that row
+go green would have deleted the finding.
+
+**Why the other four cannot be renamed.** Three distinct causes, all measured:
+
+1. **One designed band is built as two siblings.** `discover/home` vs `FD3`:
+   the design draws `shelf`; `src/shared/ui/Rail.jsx` returns a fragment of
+   `<div className="section">` **and** `<div className="rail">` as siblings.
+   One design name against two production names is a 1:N correspondence, and
+   `ALIAS` is 1:1 by construction. Aliasing `shelf`→`section` would make the
+   row read 100% and report every `rail` as *extra*, which is false.
+2. **Different decomposition, not different words.** `title/film` and
+   `title/series`: the design draws a linear column — backdrop, head,
+   primary, secondaries. The code builds `hero` + `tgrid(tposter, thead,
+   tbody, tside)`, and the design's `tprim`/`tsec` sections live *inside*
+   `tbody` as `tside-inline`, `trailer`, `tbelow`. There is no name to rename
+   them to.
+3. **The match table, not the vocabulary.** `search/results` is paired with
+   `FQ3`, which draws the *person-intent* screen — query, person card,
+   "Directed by", their films. The photographed screen is `?q=zimmer`, which
+   renders ordinary results plus a People section. **These are not the same
+   screen,** so the honest fix is the match entry or a new drawing, not the
+   band names. Section D already warns the table is a judgement call.
+
+**A fourth cause, worth its own item.** The band name is "the first class",
+and production sometimes writes a layout utility first: `<div className="pad
+searchbox-wrap">` is read as `pad`, not `searchbox-wrap`. That is the reader
+picking the wrong word, and it is why `frow` has nothing to map to. Fixing it
+means teaching `snap` to skip known utilities when naming a band — which
+rewrites `snapshots/anatomy.json` across every module, so it is its own change
+with its own diff, not a line in this one.
+
+**Not taken: `fgrid` → `grid`.** Honest for search (both are the results
+grid) and it would move `FQ3` from 20% to 40% — but it crosses a module
+boundary. `.fgrid` is *also* profile's favourites grid, and `ALIAS` is global,
+so the entry would quietly equate two different bands the day profile grows a
+`grid`. A number that does not change comparability is not worth that.
+
+**Re-scoped.** B4 is no longer "rename the docs". It is three separate
+pieces: a 1:N band mechanism (`shelf`), a band-naming fix in `snap`
+(`pad searchbox-wrap`), and a match-table correction or a new drawing for
+search. Each is worth doing; none is a rename.
+
 ### B5. ~~The banner centre-crops~~ — **withdrawn, 2026-11-28. My measurement did not support it.**
 
 Approved by the owner, then not built, because the measurement I promised instead of copying `title`'s 38% came back against the premise. Recorded in full rather than quietly dropped.
@@ -214,6 +312,25 @@ Extending the split downward is not one line. At 600 the right column would be `
 
 > My recommendation: **leave it.** 1018 is 95px over the phone and every one of them is banner; the band has no drawing to be checked against, and inventing a breakpoint to beat a number nobody has complained about is how undrawn bands get a second layout nobody maintains. Worth revisiting only if B1's phone half lands at 2:1, which puts 900 further out.
 
+#### Closed, 2026-11-28 — *decided and not doing*
+
+**Parked deliberately, not forgotten.** The condition the recommendation named
+has been settled the other way: B1's phone half landed at **3:1**, not 2:1, so
+900 does not move further out and there is no re-measurement owed.
+
+Re-measured on the shipped tree with a full eight-card shelf: **939 / 959 /
+1034 / 906 / 926 / 926 / 926** at 390 / 600 / 900 / 1120 / 1280 / 1440 / 1600.
+The peak is still 900, still **95px over the phone**, and still all banner —
+at 900 the banner is 225px and the columns are stacked.
+
+Closing it needs the two-column split to extend below 1120, and at 600 the
+right-hand column would be `600 − 48 − 320 − 32 = 200px`, which holds two and
+a half poster tiles. That means **a third breakpoint around 840 that no
+drawing contains**. Inventing one to beat a number nobody has complained
+about is how an undrawn band acquires a second layout nobody maintains.
+
+Re-open only if the medium band gets drawn.
+
 ### B7. The desktop shelf disagrees with the shipped one, three ways
 
 D1's right column draws **two** shelves (characters *and* films), as **6-across grids**, cards about **108px**, each with *"See all n →"*. Production ships **one** shelf as an **80px rail**. Three separable questions:
@@ -232,6 +349,46 @@ The tile is the only one of the three I would change, and it has a second reason
 >
 > While that file is open: the `600px` block restates `.frail .fcard { width: var(--space-80) }`, which is exactly what the base rule already says. It has never changed anything. Worth deleting so the next reader does not go looking for what it does.
 
+#### Withdrawn, 2026-11-28 — *the measurement came back against it*
+
+Approved by the owner, then not built. **Both numbers this item rested on were
+artifacts of a sparse fixture**, and the shelf's own cap makes one of them
+impossible.
+
+`PREVIEW = 8` (`src/modules/profile/favourites.js:30`) — the design's law
+*"Eight, and the cap is the feature"*, in code. **A shelf never holds more
+than eight cards, so there is never a ninth tile.** "80px shows 8 tiles and
+80% of a 9th" was capacity arithmetic against a rail that cannot be asked for
+a ninth. And "Favourite rails: 7–13% occupied" was measured against a fixture
+holding *one* favourite film — section D says as much about that fixture and
+the recommendation was built on it anyway.
+
+Re-measured with a full eight-card shelf, in the real column:
+
+| tile | 1120 — 688px column | 1280 — 768px column | 1440 / 1600 |
+|---|---|---|---|
+| **80px, shipped** | scrolls 8px, partial 72px / 90% | **all 8 fit, no scroll**, 91% occupied | all 8 fit |
+| **108px, drawn** | scrolls 232px, **partial 0px** | scrolls 152px, partial 72px / 67% | all 8 fit |
+
+**108px breaks the rail law at exactly 1120** — *"Never a whole number of
+tiles: the partial card is the only thing telling you the rail scrolls."* The
+688px column holds `6 × 108 + 5 × 8 = 688` precisely, so six tiles fill it to
+the pixel, the rail still has 232px to scroll, and nothing says so. The dead
+band is viewport 1120–1132, which includes **the width D1 is drawn at**.
+
+And the emptiness 108px was meant to fix is not there. At 1280 eight 80px
+cards occupy 696px of a 768px column — **91%** — and do not scroll at all,
+which is what a cap of eight is *for*. 108px comes from D1's **grid**, where
+six is a row and the remainder sits behind *"See all 14 →"*. This document
+already decided, correctly, to keep the rail over the grid. Taking the grid's
+tile size into a rail imports half a mechanism.
+
+**Kept from this item:** the dead `600px` restatement of
+`.frail .fcard { width: var(--space-80) }` is deleted. It duplicated the base
+rule verbatim and had never changed a pixel.
+
+Nothing else shipped. The shelf stays one rail of 80px tiles.
+
 ### B8. The identity band's expanded state is written down and unbuilt
 
 `S2` says it in one line — *"Banner 4:1 at container width with `--radius-16`; shelves show more per row; identity sits beside the avatar"* — and D1 draws a **96px avatar lifted 48px over the banner**, with the name at `--text-display`. Production at expanded: a square-cornered full-bleed banner, a **48px** avatar with no lift, the name at `--text-title`.
@@ -241,6 +398,404 @@ Not built, because B3's measured defects were all in the Overview column and thi
 **Decision:** does the identity band get its expanded state?
 
 > My recommendation: **yes, but as its own PR**, and after B1's phone half — the avatar lift is measured against the banner's bottom edge, so settling the phone ratio first means measuring it once.
+
+#### Closed and shipped, 2026-11-28 — *and D1 cannot render its own overlap*
+
+Built at 1120+, inert below it. Measured before and after, at seven widths:
+
+| at 1120+ | before | after |
+|---|---|---|
+| avatar | 48px | **96px** |
+| avatar against the banner | **−12px** (12px clear below it) | **+32px** (into it) |
+| banner corner | 0 | **16px** (`--radius-16`) |
+| name | 21px (`--text-title`) | **40px** (`--text-display`) |
+| page height | 902 / 922 / 922 / 922 | **906 / 926 / 926 / 926** |
+
+**Four pixels of page height**, at 1120 / 1280 / 1440 / 1600. At 390, 600 and
+900 every number is unchanged, and `npm run snap` agrees: of the 72 recorded
+screens **2 moved** — `profile/profile@1280`, dark and light — and the other
+70 are byte-identical, settings and the phone included. Element count 118 →
+118, because this is geometry and not markup.
+
+**The thing worth keeping from building it.** Copying D1's declarations
+produced an avatar that was *invisible*. `.pbanner` is `position: relative`;
+`.pav-row` is static. A positioned box paints above every static in-flow
+sibling whatever the DOM order says, so an avatar lifted into the banner is
+lifted **behind** it, and the first render came back with a circle sliced flat
+along the banner's bottom edge.
+
+**D1 has the same defect, and has always had it.** Measured in the design
+document itself — `elementFromPoint` at the centre of D1's own overlap returns
+the banner's scrim, not the avatar:
+
+```
+overlapPx: 13.6 (at 0.62 scale → 22px)   avatarPosition: static
+hit: DIV [position:absolute;inset:0;background:linear-gradie…]
+avatarOnTop: false   bannerPosition: relative
+```
+
+So the 48px lift the anatomy table specifies has **never once been visible in
+the drawing that specifies it**, which is why nobody noticed the declaration
+was inert. The product builds the intent instead, with one declaration D1 does
+not have: `.pav-row { position: relative }`.
+
+**Two numbers that are the drawing's, not the table's.** The table says
+*"96px, overlaps by 48"*. D1's declarations — `padding: 16px 40px 0` with
+`margin-top: -48px` — produce **22px** of overlap in the drawing and **32px**
+here. 48 is prose about a declaration; 32 is what the declaration draws, and
+the drawing is the half with numbers in it.
+
+**One thing the drawing could not have told us.** At `--text-display` the name
+is 44px tall sitting 12px off the banner's bottom edge, and the avatar's top
+lands 32px above that edge — so the circle and the name's lower-left shared
+**20px of the same column**. D1 has the identical collision at 6px and cannot
+see it, because its avatar is behind the banner. `.pname` moves to
+`bottom: var(--space-40)`, measured at **8px of clearance**.
+
+**Not taken, and recorded as B10:** the phone avatar, which the same table
+says is 64px overlapping by 32 and which ships at 48px with no overlap at all.
+That is a visible change to the phone screen and it was not what was approved.
+
+Tier of §6.1: **4 — visible.** The band is measured at seven widths and
+photographed at three, but nothing *prevents* the next lifted element from
+landing behind a positioned sibling. The general gate for that is a
+paint-order check, and it does not exist.
+
+
+### B9. The banner stopped short of the page, and `snap` could not see it
+
+**Found while measuring for B8. Shipped the same day, with a gate.**
+
+B3 gave the banner a 300px ceiling and wrote the trade down beside it:
+
+> Past a 1200 container the band is therefore wider than 4:1. That is the
+> trade: a letterbox that stays put, against a shape that keeps its ratio by
+> taking another 100px of the fold.
+
+**That is not what the declaration did.** `aspect-ratio` is not a one-way
+street from width to height. When `max-height` clamps the constrained axis and
+the other axis is `auto`, CSS re-resolves the *other* axis through the ratio
+rather than letting the box stop being the ratio. So the banner stayed exactly
+4:1 and got **narrower than its container**:
+
+| viewport | container | banner, before | blank page beside it |
+|---|---|---|---|
+| 1280 | 1200 | 1200 × 300 | 0 |
+| 1440 | 1440 | **1200 × 300** | **240px** |
+| 1600 | 1600 | **1200 × 300** | **400px** |
+
+A full-bleed band leaving 400px of empty page to its right. The fix is one
+declaration — `width: 100%` gives the ratio a definite width to work from, so
+the clamp falls on the height alone — and the band is now **1440 × 300** and
+**1600 × 300**, ratios 4.8 and 5.33. The letterbox the comment always claimed.
+
+**Nothing in the repo was looking.** `npm run snap` stops at 1280, where the
+container is 1200 and the defect cannot appear. Section D said this about B3's
+400px banner; here is the second instance of the same blind spot, and the
+first one that shipped to `main`.
+
+**The class.** *A min/max constraint on one axis of a box with `aspect-ratio`
+silently resizes the other axis.* A wider measurement harness would have
+caught this instance. The hazard is visible in the declarations without
+rendering anything, so the gate is static instead.
+
+**`npm run verify` check 25 — "A ratio with one axis constrained has the other
+definite".** It gathers declarations per selector *across files and media
+blocks*, because the two halves are routinely written apart — `.pbanner`
+declares its ratio in the base rule and its ceiling inside `@media`, and a
+check judging one rule at a time would have seen neither. Proved both ways:
+
+```
+removing `width: 100%`  →  FAIL  A ratio with one axis constrained has the other definite
+   src/modules/profile/profile.css:382: `.pbanner` sets `aspect-ratio` and `max-height`,
+   but no `width` -- when the clamp bites, the ratio re-resolves width and the box
+   shrinks away from its container instead of changing shape.
+
+blinding its rule walker  →  FAIL  only 0 selector(s) declaring `aspect-ratio` found
+   -- too few, so this check has stopped finding the boxes it judges
+```
+
+The second is C7.7: the check cannot pass by finding nothing. 25 of 25 green
+on the shipped tree, with no other selector in the product tripping it.
+
+Tier of §6.1: **2 — build-time.**
+
+### B10. The phone avatar is 64px overlapping by 32, and ships at 48px flat
+
+**Found while building B8. Not built — it is a visible change to the phone.**
+
+The same anatomy table that specifies B8's expanded avatar specifies the
+compact one, and the product matches neither half:
+
+| | design (`docs/profile-module.html:565`) | production |
+|---|---|---|
+| compact | **64px, overlaps by 32** | 48px, 12px *below* the banner |
+| expanded | 96px, overlaps by 48 | 96px, overlaps by 32 — **shipped, B8** |
+
+Both numbers are on the spacing scale (`--space-64`, `--space-32`), so this is
+cheap to build. It is also the rare divergence that would make the phone page
+**shorter**: an avatar that eats 32px into the banner reclaims the 12px it
+currently sits below it, plus the overlap.
+
+Two smaller things in the same band, both recorded rather than fixed: the
+table names a **3px** ring where `--border-focus` is 2px, and D1 puts `.bedit`
+at the gutter where production puts it at 8px.
+
+**Decision:** does the phone avatar get its specified size and overlap?
+
+> My recommendation: **yes.** It is two declarations on the scale, it matches
+> the document's own table, and unlike most of this list it takes height off
+> the first screen rather than adding it. But it changes the screen you look
+> at daily, so it is your call — the same call as B1's phone half, and I would
+> measure the page height before and after exactly as that one asked for.
+
+#### Closed and shipped, 2026-11-28 — *and the document had already written it*
+
+**The phone page is 8px shorter**, which is the rare divergence that costs
+nothing to close:
+
+| | before | after |
+|---|---|---|
+| avatar | 48px | **64px** |
+| avatar against the banner | −12px (below it) | **+32px** (into it) |
+| page at 390 | 939 | **931** |
+| page at 600 | 959 | **951** |
+| page at 900 | 1034 | **1026** |
+| expanded, 1120 / 1280 / 1440 / 1600 | 906 / 926 / 926 / 926 | **unchanged** |
+
+Of 72 recorded screens **4 moved** — `profile/profile@390` and `@900`, both
+themes. `@1280` did not, so B8 is untouched. 118 elements before and after.
+
+**This was not a judgement call after all.** `docs/profile-module.html`
+contains a complete 64px layout that matches its own anatomy table exactly,
+and no drawing uses it:
+
+| statement | says |
+|---|---|
+| anatomy table, §02 | 64px, overlaps by 32 |
+| `.pav` + `.phead`, lines 236–238 | `--space-64`, `margin-top: calc(var(--space-32) * -1)`, **and `position: relative`** |
+| the nine phone drawings | `.pav-sm` — 48px, 2px ring, no lift |
+| production, before this | 48px, 2px ring, no lift |
+
+`.pav` and `.phead` are referenced by **zero** drawings. So this is B1's shape
+exactly — a rule and a table on one side, drawings quietly using a different
+class on the other — and it resolves the same way, because the drawings are
+the half with no reasoning attached. The product had been matching the
+drawings.
+
+**The margin is 32 + 12, not 32.** `.phead` lifts the whole header block and
+carries no top padding, so `-32px` there overlaps by 32. `.pav-row` carries
+12px of top padding so the handle is not flush against the artwork, and the
+avatar has to come back through that as well to reach the same place.
+Measured: **32px of overlap**, which is what the table states. The
+alternative — dropping the row's padding to match `.phead` — moves the handle
+and bio too, and this item is the avatar.
+
+**It brought B8's collision with it, one band down.** The avatar now reaches
+32px into the banner at the same left edge the name uses, and at
+`--text-title` the name is 28px tall sitting 12px off the bottom — so the
+circle and the name's lower-left shared **20px of one column**, and the name
+won it, because `.pname` carries `z-index: 2` and the identity row does not.
+`.pname` moves to `bottom: var(--space-40)` on the **base** rule, clearing the
+avatar by 8px at every width; the expanded override B8 added is now redundant
+and is gone. **The design never hits this**, because its phone layout stacks
+the name *under* the avatar inside `.phead` where the product puts it on the
+artwork — a difference worth knowing about and not worth closing, since the
+name on the artwork is what makes the banner a nameplate.
+
+**`position: relative` moved to the base `.pav-row`**, where the explanation
+now lives. The design's own phone rules carry it and `D1` does not, which is
+why `D1` cannot render its own overlap (B8).
+
+**Not taken:** the 3px ring the same table names. `--border-focus` is 2px, 3px
+is not on the scale, and a border token exists so that rings step together.
+
+> **Revisited the same day, and taken — see B11.** The table says the expanded
+> avatar *"overlaps by 48"* and B8 shipped 32, a decision taken against D1's own
+> declarations. B10 is evidence that cuts the other way: every non-drawing
+> rule in this document agrees with its table, and only the inline numbers in
+> `D1` do not. That pattern held, the owner approved the change, and the
+> expanded overlap is now 48. Building it found something B8 had not: the
+> overlap was moving with the length of the bio.
+
+Tier of §6.1: **4 — visible.** Measured at seven widths, photographed at
+three. There is still no gate for a lifted element landing behind a
+positioned sibling; that needs a paint-order check and none exists.
+
+---
+
+### B11. The expanded overlap is 48, not the 32 B8 shipped
+
+B8 built the expanded identity band and took **32px** of overlap, from D1's
+literal `margin-top: -48px` against a row with 16px of top padding. The
+anatomy table in the same document says **48**. At the time that was one
+drawing against one table, and B8 took the drawing.
+
+B10 turned it into one drawing against everything else. Every non-drawing rule
+in `docs/profile-module.html` has now been checked against the product, and
+every one of them has agreed with its own anatomy table:
+
+| statement | agrees with the table? |
+|---|---|
+| `.pbanner`'s base `aspect-ratio: 3/1` (B1) | yes — eleven drawings overrode it with `.tall` |
+| `.pav` / `.phead`, 64px and `-32px` (B10) | yes — used by none of its nine drawings |
+| **D1's inline `margin-top: -48px`** | **no** |
+
+And `D1` is the one drawing that **cannot render its own overlap at all** —
+its avatar is `position: static` under a `position: relative` banner, so the
+lift it declares paints behind the scrim. Nobody has ever seen D1's geometry,
+including whoever wrote it. It is the weakest statement in the document, and
+it was the only one B8 had.
+
+**Decision:** *do the 48px expanded overlap too.* Shipped.
+
+#### Measured, before and after
+
+Same fixture, same markup, the margin changed from `-(32+16)` to `-(48+16)`:
+
+| at 1120+ | B8 shipped | now |
+|---|---|---|
+| avatar into the banner | 32px | **48px** |
+| name-to-avatar clearance | 8px | **8px** (`.pname` raised with it) |
+| identity row height | 64px | **56px** |
+| page height | 906 / 926 / 926 / 926 | **900 / 918 / 918 / 918** |
+
+At 390, 600 and 900 every number is unchanged — B10's phone band is untouched.
+`npm run snap`: of the 72 recorded screens **2 moved**, `profile/profile@1280`
+dark and light, and `geometry` moved with `hash`, so it is a real box change
+and not a renamed class. Element count 118 → 118.
+
+#### What building it actually found: `align-items: center` made the overlap depend on the bio
+
+The first measurement came back **44px**, not 48, with the margin arithmetic
+plainly correct. The cause was D1's `align-items: center`, which B8 had copied.
+Under `center` the avatar's **margin box** is centred in the flex line, and the
+line is as tall as the text beside it — so the overlap is a function of how much
+the person wrote about themselves. Measured at 1280, same markup, only the bio
+changed:
+
+| | empty bio | four-line bio |
+|---|---|---|
+| `align-items: center` | 44px | **24px** |
+| `align-items: flex-start` | 48px | **48px** |
+
+**A 20px swing driven by profile content.** So `center` was never "4px out" —
+it was a sliding value that happened to read 44 against a one-line fixture, and
+the fixture B8 was measured against was exactly that one. `flex-start` makes the
+overlap `padding + margin` and nothing else, which is why the 48 above is
+derivable from two declarations rather than from a screenshot.
+
+This is an instance of a class already named in `CLAUDE.md` §7 — *absent must
+never become plausible* — wearing different clothes: not an absent value
+coercing into a valid-looking one, but a **correct-looking measurement that was
+an artifact of the fixture**. B7 was the same shape earlier the same day: "7–13%
+occupied" came from a one-film shelf. Both were caught by changing the fixture
+and measuring again.
+
+**The named class this adds:** *a geometric relationship must not be expressed
+through a value that something else can resize.* An overlap between two boxes
+has to be stated as a relationship between those two boxes.
+
+Tier of §6.1: **4 — visible.** The number is measured at seven widths and
+photographed at three, and the counterfactual was run rather than reasoned
+about — `center` was reinstated and watched to move (§6.3). No gate prevents
+the next geometric constant from being routed through a flex alignment; that
+needs a check that re-measures a declared relationship under two fixtures, and
+none exists. It is the same missing harness D (**nothing above 1280**) and B8
+(**no paint-order check**) already name: there is no *second-fixture* pass in
+this repo at all.
+
+---
+
+### B12. The second-fixture pass
+
+Not a divergence. B7 and B11 were both *correct measurements of the wrong
+fixture*, and both were caught by hand. This is the gate neither had.
+
+#### The shape of the failure
+
+A value that slides with content is indistinguishable from a constant if you
+only ever measure it once:
+
+| at 1280, same markup, only the bio changed | empty | one line | four lines | at `BIO_MAX` |
+|---|---|---|---|---|
+| `align-items: center` — what B8 shipped | 44px | 44px | 24px | **14px** |
+| `align-items: flex-start` — B11 | 48px | 48px | 48px | **48px** |
+
+Thirty pixels of swing, driven by what somebody wrote about themselves. It read
+as "4px out" because every measurement of it used the same one-line seed. B7 was
+the same shape on the count axis rather than the content one: "80px shows 8
+tiles and 80% of a 9th" was measured on a shelf holding one film, where
+`PREVIEW = 8` means the ninth tile it described cannot exist.
+
+#### Built in two halves, because one half catches nothing
+
+| | what it stops | where it runs |
+|---|---|---|
+| **`verify` check 26** | you cannot **write** a new overlap without declaring it | source block, no browser |
+| **`npm run fixtures`** | a declared overlap cannot **slide** without failing | measured block, 1.6s |
+
+Check 26 reads every stylesheet for a negative margin and requires each one to
+appear in `scripts/fixtures-registry.js` — as a relationship that gets measured,
+or as a **waiver** saying why there is nothing to measure. The product has eight;
+five are relationships and four are waived, and a waiver naming a margin that no
+longer exists fails too, because a stale waiver is cover for the next selector
+that takes the same name.
+
+`npm run fixtures` then renders each relationship under every fixture and fails
+four ways:
+
+- **SLIDES** — the value moved. The bug.
+- **WRONG** — stable, but not the number the design states.
+- **NO SUCH BOX** — a selector matched nothing. Absent is not passing.
+- **VACUOUS** — the fixtures did not stress anything.
+
+**VACUOUS is what makes it a gate rather than a ritual.** Each relationship
+names the box its fixtures are meant to resize, and the pass refuses to report a
+pass until it has watched that box change — in width, height *or child count*,
+the last because a count fixture changes the DOM without changing a block-level
+container. This repo has already shipped a check that compared a long label
+against a short one and measured a difference of zero because both were broken.
+A fixture axis that moves nothing is that check wearing different clothes.
+
+It fired twice on its own first run, both times correctly about the *registry*
+rather than the code: a 40-character name does not wrap at 1280, and `.faces` is
+1280px wide holding two faces or three.
+
+#### What it covers now
+
+Nine relationships, 32 renders, ten stylesheets — profile's avatar over its
+banner at both bands, the name's 8px clearance at both bands and at `NAME_MAX`,
+title's head lifted over its hero at all three `--head-lift` steps, and the
+stacked cast faces on the count axis. Content strings are the product's own
+enforced ceilings, imported rather than retyped: `BIO_MAX` and `NAME_MAX` come
+from `identity.js`, so if a limit moves the fixture moves with it.
+
+#### Proved by reinstating the bug, five ways
+
+| reinstated | reported |
+|---|---|
+| `align-items: center` on the expanded band | **SLIDES**, 48 → 44 → 14, exit 1 — and it named the expanded band while reporting the compact one as holding |
+| a selector renamed in the registry | **NO SUCH BOX** |
+| a stress box the fixtures cannot move | **VACUOUS** |
+| a registry that said 64 where `--head-lift` steps to 80 | **WRONG** — unplanned, on the first run |
+| the stylesheet walker blinded | the C7.7 fail-open guard |
+
+Check 26 was proved four ways in turn: a new undeclared margin, a waiver gone
+stale, a class that left the JSX, and its own walker blinded. The third of those
+also caught a false positive in its first version — `.hero` is written
+`` `hero${…}` ``, and a boundary test that wanted quotes on both sides reported
+it missing from three relationships.
+
+Tier of §6.1: **2 for writing one, 3 for one that slides.** Check 26 fails
+before anything runs; the pass is a named assertion that says which relationship
+broke and under which fixture.
+
+**Not covered: nesting.** The pass renders the real stylesheets but writes its
+own markup, because nothing can render real JSX with a layout engine in CI. If
+`Identity.jsx` stopped nesting `.pav` inside `.pav-row`, every relationship
+would keep passing while the product broke. Check 26 closes the rename half —
+a class that leaves the JSX fails it — and the nesting half is open.
 
 ---
 
@@ -266,7 +821,8 @@ Stated plainly so the net is not assumed to be wider than it is.
 - **The match table is a judgement call.** Which drawing is a given screenshot's counterpart (`P1` is the filled overview, `P3` is the same screen loading) cannot be inferred and is declared by hand in `scripts/divergence.mjs`. Wrong entries produce wrong findings.
 - **The 64 laws are not checked.** They are counted and quoted. Most are product rules no stylesheet can express.
 - **Fixture artifacts, not product faults:** broken poster images (`/snap.jpg` is not a real TMDB path) and a single favourite film. A real account has more favourites, so **the real screen is more crowded than the one measured here**, not less.
-- **Nothing measured here goes above 1280, and the shell does.** `npm run snap`'s widths are 390, 900 and 1280; `--shell-max` rises to **1600 at 1440+**. So the 400px banner B3 fixed was invisible to every harness in the repo and was found by hand. Any claim about the wide band in this document was measured one-off, not gated.
+- **Nothing measured here goes above 1280, and the shell does.** `npm run snap`'s widths are 390, 900 and 1280; `--shell-max` rises to **1600 at 1440+**. So the 400px banner B3 fixed was invisible to every harness in the repo and was found by hand. Any claim about the wide band in this document was measured one-off, not gated **This blind spot has now produced two defects, and the second one shipped to `main`** — B9, a banner leaving 400px of blank page beside it at 1600, written and reviewed and photographed without anyone seeing it. A harness that measured 1440 and 1600 would have caught both. It still does not exist; B9 is gated statically instead.
+- **~~Nothing re-measures under a second fixture.~~ Built the same day — `npm run fixtures`, B12.** Nine declared relationships, 32 renders, 1.6s, gating in CI. What it still does not cover is **nesting**: it renders the real stylesheets but writes its own markup, so a class that stops being nested where the registry nests it keeps passing. `verify` check 26 closes the rename half of that; the nesting half is open.
 - **`entry` and `profile/settings` have no designed counterpart** — the welcome module has no `-module.html`, and settings is drawn as part of shell.
 
 ---
@@ -280,7 +836,7 @@ One PR each. B2 first because it is the cheapest, the most visible, and it chang
 3. ~~**WP-D3 — Re-measure, then decide desktop** (B3).~~ **Shipped 2026-11-28**, out of order, because B1's desktop half landed first and the re-measurement said the growth was still there. Two columns at 1120+, a 440px cap at 600–1119, a 300px ceiling on the banner. It threw off B6, B7 and B8.
 4. **WP-D4 — Close the vocabulary gap** (B4). Rename bands in `find`, `title` and `person`'s docs to the code's names. Docs only, no code. Raises the diff from 2 live comparisons to 7.
 
-**Gate for every one of them:** `npm run check` green (24 checks), and `npm run divergence` showing the specific row closed — not just "looks right".
+**Gate for every one of them:** `npm run check` green (25 checks), and `npm run divergence` showing the specific row closed — not just "looks right".
 
 ---
 
@@ -318,3 +874,83 @@ The ceiling is the part I would not have found from the report. `npm run snap` s
 **Three things came out of building it, and none is built:** **B6** — the tall screen is now 900, not 1280, and closing that needs a breakpoint no drawing contains; **B7** — the desktop shelf is drawn as two 6-across grids and ships as one 80px rail, where I think the product's laws beat the drawing twice and the drawing wins on the tile width; **B8** — the identity band's expanded state (`S2`: `--radius-16`, a 96px lifted avatar, the name at `--text-display`) is written down and unbuilt. All three are in section B with recommendations.
 
 Still open after today: **B1 phone half**, **B4**, and the three above.
+
+---
+
+**2026-11-28, later the same day — the five open items were put to the owner
+and all five were decided.** Branch `claude/divergence-open-items-d270c4`.
+`npm run check` green, 25 checks. Three further items — **B9**, **B10** and
+**B11** — came out of building them and were decided as they appeared. Of the
+72 recorded screens **2 moved**: `profile/profile@1280`, dark and light.
+
+| item | decision | outcome |
+|---|---|---|
+| **B1** phone half | *keep 3:1, fix the doc* | **Closed.** The design doc already said 3:1 in its base rule and its anatomy table; eleven drawings overrode both with `.tall`. `.tall` removed. `divergence` now reports **"CSS agrees (base)"** |
+| **B8** identity band | *do it* | **Shipped.** 96px avatar, `--radius-16`, name at `--text-display`. Shipped at 32px overlap; **revised to 48px the same day by B11**, which is the table's number |
+| **B6** tall screen at 900 | *record as parked* | **Closed, not doing.** Needs an undrawn ~840 breakpoint; re-measured at 1034 |
+| **B7** tile to 108px | approved, then **withdrawn** | **Not shipped.** Measured with a full eight-card shelf, both of its numbers were fixture artifacts and 108px breaks the rail law at 1120. Only the dead `600px` restatement was deleted |
+| **B4** vocabulary gap | *do it* | **Partly closed, 2 → 3 live comparisons.** `person/director` now compares. The rest is not a rename, and is re-scoped into three pieces |
+
+**Two findings came out of building these, and one of them had shipped.**
+
+**B9 — the banner left 400px of blank page beside it at 1600.** B3's ceiling
+clamped the height of a box with `aspect-ratio` and no definite width, so CSS
+kept the ratio and shrank the *width* instead — the opposite of what the
+comment beside it claimed. Invisible to every harness in the repo, because
+`snap` stops at 1280 and the container is 1200 there. Fixed with `width: 100%`,
+and gated: **`verify` check 25**, proved by reinstating the bug and by
+blinding its own walker. **Tier 2.**
+
+**B10 — the phone avatar.** The same table that specifies B8's expanded avatar
+says the compact one is 64px overlapping by 32; it ships at 48px with no
+overlap. Not built — it changes the phone screen, and that was not approved.
+It is the one item here that would make the phone page *shorter*, and it needs
+your yes.
+
+**A third thing worth saying out loud: D1 cannot render its own overlap.**
+The avatar lift the anatomy table specifies has never been visible in the
+drawing that specifies it — the drawing's avatar is `position: static` under a
+`position: relative` banner, and `elementFromPoint` inside its own overlap
+returns the scrim. Copying D1's declarations reproduced that exactly. The
+product ships the intent, with one declaration the drawing does not have.
+
+**Still open:** **B4**'s three re-scoped pieces — a 1:N band mechanism, a
+band-naming fix in `snap`, and a match-table correction for search. **B5**
+stays parked. Everything in section F is untouched.
+
+**B10 was approved and shipped the same day.** The phone avatar is 64px
+overlapping by 32, and the phone page is **8px shorter** — 931 / 951 / 1026 at
+390 / 600 / 900, with every expanded width unchanged. It turned out not to be
+a judgement call: the document already contained a `.pav`/`.phead` pair
+declaring exactly `--space-64` and a `-32px` lift, matching its anatomy table,
+used by none of its nine drawings. **That is three times in one day** —
+B1, B8 and B10 — **that a drawing has disagreed with the document it lives
+in, and three times that the rule or the table has been right.** Where a
+module doc states a thing twice and draws it once, trust the statements.
+
+**That pattern decided the last open question, and it was approved too.**
+B8's expanded overlap is now **48**, not 32 — the number its anatomy table
+states (**B11**). Building it found a defect B8 had shipped without seeing:
+the overlap was not a constant at all. D1's `align-items: center`, copied into
+B8, centres the avatar's *margin box* in a flex line whose height comes from
+the text beside it, so the overlap moved with the length of the bio — **44px
+empty, 24px against a four-line one**. `flex-start` makes it `padding + margin`
+and nothing else. The expanded page is **8px shorter**; the phone is untouched.
+
+So the day's score on the drawings is four from four: **B1, B8, B10 and B11**,
+each a case where a drawing disagreed with a statement in its own document, and
+each time the statement was right. The working rule stands: where a module doc
+states a thing twice and draws it once, trust the statements and measure the
+drawing.
+
+**And twice today a measurement was right about the wrong fixture** — B7's
+"7–13% occupied" came from a one-film shelf, B11's 44px from a one-line bio.
+Both were caught by changing the fixture and measuring again, and nothing in
+the repo did that on its own. **That gate was then built: B12.**
+
+**Still open:** **B4**'s three re-scoped pieces — a 1:N band mechanism, a
+band-naming fix in `snap`, and a match-table correction for search. **B5**
+stays parked; section F is untouched. One gate is named and not built: a
+**paint-order check**, for a lifted element landing behind a positioned
+sibling. That was B8's bug, and it was caught by looking at a screenshot
+rather than by any number.

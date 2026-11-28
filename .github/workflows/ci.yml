@@ -16,9 +16,11 @@ on:
 #               takes thirty. Reads the code; needs no browser, no network and
 #               no credentials.
 #
-#   measured    gallery · gallery:audit · states
+#   measured    gallery · gallery:audit · fixtures · states
 #               Renders the real controls and reads the boxes. Needs Chromium,
-#               so it runs last.
+#               so it runs last. `fixtures` is 1.6s and belongs here rather
+#               than beside `snap`: it serves its own page from memory, so it
+#               needs no dev server, no Supabase and no credentials.
 #
 # Deliberately NOT here:
 #   npm run auth      38 session cases · 80s + a browser download. A real cost
@@ -96,6 +98,14 @@ jobs:
         run: git diff --exit-code docs/as-built.html
       - name: Measure the rendered controls
         run: npm run gallery:audit
+      # Every declared geometric constant, re-measured under a second fixture.
+      # It gates because the failure it catches is invisible by construction: a
+      # value that slides with content reads as a constant against one seed, and
+      # the expanded avatar's overlap did exactly that -- 48px specified, 44px
+      # against an empty bio, 14px at BIO_MAX. `verify` check 26 is the other
+      # half, and runs in the source block above.
+      - name: Relationships under a second fixture
+        run: npm run fixtures
       # In CI for its table, but it blocks nothing: which coverage gaps matter
       # is a product call, not a machine's. See CLAUDE.md.
       - name: State coverage table

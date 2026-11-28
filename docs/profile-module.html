@@ -303,7 +303,14 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
 .ptabs button.on{color:var(--acc-t);border-bottom-color:var(--acc)}
 .pname-on-banner{position:absolute;left:var(--gutter);bottom:var(--space-12);z-index:2;
   font-family:var(--f-d);font-size:var(--text-title);line-height:var(--lh-title);font-weight:800;letter-spacing:-.03em;color:#fff}
-.pbanner.tall{aspect-ratio:2/1}
+/* `.pbanner.tall{aspect-ratio:2/1}` applied 2:1 to all eleven phone
+   drawings until 2026-11-28, contradicting both this document's own base
+   rule (`.pbanner{aspect-ratio:3/1}` above) and its anatomy table, which
+   says "3:1, full bleed" for compact. The product has always shipped 3:1.
+   Two statements against one modifier, and the modifier was the outlier:
+   removed, so the drawings show the ratio this document specifies and
+   `npm run divergence` stops reporting a disagreement that was never a
+   decision. See docs/GROOMING_DIVERGENCE.md B1. */
 .pav-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--gutter) 0}
 .pav-sm{width:var(--space-48);height:var(--space-48);border-radius:var(--radius-full);flex:0 0 auto;
   background:linear-gradient(140deg,var(--beam-7),var(--ink-5));border:2px solid var(--bg);
@@ -434,7 +441,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     <div class="phone">
       <div class="phone-cap"><b>P1</b> overview · filled</div>
       <div class="screen"><div class="scroll">
-        <div class="pbanner tall">
+        <div class="pbanner">
           <div class="bscrim"></div>
           <button class="bedit">Edit</button>
           <div class="pname-on-banner">Raman</div>
@@ -501,7 +508,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     <div class="phone">
       <div class="phone-cap"><b>P2</b> overview · brand-new account</div>
       <div class="screen"><div class="scroll">
-        <div class="pbanner tall empty"><span class="ecap">no banner</span><button class="bedit">Add</button>
+        <div class="pbanner empty"><span class="ecap">no banner</span><button class="bedit">Add</button>
           <div class="pname-on-banner" style="color:var(--text)">raman</div></div>
         <div class="pav-row">
           <div class="pav-sm empty">R</div>
@@ -530,7 +537,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     <div class="phone">
       <div class="phone-cap"><b>P3</b> overview · loading</div>
       <div class="screen"><div class="scroll">
-        <div class="pbanner tall" style="background:var(--surface-hv)"></div>
+        <div class="pbanner" style="background:var(--surface-hv)"></div>
         <div class="pav-row">
           <div class="pav-sm skel" style="background:var(--surface-hv);color:transparent">.</div>
           <div style="min-width:0;flex:1">
@@ -871,7 +878,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <div class="phone">
         <div class="phone-cap"><b>P7</b> edit identity</div>
         <div class="screen"><div class="scroll" style="filter:brightness(.5)">
-          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pbanner"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
           <div class="pav-row"><div class="pav-sm">R</div><div class="phandle">@raman</div></div>
         </div>
         <div class="sheetwrap"><div class="sheet">
@@ -889,7 +896,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <div class="phone">
         <div class="phone-cap"><b>P8</b> choose a banner</div>
         <div class="screen"><div class="scroll" style="filter:brightness(.5)">
-          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pbanner"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
         </div>
         <div class="sheetwrap"><div class="sheet">
           <div class="grab"></div>
@@ -933,7 +940,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <div class="phone">
         <div class="phone-cap"><b>P10</b> stats failed · profile fine</div>
         <div class="screen"><div class="scroll">
-          <div class="pbanner tall"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pbanner"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
           <div class="pav-row"><div class="pav-sm">R</div><div class="phandle">@raman · joined Mar 2026</div></div>
           <div class="ptabs"><button class="on">Overview</button><button>Favourites</button><button>Stats</button><button>Library</button></div>
           <div class="sblock" style="border-color:var(--st-drop-9);background:var(--st-drop-3)">
@@ -955,7 +962,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <div class="phone">
         <div class="phone-cap"><b>P11</b> guest reaches a profile control</div>
         <div class="screen"><div class="scroll" style="filter:brightness(.5)">
-          <div class="pbanner tall empty"><span class="ecap">no banner</span></div>
+          <div class="pbanner empty"><span class="ecap">no banner</span></div>
           <div class="pav-row"><div class="pav-sm empty">?</div></div>
         </div>
         <div class="sheetwrap"><div class="sheet">
@@ -1096,7 +1103,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
     </div></div></div></div>
 
     <div class="note"><b>The two-column split is the only structural change from mobile.</b> Stats go left in a fixed 320px rail, favourites go right and fill. Nothing is added and nothing is hidden — a profile that needed a desktop-only section would be a profile that does not fit on a phone.</div>
-    <div class="note warn"><b>The banner is 4:1 here, not 2:1.</b> A 2:1 banner at 1120 wide is 560px tall — half the window spent on decoration before a single number. The name scales with it, to <code>--text-display</code>.</div>
+    <div class="note warn"><b>The banner is 4:1 here, not 3:1.</b> A 3:1 banner at 1120 wide is 373px tall, and an unceilinged one is 400px on a 1600 window — half the window spent on decoration before a single number, which is why it is also capped at 300px. The name scales with it, to <code>--text-display</code>.</div>
 
     <div class="deskcap"><b>D2</b> stats · expanded</div>
     <div class="deskwrap"><div style="height:436px"><div class="deskscale"><div class="desk">
@@ -1222,7 +1229,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <div class="phone">
         <div class="phone-cap"><b>N1</b> 0 titles · one invitation</div>
         <div class="screen"><div class="scroll">
-          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--ink-5),var(--ink-7))">
+          <div class="pbanner" style="background:linear-gradient(115deg,var(--ink-5),var(--ink-7))">
             <div class="bscrim"></div><button class="bedit">Add</button>
             <div class="pname-on-banner">raman</div></div>
           <div class="pav-row"><div class="pav-sm">R</div>
@@ -1242,7 +1249,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <div class="phone">
         <div class="phone-cap"><b>N2</b> 1 title · first entry named</div>
         <div class="screen"><div class="scroll">
-          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--ink-5),var(--beam-7))">
+          <div class="pbanner" style="background:linear-gradient(115deg,var(--ink-5),var(--beam-7))">
             <div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
           <div class="pav-row"><div class="pav-sm">R</div>
             <div style="min-width:0"><div class="phandle">@raman · joined today</div></div></div>
@@ -1267,7 +1274,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <div class="phone">
         <div class="phone-cap"><b>N3</b> 6 titles · partly alive</div>
         <div class="screen"><div class="scroll">
-          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--mar-7),var(--ink-5))">
+          <div class="pbanner" style="background:linear-gradient(115deg,var(--mar-7),var(--ink-5))">
             <div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
           <div class="pav-row"><div class="pav-sm">R</div>
             <div style="min-width:0"><div class="phandle">@raman · joined Mar 2026</div>
@@ -1301,7 +1308,7 @@ cast[0].roles[0] = { "credit_id": "<b>52542282760ee313280017f9</b>",
       <div class="phone">
         <div class="phone-cap"><b>N4</b> proposed favourites</div>
         <div class="screen"><div class="scroll" style="filter:brightness(.5)">
-          <div class="pbanner tall" style="background:linear-gradient(115deg,var(--mar-7),var(--ink-5))"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
+          <div class="pbanner" style="background:linear-gradient(115deg,var(--mar-7),var(--ink-5))"><div class="bscrim"></div><div class="pname-on-banner">Raman</div></div>
         </div>
         <div class="sheetwrap"><div class="sheet">
           <div class="grab"></div>

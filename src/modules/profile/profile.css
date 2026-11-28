@@ -396,8 +396,24 @@
 
      Past a 1200 container the band is therefore wider than 4:1. That is the
      trade: a letterbox that stays put, against a shape that keeps its ratio
-     by taking another 100px of the fold. */
-  .pbanner { max-height: 300px; }
+     by taking another 100px of the fold.
+
+     `width: 100%` is what makes the paragraph above true, and it was missing
+     until 2026-11-28. `max-height` on a box whose width is auto does not just
+     clamp the height: aspect-ratio re-resolves the WIDTH through the ratio to
+     keep it, so the band stayed exactly 4:1 and stopped short of the page
+     instead. Measured, with the ceiling and no definite width: the banner was
+     1200px wide in a 1440px container and 1200px in a 1600px one, leaving
+     240px and 400px of empty page beside it. With `width: 100%` the ratio has
+     a definite width to work from, the clamp falls on the height alone, and
+     the band is 1440x300 and 1600x300 -- the letterbox the comment claims.
+
+     Nothing saw this because `npm run snap` stops at 1280, where the
+     container is 1200 and the defect does not exist. See
+     docs/GROOMING_DIVERGENCE.md B9, and verify's `ratio-constraint` check,
+     which now fails any box that constrains one axis of a ratio while
+     leaving the other indefinite. */
+  .pbanner { width: 100%; max-height: 300px; }
 
   /* The medium band is undrawn -- the design system has eleven phone screens
      and a 1120 desktop, and nothing in between -- so it takes the answer the
@@ -409,8 +425,11 @@
      this from 1120 up; this is what happens in the 519px before it. */
   .sblock { max-width: 440px; }
 
+  /* `.frail .fcard { width: var(--space-80) }` stood here until 2026-11-28,
+     restating the base rule verbatim. It never changed a pixel. Removed
+     rather than kept, because the next reader spends their time working out
+     what it does before concluding it does nothing. */
   .fgrid { grid-template-columns: repeat(5, 1fr); }
-  .frail .fcard { width: var(--space-80); }
 }
 
 /* ---------------- expanded ----------------

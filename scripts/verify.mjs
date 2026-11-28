@@ -1172,6 +1172,89 @@ for (const f of jsx) {
 }
 
 
+/* ---- 25. a ratio with one axis constrained must have the other definite --
+   `aspect-ratio` is not a one-way street from width to height. When the
+   constrained axis is clamped by `max-height` and the OTHER axis is `auto`,
+   CSS re-resolves that other axis through the ratio rather than letting the
+   box stop being the ratio. So a box that is `aspect-ratio: 4/1` with
+   `max-height: 300px` and no definite width does not become a wider
+   letterbox when the clamp bites -- it stays exactly 4:1 and gets NARROWER
+   than its container.
+
+   That shipped on `.pbanner` on 2026-11-28 and reached `main`. The committed
+   comment beside it asserted the opposite in so many words -- "past a 1200
+   container the band is therefore wider than 4:1" -- and the banner was
+   measured at 1200px wide inside a 1440px container and 1200px inside a
+   1600px one, leaving 240px and 400px of blank page beside a full-bleed
+   band. Nothing caught it: `npm run snap` stops at 1280, where the shell's
+   container is 1200 and the defect cannot appear.
+
+   A measurement harness that went wider would have found that instance. This
+   is the whole class instead, and it is static: the hazard is visible in the
+   declarations without rendering anything. The fix in every case is to make
+   the unconstrained axis definite -- `width: 100%` is usually it -- which
+   leaves the clamp to act on the axis it names.
+
+   Declarations are gathered per selector ACROSS files and media blocks,
+   because the two halves are routinely written apart: `.pbanner` declares
+   its ratio in the base rule and its ceiling inside `@media`, and a check
+   that judged one rule at a time would have seen neither problem. */
+{
+    const AXES = [
+        { ratio: 'height', constraints: ['max-height', 'min-height'], definite: ['width', 'inline-size'] },
+        { ratio: 'width', constraints: ['max-width', 'min-width'], definite: ['height', 'block-size'] },
+    ];
+    /* `inset` with an out-of-flow box makes both axes definite from the
+       containing block, so a ratio there is decoration rather than a sizer. */
+    const SELF_DEFINITE = ['inset', 'inset-block', 'inset-inline'];
+
+    const props = new Map();   // selector -> Map(prop -> "file:line")
+    for (const f of cssFiles) {
+        const rel = relative(ROOT, f);
+        const src = blankComments(readFileSync(f, 'utf8'));
+        for (const m of src.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+            const line = src.slice(0, m.index).split('\n').length;
+            if (m[1].includes('@')) continue;            // at-rule preludes carry no declarations
+            for (const sel of m[1].split(',')) {
+                const sl = sel.trim().replace(/\s+/g, ' ');
+                if (!sl) continue;
+                if (!props.has(sl)) props.set(sl, new Map());
+                const bag = props.get(sl);
+                for (const d of m[2].split(';')) {
+                    const name = d.split(':')[0]?.trim();
+                    if (!name || name.startsWith('--')) continue;
+                    if (!bag.has(name)) bag.set(name, `${rel}:${line}`);
+                }
+            }
+        }
+    }
+
+    let ratios = 0;
+    for (const [sl, bag] of props) {
+        if (!bag.has('aspect-ratio')) continue;
+        ratios++;
+        if (SELF_DEFINITE.some((p) => bag.has(p))) continue;
+        for (const axis of AXES) {
+            const hit = axis.constraints.find((c) => bag.has(c));
+            if (!hit) continue;
+            if (axis.definite.some((d) => bag.has(d))) continue;
+            fail('ratio-constraint', `${bag.get(hit)}: \`${sl}\` sets \`aspect-ratio\``
+                + ` (${bag.get('aspect-ratio')}) and \`${hit}\`, but no \`${axis.definite[0]}\``
+                + ` -- when the clamp bites, the ratio re-resolves ${axis.definite[0]} and the box`
+                + ` shrinks away from its container instead of changing shape.`
+                + ` Declare \`${axis.definite[0]}\` so the clamp falls on ${axis.ratio} alone`);
+        }
+    }
+    /* C7.7 -- the product has had `aspect-ratio` on posters since the first
+       extraction. Zero means the rule walker stopped reading declarations,
+       which is exactly how the shapes lane in `divergence` ran half-blind. */
+    if (ratios < 5) {
+        fail('ratio-constraint', `only ${ratios} selector(s) declaring \`aspect-ratio\` found`
+            + ' -- too few, so this check has stopped finding the boxes it judges');
+    }
+}
+
+
 const byCheck = new Map();
 for (const f of failures) byCheck.set(f.check, [...(byCheck.get(f.check) || []), f.detail]);
 
@@ -1201,6 +1284,7 @@ const CHECKS = [
     ['no-repaint', 'A module positions a shared control, never repaints it'],
     ['status-chroma', 'Every watch state carries enough colour to be a state'],
     ['font-loaded', 'A typeface the design names is a typeface the product loads'],
+    ['ratio-constraint', 'A ratio with one axis constrained has the other definite'],
 ];
 
 let failed = 0;

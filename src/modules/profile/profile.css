@@ -466,6 +466,80 @@
      Series block below the Films block it sits under. Two, because there are
      two media -- a third row here would mean a third medium. */
   .pcols .shelf { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
+
+  /* ---- the identity band's expanded state -------------------------------
+
+     S2 states it and D1 draws it, and until 2026-11-28 the stylesheet did
+     neither: a square-cornered banner, a 48px avatar sitting below it, and
+     the name at --text-title. The band sits ABOVE the tabs, so it is shared
+     by all three of them -- which is why B3 left it alone and why this is
+     its own change.
+
+         S2  "Banner 4:1 at container width with --radius-16; shelves show
+              more per row; identity sits beside the avatar."
+
+     Four declarations, each with a number behind it from D1's own drawing
+     (docs/profile-module.html, the `.deskwrap` holding D1) rather than
+     from the prose:
+
+     --radius-16 on the banner. S2 says it and the anatomy table says it; D1's
+     drawing omits it. Two statements against one drawing, and the drawing is
+     the one with no reason attached. The band is already at container width
+     -- measured, the banner is the full container at every expanded width --
+     so there is a corner here to round.
+
+     The avatar at twice the overlap. Written as `calc(--space-48 * 2)` and
+     not as 96px because that IS the relationship: the design's row reads
+     "96px, overlaps by 48", and an avatar that overlaps by half its height
+     is the thing being specified. 96 is also not a step on the spacing
+     scale, and adding one for a single use is a worse trade than deriving
+     it from the step that is already there.
+
+     The lift as a negative margin, which is what D1 declares. Note that the
+     overlap this produces is NOT 48px: the row carries 16px of top padding,
+     so the avatar's top lands 32px into the banner, exactly as it does in
+     the drawing. The anatomy table's "overlaps by 48" is prose about the
+     declaration; 32px is what the declaration draws. Measured and recorded
+     rather than reconciled, because the drawing is the half with numbers.
+
+     The name at --text-display, which is D1's 40/44 and the one thing the
+     drawing, S2's neighbouring note and the warn note all agree on: "the
+     name scales with it, to --text-display". The avatar's initial goes with
+     it -- a 21px letter in a 96px circle is a letter that got lost -- to
+     --text-display-sm, the nearest step to D1's 32px.
+
+     NOT taken here, and recorded in docs/GROOMING_DIVERGENCE.md instead:
+     the phone avatar, which the same table says is 64px overlapping by 32
+     and which ships at 48px with no overlap at all (B10); `.bedit` at the
+     gutter rather than 8px; the 3px ring the table names against the 2px
+     --border-focus the product has. None of those is this change. */
+  .pbanner { border-radius: var(--radius-16); }
+
+  /* `position` is not decoration here, and D1 is missing it. A banner that
+     is `position: relative` paints above every static in-flow sibling
+     whatever the DOM order says, so an avatar lifted into it is lifted
+     BEHIND it. Measured in the design document itself: at a point inside
+     D1's own overlap, `elementFromPoint` returns the banner's scrim, not
+     the avatar -- the 48px lift the anatomy table specifies has never once
+     been visible in the drawing that specifies it. Copying D1's
+     declarations reproduced that exactly. This builds the intent instead,
+     and docs/GROOMING_DIVERGENCE.md B8 records why the drawing and the
+     code differ by one declaration the drawing does not have. */
+  .pav-row { position: relative; align-items: center; gap: var(--space-16); padding-top: var(--space-16); }
+
+  .pav {
+    width: calc(var(--space-48) * 2); height: calc(var(--space-48) * 2);
+    margin-top: calc(var(--space-48) * -1);
+    font-size: var(--text-display-sm); line-height: var(--lh-display-sm);
+  }
+
+  /* And the name moves up out of the avatar's way. At --text-display the
+     name is 44px tall sitting 12px off the banner's bottom edge, and the
+     avatar's top lands 32px above that edge -- so the circle and the name's
+     lower-left share 20px of the same column. D1 has the same collision at
+     6px and cannot see it, because its avatar is behind the banner. 40px
+     clears the avatar's top by 8px, measured. */
+  .pname { bottom: var(--space-40); font-size: var(--text-display); line-height: var(--lh-display); }
 }
 
 /* ---------------- the picker ----------------

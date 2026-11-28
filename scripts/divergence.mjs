@@ -285,6 +285,24 @@ const MATCH = {
 const ALIAS = {
     lh: 'page-head', lchips: 'chips', phero: 'hero', tbd: 'hero',
     pname: 'pid', 'pav-row': 'pav-row',
+    /* Person, added 2026-11-28 (B4). Each of these three was checked against
+       both markups rather than guessed from the name, and each is the same
+       band holding the same thing:
+
+         phdr   -> pintro   photo, name and the one-line description, as a
+                            flex row. The drawing's `.phdr .pimg/.pbd` and
+                            the product's `.pintro > .phead` are the same
+                            two columns.
+         pstrip -> pstats   the dt/dd strip. Both hold exactly Credits,
+                            "You have seen" and Active, in that order.
+         pfilt  -> rolesw   the role filter. All / Directed / Wrote in the
+                            drawing, All / <role> in the product.
+
+       `phero` is deliberately NOT given a new target. It already aliases to
+       `hero`, and the person page does not build one -- it opens on
+       `page-head`. That is a finding, and aliasing it to `page-head` to make
+       the row go green would delete it. */
+    phdr: 'pintro', pstrip: 'pstats', pfilt: 'rolesw',
 };
 
 /* The shell's furniture. The design draws it on every module screen because a

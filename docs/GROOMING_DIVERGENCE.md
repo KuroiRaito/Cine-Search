@@ -22,7 +22,7 @@ Read-only. No product code was changed to produce this document. The one CSS edi
 
 Nothing here needs a schema change, a new endpoint, or new data. Every decision below is a layout decision.
 
-**Read the eight bullets above as the report of the morning of 2026-11-28.** Four of them are already history: B2 shipped, B5 was **withdrawn by its own measurement**, and B1's desktop half and **B3** both shipped the same day. So Overview now carries one shelf, not four extra bands; **profile no longer gets taller as the window gets wider** — it is 970px at 1280, 1440 *and* 1600; and the 60px bar is deliberate after all (D3, marked *Settled* in prose, which no drawing shows). *Owner decisions* at the foot is the current state.
+**Read the eight bullets above as the report of the morning of 2026-11-28.** Four of them are already history: B2 shipped, B5 was **withdrawn by its own measurement**, and B1's desktop half and **B3** both shipped the same day. So Overview now carries one shelf, not four extra bands; **profile no longer gets taller as the window gets wider** — it is 922px at 1280, 1440 *and* 1600; and the 60px bar is deliberate after all (D3, marked *Settled* in prose, which no drawing shows). *Owner decisions* at the foot is the current state.
 
 ---
 
@@ -117,7 +117,7 @@ The design's Overview keeps **one** shelf — Favourite characters — and links
 
 `profile.css` contains **one** media query. It sets `.fgrid` to five columns and fixes `.frail .fcard` width — both on the **Favourites tab**. The Overview has no desktop rules whatsoever, so it is the phone column stretched to 1120px:
 
-- Films card: **1120px wide holding 154px of text.**
+- Films card: **1120px wide holding 154px of text.** *(The 154px was an artifact of this branch's own fixture — corrected below. The 1120px was not, and at 1600 it is 1520px.)*
 - Score spread: full-width card for one sentence.
 - Favourite rails: **7–13% occupied.**
 
@@ -135,21 +135,28 @@ Built as D1 states it, which is a law and not a drawing:
 
 Three changes, and each one is answerable with a number.
 
+> **Numbers corrected 2026-11-28 after merging main** (`1d5eb23`). Main had independently rebuilt the profile fixture, better, and its version won. Everything below is re-measured against it; the earlier figures were taken against a fixture that no longer exists. The layout conclusions did not move. One piece of *evidence* did, and is replaced — see the note under the table.
+
 | | before | after |
 |---|---|---|
-| Films card at 900 | 852px wide, **18% ink** | 440px wide, **35% ink** |
-| Films card at 1280 | 440px wide, 35% ink | **320px wide, 48% ink** |
-| page at 1280 | 1122px | **970px** |
-| page at 1440 | 1030px | **970px** |
-| page at 1600 | 1070px | **970px** |
+| Films card at 900 | **852px** wide | **440px** |
+| Films card at 1280 | 1120px wide | **320px** |
+| Films card at 1600 | **1520px** wide | **320px** |
+| page at 1280 | 1122px | **922px** |
+| page at 1440 | 1122px | **922px** |
+| page at 1600 | 1122px | **922px** |
+
+**What the card's width actually costs, said without a fixture in it.** `.sblock-h` is `justify-content: space-between`: the block's name sits at the left edge and its qualifier — *"at least"*, when series minutes are still arriving season by season — sits at the right. At 1600 uncapped those two were **1494px apart**. That is the same defect `.sect.taste-head` already has a comment about — *"at 1280 it is what stops 'Score ▾' from sitting 800px away from the heading it modifies"* — and the same answer. At 320px they are 294px apart.
+
+*(The first version of this table said the card held "154px of text" in a 1120px box. That was true only of the fixture this branch wrote: its Films block had `partial: false`, so the right-hand label was absent and there was nothing out at the edge to measure. Main's fixture derives `partial` from the rows, the label is there, and the measurement reads 98% at every width. The defect and the fix are unchanged; the number was fixture-shaped.)*
 
 1. **The two-column grid at 1120+.** `.pcols`, 320px and the rest, the shelf spanning both rows beside the medium blocks. This needed the one thing CSS could not supply: the Overview bands are direct children of `.page`, which belongs to the shell, so there was nothing for a grid to be. **One wrapper element in `Profile.jsx`** — development lane, flagged, and inert below 1120.
-2. **A cap on the card at 600–1119.** The medium band is undrawn, so it takes the answer the Stats tab already gives: `.tastecard`, `.stiles` and `.sect.taste-head` all stop at 440px. The Films block had no stop, which is why it was 852px of card around 154px of text at 900.
+2. **A cap on the card at 600–1119.** The medium band is undrawn, so it takes the answer the Stats tab already gives: `.tastecard`, `.stiles` and `.sect.taste-head` all stop at 440px. The Films block had no stop, which is why its name and its qualifier sat 826px apart at 900 and 1494px apart at 1600.
 3. **A ceiling on the banner at 300px.** This is the growth problem, and it was worse than the report said, because **`npm run snap` stops at 1280 and the shell does not.** `--shell-max` is 1200 at expanded and **1600 at wide**, so a 4:1 banner reaches **400px on a 1600 window** — 44% of a 900px viewport, which is the objection the design itself makes against 2:1 at 1120, arrived at from the other side. 300px is where the title page's hero stops (`--hero-h`); the hero is its page's subject and this is furniture, so the banner does not get to be taller.
 
-**Profile has stopped growing with width:** 970px at 1280, 1440 and 1600. The sentence I have been repeating all day is now false, which was the point of the item.
+**Profile has stopped growing with width:** 922px at 1280, 1440 and 1600. The sentence I have been repeating all day is now false, which was the point of the item.
 
-**Each of the three was proved by removing it and watching the number come back** — ceiling out → 1030/1070 at 1440/1600; grid out → 1122 flat; cap out → 852px card at 900. 24 checks green. Of the 72 recorded screens **6 moved** — profile's Overview, at both themes and all three widths — and the other 66, settings included, are byte-identical. At 390 and 900 the page height and every band's size are unchanged; the fingerprint moved because the DOM has one more element in it.
+**Each of the three was proved by removing it and watching the number come back**, and all three proofs were re-run on the merged tree — ceiling out → **982 / 1022** at 1440 / 1600; grid out → **1122 flat**; cap out → an **852px** card at 900. 24 checks green. Of the 72 recorded screens **6 moved** — profile's Overview, at both themes and all three widths — and the other 66, settings included, are byte-identical. At 390 and 900 the page height and every band's size are unchanged; the fingerprint moved because the DOM has one more element in it.
 
 ### B4. Three modules cannot be checked
 
@@ -199,13 +206,13 @@ If anything the direction reverses: production's wash is heaviest at the bottom,
 
 ### B6. The tall screen is now 900, not 1280
 
-**Found by building B3.** Profile is **947 / 1018 / 970 / 970 / 970** at 390 / 900 / 1280 / 1440 / 1600. The peak has moved off desktop and onto the band the design system never drew: at 900 the banner is already 225px and the columns are still stacked, so it carries desktop's banner and the phone's layout at once.
+**Found by building B3.** Profile is **923 / 1018 / 922 / 922 / 922** at 390 / 900 / 1280 / 1440 / 1600. The peak has moved off desktop and onto the band the design system never drew: at 900 the banner is already 225px and the columns are still stacked, so it carries desktop's banner and the phone's layout at once.
 
 Extending the split downward is not one line. At 600 the right column would be `600 − 48 − 320 − 32 = 200px`, which holds two and a half poster tiles — so it needs **a third breakpoint, around 840, that no drawing contains.**
 
 **Decision:** invent that breakpoint, or leave 900 as the tall one?
 
-> My recommendation: **leave it.** 1018 is 71px over the phone and every one of them is banner; the band has no drawing to be checked against, and inventing a breakpoint to beat a number nobody has complained about is how undrawn bands get a second layout nobody maintains. Worth revisiting only if B1's phone half lands at 2:1, which puts 900 further out.
+> My recommendation: **leave it.** 1018 is 95px over the phone and every one of them is banner; the band has no drawing to be checked against, and inventing a breakpoint to beat a number nobody has complained about is how undrawn bands get a second layout nobody maintains. Worth revisiting only if B1's phone half lands at 2:1, which puts 900 further out.
 
 ### B7. The desktop shelf disagrees with the shipped one, three ways
 
@@ -302,7 +309,7 @@ Profile across the three widths, after both changes: **947 / 1018 / 1122px** (wa
 
 Still open: **B1 phone half** (design draws 2:1 on eleven screens, `.pbanner`'s comment argues 3:1 because "taller eats the fold"), **B3** — now carrying the growth problem — and **B4**.
 
-**B3 closed and shipped the same day** — *do B3 now* — as two columns at 1120+, a 440px cap on the card at 600–1119, and a **300px ceiling on the banner**. Full numbers and proofs in B3 above. The headline: **profile is 970px at 1280, 1440 and 1600** — it has stopped growing with width, which is what the item was given to own. The Films card is 320px of card around 154px of text instead of 1120px.
+**B3 closed and shipped the same day** — *do B3 now* — as two columns at 1120+, a 440px cap on the card at 600–1119, and a **300px ceiling on the banner**. Full numbers and proofs in B3 above. The headline: **profile is 922px at 1280, 1440 and 1600** — it has stopped growing with width, which is what the item was given to own. The Films card is **320px** wide instead of 1120px at 1280, and instead of 1520px at 1600.
 
 The ceiling is the part I would not have found from the report. `npm run snap` stops at 1280; `--shell-max` goes to **1600 at 1440+**; a 4:1 banner at 1600 is **400px**, and nothing in the repo was looking there. Section D now says so.
 

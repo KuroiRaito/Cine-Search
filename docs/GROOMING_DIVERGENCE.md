@@ -190,6 +190,7 @@ This is why `npm run divergence` **always exits 0** and gates nothing. A script 
 Stated plainly so the net is not assumed to be wider than it is.
 
 - **2 of 9 comparisons are live;** 7 are refused (B4). Profile and library only.
+- **The shapes lane was reading half the stylesheet until 2026-11-28.** Its rule scanner could not look inside `@media`, and dropped the first rule of every block. 7 declarations found before the fix, 14 after. Any conclusion drawn from an earlier run should be re-checked.
 - **One theme, one width per screen.** Dark, and the width named in the match table. Dark and light render the same boxes, so the theme costs nothing — but **colour is not compared at all**, in either direction.
 - **The match table is a judgement call.** Which drawing is a given screenshot's counterpart (`P1` is the filled overview, `P3` is the same screen loading) cannot be inferred and is declared by hand in `scripts/divergence.mjs`. Wrong entries produce wrong findings.
 - **The 64 laws are not checked.** They are counted and quoted. Most are product rules no stylesheet can express.
@@ -228,4 +229,10 @@ Carried forward, unchanged, not addressed by anything above:
 
 **B5 approved, then withdrawn by measurement** — see above. Nothing shipped.
 
-Still open: **B1** (desktop half needs only a yes; phone half is a real choice), **B3**, **B4**.
+**B1 desktop half closed and shipped** (`32a49f4`): `.pbanner` is 4:1 from 600 up, in the media query profile.css already had. Banner 130 / 225 / 300px at 390 / 900 / 1280.
+
+**It did not do what I said it would.** I have been calling profile "the only screen that gets taller as the window gets wider". **It still is** — +175px across the range, down from +275. A ratio with no ceiling grows with width whatever the ratio is; 4:1 only slows it. Stopping it needs a `max-height` or a real desktop layout, so **B3 now owns this**, and it is no longer optional-feeling.
+
+Profile across the three widths, after both changes: **947 / 1018 / 1122px** (was 1441 / — / 1716).
+
+Still open: **B1 phone half** (design draws 2:1 on eleven screens, `.pbanner`'s comment argues 3:1 because "taller eats the fold"), **B3** — now carrying the growth problem — and **B4**.

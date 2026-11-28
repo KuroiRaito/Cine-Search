@@ -77,7 +77,7 @@ component, so it cannot drift from the code — that is the whole point of it.
 If it looks wrong, the code is wrong.
 
 The specification and the code are checked against each other (`verify` check
-18; there are 24 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
+18; there are 25 in all) on the 83 tokens the spec declares. **It does not declare the spacing or
 radius scales**, so those are not cross-checked — `src/shared/theme/tokens.css`
 is the only statement of them.
 

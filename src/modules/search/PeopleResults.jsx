@@ -86,6 +86,11 @@ export default function PeopleResults({ people }) {
                 <PersonResult
                     key={p.id}
                     person={p}
+                    /* FQ4. Set only on a row whose name the response cannot
+                       tell apart, and then it replaces the role label rather
+                       than joining it: a second line is not what a 320px row
+                       has, and the label is the thing that failed. */
+                    evidence={p.evidence}
                     // undefined = not looked up yet (wait); null = looked up, no
                     // row (ask TMDB). Conflating the two meant a person absent
                     // from the catalogue was never asked for at all.
@@ -93,6 +98,33 @@ export default function PeopleResults({ people }) {
                     credits={cached?.credits?.filter((c) => c.person_id === p.id)}
                 />
             ))}
+        </div>
+    );
+}
+
+/**
+ * FQ3 — the same row, promoted above the grid.
+ *
+ * No "People" heading over it, because it is not a section of people: it is the
+ * answer, and the heading would be a label on a list of one. It is also
+ * deliberately the SAME component as a row in the section below — the row
+ * already carries the interesting thing ("Directed · 9 of 12 seen"), and
+ * promoting it surfaces that number one screen earlier rather than inventing a
+ * second rendering of a person that would drift from the first.
+ *
+ * The request it makes for that number is `/person/{id}`, which is the request
+ * the grid beside it needs for the filmography. client.js keys its session
+ * cache on the URL, so the two share one round trip.
+ */
+export function PromotedPerson({ person }) {
+    const cached = useCachedTotals([person]);
+    return (
+        <div className="sect pad">
+            <PersonResult
+                person={person}
+                cached={cached ? (cached.totals[person.id] ?? null) : undefined}
+                credits={cached?.credits?.filter((c) => c.person_id === person.id)}
+            />
         </div>
     );
 }
@@ -123,7 +155,7 @@ function useCachedTotals(people) {
     return answer && answer.ids === ids ? answer : undefined;
 }
 
-function PersonResult({ person, cached, credits }) {
+function PersonResult({ person, cached, credits, evidence = null }) {
     const { isSignedIn } = useAuth();
     const lib = useLibrary();
     const [role, setRole] = useState(null);
@@ -140,6 +172,10 @@ function PersonResult({ person, cached, credits }) {
     // would never get the chance to save anything.
     useEffect(() => {
         if (cached === undefined) return undefined;
+        /* An evidence row says nothing about role or progress, so the request
+           that would fetch them is not made. Three ambiguous people cost three
+           requests for two labels that were never going to be shown. */
+        if (evidence) return undefined;
         const controller = new AbortController();
         let live = true;
 
@@ -163,7 +199,7 @@ function PersonResult({ person, cached, credits }) {
             .catch(() => {});
 
         return () => { live = false; controller.abort(); };
-    }, [person.id, person.name, person.profile_path, cached, isSignedIn]);
+    }, [person.id, person.name, person.profile_path, cached, isSignedIn, evidence]);
 
     // A guest has no library, so there is nothing to be "0 of 131" of.
     //
@@ -183,10 +219,10 @@ function PersonResult({ person, cached, credits }) {
 
     // The department is the fallback while the credits are in flight, or if
     // they never arrive — not the guest's answer.
-    const sub = role
+    const sub = evidence || (role
         ? [role.label, progress && `${progress.seen} of ${progress.total} seen`]
             .filter(Boolean).join(' · ')
-        : person.known_for_department;
+        : person.known_for_department);
 
     return (
         <PersonRow

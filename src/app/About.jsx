@@ -16,7 +16,7 @@ export default function About() {
             <div className="page-head"><h1>About</h1></div>
 
             <div className="card">
-                <h2 className="about-h">Cine Search</h2>
+                <h2 className="about-h">Bingecon</h2>
                 <p className="about-p">
                     Films and series in one place. Track what you&apos;re watching, remember what
                     you loved, and find the next thing.

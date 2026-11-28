@@ -15,6 +15,10 @@ export const SORTS = [
     { key: 'rating', label: 'Your rating', note: 'your rating', answers: 'what did I love' },
     { key: 'year', label: 'Release year', note: 'release year', answers: 'what era is this shelf' },
     { key: 'progress', label: 'Progress', note: 'progress', answers: 'what is nearly finished' },
+    /* L28. Offered only once a name exists — see availableSorts. The label is
+       "From" rather than "Recommender" because that is the word the row
+       itself uses: "From Priya". */
+    { key: 'recommender', label: 'From', note: 'who recommended it', answers: 'who told me to watch this' },
 ];
 
 export const sortMeta = (key) => SORTS.find((s) => s.key === key) || SORTS[0];
@@ -53,6 +57,12 @@ export function availableSorts(rows) {
         if (s.key === 'rating') return has((r) => r.rating != null);
         if (s.key === 'progress') return has((r) => r.mediaType === 'tv' && r.total > 0 && r.seen < r.total);
         if (s.key === 'year') return has((r) => r.year);
+        /* L28 and L29 in one line. The section appears with the first name and
+           disappears with the last, because it is asked of the rows rather
+           than kept as a flag somebody has to remember to clear. A sort that
+           stops being offered also stops being effective — the caller already
+           falls back when a remembered key is no longer in this list. */
+        if (s.key === 'recommender') return has((r) => r.recommendedBy);
         return true;
     });
 }
@@ -68,7 +78,17 @@ const BY = {
     rating: (a, b) => cmpDesc(lastIfNull(a.rating), lastIfNull(b.rating)),
     year: (a, b) => cmpDesc(lastIfNull(a.year), lastIfNull(b.year)),
     progress: (a, b) => cmpDesc(fraction(a), fraction(b)),
+    /* Ascending, unlike the rest: names read A–Z, and "nulls last" here means
+       every row nobody recommended sits below every row somebody did. */
+    recommender: (a, b) => cmpAsc(lastIfNull(a.recommendedBy), lastIfNull(b.recommendedBy)),
 };
+
+function cmpAsc(a, b) {
+    if (a == null && b == null) return 0;
+    if (a == null) return 1;
+    if (b == null) return -1;
+    return fold(a).localeCompare(fold(b));
+}
 
 function cmpDesc(a, b) {
     if (a == null && b == null) return 0;

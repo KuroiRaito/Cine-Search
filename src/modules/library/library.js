@@ -257,6 +257,10 @@ export function shapeRow(r, entry = {}) {
         rating: entry.rating ?? r.rating,
         updatedAt: r.updated_at,
         addedAt: r.added_at,
+        /* L26/L27/L28 all read this. It is converted here, at the boundary,
+           rather than by each screen reaching for the snake_case column — a
+           shape that crosses a module boundary is converted at the boundary. */
+        recommendedBy: entry.recommended_by ?? r.recommended_by ?? null,
         watched,
         seen: episodesWatched(watched),
         total,

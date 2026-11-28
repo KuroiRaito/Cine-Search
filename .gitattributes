@@ -1,0 +1,19 @@
+# Generated output. A line-level merge of it produces a file that describes
+# neither side — this merge produced seven such hunks, each one a pair of
+# element counts and geometry hashes spliced into a value that was never
+# measured from any tree.
+#
+# `-merge` makes git stop trying: the conflict is declared, our side is kept,
+# and the correct resolution is always the same one — regenerate it.
+#
+#   npm run snap          rewrite it from the current code
+#   npm run snap --check   confirm it still describes the code
+#
+# Regenerate only when every third-party request has a fixture. If snap reports
+# requests that "went to the network", the values it writes for those screens
+# are measurements of live TMDB and will drift for reasons nobody caused, which
+# is the thing pinning the corpus exists to prevent.
+snapshots/fingerprints.json -merge -diff
+
+# Recorded corpus: compressed, so there is nothing for git to merge or show.
+snapshots/tmdb-fixtures.json.gz binary

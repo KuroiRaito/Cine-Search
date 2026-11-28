@@ -59,8 +59,19 @@ const MODULES = {
     title:    [{ name: 'series', path: '/title/tv/1396' },
                { name: 'film', path: '/title/movie/27205' }],
     person:   [{ name: 'director', path: '/person/137427' }],
-    library:  [{ name: 'library', path: '/library' }],
-    profile:  [{ name: 'profile', path: '/you' },
+    /* `absent` is the phrase this screen shows when it has nothing, and the
+       harness seeds a library, so seeing it means the fixture stopped feeding
+       the screen rather than that the screen is right. It is declared per
+       screen because only the screen knows its own empty words.
+
+       This exists because the profile's fixture had the wrong shape for
+       months and every shot of it was the empty state. Nothing caught it: a
+       photograph of an empty page is still a photograph, the fingerprint was
+       stable, and `snap --check` compared one empty profile against another
+       and agreed. A gate that cannot fail open is worth more than a gate that
+       is merely present. */
+    library:  [{ name: 'library', path: '/library', absent: 'Nothing saved yet' }],
+    profile:  [{ name: 'profile', path: '/you', absent: 'Nothing watched yet' },
                { name: 'settings', path: '/settings' }],
 };
 const WIDTHS = [390, 900, 1280];
@@ -69,6 +80,9 @@ const THEMES = ['dark', 'light'];
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
 const RECORD = args.includes('--record');
+/* A full refresh of the corpus, which is a deliberate maintenance action with
+   its own diff. --record on its own fills the gaps; see below. */
+const FRESH = args.includes('--fresh');
 
 /**
  * Every third-party response, frozen.
@@ -95,6 +109,8 @@ const RECORD = args.includes('--record');
 const NOT_COMPARED = new Set();
 const wanted = args.filter((a) => !a.startsWith('--'));
 const modules = Object.keys(MODULES).filter((m) => !wanted.length || wanted.includes(m));
+/* Screens photographed showing the words they use when they have nothing. */
+const hollow = [];
 
 /**
  * Every element's box, hashed. Artwork-independent, layout-sensitive.
@@ -251,69 +267,97 @@ const LIBRARY = [
     shelfRow(27205, 'movie', 'want_to_watch', { title: 'Inception', date: '2010-07-15' }),
 ];
 
+/**
+ * The profile's statistics, derived from the library above rather than typed
+ * out beside it.
+ *
+ * What was here before was a hand-written object — `{ films: 1, series: 2,
+ * episodes: 3, hours: 4 }` — and `profile_stats` has never returned that
+ * shape. The real function nests the counts under `totals`, `Profile.jsx`
+ * reads `data.totals.titles`, got nothing, and took its "Nothing watched yet"
+ * branch. So every committed profile screenshot and fingerprint, at three
+ * widths in two themes, was of the empty state. The screen was never
+ * photographed at all, and nothing said so, because a picture of an empty page
+ * is still a picture.
+ *
+ * Deriving it is the fix rather than correcting the numbers. Two fixtures
+ * describing the same library will disagree the first time somebody edits one
+ * of them, and that is exactly what happened here. Now a row added to LIBRARY
+ * changes this too, because this *is* LIBRARY, counted.
+ *
+ * It mirrors the SQL in `supabase/007_profile_stats.sql`: `lib` is every row,
+ * which is what the distribution bar is about, and `seen` is the narrower
+ * `watched`/`rewatching` set that everything else counts. Runtimes and genres
+ * are not in these rows, so minutes are zero and `partial` is true — which is
+ * the honest answer, and the state the screen has a phrase for ("Days, at
+ * least"). It is not a transcription of the SQL and does not need to be: it
+ * needs the shape right and the numbers self-consistent.
+ */
+const SEEN = new Set(['watched', 'rewatching']);
 
-/* ---------------------------------------------------------------------
-   The populated profile.
+function profileStatsFor(rows) {
+    const seen = rows.filter((r) => SEEN.has(r.status));
+    const rated = seen.filter((r) => r.rating != null);
+    const mean = (list) => (list.length
+        ? Math.round((list.reduce((t, r) => t + r.rating, 0) / list.length) * 10) / 10
+        : null);
 
-   This fixture used to be `{ films: 1, series: 2, episodes: 3, hours: 4,
-   ratings: 1, favourites: 1 }` -- the shape `taste_summary()` returned
-   before 008 retired it. `profile_stats()` answers something else
-   entirely, so the screen read a shape it did not understand, found no
-   `totals.titles`, and fell to "Nothing watched yet".
+    /* Specials are not progress, so season 0 never counts — the same exclusion
+       the function makes with `e.key <> '0'`. */
+    const episodesOf = (r) => Object.entries(r.watched_episodes || {})
+        .filter(([season]) => season !== '0')
+        .reduce((t, [, list]) => t + (list?.length || 0), 0);
 
-   **So every profile screenshot ever taken was of the empty state**, and
-   nothing said so, because degrading to an empty state is exactly what
-   that screen is supposed to do when somebody has watched nothing. A
-   fixture that has drifted from its RPC does not fail -- it quietly
-   photographs the wrong screen.
+    const block = (media) => {
+        const mine = seen.filter((r) => r.media_type === media);
+        const scored = mine.filter((r) => r.rating != null);
+        return {
+            watched: mine.length,
+            ...(media === 'tv' ? { episodes: mine.reduce((t, r) => t + episodesOf(r), 0) } : {}),
+            minutes: 0,
+            rated: scored.length,
+            mean: mean(scored),
+            partial: mine.length > 0,
+        };
+    };
 
-   The shape below is `supabase/007_profile_stats.sql`, field for field.
-   The values are a plausible library rather than a maximal one: 112 films
-   and 56 series is a real person's few years of watching, and the numbers
-   agree with each other (112 films at ~145 min is 11.3 days; the status
-   distributions sum to the watched counts).
+    /* Over the whole library, not the watched set: the bar is "what is in
+       here", which is why a want-to-watch row belongs in it. */
+    const distribution = {};
+    for (const r of rows) {
+        distribution[r.media_type] ??= {};
+        distribution[r.media_type][r.status] = (distribution[r.media_type][r.status] || 0) + 1;
+    }
 
-   Content is real, per CLAUDE.md s5 -- TMDB's own genre names, real
-   decades, and people already present in this repo's recorded responses.
---------------------------------------------------------------------- */
-const dim = (key, count, rated, mean, minutes) => ({ key, count, rated, mean, minutes, partial: false });
-const PROFILE_STATS = {
-    films:  { watched: 112, minutes: 16272, rated: 86, mean: 7.8, partial: false },
-    series: { watched: 56, episodes: 1243, minutes: 55000, rated: 41, mean: 8.1, partial: true },
-    distribution: {
-        movie: { watched: 72, want_to_watch: 21, rewatching: 10, dropped: 3 },
-        tv: { watched: 23, watching: 15, want_to_watch: 10, on_hold: 5, dropped: 3 },
-    },
-    spread: { n: 127, mean: 7.9, sd: 1.3 },
-    dimensions: {
-        genre: [
-            dim('Drama', 64, 52, 8.1, 9280), dim('Science Fiction', 41, 35, 8.4, 6150),
-            dim('Thriller', 38, 29, 7.6, 5320), dim('Action & Adventure', 33, 24, 7.2, 4980),
-            dim('Comedy', 27, 19, 7.0, 3510), dim('Animation', 22, 18, 8.2, 2860),
-            dim('Documentary', 14, 11, 7.9, 1820), dim('Crime', 12, 9, 8.0, 1740),
-        ],
-        decade: [
-            dim('2010s', 58, 47, 7.9, 8410), dim('2020s', 44, 36, 7.7, 6380),
-            dim('2000s', 31, 25, 8.0, 4495), dim('1990s', 19, 16, 8.3, 2755),
-            dim('1980s', 11, 9, 7.8, 1595), dim('1970s', 5, 4, 8.1, 725),
-        ],
-    },
-    people: [
-        { person_id: 137427, name: 'Denis Villeneuve', profile_path: '/snap.jpg', role: 'director',
-          job: 'Director', count: 7, rated: 7, mean: 8.6, minutes: 1015, credit_totals: null },
-        { person_id: 947, name: 'Hans Zimmer', profile_path: '/snap.jpg', role: 'crew',
-          job: 'Original Music Composer', count: 12, rated: 10, mean: 8.1, minutes: 1740, credit_totals: null },
-        { person_id: 1245, name: 'Scarlett Johansson', profile_path: '/snap.jpg', role: 'cast',
-          job: null, count: 9, rated: 7, mean: 7.4, minutes: 1305, credit_totals: null },
-        { person_id: 17419, name: 'Bryan Cranston', profile_path: '/snap.jpg', role: 'cast',
-          job: null, count: 6, rated: 5, mean: 8.8, minutes: 2790, credit_totals: null },
-    ],
-    totals: { titles: 168, episodes: 1243, minutes: 71272, partial: true },
-};
+    const scores = rated.map((r) => r.rating);
+    const avg = mean(rated);
+    const sd = scores.length
+        ? Math.round(Math.sqrt(scores.reduce((t, n) => t + (n - avg) ** 2, 0) / scores.length) * 10) / 10
+        : null;
 
-/* The four shelves the Overview previews. `from: 'library'` shelves read the
-   library rows; `from: 'shelf'` shelves read user_favourites, so people and
-   characters need rows of their own or two of the four draw empty. */
+    return {
+        films: block('movie'),
+        series: block('tv'),
+        distribution,
+        spread: { n: scores.length, mean: avg, sd },
+        /* A person earns a card at two titles and a dimension needs a genre;
+           these rows carry neither, so both are empty rather than invented.
+           An empty array is a real answer the screen is specified for. */
+        dimensions: {},
+        people: [],
+        totals: {
+            titles: seen.length,
+            episodes: seen.reduce((t, r) => t + episodesOf(r), 0),
+            minutes: 0,
+            partial: seen.length > 0,
+        },
+    };
+}
+
+/* The four favourite shelves. `from: 'library'` shelves read the library
+   rows; `from: 'shelf'` shelves read user_favourites, so people and characters
+   need rows of their own or two of the four draw empty. Overview previews one
+   of them and the Favourites tab holds all four. */
 const FAVOURITES = [
     { kind: 'person', ref: '137427', position: 1000, name: 'Denis Villeneuve', subtitle: 'Director',
       actor: null, image_path: '/snap.jpg', poster_path: null, media_type: null, tmdb_id: 137427,
@@ -331,6 +375,7 @@ const FAVOURITES = [
       added_at: '2026-01-04T00:00:00Z' },
 ];
 
+
 const reply = (route, body) => route.fulfill({
     status: 200, contentType: 'application/json', body: JSON.stringify(body),
 });
@@ -340,7 +385,7 @@ async function pinSession(ctx) {
        general pattern registered last silently shadows every specific one. */
     await ctx.route('**/rest/v1/**', (r) => reply(r, []));
     await ctx.route('**/rest/v1/rpc/**', (r) => reply(r, {}));
-    await ctx.route('**/rest/v1/rpc/profile_stats**', (r) => reply(r, PROFILE_STATS));
+    await ctx.route('**/rest/v1/rpc/profile_stats**', (r) => reply(r, profileStatsFor(LIBRARY)));
     await ctx.route('**/rest/v1/profiles**', (r) => reply(r, [PROFILE]));
     await ctx.route('**/rest/v1/user_favourites**', (r) => {
         const asked = /kind=eq\.([a-z_]+)/.exec(r.request().url());
@@ -384,10 +429,22 @@ let shots = 0;
    /api/tmdb?path=<path>&<params>, and the dev server's port changes per run so
    the rest of the URL is not stable. Wikidata and Wikipedia are keyed by the
    whole URL, because that is what identifies them. */
-const fixtures = !RECORD && existsSync(FIXTURES)
+/* Loaded even when recording, which is the difference between filling the
+   corpus and replacing it.
+   
+   This used to be `!RECORD`, so `--record` started from nothing and re-fetched
+   every response — which meant there was no way to pin eight missing requests
+   without also refreshing the other hundred and moving every fingerprint with
+   them. A flag called "record" that discards what is already recorded is a
+   destructive default wearing an additive name.
+   
+   Now a key that is already pinned is served from the fixture and never
+   reaches the network, so a record run fetches precisely what is missing.
+   `--fresh` is how you ask for the old behaviour, having meant to. */
+const fixtures = !FRESH && existsSync(FIXTURES)
     ? JSON.parse(gunzipSync(readFileSync(FIXTURES)).toString('utf8'))
     : {};
-const recorded = {};
+const recorded = { ...fixtures };
 const missed = new Set();
 
 const keyOf = (url) => {
@@ -488,6 +545,13 @@ try {
                        skeleton. */
                     await page.waitForTimeout(1500);
                     const key = `${mod}/${screen.name}@${width}-${theme}`;
+                    if (screen.absent) {
+                        const shown = await page.evaluate(
+                            (phrase) => (document.body.innerText || '').includes(phrase),
+                            screen.absent,
+                        );
+                        if (shown) hollow.push(`${key} — "${screen.absent}"`);
+                    }
                     /* `bands` is pulled OUT of the fingerprint rather than
                        left in it. fingerprints.json is committed and compared
                        key-for-key by --check, so adding a field to it would
@@ -513,16 +577,44 @@ try {
 if (RECORD) {
     writeFileSync(FIXTURES, gzipSync(JSON.stringify(recorded), { level: 9 }));
     const kb = Math.round(readFileSync(FIXTURES).length / 1024);
+    const total = Object.keys(recorded).length;
+    const added = total - Object.keys(fixtures).length;
     const wiki = Object.keys(recorded).filter((k) => k.startsWith('http')).length;
-    console.log(`\n  Recorded ${Object.keys(recorded).length} responses`
-        + ` (${Object.keys(recorded).length - wiki} TMDB, ${wiki} Wikidata/Wikipedia), ${kb} KB.\n`);
+    console.log(`\n  ${added === total ? 'Recorded' : `Added ${added}, keeping ${total - added}.`}`
+        + ` ${total} responses in the corpus`
+        + ` (${total - wiki} TMDB, ${wiki} Wikidata/Wikipedia), ${kb} KB.\n`);
     process.exit(0);
 }
 
 if (missed.size) {
     console.log(`\n  ${missed.size} request(s) had no fixture and went to the network:`);
     for (const k of [...missed].slice(0, 8)) console.log(`    ${k}`);
-    console.log('  Those screens are measuring live data. Re-record: npm run snap -- --record\n');
+    console.log('  Those screens are measuring live data. Record them: npm run snap -- --record\n');
+    /* And a comparison against live data is not a comparison. The fingerprint
+       is meant to be a fact about the code; for an unpinned screen it is a fact
+       about what TMDB returned this minute, so --check would go red for reasons
+       nobody caused — which is the thing that teaches everyone to ignore it,
+       and the reason this corpus exists at all. */
+    if (CHECK) {
+        console.log('  A check against live data is not a check. Nothing was compared.\n');
+        process.exit(1);
+    }
+}
+
+/* Reported before the comparison, and fatal on its own.
+   
+   Order matters here and has bitten this repo before: a check that runs after
+   its results have been collected and acted on has its complaints go unread.
+   An empty screen is not a layout change, so `--check` would pass it happily
+   and a record run would write the fingerprint of a page with nothing on it.
+   Either way the photograph is worthless, so this stops first. */
+if (hollow.length) {
+    console.log('\n  PHOTOGRAPHED EMPTY\n');
+    for (const line of hollow) console.log(`    ${line}`);
+    console.log('\n  These screens were seeded with a library and drew their'
+        + '\n  empty state anyway, so the fixture stopped feeding them.'
+        + '\n  Fix the fixture before trusting anything else in this run.\n');
+    process.exit(1);
 }
 
 if (CHECK) {

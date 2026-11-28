@@ -12,7 +12,7 @@ import {
     useLibrary, useTileStates, useQuickAdd, loadShelf, shapeRow,
 } from '../library';
 import { SignInPrompt } from '../entry';
-import { presetsFor, facetsFor, toParams, readRegion } from '../search';
+import { toParams, Presets } from '../search';
 import './discover.css';
 
 /* L6 — every rail header is a link, and the link is a browse.
@@ -176,7 +176,7 @@ export default function Discover() {
                 or an empty library: the person with nothing to continue is the
                 one who most needs a way in. With a library it drops below the
                 feeds. */}
-            {!hasLibrary && <Presets />}
+            {!hasLibrary && <Presets className="chips presets" />}
 
             <FeedRail
                 title="Trending this week"
@@ -223,7 +223,7 @@ export default function Discover() {
                 deps={[region]}
             />
 
-            {hasLibrary && <Presets />}
+            {hasLibrary && <Presets className="chips presets" />}
 
             {prompt && <SignInPrompt {...prompt} onClose={() => setPrompt(null)} />}
         </div>
@@ -237,16 +237,3 @@ export default function Discover() {
  * be taken apart one at a time. That is the difference between a curated shelf
  * and a starting point.
  */
-function Presets() {
-    const region = readRegion();
-    const offered = presetsFor(region);
-    return (
-        <div className="chips presets">
-            {offered.map((p) => (
-                <Chip key={p.key} as={Link} to={browseTo(facetsFor(p, region))} title={p.definition}>
-                    {p.label}
-                </Chip>
-            ))}
-        </div>
-    );
-}

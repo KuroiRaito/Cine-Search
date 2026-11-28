@@ -97,7 +97,18 @@ export async function loadShelf(kind) {
 }
 
 export async function addFavourite(row) {
-    return supabase.from('user_favourites').upsert(row, { onConflict: 'user_id,kind,ref' }).then(unwrap);
+    // user_id is NOT NULL with no default, and the RLS check is
+    // auth.uid() = user_id — so a row without it is not merely incomplete, it
+    // is refused with a 403. The heart is optimistic and reverts on failure,
+    // which made every People and Characters favourite look like a control
+    // that flickered rather than a write that never landed.
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+    if (!userId) throw new Error('Not signed in.');
+    return supabase
+        .from('user_favourites')
+        .upsert({ ...row, user_id: userId }, { onConflict: 'user_id,kind,ref' })
+        .then(unwrap);
 }
 
 export async function removeFavourite(kind, ref) {

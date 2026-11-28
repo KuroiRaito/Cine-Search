@@ -8,7 +8,7 @@ import {
     statusMeta, epLabel, loadEntries, keyOf, shapeRow,
 } from './library.js';
 import { useAsync } from '../../shared/hooks/useAsync.js';
-import { matches, isFinding } from './find.js';
+import { rowMatches, isFinding, recommenderSummary } from './find.js';
 import { applySort, availableSorts, defaultSortFor, sortNote } from './sort.js';
 import { readDensity, writeDensity, compactSlots } from './density.js';
 import './library.css';
@@ -166,7 +166,7 @@ export default function Library() {
        the film. */
     const finding = isFinding(term);
     const shown = finding
-        ? rows.filter((r) => matches(r.title, term))
+        ? rows.filter((r) => rowMatches(r, term))
         : (active === 'all' ? rows : rows.filter((r) => r.status === active));
     /* Find has no shelf, so it has no remembered sort — the answer to "where
        did I put it" is the title you typed, in the order the shelf already
@@ -177,6 +177,11 @@ export default function Library() {
     // — rating on a shelf whose last rated title was removed. Fall back rather
     // than sort by something that is no longer there.
     const effective = options.some((o) => o.key === sortKey) ? sortKey : defaultSortFor(active);
+
+    /* L27. Asked of every row, not of `shown` — the count is "how many did
+       Priya recommend", and filtering first would answer "how many of Priya's
+       are on this shelf", which is a different and less useful number. */
+    const fromWhom = finding ? recommenderSummary(rows, term) : null;
 
     const ordered = applySort(shown, effective);
     const series = ordered.filter((r) => r.mediaType === 'tv');
@@ -275,6 +280,15 @@ export default function Library() {
                         </Button>
                     }
                 />
+            )}
+
+            {/* L27's payoff: not what did she recommend, but am I behind on
+                what she recommended. Rendered only when one person matched —
+                recommenderSummary returns nothing for an ambiguous name. */}
+            {fromWhom && (
+                <p className="lcount">
+                    {fromWhom.total} recommended by {fromWhom.name} &middot; {fromWhom.watched} watched
+                </p>
             )}
 
             {/* Series always sits above Films, whether or not either has
@@ -449,6 +463,9 @@ function SeriesRow({ row, onBump }) {
                         ? <>{row.next ? `${epLabel(row.next)} · ` : 'Complete · '}{row.seen} of {row.total}</>
                         : <>{statusMeta(row.status)?.label}</>}
                 </span>
+                {/* L26. Rows without a name show nothing, and nothing marks
+                    the absence — no placeholder, no dash. */}
+                {row.recommendedBy && <span className="ep from">From {row.recommendedBy}</span>}
             </Link>
             <button
                 type="button"

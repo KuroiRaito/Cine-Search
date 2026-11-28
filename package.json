@@ -27,6 +27,11 @@
     "auth": "node --env-file=.env scripts/auth-cases.mjs",
     "cohorts": "node scripts/title-cohorts.mjs",
     "find": "node --env-file-if-exists=.env scripts/find-cases.mjs",
+    "library": "vite-node scripts/library-cases.mjs",
+    "paste": "vite-node scripts/paste-cases.mjs",
+    "restore": "vite-node scripts/restore-cases.mjs",
+    "person": "vite-node scripts/person-cases.mjs",
+    "answer": "vite-node scripts/answer-cases.mjs",
     "divergence": "node scripts/divergence.mjs"
   },
   "dependencies": {

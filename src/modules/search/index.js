@@ -7,3 +7,5 @@ export { default } from './SearchPage.jsx';
 export { search, DEFAULT_SEARCH_OPTS } from './lib/index.js';
 export { PRESETS, presetsFor, facetsFor } from './presets.js';
 export { toParams, readRegion } from './browse.js';
+export { default as Presets } from './Presets.jsx';
+export { recentSearches, rememberSearch } from './recents.js';

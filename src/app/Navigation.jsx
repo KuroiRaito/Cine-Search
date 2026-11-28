@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigationType } from 'react-router-dom';
+import { isClamp, reachable } from './restore.js';
 
 /**
  * What should happen between two routes, and did not.
@@ -52,7 +53,35 @@ export default function Navigation() {
        cleanup runs the browser may already have scrolled. */
     useEffect(() => {
         leaving.current = location.key;
-        const remember = () => positions.set(leaving.current, window.scrollY);
+
+        /* The page getting shorter is not the person scrolling up.
+           
+           This listener writes under the outgoing entry's key until React runs
+           this effect again — and the DOM swap happens first. So when a tall
+           list is replaced by a shorter page, the browser clamps the scroll
+           position to the new maximum, that clamp raises a scroll event, and
+           the event lands here while `leaving` still points at the list. The
+           position recorded for the list was therefore whatever the *next*
+           page could hold, which for a title page arriving at the top is zero.
+
+           Measured, not reasoned: three pages into Browse at y=946.5, the map
+           held 0 for that entry. Every restore in this app was reading a
+           position destroyed by the navigation it was meant to survive, which
+           is why the feature looked like "scroll restore is flaky" rather than
+           like a bug with a cause.
+
+           So a scroll event is ignored when the document just got shorter and
+           the new position is the most that document can hold — that pair is a
+           clamp, and a clamp is the page moving, not the person. */
+        let tall = document.documentElement.scrollHeight;
+        const remember = () => {
+            const height = document.documentElement.scrollHeight;
+            const before = tall;
+            tall = height;
+            if (isClamp(window.scrollY, height, window.innerHeight, before)) return;
+            positions.set(leaving.current, window.scrollY);
+        };
+
         window.addEventListener('scroll', remember, { passive: true });
         return () => {
             remember();
@@ -69,15 +98,34 @@ export default function Navigation() {
            height to scroll into — which is exactly what the first version did,
            landing focus on <body> and the scroll at zero.
            
-           So it waits, briefly and on a budget: each frame, take the focus if a
-           heading has appeared, and restore the position once the document is
-           tall enough to hold it. It stops as soon as both are done, and gives
-           up after a second either way rather than fighting somebody who has
-           started scrolling themselves. */
+           So it waits: each frame, take the focus if a heading has appeared,
+           and restore the position once the document is tall enough to hold
+           it. It stops as soon as both are done.
+
+           It used to stop after a second either way, and the reason given was
+           not to fight somebody who had started scrolling themselves. That is
+           the right thing to avoid and the wrong way to detect it. A second is
+           a guess about how long a fetch takes, and on the screen this matters
+           most — three pages deep in Browse, where every page has to come back
+           before the document is tall enough — it is a guess that is wrong on
+           any connection worse than a desk.
+
+           So it watches for the person instead of the clock. A wheel, a touch
+           or a key is somebody taking over, and restoring under them would be
+           rude; our own scrollTo raises none of those. The timer stays as a
+           backstop at five seconds, for a fetch that never answers at all. */
         let done = target === 0;
         let focused = false;
-        const until = performance.now() + 1000;
+        let taken = false;
+        const until = performance.now() + 5000;
         let frame;
+
+        /* Input events, deliberately, not 'scroll' — scroll fires for our own
+           restore too, so listening for it would cancel the thing it is meant
+           to protect. */
+        const takeOver = () => { taken = true; };
+        const INPUT = ['wheel', 'touchstart', 'keydown'];
+        INPUT.forEach((e) => window.addEventListener(e, takeOver, { passive: true }));
 
         const settle = () => {
             if (!focused) {
@@ -92,11 +140,34 @@ export default function Navigation() {
                     focused = true;
                 }
             }
-            if (!done && document.documentElement.scrollHeight >= target + window.innerHeight) {
-                window.scrollTo(0, target);
-                done = true;
+            /* Follow the document down as it grows, rather than waiting for
+               one perfect moment and latching.
+
+               The previous rule restored only once the page was tall enough to
+               put the target at the top of the viewport:
+
+                   scrollHeight >= target + innerHeight
+
+               which a position at the bottom of a list can never satisfy. The
+               greatest legal scrollY is exactly scrollHeight - innerHeight, so
+               for a target at the very bottom the test is asking whether a
+               number is greater than itself — and measured on a real page it
+               failed by half a pixel: 1714 >= 1714.5. Three pages into Browse,
+               at the bottom, tapping a film and coming back restored nothing,
+               and that is the single most likely way to arrive here.
+
+               So: each frame, go as close to the target as the document can
+               currently hold, and keep going as the rest of it arrives. There
+               is no moment to pick correctly, which means there is no moment
+               to pick wrongly — a clamped early guess is corrected by the next
+               frame instead of being the final answer. It is finished only
+               when the page can hold the whole position. */
+            if (!done) {
+                const here = reachable(target, document.documentElement.scrollHeight, window.innerHeight);
+                if (Math.abs(window.scrollY - here) > 1) window.scrollTo(0, here);
+                done = here >= target;
             }
-            if ((!done || !focused) && performance.now() < until) {
+            if ((!done || !focused) && !taken && performance.now() < until) {
                 frame = requestAnimationFrame(settle);
             }
         };
@@ -105,7 +176,10 @@ export default function Navigation() {
         frame = requestAnimationFrame(settle);
 
         setAnnounced(nameOf(location.pathname));
-        return () => cancelAnimationFrame(frame);
+        return () => {
+            cancelAnimationFrame(frame);
+            INPUT.forEach((e) => window.removeEventListener(e, takeOver));
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.key]);
 

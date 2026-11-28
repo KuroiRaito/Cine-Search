@@ -549,6 +549,79 @@ at the gutter where production puts it at 8px.
 > at daily, so it is your call — the same call as B1's phone half, and I would
 > measure the page height before and after exactly as that one asked for.
 
+#### Closed and shipped, 2026-11-28 — *and the document had already written it*
+
+**The phone page is 8px shorter**, which is the rare divergence that costs
+nothing to close:
+
+| | before | after |
+|---|---|---|
+| avatar | 48px | **64px** |
+| avatar against the banner | −12px (below it) | **+32px** (into it) |
+| page at 390 | 939 | **931** |
+| page at 600 | 959 | **951** |
+| page at 900 | 1034 | **1026** |
+| expanded, 1120 / 1280 / 1440 / 1600 | 906 / 926 / 926 / 926 | **unchanged** |
+
+Of 72 recorded screens **4 moved** — `profile/profile@390` and `@900`, both
+themes. `@1280` did not, so B8 is untouched. 118 elements before and after.
+
+**This was not a judgement call after all.** `docs/profile-module.html`
+contains a complete 64px layout that matches its own anatomy table exactly,
+and no drawing uses it:
+
+| statement | says |
+|---|---|
+| anatomy table, §02 | 64px, overlaps by 32 |
+| `.pav` + `.phead`, lines 236–238 | `--space-64`, `margin-top: calc(var(--space-32) * -1)`, **and `position: relative`** |
+| the nine phone drawings | `.pav-sm` — 48px, 2px ring, no lift |
+| production, before this | 48px, 2px ring, no lift |
+
+`.pav` and `.phead` are referenced by **zero** drawings. So this is B1's shape
+exactly — a rule and a table on one side, drawings quietly using a different
+class on the other — and it resolves the same way, because the drawings are
+the half with no reasoning attached. The product had been matching the
+drawings.
+
+**The margin is 32 + 12, not 32.** `.phead` lifts the whole header block and
+carries no top padding, so `-32px` there overlaps by 32. `.pav-row` carries
+12px of top padding so the handle is not flush against the artwork, and the
+avatar has to come back through that as well to reach the same place.
+Measured: **32px of overlap**, which is what the table states. The
+alternative — dropping the row's padding to match `.phead` — moves the handle
+and bio too, and this item is the avatar.
+
+**It brought B8's collision with it, one band down.** The avatar now reaches
+32px into the banner at the same left edge the name uses, and at
+`--text-title` the name is 28px tall sitting 12px off the bottom — so the
+circle and the name's lower-left shared **20px of one column**, and the name
+won it, because `.pname` carries `z-index: 2` and the identity row does not.
+`.pname` moves to `bottom: var(--space-40)` on the **base** rule, clearing the
+avatar by 8px at every width; the expanded override B8 added is now redundant
+and is gone. **The design never hits this**, because its phone layout stacks
+the name *under* the avatar inside `.phead` where the product puts it on the
+artwork — a difference worth knowing about and not worth closing, since the
+name on the artwork is what makes the banner a nameplate.
+
+**`position: relative` moved to the base `.pav-row`**, where the explanation
+now lives. The design's own phone rules carry it and `D1` does not, which is
+why `D1` cannot render its own overlap (B8).
+
+**Not taken:** the 3px ring the same table names. `--border-focus` is 2px, 3px
+is not on the scale, and a border token exists so that rings step together.
+
+> **Worth revisiting, and not revisited here.** The table says the expanded
+> avatar *"overlaps by 48"* and B8 ships 32, a decision taken against D1's own
+> declarations. B10 is evidence that cuts the other way: every non-drawing
+> rule in this document agrees with its table, and only the inline numbers in
+> `D1` do not. If that pattern holds, the table is the reliable statement at
+> both bands and expanded should be 48. One token, and it was not what was
+> approved, so it stays open.
+
+Tier of §6.1: **4 — visible.** Measured at seven widths, photographed at
+three. There is still no gate for a lifted element landing behind a
+positioned sibling; that needs a paint-order check and none exists.
+
 ---
 
 ## C. Found by the tool, and the code is right
@@ -664,7 +737,21 @@ drawing that specifies it — the drawing's avatar is `position: static` under a
 returns the scrim. Copying D1's declarations reproduced that exactly. The
 product ships the intent, with one declaration the drawing does not have.
 
-**Still open:** **B10** (new, needs a decision), and **B4**'s three re-scoped
-pieces — a 1:N band mechanism, a band-naming fix in `snap`, and a match-table
-correction for search. **B5** stays parked. Everything in section F is
-untouched.
+**Still open:** **B4**'s three re-scoped pieces — a 1:N band mechanism, a
+band-naming fix in `snap`, and a match-table correction for search. **B5**
+stays parked. Everything in section F is untouched.
+
+**B10 was approved and shipped the same day.** The phone avatar is 64px
+overlapping by 32, and the phone page is **8px shorter** — 931 / 951 / 1026 at
+390 / 600 / 900, with every expanded width unchanged. It turned out not to be
+a judgement call: the document already contained a `.pav`/`.phead` pair
+declaring exactly `--space-64` and a `-32px` lift, matching its anatomy table,
+used by none of its nine drawings. **That is three times in one day** —
+B1, B8 and B10 — **that a drawing has disagreed with the document it lives
+in, and three times that the rule or the table has been right.** Where a
+module doc states a thing twice and draws it once, trust the statements.
+
+One question it raises is left open rather than answered: whether B8's
+expanded overlap should be 48 rather than 32, now that every non-drawing rule
+in the document has agreed with its table and only `D1`'s inline numbers have
+not. One token, and it was not what was approved.

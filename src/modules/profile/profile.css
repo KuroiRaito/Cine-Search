@@ -171,24 +171,63 @@
 
 /* On the artwork, which is what makes the banner a nameplate rather than
    decoration. Two lines then ellipsis — P7. */
+/* `bottom` is 40 and not 12 because the avatar now reaches 32px into the
+   banner at the same left edge. At --text-title the name is 28px tall, so
+   at 12 the circle and the name's lower-left shared 20px of one column --
+   measured, and the name won it, because .pname carries z-index 2 and the
+   identity row does not. 40 clears the avatar's top by 8px at every width.
+   The design does not hit this: its phone layout stacks the name UNDER the
+   avatar inside .phead, where the product puts it on the artwork. */
 .pname {
-  position: absolute; left: var(--gutter); right: var(--space-64); bottom: var(--space-12); z-index: 2;
+  position: absolute; left: var(--gutter); right: var(--space-64); bottom: var(--space-40); z-index: 2;
   margin: 0; font-family: var(--f-d);
   font-size: var(--text-title); line-height: var(--lh-title);
   font-weight: 800; letter-spacing: -.03em; color: #fff;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 
+/* `position` carries the overlap, at every width. .pbanner is
+   `position: relative`, and a positioned box paints above every static
+   in-flow sibling whatever the DOM order says -- so an avatar lifted into
+   the banner is lifted BEHIND it, which is what the first build of the
+   expanded band did and what D1 still does. The design's own phone layout
+   has this declaration (`.phead` carries `position: relative` beside its
+   -32px lift) and its desktop drawing does not. */
 .pav-row {
+  position: relative;
   display: flex; align-items: flex-start; gap: var(--space-12);
   padding: var(--space-12) var(--gutter) 0;
 }
-/* The ring is what separates it from the banner, in both themes. */
+/* The ring is what separates it from the banner, in both themes.
+
+   64px overlapping the banner by 32 -- §02's anatomy table, and the
+   document's own `.pav`/`.phead` rules, which declare exactly
+   `--space-64` and `margin-top: calc(var(--space-32) * -1)`. Neither had
+   ever been built: the avatar shipped at 48px sitting 12px BELOW the
+   banner, and all nine phone drawings use a second class, `.pav-sm`, that
+   agrees with the shipped version rather than with the table beside it.
+   `.pav` and `.phead` are used by no drawing at all. Same shape as B1 --
+   a rule and a table against drawings that quietly use something else --
+   and resolved the same way, because the drawings are the half with no
+   reasoning attached.
+
+   The margin is 32 + 12 and not 32. `.phead` lifts the whole header block
+   and carries no top padding, so -32px there overlaps by 32. `.pav-row`
+   carries 12px of top padding so the handle is not flush against the
+   artwork, and the avatar must come back through it as well to reach the
+   same place. Measured: 32px of overlap, which is the number the table
+   states. The alternative -- dropping the row's padding to match `.phead`
+   exactly -- moves the handle and bio too, and this item is the avatar.
+
+   See docs/GROOMING_DIVERGENCE.md B10. The 3px ring the same table names
+   is NOT taken: --border-focus is 2px, 3px is not on the scale, and a
+   border token exists so that rings step together. */
 .pav {
-  width: var(--space-48); height: var(--space-48); flex: 0 0 auto;
+  width: var(--space-64); height: var(--space-64); flex: 0 0 auto;
+  margin-top: calc((var(--space-32) + var(--space-12)) * -1);
   border-radius: var(--radius-full); border: var(--border-focus) solid var(--bg);
   display: grid; place-items: center; overflow: hidden;
-  font-family: var(--f-d); font-size: var(--text-title-sm); line-height: var(--lh-title-sm);
+  font-family: var(--f-d); font-size: var(--text-title); line-height: var(--lh-title);
   font-weight: 800; color: #fff;
 }
 .pav img { width: 100%; height: 100%; object-fit: cover; }
@@ -515,31 +554,29 @@
      --border-focus the product has. None of those is this change. */
   .pbanner { border-radius: var(--radius-16); }
 
-  /* `position` is not decoration here, and D1 is missing it. A banner that
-     is `position: relative` paints above every static in-flow sibling
-     whatever the DOM order says, so an avatar lifted into it is lifted
-     BEHIND it. Measured in the design document itself: at a point inside
-     D1's own overlap, `elementFromPoint` returns the banner's scrim, not
-     the avatar -- the 48px lift the anatomy table specifies has never once
-     been visible in the drawing that specifies it. Copying D1's
-     declarations reproduced that exactly. This builds the intent instead,
-     and docs/GROOMING_DIVERGENCE.md B8 records why the drawing and the
-     code differ by one declaration the drawing does not have. */
-  .pav-row { position: relative; align-items: center; gap: var(--space-16); padding-top: var(--space-16); }
+  /* `position: relative` is on the base rule, where the comment explaining
+     it lives; D1 omits it and cannot render its own overlap because of
+     that. See docs/GROOMING_DIVERGENCE.md B8. */
+  .pav-row { align-items: center; gap: var(--space-16); padding-top: var(--space-16); }
 
+  /* -48 unchanged, which with the row's 16px of top padding is the 32px of
+     overlap B8 measured and shipped. NOT re-derived as 48 + 16 to satisfy
+     the table's "overlaps by 48": that was B8's decision, taken against
+     D1's own declarations, and this item is the phone. Worth revisiting
+     together -- see the note under B10 -- since the document's non-drawing
+     rules agree with its table everywhere they exist, and only D1's inline
+     numbers do not. */
   .pav {
     width: calc(var(--space-48) * 2); height: calc(var(--space-48) * 2);
     margin-top: calc(var(--space-48) * -1);
     font-size: var(--text-display-sm); line-height: var(--lh-display-sm);
   }
 
-  /* And the name moves up out of the avatar's way. At --text-display the
-     name is 44px tall sitting 12px off the banner's bottom edge, and the
-     avatar's top lands 32px above that edge -- so the circle and the name's
-     lower-left share 20px of the same column. D1 has the same collision at
-     6px and cannot see it, because its avatar is behind the banner. 40px
-     clears the avatar's top by 8px, measured. */
-  .pname { bottom: var(--space-40); font-size: var(--text-display); line-height: var(--lh-display); }
+  /* `bottom: var(--space-40)` is the base rule's now, for the same reason
+     at a different size -- see the comment beside .pname. D1 has this
+     collision too, at 6px, and cannot see it because its avatar is behind
+     its banner. */
+  .pname { font-size: var(--text-display); line-height: var(--lh-display); }
 }
 
 /* ---------------- the picker ----------------

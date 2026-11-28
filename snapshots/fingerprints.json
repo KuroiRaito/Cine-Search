@@ -221,23 +221,23 @@
   },
   "profile/profile@390-dark": {
     "elements": 118,
-    "hash": "6a8bac0c",
-    "geometry": "b84ffc89"
+    "hash": "bdb00124",
+    "geometry": "ce1e8157"
   },
   "profile/profile@390-light": {
     "elements": 118,
-    "hash": "6a8bac0c",
-    "geometry": "b84ffc89"
+    "hash": "bdb00124",
+    "geometry": "ce1e8157"
   },
   "profile/profile@900-dark": {
     "elements": 118,
-    "hash": "ba4d5662",
-    "geometry": "87d11085"
+    "hash": "ec660074",
+    "geometry": "aaa10969"
   },
   "profile/profile@900-light": {
     "elements": 118,
-    "hash": "ba4d5662",
-    "geometry": "87d11085"
+    "hash": "ec660074",
+    "geometry": "aaa10969"
   },
   "profile/settings@1280-dark": {
     "elements": 71,

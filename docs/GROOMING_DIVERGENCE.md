@@ -610,17 +610,100 @@ why `D1` cannot render its own overlap (B8).
 **Not taken:** the 3px ring the same table names. `--border-focus` is 2px, 3px
 is not on the scale, and a border token exists so that rings step together.
 
-> **Worth revisiting, and not revisited here.** The table says the expanded
-> avatar *"overlaps by 48"* and B8 ships 32, a decision taken against D1's own
+> **Revisited the same day, and taken — see B11.** The table says the expanded
+> avatar *"overlaps by 48"* and B8 shipped 32, a decision taken against D1's own
 > declarations. B10 is evidence that cuts the other way: every non-drawing
 > rule in this document agrees with its table, and only the inline numbers in
-> `D1` do not. If that pattern holds, the table is the reliable statement at
-> both bands and expanded should be 48. One token, and it was not what was
-> approved, so it stays open.
+> `D1` do not. That pattern held, the owner approved the change, and the
+> expanded overlap is now 48. Building it found something B8 had not: the
+> overlap was moving with the length of the bio.
 
 Tier of §6.1: **4 — visible.** Measured at seven widths, photographed at
 three. There is still no gate for a lifted element landing behind a
 positioned sibling; that needs a paint-order check and none exists.
+
+---
+
+### B11. The expanded overlap is 48, not the 32 B8 shipped
+
+B8 built the expanded identity band and took **32px** of overlap, from D1's
+literal `margin-top: -48px` against a row with 16px of top padding. The
+anatomy table in the same document says **48**. At the time that was one
+drawing against one table, and B8 took the drawing.
+
+B10 turned it into one drawing against everything else. Every non-drawing rule
+in `docs/profile-module.html` has now been checked against the product, and
+every one of them has agreed with its own anatomy table:
+
+| statement | agrees with the table? |
+|---|---|
+| `.pbanner`'s base `aspect-ratio: 3/1` (B1) | yes — eleven drawings overrode it with `.tall` |
+| `.pav` / `.phead`, 64px and `-32px` (B10) | yes — used by none of its nine drawings |
+| **D1's inline `margin-top: -48px`** | **no** |
+
+And `D1` is the one drawing that **cannot render its own overlap at all** —
+its avatar is `position: static` under a `position: relative` banner, so the
+lift it declares paints behind the scrim. Nobody has ever seen D1's geometry,
+including whoever wrote it. It is the weakest statement in the document, and
+it was the only one B8 had.
+
+**Decision:** *do the 48px expanded overlap too.* Shipped.
+
+#### Measured, before and after
+
+Same fixture, same markup, the margin changed from `-(32+16)` to `-(48+16)`:
+
+| at 1120+ | B8 shipped | now |
+|---|---|---|
+| avatar into the banner | 32px | **48px** |
+| name-to-avatar clearance | 8px | **8px** (`.pname` raised with it) |
+| identity row height | 64px | **56px** |
+| page height | 906 / 926 / 926 / 926 | **900 / 918 / 918 / 918** |
+
+At 390, 600 and 900 every number is unchanged — B10's phone band is untouched.
+`npm run snap`: of the 72 recorded screens **2 moved**, `profile/profile@1280`
+dark and light, and `geometry` moved with `hash`, so it is a real box change
+and not a renamed class. Element count 118 → 118.
+
+#### What building it actually found: `align-items: center` made the overlap depend on the bio
+
+The first measurement came back **44px**, not 48, with the margin arithmetic
+plainly correct. The cause was D1's `align-items: center`, which B8 had copied.
+Under `center` the avatar's **margin box** is centred in the flex line, and the
+line is as tall as the text beside it — so the overlap is a function of how much
+the person wrote about themselves. Measured at 1280, same markup, only the bio
+changed:
+
+| | empty bio | four-line bio |
+|---|---|---|
+| `align-items: center` | 44px | **24px** |
+| `align-items: flex-start` | 48px | **48px** |
+
+**A 20px swing driven by profile content.** So `center` was never "4px out" —
+it was a sliding value that happened to read 44 against a one-line fixture, and
+the fixture B8 was measured against was exactly that one. `flex-start` makes the
+overlap `padding + margin` and nothing else, which is why the 48 above is
+derivable from two declarations rather than from a screenshot.
+
+This is an instance of a class already named in `CLAUDE.md` §7 — *absent must
+never become plausible* — wearing different clothes: not an absent value
+coercing into a valid-looking one, but a **correct-looking measurement that was
+an artifact of the fixture**. B7 was the same shape earlier the same day: "7–13%
+occupied" came from a one-film shelf. Both were caught by changing the fixture
+and measuring again.
+
+**The named class this adds:** *a geometric relationship must not be expressed
+through a value that something else can resize.* An overlap between two boxes
+has to be stated as a relationship between those two boxes.
+
+Tier of §6.1: **4 — visible.** The number is measured at seven widths and
+photographed at three, and the counterfactual was run rather than reasoned
+about — `center` was reinstated and watched to move (§6.3). No gate prevents
+the next geometric constant from being routed through a flex alignment; that
+needs a check that re-measures a declared relationship under two fixtures, and
+none exists. It is the same missing harness D (**nothing above 1280**) and B8
+(**no paint-order check**) already name: there is no *second-fixture* pass in
+this repo at all.
 
 ---
 
@@ -647,6 +730,7 @@ Stated plainly so the net is not assumed to be wider than it is.
 - **The 64 laws are not checked.** They are counted and quoted. Most are product rules no stylesheet can express.
 - **Fixture artifacts, not product faults:** broken poster images (`/snap.jpg` is not a real TMDB path) and a single favourite film. A real account has more favourites, so **the real screen is more crowded than the one measured here**, not less.
 - **Nothing measured here goes above 1280, and the shell does.** `npm run snap`'s widths are 390, 900 and 1280; `--shell-max` rises to **1600 at 1440+**. So the 400px banner B3 fixed was invisible to every harness in the repo and was found by hand. Any claim about the wide band in this document was measured one-off, not gated **This blind spot has now produced two defects, and the second one shipped to `main`** — B9, a banner leaving 400px of blank page beside it at 1600, written and reviewed and photographed without anyone seeing it. A harness that measured 1440 and 1600 would have caught both. It still does not exist; B9 is gated statically instead.
+- **Nothing re-measures under a second fixture.** Every measurement in this repo is taken once, against one seeded account. Two findings today were correct numbers about the wrong fixture: B7's "7-13% occupied" (a one-film shelf) and B11's 44px overlap (a one-line bio, where a four-line one gave 24px). Both were found by hand, by varying the fixture and measuring again. **No harness does that**, so a value that reads right against the seeded account and slides against a real one is invisible here.
 - **`entry` and `profile/settings` have no designed counterpart** — the welcome module has no `-module.html`, and settings is drawn as part of shell.
 
 ---
@@ -703,13 +787,14 @@ Still open after today: **B1 phone half**, **B4**, and the three above.
 
 **2026-11-28, later the same day — the five open items were put to the owner
 and all five were decided.** Branch `claude/divergence-open-items-d270c4`.
-`npm run check` green, 25 checks. Of the 72 recorded screens **2 moved**:
-`profile/profile@1280`, dark and light.
+`npm run check` green, 25 checks. Three further items — **B9**, **B10** and
+**B11** — came out of building them and were decided as they appeared. Of the
+72 recorded screens **2 moved**: `profile/profile@1280`, dark and light.
 
 | item | decision | outcome |
 |---|---|---|
 | **B1** phone half | *keep 3:1, fix the doc* | **Closed.** The design doc already said 3:1 in its base rule and its anatomy table; eleven drawings overrode both with `.tall`. `.tall` removed. `divergence` now reports **"CSS agrees (base)"** |
-| **B8** identity band | *do it* | **Shipped.** 96px avatar, 32px overlap, `--radius-16`, name at `--text-display`. +4px page height at expanded, phone untouched |
+| **B8** identity band | *do it* | **Shipped.** 96px avatar, `--radius-16`, name at `--text-display`. Shipped at 32px overlap; **revised to 48px the same day by B11**, which is the table's number |
 | **B6** tall screen at 900 | *record as parked* | **Closed, not doing.** Needs an undrawn ~840 breakpoint; re-measured at 1034 |
 | **B7** tile to 108px | approved, then **withdrawn** | **Not shipped.** Measured with a full eight-card shelf, both of its numbers were fixture artifacts and 108px breaks the rail law at 1120. Only the dead `600px` restatement was deleted |
 | **B4** vocabulary gap | *do it* | **Partly closed, 2 → 3 live comparisons.** `person/director` now compares. The rest is not a rename, and is re-scoped into three pieces |
@@ -751,7 +836,22 @@ B1, B8 and B10 — **that a drawing has disagreed with the document it lives
 in, and three times that the rule or the table has been right.** Where a
 module doc states a thing twice and draws it once, trust the statements.
 
-One question it raises is left open rather than answered: whether B8's
-expanded overlap should be 48 rather than 32, now that every non-drawing rule
-in the document has agreed with its table and only `D1`'s inline numbers have
-not. One token, and it was not what was approved.
+**That pattern decided the last open question, and it was approved too.**
+B8's expanded overlap is now **48**, not 32 — the number its anatomy table
+states (**B11**). Building it found a defect B8 had shipped without seeing:
+the overlap was not a constant at all. D1's `align-items: center`, copied into
+B8, centres the avatar's *margin box* in a flex line whose height comes from
+the text beside it, so the overlap moved with the length of the bio — **44px
+empty, 24px against a four-line one**. `flex-start` makes it `padding + margin`
+and nothing else. The expanded page is **8px shorter**; the phone is untouched.
+
+So the day's score on the drawings is four from four: **B1, B8, B10 and B11**,
+each a case where a drawing disagreed with a statement in its own document, and
+each time the statement was right. The working rule stands: where a module doc
+states a thing twice and draws it once, trust the statements and measure the
+drawing.
+
+**And twice today a measurement was right about the wrong fixture** — B7's
+"7–13% occupied" came from a one-film shelf, B11's 44px from a one-line bio.
+Both were caught by changing the fixture and measuring again, and nothing in
+the repo does that on its own. A second-fixture pass is the gate neither has.

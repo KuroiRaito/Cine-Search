@@ -245,6 +245,19 @@ check 25 fails any selector that constrains one axis of a ratio while leaving
 the other indefinite.** It reads declarations per selector across files *and*
 media blocks, because the ratio and its ceiling are routinely written apart.
 
+**A geometric relationship routed through a value something else can resize.**
+The expanded avatar's overlap with the banner was set by `margin-top` under
+`align-items: center`, so the avatar's margin box was centred in a flex line
+whose height came from the *text beside it*: the overlap moved with the length
+of the user's bio — 48px specified, 44px against an empty one, **24px against
+a four-line one**. It measured 4px out and looked like a rounding error; it was
+a sliding value that happened to read 44 against the seeded fixture. **An
+overlap is a relationship between two boxes and must be expressed as one** —
+here `flex-start`, which makes it `padding + margin` and nothing else. Related:
+every measurement in this repo is taken against one fixture, so a number that
+slides reads as a constant. Two findings in one day were correct numbers about
+the wrong fixture.
+
 **A drawing can specify something it cannot render.** `D1` draws a 96px avatar
 lifted 48px over the banner; its avatar is `position: static` under a
 `position: relative` banner, so `elementFromPoint` inside its own overlap

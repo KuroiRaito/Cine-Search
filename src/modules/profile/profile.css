@@ -175,7 +175,14 @@
    banner at the same left edge. At --text-title the name is 28px tall, so
    at 12 the circle and the name's lower-left shared 20px of one column --
    measured, and the name won it, because .pname carries z-index 2 and the
-   identity row does not. 40 clears the avatar's top by 8px at every width.
+   identity row does not.
+
+   The rule both bands follow is `overlap + 8`: 32 + 8 here, 48 + 8 at
+   expanded, where the name is also 44px tall rather than 28. It is written
+   out at each band rather than derived from a shared custom property,
+   because the overlap itself is two different numbers the design states
+   separately and a single knob would imply they move together.
+
    The design does not hit this: its phone layout stacks the name UNDER the
    avatar inside .phead, where the product puts it on the artwork. */
 .pname {
@@ -556,27 +563,62 @@
 
   /* `position: relative` is on the base rule, where the comment explaining
      it lives; D1 omits it and cannot render its own overlap because of
-     that. See docs/GROOMING_DIVERGENCE.md B8. */
-  .pav-row { align-items: center; gap: var(--space-16); padding-top: var(--space-16); }
+     that. See docs/GROOMING_DIVERGENCE.md B8.
 
-  /* -48 unchanged, which with the row's 16px of top padding is the 32px of
-     overlap B8 measured and shipped. NOT re-derived as 48 + 16 to satisfy
-     the table's "overlaps by 48": that was B8's decision, taken against
-     D1's own declarations, and this item is the phone. Worth revisiting
-     together -- see the note under B10 -- since the document's non-drawing
-     rules agree with its table everywhere they exist, and only D1's inline
-     numbers do not. */
+     `align-items` is NOT set here, so the base rule's `flex-start` holds --
+     and D1's `center` is deliberately not taken. Under `center` the
+     avatar's margin box is centred in the flex line, and the line is as
+     tall as the TEXT beside it, so the overlap becomes a function of the
+     bio's length. Measured at 1280, same markup, only the bio changed:
+
+                       empty bio    four-line bio
+       center             44px          24px        clearance 12 -> 32
+       flex-start         48px          48px        clearance  8 ->  8
+
+     So `center` is not 4px out, it is a sliding value that happens to read
+     44 against this fixture -- and the first build of this band was
+     measured against exactly that fixture. An overlap is a relationship
+     between the avatar and the banner; it must not depend on what somebody
+     wrote about themselves. `flex-start` makes it padding + margin and
+     nothing else, which is why the number above is derivable from the two
+     declarations below rather than from a screenshot.
+
+     The text does not move either way -- it is the tallest item in the
+     line, so it fills it under both values. Only the avatar does. */
+  .pav-row { gap: var(--space-16); padding-top: var(--space-16); }
+
+  /* 48 + 16, for 48px of overlap -- the number the anatomy table states.
+
+     This shipped at 32 first, taking D1's literal `margin-top: -48px`,
+     which with the row's 16px of top padding lands at 32. B10 settled the
+     question the other way and the evidence is now one-sided: EVERY
+     non-drawing rule in the module document agrees with its anatomy table
+     -- `.pbanner`'s 3:1 (B1), `.pav`/`.phead`'s 64px and -32px lift (B10)
+     -- and only D1's inline numbers do not. D1 is also the one drawing
+     that cannot render its own overlap at all, so its geometry has never
+     been looked at by anybody, including whoever wrote it. The table is
+     the reliable statement at both bands.
+
+     So the overlap is specified and the margin is derived from it, rather
+     than the other way round: the row's top padding has to be crossed
+     before the banner's edge is reached. 32 + 12 on the phone, 48 + 16
+     here. Measured: 48px. */
   .pav {
     width: calc(var(--space-48) * 2); height: calc(var(--space-48) * 2);
-    margin-top: calc(var(--space-48) * -1);
+    margin-top: calc((var(--space-48) + var(--space-16)) * -1);
     font-size: var(--text-display-sm); line-height: var(--lh-display-sm);
   }
 
-  /* `bottom: var(--space-40)` is the base rule's now, for the same reason
-     at a different size -- see the comment beside .pname. D1 has this
-     collision too, at 6px, and cannot see it because its avatar is behind
-     its banner. */
-  .pname { font-size: var(--text-display); line-height: var(--lh-display); }
+  /* The name clears the avatar by 8px at both bands, so it moves with the
+     overlap: 32 + 8 on the phone (the base rule), 48 + 8 here. Without
+     this the deeper overlap puts the circle back through the name's
+     lower-left by 8px, and the name wins, because .pname carries z-index 2
+     and the identity row does not. D1 has this collision at 6px and cannot
+     see it, its avatar being behind its banner. */
+  .pname {
+    bottom: calc(var(--space-48) + var(--space-8));
+    font-size: var(--text-display); line-height: var(--lh-display);
+  }
 }
 
 /* ---------------- the picker ----------------

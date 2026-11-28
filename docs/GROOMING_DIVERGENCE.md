@@ -71,7 +71,16 @@ The design's own warning note argues the case: *"The banner is 4:1 here, not 2:1
 
 **This is not a pure win and should not be groomed as one.** Implementing the design makes the phone banner **65px taller**, not shorter. The desktop banner gets **100px shorter**.
 
-**Decision:** implement the two ratios as drawn (2:1 phone, 4:1 desktop), or keep 3:1 everywhere and update the doc to say so?
+**The code already concedes half of this.** `profile.css:145` reads:
+
+> *"3:1 on a phone: taller eats the fold. **4:1 from medium up: wider becomes a letterbox.** The banner is furniture, not content."*
+
+So the two halves are not the same question:
+
+- **Desktop 4:1 is not contested by anyone.** The design draws it, and the code's own comment states it as the intent. There is no media query, so the comment describes a decision the stylesheet never carried out. This is an unimplemented intent, not a disagreement.
+- **Phone 2:1 is genuinely contested.** The design draws 2:1 on all eleven phone screens; the code comment argues 3:1 because *"taller eats the fold"*. Two considered positions.
+
+**Decision:** desktop 4:1 needs only a yes. For phone — 2:1 as drawn, or 3:1 as the code argues, with the doc updated to match?
 
 > My recommendation: **implement as drawn.** The phone is where the banner does its job — it is the only place the name sits on it — and desktop is where it is pure cost. But the phone half is a visible change to a screen you look at daily, so it is your call, not a correctness fix.
 
@@ -134,43 +143,33 @@ Two desktop drawings (`profile D1`, `library D1`) are refused for the other reas
 
 > My recommendation: **yes, but last, and as renaming in the docs rather than in the code.** The code's names are load-bearing and under test; the docs' are not. Cheaper and far less risky to make the drawings speak the code's language than the reverse.
 
-### B5. The banner centre-crops a 16:9 backdrop, and `title` already solved this
+### B5. ~~The banner centre-crops~~ — **withdrawn, 2026-11-28. My measurement did not support it.**
 
-Found while re-reading the notes the tool surfaces beside B1, not by the anatomy diff. **This one is a defect, not a difference of opinion** — it needs a yes, not a choice.
+Approved by the owner, then not built, because the measurement I promised instead of copying `title`'s 38% came back against the premise. Recorded in full rather than quietly dropped.
 
-Banner art is a TMDB **16:9 backdrop**. The design says so and argues for it:
+**What I claimed:** `.pbanner-art` sets `object-fit: cover` with no `object-position`, so it centre-crops a 16:9 backdrop and cuts faces, exactly as `title.css:23` describes and fixes with `object-position: center 38%`.
 
-> *"Every title already carries a 16:9 backdrop — a still from something you actually watched… It also composes correctly by construction: a backdrop is already an image designed to have things sit on top of it."*
+**What I measured.** 60 real TMDB backdrops from `snapshots/tmdb-fixtures.json.gz`, drawn to canvas and scored by row-wise edge energy — flat sky and bokeh score near zero, faces and horizons score high. The vertical centroid of that energy:
 
-Cropping 16:9 (1.78:1) into a wide band throws height away:
-
-| band | keeps |
+| | |
 |---|---|
-| 2:1 — design, phone | **89%** of the backdrop |
-| 3:1 — production, every width | **59%** |
-| 4:1 — design, desktop | **44%** |
+| mean | **48.5%** |
+| median | **49.1%** |
+| p10 / p90 | 40.8% / 55.4% |
 
-`src/modules/profile/profile.css:148` is:
+Detail sits **dead centre**, on a broad plateau from roughly 20% to 70% of height. The claim that *"subjects sit above the midline far more often than below it"* is not visible in this sample, so an upward bias has nothing to recover.
 
-```css
-.pbanner-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-```
+**And the geometry argument was built on the wrong scrim.** I read the *design doc's* scrim — `linear-gradient(to top, var(--bg), transparent 62%)`, which hides the bottom 62% and leaves a legible top 38%. **Production's scrim is not that**, and `profile.css:150` says why: fading to `--bg` made a white name vanish in light mode, so it is a partial dark wash instead, `rgba(4,6,12,.78)` to transparent. The artwork is visible across the whole band. There is no "legible top 38%" to protect, which was most of my case.
 
-**No `object-position`**, so it defaults to `center center` — the crop takes equal bites off the top and the bottom. `title` hit exactly this and fixed it, with the reasoning recorded beside the declaration at `src/modules/title/title.css:23`:
+If anything the direction reverses: production's wash is heaviest at the bottom, so lifting detail into the clearer top would want `object-position` **below** 50%, not above. I am not shipping a number off that chain of reasoning — it is the same arguing-about-CSS that this document exists to replace.
 
-> *"A 16:9 backdrop cropped into a 4:1 desktop hero loses most of its height, and centring that crop cuts faces in half — subjects sit above the midline far more often than below it. Biasing the crop upward keeps the part of the image that carries the meaning."*
+**Why `title` is still right:** its hero crops to a fixed height with no equivalent wash, and its claim is about *faces*, which edge energy cannot see. My proxy fails to confirm `title`'s reasoning; it does not refute it.
 
-```css
-.hero img { …; object-fit: cover; object-position: center 38%; }
-```
+**Decision:** park, or look at twenty real banners by eye and set the figure from that? There is no measurement I can take here that settles it — the question is about faces, and I do not have a face detector.
 
-And profile's own law points at the same number from the other direction: the banner *"sits behind a scrim that fades to `--bg` by 62% of its height"* — so the part of the artwork that is actually legible is the **top 38%**, which is precisely the part a centred crop eats into.
+> My recommendation: **park it.** It is cosmetic, the evidence is against the fix as specified, and B1 changes this band's geometry anyway. Re-open after B1 lands, against the ratio that actually ships.
 
-So production is the one combination nobody designed: the middle ratio, cropped centrally, with no upward bias, behind a scrim that hides the bottom anyway.
-
-**Decision:** adopt `title`'s solution on `.pbanner-art`? The principle is settled — bias the crop upward. Only the figure is open, and profile's scrim geometry is not title's, so it should be measured against real banners rather than copied at 38%.
-
-> My recommendation: **yes, and fold it into WP-D2 with the ratio change**, since both are one-line edits to the same band and both need the same re-measure. Doing the ratio without this makes it worse at 4:1, where only 44% of the backdrop survives.
+---
 
 ---
 
@@ -225,4 +224,8 @@ Carried forward, unchanged, not addressed by anything above:
 
 ## Owner decisions
 
-*Grooming is open. B1, B2 (three parts), B3, B4 and B5 need your call before WP-D1 starts. B5 needs only a yes.*
+**2026-11-28.** B2 closed — *do it as drawn* — and shipped as WP-D1 (`35649bd`), minus B2.3, which is **withdrawn**: the design settles the header control in prose (D3, "Settled") even though no drawing shows it. Profile is 1441px → **947px** at 390 and 1716px → **1222px** at 1280. The anatomy row went 4 extra → 1, and that one is `page-head`, which is correct.
+
+**B5 approved, then withdrawn by measurement** — see above. Nothing shipped.
+
+Still open: **B1** (desktop half needs only a yes; phone half is a real choice), **B3**, **B4**.

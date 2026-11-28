@@ -180,64 +180,64 @@
     "geometry": "5ea9cdde"
   },
   "person/director@1280-dark": {
-    "elements": 236,
-    "hash": "16bce16a",
-    "geometry": "84596e29"
+    "elements": 237,
+    "hash": "9c756271",
+    "geometry": "9a0a8c62"
   },
   "person/director@1280-light": {
-    "elements": 236,
-    "hash": "16bce16a",
-    "geometry": "84596e29"
+    "elements": 237,
+    "hash": "9c756271",
+    "geometry": "9a0a8c62"
   },
   "person/director@390-dark": {
-    "elements": 236,
-    "hash": "3834115",
-    "geometry": "c225ab24"
+    "elements": 167,
+    "hash": "fdd94961",
+    "geometry": "8ca03317"
   },
   "person/director@390-light": {
-    "elements": 236,
-    "hash": "3834115",
-    "geometry": "c225ab24"
+    "elements": 167,
+    "hash": "fdd94961",
+    "geometry": "8ca03317"
   },
   "person/director@900-dark": {
-    "elements": 236,
-    "hash": "d3a8248d",
-    "geometry": "779c80c"
+    "elements": 215,
+    "hash": "6354b6a6",
+    "geometry": "4d4aec52"
   },
   "person/director@900-light": {
-    "elements": 236,
-    "hash": "d3a8248d",
-    "geometry": "779c80c"
+    "elements": 215,
+    "hash": "6354b6a6",
+    "geometry": "4d4aec52"
   },
   "profile/profile@1280-dark": {
-    "elements": 110,
-    "hash": "b1dfd574",
-    "geometry": "1db30f96"
+    "elements": 118,
+    "hash": "41cfa79b",
+    "geometry": "1f4570f0"
   },
   "profile/profile@1280-light": {
-    "elements": 110,
-    "hash": "b1dfd574",
-    "geometry": "1db30f96"
+    "elements": 118,
+    "hash": "41cfa79b",
+    "geometry": "1f4570f0"
   },
   "profile/profile@390-dark": {
-    "elements": 110,
-    "hash": "ca779d99",
-    "geometry": "6b75cfe5"
+    "elements": 118,
+    "hash": "6a8bac0c",
+    "geometry": "b84ffc89"
   },
   "profile/profile@390-light": {
-    "elements": 110,
-    "hash": "ca779d99",
-    "geometry": "6b75cfe5"
+    "elements": 118,
+    "hash": "6a8bac0c",
+    "geometry": "b84ffc89"
   },
   "profile/profile@900-dark": {
-    "elements": 110,
-    "hash": "ba509de4",
-    "geometry": "4598780a"
+    "elements": 118,
+    "hash": "ba4d5662",
+    "geometry": "87d11085"
   },
   "profile/profile@900-light": {
-    "elements": 110,
-    "hash": "ba509de4",
-    "geometry": "4598780a"
+    "elements": 118,
+    "hash": "ba4d5662",
+    "geometry": "87d11085"
   },
   "profile/settings@1280-dark": {
     "elements": 71,

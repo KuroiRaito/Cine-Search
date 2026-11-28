@@ -31,7 +31,8 @@
     "paste": "vite-node scripts/paste-cases.mjs",
     "restore": "vite-node scripts/restore-cases.mjs",
     "person": "vite-node scripts/person-cases.mjs",
-    "answer": "vite-node scripts/answer-cases.mjs"
+    "answer": "vite-node scripts/answer-cases.mjs",
+    "divergence": "node scripts/divergence.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "^5.3.0",

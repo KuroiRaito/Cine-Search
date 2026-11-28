@@ -40,6 +40,7 @@ import process from 'node:process';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const OUT = join(ROOT, 'snapshots');
 const FINGERPRINTS = join(OUT, 'fingerprints.json');
+const ANATOMY = join(OUT, 'anatomy.json');
 const FIXTURES = join(OUT, 'tmdb-fixtures.json.gz');
 
 /* One representative screen per module, and the widths that change its shape.
@@ -148,7 +149,38 @@ const FINGERPRINT = `(() => {
         geom.push(el.tagName + '|' + box);
     }
     const hash = (a) => { let h = 0; for (const c of a.join('\\n')) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h.toString(16); };
-    return { elements: parts.length, hash: hash(parts), geometry: hash(geom) };
+
+    /* The ANATOMY: the screen's top-level bands, in order, with their height.
+       A hash answers "did anything move"; this answers "what is on the screen
+       and in what order", which is the question the module docs specify and
+       the one a hash is structurally unable to report. The two are recorded
+       together because they come from the same walk and must describe the
+       same render -- collected separately they could disagree, which is
+       exactly how an earlier check in this repo ran after its own results had
+       been gathered and passed while broken. */
+    const page = document.querySelector('.page') || document.querySelector('#root > *');
+    const nameOf = (el) => (typeof el.className === 'string' && el.className.trim().split(/\\s+/)[0])
+        || ('<' + el.tagName.toLowerCase() + '>');
+    /* TWO levels, not one. The modules do not agree on how deep a band sits:
+       profile's are direct children of .page, while title puts every one of
+       them inside a .tgrid that exists only to lay them out. Recorded one
+       level deep, title's anatomy reads as "hero then tgrid" -- two bands for
+       a screen the design draws as six, which is not a divergence, it is the
+       walker stopping too early. (No backticks in here: this whole walker is
+       a template literal, and one closes it.) So each band carries its own
+       children, and
+       the comparison picks the level that matches rather than guessing here,
+       where the module's shape is not known. */
+    const band = (el) => {
+        const r = el.getBoundingClientRect();
+        return { name: nameOf(el), w: Math.round(r.width), h: Math.round(r.height) };
+    };
+    const bands = [...(page ? page.children : [])].map((el) => ({
+        ...band(el),
+        children: [...el.children].map(band),
+    }));
+
+    return { elements: parts.length, hash: hash(parts), geometry: hash(geom), bands };
 })()`;
 
 /* ---------------------------------------------------------------
@@ -322,6 +354,28 @@ function profileStatsFor(rows) {
     };
 }
 
+/* The four favourite shelves. `from: 'library'` shelves read the library
+   rows; `from: 'shelf'` shelves read user_favourites, so people and characters
+   need rows of their own or two of the four draw empty. Overview previews one
+   of them and the Favourites tab holds all four. */
+const FAVOURITES = [
+    { kind: 'person', ref: '137427', position: 1000, name: 'Denis Villeneuve', subtitle: 'Director',
+      actor: null, image_path: '/snap.jpg', poster_path: null, media_type: null, tmdb_id: 137427,
+      animated: false, added_at: '2026-01-04T00:00:00Z' },
+    { kind: 'person', ref: '947', position: 2000, name: 'Hans Zimmer', subtitle: 'Composer',
+      actor: null, image_path: '/snap.jpg', poster_path: null, media_type: null, tmdb_id: 947,
+      animated: false, added_at: '2026-01-04T00:00:00Z' },
+    { kind: 'character', ref: 'c:walter-white', position: 1000, name: 'Walter White',
+      subtitle: 'Breaking Bad', actor: 'Bryan Cranston', image_path: '/snap.jpg',
+      poster_path: '/snap.jpg', media_type: 'tv', tmdb_id: 1396, animated: false,
+      added_at: '2026-01-04T00:00:00Z' },
+    { kind: 'character', ref: 'c:tyler-durden', position: 2000, name: 'Tyler Durden',
+      subtitle: 'Fight Club', actor: 'Brad Pitt', image_path: '/snap.jpg',
+      poster_path: '/snap.jpg', media_type: 'movie', tmdb_id: 550, animated: false,
+      added_at: '2026-01-04T00:00:00Z' },
+];
+
+
 const reply = (route, body) => route.fulfill({
     status: 200, contentType: 'application/json', body: JSON.stringify(body),
 });
@@ -333,6 +387,10 @@ async function pinSession(ctx) {
     await ctx.route('**/rest/v1/rpc/**', (r) => reply(r, {}));
     await ctx.route('**/rest/v1/rpc/profile_stats**', (r) => reply(r, profileStatsFor(LIBRARY)));
     await ctx.route('**/rest/v1/profiles**', (r) => reply(r, [PROFILE]));
+    await ctx.route('**/rest/v1/user_favourites**', (r) => {
+        const asked = /kind=eq\.([a-z_]+)/.exec(r.request().url());
+        return reply(r, asked ? FAVOURITES.filter((x) => x.kind === asked[1]) : FAVOURITES);
+    });
     await ctx.route('**/rest/v1/user_library**', (r) => {
         const asked = /status=eq\.([a-z_]+)/.exec(r.request().url());
         return reply(r, asked ? LIBRARY.filter((x) => x.status === asked[1]) : LIBRARY);
@@ -357,6 +415,14 @@ if (!REF) {
 
 const browser = await chromium.launch();
 const results = {};
+/* The band sequence of every screen, for scripts/divergence.mjs to read the
+   product's anatomy without rendering it a second time. Committed, like the
+   fingerprints -- .gitignore drops only the PNGs -- so a reviewer can see a
+   band appear or move in the diff of a pull request rather than having to
+   run the sweep. Unlike the fingerprints it gates nothing: --check does not
+   compare it, because a band that moved is a question for grooming and not a
+   reason to fail a build. */
+const anatomy = {};
 let shots = 0;
 
 /* TMDB is keyed by its query string — client.js builds every call as
@@ -486,7 +552,15 @@ try {
                         );
                         if (shown) hollow.push(`${key} — "${screen.absent}"`);
                     }
-                    results[key] = await page.evaluate(FINGERPRINT);
+                    /* `bands` is pulled OUT of the fingerprint rather than
+                       left in it. fingerprints.json is committed and compared
+                       key-for-key by --check, so adding a field to it would
+                       report all 72 screens as changed on the next run and
+                       bury a real movement in the noise. The anatomy is the
+                       same render, recorded beside it. */
+                    const { bands, ...print } = await page.evaluate(FINGERPRINT);
+                    results[key] = print;
+                    anatomy[key] = bands;
                     await page.screenshot({ path: join(OUT, mod, `${screen.name}@${width}-${theme}.png`), fullPage: true });
                     shots++;
                 }
@@ -579,5 +653,10 @@ if (CHECK) {
     const sorted = Object.fromEntries(Object.keys(merged).sort().map((k) => [k, merged[k]]));
     mkdirSync(OUT, { recursive: true });
     writeFileSync(FINGERPRINTS, JSON.stringify(sorted, null, 2) + '\n');
+    const mergedAnat = existsSync(ANATOMY)
+        ? { ...JSON.parse(readFileSync(ANATOMY, 'utf8')), ...anatomy }
+        : anatomy;
+    writeFileSync(ANATOMY, JSON.stringify(
+        Object.fromEntries(Object.keys(mergedAnat).sort().map((k) => [k, mergedAnat[k]])), null, 2) + '\n');
     console.log(`\n  ${shots} screenshots → snapshots/\n`);
 }

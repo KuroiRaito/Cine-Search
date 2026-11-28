@@ -359,8 +359,94 @@
    is used is not where it is declared. */
 
 @media (min-width: 600px) {
+  /* The second half of the sentence four lines above .pbanner, which the
+     stylesheet has been stating and not doing: "4:1 from medium up: wider
+     becomes a letterbox."
+
+     A ratio with no ceiling grows without one. The banner is full-bleed, so
+     at 3:1 it was 400px at 1280 — 44% of the window, spent on furniture
+     before a single number — and profile was the only screen in the product
+     that got TALLER as the window got wider. Person goes 3350 -> 2105 over
+     the same range.
+
+     600 rather than 1120 because that is what "medium up" means here
+     (shell.css names the bands: medium 600-1119, expanded 1120+), and
+     because the problem is continuous in width, not something that waits for
+     the multi-column layout: at 900 a 3:1 banner is already 284px. The
+     design's own desktop drawing is 4:1 at 1120, which this satisfies.
+
+     Phone stays 3:1 and is NOT settled — the design draws 2:1 on all eleven
+     of its phone screens, and .pbanner's own comment argues 3:1 because
+     "taller eats the fold". That half is open; see
+     docs/GROOMING_DIVERGENCE.md B1. */
+  .pbanner { aspect-ratio: 4 / 1; }
+
+  /* And a ceiling, because a ratio without one grows without one -- which is
+     what 4:1 alone got wrong. The shell's container caps at 1200 (expanded)
+     and again at 1600 (wide), so a 4:1 banner is 300px on a 1280 window and
+     400px on a 1600 one: 44% of a 900px viewport, which is the objection the
+     design makes against 2:1 at 1120 -- "half the window spent on decoration
+     before a single number" -- reached from the other side. Measured, the
+     page was 970 / 1030 / 1070 at 1280 / 1440 / 1600; with this it is 970 at
+     all three.
+
+     300 is where the title page's hero stops (--hero-h). The hero is the
+     subject of its page and this is furniture, so the banner does not get to
+     be taller than it.
+
+     Past a 1200 container the band is therefore wider than 4:1. That is the
+     trade: a letterbox that stays put, against a shape that keeps its ratio
+     by taking another 100px of the fold. */
+  .pbanner { max-height: 300px; }
+
+  /* The medium band is undrawn -- the design system has eleven phone screens
+     and a 1120 desktop, and nothing in between -- so it takes the answer the
+     Stats tab already gives. `.tastecard`, `.stiles` and `.sect.taste-head`
+     all stop at 440, because a card holding three numbers and a bar does not
+     become a better card by being wider. The Films block had no such stop:
+     measured at 900 it was 852px wide around 154px of text, and at 1120 it
+     was 1120px wide around the same 154px. The 320px rail below supersedes
+     this from 1120 up; this is what happens in the 519px before it. */
+  .sblock { max-width: 440px; }
+
   .fgrid { grid-template-columns: repeat(5, 1fr); }
   .frail .fcard { width: var(--space-80); }
+}
+
+/* ---------------- expanded ----------------
+
+   D1, and it is stated as a law rather than drawn as a nicety:
+
+       The two-column split is the only structural change from mobile. Stats
+       go left in a fixed 320px rail, favourites go right and fill. Nothing
+       is added and nothing is hidden -- a profile that needed a desktop-only
+       section would be a profile that does not fit on a phone.
+
+   So this block moves three bands and adds none. 1120 because that is where
+   the shell turns the bottom tabs into a top bar and names the band expanded;
+   below it there is not enough width for a 320px rail and a shelf beside it.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 1120px) {
+  .pcols {
+    display: grid; grid-template-columns: 320px minmax(0, 1fr);
+    gap: 0 var(--space-32); align-items: start;
+    padding: var(--space-24) var(--gutter) 0;
+  }
+
+  /* The bands carry the page gutter themselves, because on a phone they ARE
+     the page and there is nothing else to carry it. Inside the grid the
+     container holds it once, or every cell pays for it again -- which is how
+     a 320px rail becomes a 240px one. */
+  .pcols .sblock { grid-column: 1; max-width: none; margin: 0 0 var(--space-12); }
+  .pcols .shelf-h, .pcols .frail { padding-inline: 0; }
+
+  /* The shelf spans both rows for the same reason the title page's poster
+     spans both of its: the rows are sized by the left column, and a shelf
+     placed in row 1 alone makes row 1 as tall as itself, which strands the
+     Series block below the Films block it sits under. Two, because there are
+     two media -- a third row here would mean a third medium. */
+  .pcols .shelf { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
 }
 
 /* ---------------- the picker ----------------

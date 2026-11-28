@@ -179,18 +179,24 @@ export default function You() {
             </div>
 
             {tab === 'Overview' && (
-                <>
-            {/* A film has a runtime and no episodes; a series has both. One
-                blended "titles" number hid which of the two you actually are. */}
-            <MediumBlock
-                title="Films" block={data.films} dist={data.distribution?.movie}
-                second={{ label: data.films?.partial ? 'Days, at least' : 'Days',
-                    value: formatDays(data.films?.minutes) }}
-            />
-            <MediumBlock
-                title="Series" block={data.series} dist={data.distribution?.tv}
-                second={{ label: 'Episodes', value: data.series?.episodes ?? 0 }}
-            />
+                /* The only element this layout needs that the phone did not:
+                   at expanded, D1 puts the medium blocks in a 320px rail and
+                   the shelf beside them, and a grid needs something to be the
+                   grid. Below 1120 it carries no rules and changes nothing --
+                   the bands keep their own gutters, as they do on a phone. */
+                <div className="pcols">
+                    {/* A film has a runtime and no episodes; a series has both.
+                        One blended "titles" number hid which of the two you
+                        actually are. */}
+                    <MediumBlock
+                        title="Films" block={data.films} dist={data.distribution?.movie}
+                        second={{ label: data.films?.partial ? 'Days, at least' : 'Days',
+                            value: formatDays(data.films?.minutes) }}
+                    />
+                    <MediumBlock
+                        title="Series" block={data.series} dist={data.distribution?.tv}
+                        second={{ label: 'Episodes', value: data.series?.episodes ?? 0 }}
+                    />
 
                     {/* ONE shelf here, not four. P1 draws a single rail --
                         Favourite characters -- and sends the rest to the tab
@@ -210,7 +216,7 @@ export default function You() {
                             onSeeAll={() => setTab('Favourites')}
                         />
                     )}
-                </>
+                </div>
             )}
 
             {tab === 'Favourites' && <FavouritesTab shelves={fav.shelves} onChanged={fav.retry} />}

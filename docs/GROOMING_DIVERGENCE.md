@@ -22,6 +22,8 @@ Read-only. No product code was changed to produce this document. The one CSS edi
 
 Nothing here needs a schema change, a new endpoint, or new data. Every decision below is a layout decision.
 
+**Read the eight bullets above as the report of the morning of 2026-11-28.** Four of them are already history: B2 shipped, B5 was **withdrawn by its own measurement**, and B1's desktop half and **B3** both shipped the same day. So Overview now carries one shelf, not four extra bands; **profile no longer gets taller as the window gets wider** — it is 970px at 1280, 1440 *and* 1600; and the 60px bar is deliberate after all (D3, marked *Settled* in prose, which no drawing shows). *Owner decisions* at the foot is the current state.
+
 ---
 
 ## What the design drew
@@ -125,6 +127,30 @@ The design has a dedicated desktop section (`D1`, drawn at 1120×700) which says
 
 > My recommendation: **after.** 270px of the 275px growth is the banner (B1), and B2 removes four bands. Fix those two, re-measure, and the remaining desktop problem will be a much smaller and better-understood one. Designing a desktop grid now means designing against numbers that are about to change.
 
+#### Closed and shipped, 2026-11-28 — *do it now*
+
+Built as D1 states it, which is a law and not a drawing:
+
+> The two-column split is the only structural change from mobile. Stats go left in a fixed 320px rail, favourites go right and fill. Nothing is added and nothing is hidden — a profile that needed a desktop-only section would be a profile that does not fit on a phone.
+
+Three changes, and each one is answerable with a number.
+
+| | before | after |
+|---|---|---|
+| Films card at 900 | 852px wide, **18% ink** | 440px wide, **35% ink** |
+| Films card at 1280 | 440px wide, 35% ink | **320px wide, 48% ink** |
+| page at 1280 | 1122px | **970px** |
+| page at 1440 | 1030px | **970px** |
+| page at 1600 | 1070px | **970px** |
+
+1. **The two-column grid at 1120+.** `.pcols`, 320px and the rest, the shelf spanning both rows beside the medium blocks. This needed the one thing CSS could not supply: the Overview bands are direct children of `.page`, which belongs to the shell, so there was nothing for a grid to be. **One wrapper element in `Profile.jsx`** — development lane, flagged, and inert below 1120.
+2. **A cap on the card at 600–1119.** The medium band is undrawn, so it takes the answer the Stats tab already gives: `.tastecard`, `.stiles` and `.sect.taste-head` all stop at 440px. The Films block had no stop, which is why it was 852px of card around 154px of text at 900.
+3. **A ceiling on the banner at 300px.** This is the growth problem, and it was worse than the report said, because **`npm run snap` stops at 1280 and the shell does not.** `--shell-max` is 1200 at expanded and **1600 at wide**, so a 4:1 banner reaches **400px on a 1600 window** — 44% of a 900px viewport, which is the objection the design itself makes against 2:1 at 1120, arrived at from the other side. 300px is where the title page's hero stops (`--hero-h`); the hero is its page's subject and this is furniture, so the banner does not get to be taller.
+
+**Profile has stopped growing with width:** 970px at 1280, 1440 and 1600. The sentence I have been repeating all day is now false, which was the point of the item.
+
+**Each of the three was proved by removing it and watching the number come back** — ceiling out → 1030/1070 at 1440/1600; grid out → 1122 flat; cap out → 852px card at 900. 24 checks green. Of the 72 recorded screens **6 moved** — profile's Overview, at both themes and all three widths — and the other 66, settings included, are byte-identical. At 390 and 900 the page height and every band's size are unchanged; the fingerprint moved because the DOM has one more element in it.
+
 ### B4. Three modules cannot be checked
 
 | screen | shared band vocabulary |
@@ -171,6 +197,44 @@ If anything the direction reverses: production's wash is heaviest at the bottom,
 
 ---
 
+### B6. The tall screen is now 900, not 1280
+
+**Found by building B3.** Profile is **947 / 1018 / 970 / 970 / 970** at 390 / 900 / 1280 / 1440 / 1600. The peak has moved off desktop and onto the band the design system never drew: at 900 the banner is already 225px and the columns are still stacked, so it carries desktop's banner and the phone's layout at once.
+
+Extending the split downward is not one line. At 600 the right column would be `600 − 48 − 320 − 32 = 200px`, which holds two and a half poster tiles — so it needs **a third breakpoint, around 840, that no drawing contains.**
+
+**Decision:** invent that breakpoint, or leave 900 as the tall one?
+
+> My recommendation: **leave it.** 1018 is 71px over the phone and every one of them is banner; the band has no drawing to be checked against, and inventing a breakpoint to beat a number nobody has complained about is how undrawn bands get a second layout nobody maintains. Worth revisiting only if B1's phone half lands at 2:1, which puts 900 further out.
+
+### B7. The desktop shelf disagrees with the shipped one, three ways
+
+D1's right column draws **two** shelves (characters *and* films), as **6-across grids**, cards about **108px**, each with *"See all n →"*. Production ships **one** shelf as an **80px rail**. Three separable questions:
+
+| | drawn | shipped | what argues for the shipped one |
+|---|---|---|---|
+| how many shelves | two | one | D1's own note: *"nothing is added"* relative to mobile, and P1 draws one |
+| grid or rail | grid of 6 | scrolling rail | *"Never a whole number of tiles: the partial card is the only thing telling you the rail scrolls."* A grid of six holding fourteen either wraps to three rows or hides eight cards with no affordance |
+| tile width | ~108px | 80px | nothing — this one is just undecided |
+
+The tile is the only one of the three I would change, and it has a second reason: **`.frail` is the one rail in the product that ignores `--rail-tile`**, which is the exact mistake `title.css:446` records itself fixing. But `--rail-tile` is 190px at expanded, and in a 768px column that leaves a **16px sliver** of the fourth card — a partial nobody reads as partial, so the law would be satisfied on paper and broken in fact. Measured in that column: 80px shows 8 tiles and 80% of a 9th; **108px shows 6 and 67% of a 7th** — the drawn density, with a partial you can see; 190px shows 3 and a sliver.
+
+**Decision:** leave the shelf as shipped, or take the drawn 108px at 1120+?
+
+> My recommendation: **take 108px at expanded, and leave the other two alone.** One declaration inside the block B3 just added, design lane, and it is the drawn number rather than one I invented. Keep one shelf and keep the rail — on both of those the product's own laws beat the drawing, and the drawing predates the tabs.
+>
+> While that file is open: the `600px` block restates `.frail .fcard { width: var(--space-80) }`, which is exactly what the base rule already says. It has never changed anything. Worth deleting so the next reader does not go looking for what it does.
+
+### B8. The identity band's expanded state is written down and unbuilt
+
+`S2` says it in one line — *"Banner 4:1 at container width with `--radius-16`; shelves show more per row; identity sits beside the avatar"* — and D1 draws a **96px avatar lifted 48px over the banner**, with the name at `--text-display`. Production at expanded: a square-cornered full-bleed banner, a **48px** avatar with no lift, the name at `--text-title`.
+
+Not built, because B3's measured defects were all in the Overview column and this band sits above the tabs, where it is shared by all three tabs. Changing it means touching `.pav-row`'s padding and the avatar's negative margin together, and that is its own change with its own before-and-after.
+
+**Decision:** does the identity band get its expanded state?
+
+> My recommendation: **yes, but as its own PR**, and after B1's phone half — the avatar lift is measured against the banner's bottom edge, so settling the phone ratio first means measuring it once.
+
 ---
 
 ## C. Found by the tool, and the code is right
@@ -195,6 +259,7 @@ Stated plainly so the net is not assumed to be wider than it is.
 - **The match table is a judgement call.** Which drawing is a given screenshot's counterpart (`P1` is the filled overview, `P3` is the same screen loading) cannot be inferred and is declared by hand in `scripts/divergence.mjs`. Wrong entries produce wrong findings.
 - **The 64 laws are not checked.** They are counted and quoted. Most are product rules no stylesheet can express.
 - **Fixture artifacts, not product faults:** broken poster images (`/snap.jpg` is not a real TMDB path) and a single favourite film. A real account has more favourites, so **the real screen is more crowded than the one measured here**, not less.
+- **Nothing measured here goes above 1280, and the shell does.** `npm run snap`'s widths are 390, 900 and 1280; `--shell-max` rises to **1600 at 1440+**. So the 400px banner B3 fixed was invisible to every harness in the repo and was found by hand. Any claim about the wide band in this document was measured one-off, not gated.
 - **`entry` and `profile/settings` have no designed counterpart** — the welcome module has no `-module.html`, and settings is drawn as part of shell.
 
 ---
@@ -205,7 +270,7 @@ One PR each. B2 first because it is the cheapest, the most visible, and it chang
 
 1. **WP-D1 — Overview carries what the design puts on it** (B2). Move Score spread to the Stats tab; move Favourite films and people behind the Favourites tab, leaving characters plus *"See all n →"*; overlay the gear on the banner and drop `page-head` from profile. **Four bands and ~60px off the first screen; nothing deleted.** Markup changes, so it is a development lane PR, not a design one. Re-run `npm run snap` and expect profile's fingerprints to move and nothing else's.
 2. **WP-D2 — The banner gets its two ratios and stops cutting faces** (B1 + B5). `.pbanner` to 2:1, with 4:1 above the desktop breakpoint; `.pbanner-art` gets an upward crop bias, measured against real banners rather than copied from `title`'s 38%. Two CSS rules plus one media query. Design lane. Expect profile geometry to move at all three widths.
-3. **WP-D3 — Re-measure, then decide desktop** (B3). After 1 and 2, re-run `npm run divergence` and the heights table. Desktop Overview is groomed against the new numbers, not these.
+3. ~~**WP-D3 — Re-measure, then decide desktop** (B3).~~ **Shipped 2026-11-28**, out of order, because B1's desktop half landed first and the re-measurement said the growth was still there. Two columns at 1120+, a 440px cap at 600–1119, a 300px ceiling on the banner. It threw off B6, B7 and B8.
 4. **WP-D4 — Close the vocabulary gap** (B4). Rename bands in `find`, `title` and `person`'s docs to the code's names. Docs only, no code. Raises the diff from 2 live comparisons to 7.
 
 **Gate for every one of them:** `npm run check` green (24 checks), and `npm run divergence` showing the specific row closed — not just "looks right".
@@ -236,3 +301,13 @@ Carried forward, unchanged, not addressed by anything above:
 Profile across the three widths, after both changes: **947 / 1018 / 1122px** (was 1441 / — / 1716).
 
 Still open: **B1 phone half** (design draws 2:1 on eleven screens, `.pbanner`'s comment argues 3:1 because "taller eats the fold"), **B3** — now carrying the growth problem — and **B4**.
+
+**B3 closed and shipped the same day** — *do B3 now* — as two columns at 1120+, a 440px cap on the card at 600–1119, and a **300px ceiling on the banner**. Full numbers and proofs in B3 above. The headline: **profile is 970px at 1280, 1440 and 1600** — it has stopped growing with width, which is what the item was given to own. The Films card is 320px of card around 154px of text instead of 1120px.
+
+The ceiling is the part I would not have found from the report. `npm run snap` stops at 1280; `--shell-max` goes to **1600 at 1440+**; a 4:1 banner at 1600 is **400px**, and nothing in the repo was looking there. Section D now says so.
+
+**It cost one element of markup.** The Overview bands are direct children of `.page`, which the shell owns, so no stylesheet could make them a grid — there was nothing to be the grid. One `<div className="pcols">`, inert below 1120. That is development lane; I did it rather than stopping, on the same authority as B2, and it is the only line of `.jsx` the change contains.
+
+**Three things came out of building it, and none is built:** **B6** — the tall screen is now 900, not 1280, and closing that needs a breakpoint no drawing contains; **B7** — the desktop shelf is drawn as two 6-across grids and ships as one 80px rail, where I think the product's laws beat the drawing twice and the drawing wins on the tile width; **B8** — the identity band's expanded state (`S2`: `--radius-16`, a 96px lifted avatar, the name at `--text-display`) is written down and unbuilt. All three are in section B with recommendations.
+
+Still open after today: **B1 phone half**, **B4**, and the three above.

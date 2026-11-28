@@ -7046,73 +7046,24 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 1120,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 1094,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 1094,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 1094,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 1094,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 1120,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 1094,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 1094,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 1094,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 1094,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "shelf",
+      "name": "pcols",
       "w": 1200,
-      "h": 192,
+      "h": 356,
       "children": [
         {
-          "name": "shelf-h",
-          "w": 1200,
-          "h": 24
+          "name": "sblock",
+          "w": 320,
+          "h": 154
         },
         {
-          "name": "frail",
-          "w": 1200,
-          "h": 160
+          "name": "sblock",
+          "w": 320,
+          "h": 154
+        },
+        {
+          "name": "shelf",
+          "w": 768,
+          "h": 192
         }
       ]
     }
@@ -7180,73 +7131,24 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 1120,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 1094,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 1094,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 1094,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 1094,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 1120,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 1094,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 1094,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 1094,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 1094,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "shelf",
+      "name": "pcols",
       "w": 1200,
-      "h": 192,
+      "h": 356,
       "children": [
         {
-          "name": "shelf-h",
-          "w": 1200,
-          "h": 24
+          "name": "sblock",
+          "w": 320,
+          "h": 154
         },
         {
-          "name": "frail",
-          "w": 1200,
-          "h": 160
+          "name": "sblock",
+          "w": 320,
+          "h": 154
+        },
+        {
+          "name": "shelf",
+          "w": 768,
+          "h": 192
         }
       ]
     }
@@ -7314,73 +7216,24 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 358,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 332,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 332,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 332,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 332,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 358,
-      "h": 154,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 332,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 332,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 332,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 332,
-          "h": 40
-        }
-      ]
-    },
-    {
-      "name": "shelf",
+      "name": "pcols",
       "w": 390,
-      "h": 192,
+      "h": 516,
       "children": [
         {
-          "name": "shelf-h",
-          "w": 390,
-          "h": 24
+          "name": "sblock",
+          "w": 358,
+          "h": 130
         },
         {
-          "name": "frail",
+          "name": "sblock",
+          "w": 358,
+          "h": 154
+        },
+        {
+          "name": "shelf",
           "w": 390,
-          "h": 160
+          "h": 192
         }
       ]
     }
@@ -7448,73 +7301,24 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 358,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 332,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 332,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 332,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 332,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 358,
-      "h": 154,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 332,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 332,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 332,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 332,
-          "h": 40
-        }
-      ]
-    },
-    {
-      "name": "shelf",
+      "name": "pcols",
       "w": 390,
-      "h": 192,
+      "h": 516,
       "children": [
         {
-          "name": "shelf-h",
-          "w": 390,
-          "h": 24
+          "name": "sblock",
+          "w": 358,
+          "h": 130
         },
         {
-          "name": "frail",
+          "name": "sblock",
+          "w": 358,
+          "h": 154
+        },
+        {
+          "name": "shelf",
           "w": 390,
-          "h": 160
+          "h": 192
         }
       ]
     }
@@ -7582,73 +7386,24 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 852,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 826,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 826,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 826,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 826,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 852,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 826,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 826,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 826,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 826,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "shelf",
+      "name": "pcols",
       "w": 900,
-      "h": 192,
+      "h": 492,
       "children": [
         {
-          "name": "shelf-h",
-          "w": 900,
-          "h": 24
+          "name": "sblock",
+          "w": 440,
+          "h": 130
         },
         {
-          "name": "frail",
+          "name": "sblock",
+          "w": 440,
+          "h": 130
+        },
+        {
+          "name": "shelf",
           "w": 900,
-          "h": 160
+          "h": 192
         }
       ]
     }
@@ -7716,73 +7471,24 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 852,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 826,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 826,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 826,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 826,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 852,
-      "h": 130,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 826,
-          "h": 16
-        },
-        {
-          "name": "snums",
-          "w": 826,
-          "h": 40
-        },
-        {
-          "name": "dbar",
-          "w": 826,
-          "h": 8
-        },
-        {
-          "name": "dlegend",
-          "w": 826,
-          "h": 16
-        }
-      ]
-    },
-    {
-      "name": "shelf",
+      "name": "pcols",
       "w": 900,
-      "h": 192,
+      "h": 492,
       "children": [
         {
-          "name": "shelf-h",
-          "w": 900,
-          "h": 24
+          "name": "sblock",
+          "w": 440,
+          "h": 130
         },
         {
-          "name": "frail",
+          "name": "sblock",
+          "w": 440,
+          "h": 130
+        },
+        {
+          "name": "shelf",
           "w": 900,
-          "h": 160
+          "h": 192
         }
       ]
     }

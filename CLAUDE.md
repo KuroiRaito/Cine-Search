@@ -235,6 +235,24 @@ because `discover` returns the harness shape while `Tile` wants the view shape.
 `.head-actions` on the find document's instruction removed the only sign-in
 route for a guest on a phone — the shell document had claimed it.
 
+**Constraining one axis of an `aspect-ratio` box resizes the other.** `max-height`
+on a box whose width is `auto` does not clamp the height and leave the shape:
+CSS re-resolves the *width* through the ratio to keep it. `.pbanner` with a
+300px ceiling stayed exactly 4:1 and went **narrower than its container** —
+1200px inside a 1600px one, 400px of blank page beside a full-bleed band, on
+`main`, and the comment beside it asserted the opposite. **Class fix: `verify`
+check 25 fails any selector that constrains one axis of a ratio while leaving
+the other indefinite.** It reads declarations per selector across files *and*
+media blocks, because the ratio and its ceiling are routinely written apart.
+
+**A drawing can specify something it cannot render.** `D1` draws a 96px avatar
+lifted 48px over the banner; its avatar is `position: static` under a
+`position: relative` banner, so `elementFromPoint` inside its own overlap
+returns the scrim. The lift has never been visible in the drawing that
+specifies it, and copying the declarations reproduced that exactly. Build the
+intent and record the extra declaration; do not assume a drawing renders what
+it declares.
+
 ## 8. What is NOT covered
 
 Say so rather than assuming the net is wider than it is.

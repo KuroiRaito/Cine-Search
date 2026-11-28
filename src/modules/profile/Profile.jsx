@@ -145,6 +145,19 @@ export default function You() {
 
     const ranked = interleave(data, order);
 
+    /* Which shelf Overview promotes. Characters when there are any, because
+       that is what P1 draws and what the law argues for.
+
+       The fallback is NOT drawn, and is a judgement: a person with eight
+       favourite films and no characters would otherwise reach an Overview
+       with no favourites on it at all, because ShelfRail renders nothing for
+       an empty shelf. The design's point is to promote characters and send
+       the REST to the tab, not to hide everything from somebody who collects
+       differently -- so the first shelf that has cards stands in. Flagged in
+       docs/GROOMING_DIVERGENCE.md B2 as a case the drawings do not answer. */
+    const overview = SHELVES.find((sh) => sh.key === 'character' && fav.shelves[sh.key]?.length)
+        || SHELVES.find((sh) => fav.shelves[sh.key]?.length);
+
     return (
         <div className="page">
             <YouHead name={profile?.username} status={loading ? 'loading' : 'ready'} />
@@ -179,16 +192,24 @@ export default function You() {
                 second={{ label: 'Episodes', value: data.series?.episodes ?? 0 }}
             />
 
-            <ScoreSpread spread={data.spread} />
+                    {/* ONE shelf here, not four. P1 draws a single rail --
+                        Favourite characters -- and sends the rest to the tab
+                        with "See all n →". Overview was rendering every shelf,
+                        which is the thing the tabs exist to prevent:
 
-                    {/* The first eight are the statement; the tab behind them
-                        is the whole collection. */}
-                    {SHELVES.map((sh) => (
+                            The profile is tabbed, not one long scroll. This
+                            is the structural change the benchmark forced.
+
+                        Characters is the one promoted, and the design argues
+                        it: across every profile sampled, characters sat at the
+                        API's page cap while studios sat between 0 and 11, and
+                        the old layout buried them eleven screens down. */}
+                    {overview && (
                         <ShelfRail
-                            key={sh.key} shelf={sh} cards={fav.shelves[sh.key] || []}
+                            shelf={overview} cards={fav.shelves[overview.key] || []}
                             onSeeAll={() => setTab('Favourites')}
                         />
-                    ))}
+                    )}
                 </>
             )}
 
@@ -196,6 +217,13 @@ export default function You() {
 
             {tab === 'Stats' && (
                 <>
+            {/* P4 opens the Stats tab with this block, above the dimension
+                grids. It was on Overview, where the design does not put it --
+                a full-width card carrying one sentence, between the numbers
+                and the favourites. It is a statement ABOUT the ratings, so it
+                belongs with them. */}
+            <ScoreSpread spread={data.spread} />
+
             <div className="sect taste-head">
                 <div className="sect-h">
                     <span>Your taste · by {order}</span>

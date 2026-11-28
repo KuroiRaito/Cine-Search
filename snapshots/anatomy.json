@@ -7100,57 +7100,6 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 1120,
-      "h": 70,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 1094,
-          "h": 16
-        },
-        {
-          "name": "spread-line",
-          "w": 1094,
-          "h": 20
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 1200,
-      "h": 192,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 1200,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 1200,
-          "h": 160
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 1200,
-      "h": 168,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 1200,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 1200,
-          "h": 136
-        }
-      ]
-    },
-    {
       "name": "shelf",
       "w": 1200,
       "h": 192,
@@ -7281,57 +7230,6 @@
           "name": "dlegend",
           "w": 1094,
           "h": 16
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 1120,
-      "h": 70,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 1094,
-          "h": 16
-        },
-        {
-          "name": "spread-line",
-          "w": 1094,
-          "h": 20
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 1200,
-      "h": 192,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 1200,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 1200,
-          "h": 160
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 1200,
-      "h": 168,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 1200,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 1200,
-          "h": 136
         }
       ]
     },
@@ -7470,57 +7368,6 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 358,
-      "h": 70,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 332,
-          "h": 16
-        },
-        {
-          "name": "spread-line",
-          "w": 332,
-          "h": 20
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 390,
-      "h": 192,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 390,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 390,
-          "h": 160
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 390,
-      "h": 168,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 390,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 390,
-          "h": 136
-        }
-      ]
-    },
-    {
       "name": "shelf",
       "w": 390,
       "h": 192,
@@ -7651,57 +7498,6 @@
           "name": "dlegend",
           "w": 332,
           "h": 40
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 358,
-      "h": 70,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 332,
-          "h": 16
-        },
-        {
-          "name": "spread-line",
-          "w": 332,
-          "h": 20
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 390,
-      "h": 192,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 390,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 390,
-          "h": 160
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 390,
-      "h": 168,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 390,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 390,
-          "h": 136
         }
       ]
     },
@@ -7840,57 +7636,6 @@
       ]
     },
     {
-      "name": "sblock",
-      "w": 852,
-      "h": 70,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 826,
-          "h": 16
-        },
-        {
-          "name": "spread-line",
-          "w": 826,
-          "h": 20
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 900,
-      "h": 192,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 900,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 900,
-          "h": 160
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 900,
-      "h": 168,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 900,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 900,
-          "h": 136
-        }
-      ]
-    },
-    {
       "name": "shelf",
       "w": 900,
       "h": 192,
@@ -8021,57 +7766,6 @@
           "name": "dlegend",
           "w": 826,
           "h": 16
-        }
-      ]
-    },
-    {
-      "name": "sblock",
-      "w": 852,
-      "h": 70,
-      "children": [
-        {
-          "name": "sblock-h",
-          "w": 826,
-          "h": 16
-        },
-        {
-          "name": "spread-line",
-          "w": 826,
-          "h": 20
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 900,
-      "h": 192,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 900,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 900,
-          "h": 160
-        }
-      ]
-    },
-    {
-      "name": "shelf",
-      "w": 900,
-      "h": 168,
-      "children": [
-        {
-          "name": "shelf-h",
-          "w": 900,
-          "h": 24
-        },
-        {
-          "name": "frail",
-          "w": 900,
-          "h": 136
         }
       ]
     },

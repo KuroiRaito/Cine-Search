@@ -424,11 +424,25 @@ function ratios(modules) {
         /* A ratio a note argues about, with the sentence it argues in. These
            are the design explaining itself, and the explanation is usually
            where the real constraint is written down. */
+        /* ONE row per note, not one per number in it. The banner note argues
+           4:1 against 2:1 and mentions 2:1 twice, so an occurrence-per-row
+           printed the same sentence three times and made a single argument
+           look like three findings.
+
+           The excerpt is centred on the first ratio rather than taken from
+           the start, because a note that mentions 16:9 in its last clause
+           printed 150 characters in which the matched number does not appear
+           -- a row whose own evidence is off-screen. */
         const said = [];
         for (const n of data.notes) {
-            for (const m of n.text.matchAll(/\b(\d+)\s*:\s*(\d+)\b/g)) {
-                said.push({ ratio: `${m[1]}:${m[2]}`, kind: n.kind, text: n.text.slice(0, 150) });
-            }
+            const hits = [...n.text.matchAll(/\b(\d+)\s*:\s*(\d+)\b/g)];
+            if (!hits.length) continue;
+            const at = Math.max(0, hits[0].index - 40);
+            said.push({
+                ratios: [...new Set(hits.map((m) => `${m[1]}:${m[2]}`))],
+                kind: n.kind,
+                text: (at ? '...' : '') + n.text.slice(at, at + 150),
+            });
         }
         /* Grouped, because a band drawn the same way on eleven screens is one
            fact stated eleven times, and printing it eleven times buries the
@@ -574,7 +588,9 @@ if (JSON_OUT) {
                 console.log(`     drawn  ${pad(g.name, 12)}${pad(g.ratio, 7)}${pad(g.device, 7)}`
                     + `${pad(g.screens + ' screen' + (g.screens > 1 ? 's' : ''), 12)}${mark}`);
             }
-            for (const sd of r.said) console.log(`     ${pad(sd.kind, 6)}${sd.ratio}  "${sd.text.slice(0, 96)}..."`);
+            for (const sd of r.said) {
+                console.log(`     ${pad(sd.kind, 6)}${pad(sd.ratios.join(' vs '), 12)}"${sd.text.slice(0, 92)}..."`);
+            }
         }
         console.log('\n  declared in CSS:');
         for (const b of rs.built) console.log(`     ${pad(b.ratio, 7)}${pad(b.sel.slice(0, 34), 36)}${b.file}`);

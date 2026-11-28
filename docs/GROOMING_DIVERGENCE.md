@@ -16,6 +16,7 @@ Read-only. No product code was changed to produce this document. The one CSS edi
 - The design has a law for precisely this, and it names the failure mode in your own words: *"The profile is tabbed, not one long scroll. This is the structural change the benchmark forced."* The thing tabs were introduced to prevent is what ships.
 - **The banner is 3:1 at every width.** All **11** banners in the design are `.pbanner.tall`, which is **2:1**; the desktop drawing is **4:1**. The doc declares a 3:1 base rule and **never draws with it**. At 1280 that is a 400px banner — 44% of the window — and it is why profile is the only screen in the app that gets **taller** as the window gets wider (1441px → 1716px, where Person goes 3350 → 2105).
 - **A 60px bar above the banner is in no drawing.** Production renders `page-head` holding one gear button; the design overlays its controls on the banner itself.
+- **The banner centre-crops its artwork**, which `title` already found and fixed. One missing `object-position`, and the only outright defect in this document (B5).
 - **Library matches**, band for band, but for one fixture-dependent difference.
 - **Three modules cannot be checked at all.** `find`, `title` and `person` share **0–33%** of their band vocabulary with their own design docs. That is not a clean bill of health — the diff is blind there, and closing that gap is itself a work item.
 
@@ -133,6 +134,44 @@ Two desktop drawings (`profile D1`, `library D1`) are refused for the other reas
 
 > My recommendation: **yes, but last, and as renaming in the docs rather than in the code.** The code's names are load-bearing and under test; the docs' are not. Cheaper and far less risky to make the drawings speak the code's language than the reverse.
 
+### B5. The banner centre-crops a 16:9 backdrop, and `title` already solved this
+
+Found while re-reading the notes the tool surfaces beside B1, not by the anatomy diff. **This one is a defect, not a difference of opinion** — it needs a yes, not a choice.
+
+Banner art is a TMDB **16:9 backdrop**. The design says so and argues for it:
+
+> *"Every title already carries a 16:9 backdrop — a still from something you actually watched… It also composes correctly by construction: a backdrop is already an image designed to have things sit on top of it."*
+
+Cropping 16:9 (1.78:1) into a wide band throws height away:
+
+| band | keeps |
+|---|---|
+| 2:1 — design, phone | **89%** of the backdrop |
+| 3:1 — production, every width | **59%** |
+| 4:1 — design, desktop | **44%** |
+
+`src/modules/profile/profile.css:148` is:
+
+```css
+.pbanner-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+```
+
+**No `object-position`**, so it defaults to `center center` — the crop takes equal bites off the top and the bottom. `title` hit exactly this and fixed it, with the reasoning recorded beside the declaration at `src/modules/title/title.css:23`:
+
+> *"A 16:9 backdrop cropped into a 4:1 desktop hero loses most of its height, and centring that crop cuts faces in half — subjects sit above the midline far more often than below it. Biasing the crop upward keeps the part of the image that carries the meaning."*
+
+```css
+.hero img { …; object-fit: cover; object-position: center 38%; }
+```
+
+And profile's own law points at the same number from the other direction: the banner *"sits behind a scrim that fades to `--bg` by 62% of its height"* — so the part of the artwork that is actually legible is the **top 38%**, which is precisely the part a centred crop eats into.
+
+So production is the one combination nobody designed: the middle ratio, cropped centrally, with no upward bias, behind a scrim that hides the bottom anyway.
+
+**Decision:** adopt `title`'s solution on `.pbanner-art`? The principle is settled — bias the crop upward. Only the figure is open, and profile's scrim geometry is not title's, so it should be measured against real banners rather than copied at 38%.
+
+> My recommendation: **yes, and fold it into WP-D2 with the ratio change**, since both are one-line edits to the same band and both need the same re-measure. Doing the ratio without this makes it worse at 4:1, where only 44% of the backdrop survives.
+
 ---
 
 ## C. Found by the tool, and the code is right
@@ -165,7 +204,7 @@ Stated plainly so the net is not assumed to be wider than it is.
 One PR each. B2 first because it is the cheapest, the most visible, and it changes the numbers the others are judged against.
 
 1. **WP-D1 — Overview carries what the design puts on it** (B2). Move Score spread to the Stats tab; move Favourite films and people behind the Favourites tab, leaving characters plus *"See all n →"*; overlay the gear on the banner and drop `page-head` from profile. **Four bands and ~60px off the first screen; nothing deleted.** Markup changes, so it is a development lane PR, not a design one. Re-run `npm run snap` and expect profile's fingerprints to move and nothing else's.
-2. **WP-D2 — The banner gets its two ratios** (B1). `.pbanner` to 2:1, with 4:1 above the desktop breakpoint. One CSS rule plus one media query. Design lane. Expect profile geometry to move at all three widths.
+2. **WP-D2 — The banner gets its two ratios and stops cutting faces** (B1 + B5). `.pbanner` to 2:1, with 4:1 above the desktop breakpoint; `.pbanner-art` gets an upward crop bias, measured against real banners rather than copied from `title`'s 38%. Two CSS rules plus one media query. Design lane. Expect profile geometry to move at all three widths.
 3. **WP-D3 — Re-measure, then decide desktop** (B3). After 1 and 2, re-run `npm run divergence` and the heights table. Desktop Overview is groomed against the new numbers, not these.
 4. **WP-D4 — Close the vocabulary gap** (B4). Rename bands in `find`, `title` and `person`'s docs to the code's names. Docs only, no code. Raises the diff from 2 live comparisons to 7.
 
@@ -186,4 +225,4 @@ Carried forward, unchanged, not addressed by anything above:
 
 ## Owner decisions
 
-*Grooming is open. B1, B2 (three parts), B3 and B4 need your call before WP-D1 starts.*
+*Grooming is open. B1, B2 (three parts), B3, B4 and B5 need your call before WP-D1 starts. B5 needs only a yes.*
